@@ -1,0 +1,62 @@
+{
+  "description": "Normalized Label Studio export row for DNF Domain QA SLM/RAG v2.",
+  "type": "object",
+  "required": [
+    "item_id",
+    "question",
+    "intent",
+    "answerability",
+    "evidence_quality",
+    "evidence_doc_ids",
+    "corrected_answer"
+  ],
+  "properties": {
+    "item_id": {
+      "type": "string",
+      "description": "Source qa_id, eval_id, or Label Studio task id."
+    },
+    "question": {
+      "type": "string"
+    },
+    "intent": {
+      "type": "string",
+      "enum": [
+        "patch_note",
+        "notice",
+        "event",
+        "game_system",
+        "character_item",
+        "operation_policy",
+        "account_payment",
+        "bug_known_issue",
+        "recommendation",
+        "unknown"
+      ]
+    },
+    "answerability": {
+      "type": "string",
+      "enum": ["true", "partial", "false"]
+    },
+    "evidence_quality": {
+      "type": "string",
+      "enum": ["good", "partial", "poor"]
+    },
+    "evidence_doc_ids": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "corrected_answer": {
+      "type": "string"
+    },
+    "review_notes": {
+      "type": "string"
+    },
+    "source_split": {
+      "type": "string"
+    },
+    "source_payload": {
+      "type": "object",
+      "description": "Original row for traceability."
+    }
+  }
+}

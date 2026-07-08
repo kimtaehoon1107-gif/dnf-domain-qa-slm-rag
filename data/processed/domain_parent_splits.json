@@ -1,0 +1,1335 @@
+{
+  "strategy": "stratified_parent_modulo_v1",
+  "note": "Parent documents, not chunks, are assigned to exactly one split.",
+  "splits": {
+    "train": [
+      "official_event_2927808",
+      "official_event_event_card_002",
+      "official_event_event_card_006",
+      "official_event_event_card_007",
+      "official_event_event_card_008",
+      "official_event_event_card_011",
+      "official_event_event_card_012",
+      "official_event_event_card_013",
+      "official_event_event_card_015",
+      "official_event_event_card_017",
+      "official_event_event_card_019",
+      "official_event_event_card_020",
+      "official_event_event_card_021",
+      "official_event_event_card_022",
+      "official_guide_1162",
+      "official_guide_1169",
+      "official_guide_1178",
+      "official_guide_1179",
+      "official_guide_1204",
+      "official_guide_1205",
+      "official_guide_1207",
+      "official_guide_1209",
+      "official_guide_1219",
+      "official_guide_1220",
+      "official_guide_1227",
+      "official_guide_1228",
+      "official_guide_1229",
+      "official_guide_1230",
+      "official_guide_1235",
+      "official_guide_1236",
+      "official_guide_1237",
+      "official_guide_1238",
+      "official_guide_1241",
+      "official_guide_1242",
+      "official_guide_1243",
+      "official_guide_1246",
+      "official_guide_1252",
+      "official_guide_1253",
+      "official_guide_1256",
+      "official_guide_1257",
+      "official_guide_1258",
+      "official_guide_1259",
+      "official_guide_1260",
+      "official_guide_1269",
+      "official_guide_1270",
+      "official_guide_1271",
+      "official_guide_1274",
+      "official_guide_1284",
+      "official_guide_1285",
+      "official_guide_1286",
+      "official_guide_1287",
+      "official_guide_1289",
+      "official_guide_1290",
+      "official_guide_1292",
+      "official_guide_1293",
+      "official_guide_1294",
+      "official_guide_1295",
+      "official_guide_1296",
+      "official_guide_1309",
+      "official_guide_1311",
+      "official_guide_1375",
+      "official_guide_1420",
+      "official_guide_1422",
+      "official_guide_1426",
+      "official_guide_1427",
+      "official_guide_1470",
+      "official_guide_1471",
+      "official_guide_1478",
+      "official_guide_1479",
+      "official_guide_1482",
+      "official_guide_1484",
+      "official_guide_1485",
+      "official_guide_1486",
+      "official_guide_1489",
+      "official_guide_1490",
+      "official_guide_1491",
+      "official_guide_1492",
+      "official_guide_1494",
+      "official_guide_1495",
+      "official_guide_1505",
+      "official_guide_1506",
+      "official_guide_1508",
+      "official_guide_1509",
+      "official_guide_1510",
+      "official_guide_1512",
+      "official_guide_1516",
+      "official_guide_1518",
+      "official_guide_1519",
+      "official_guide_1520",
+      "official_guide_1521",
+      "official_guide_1522",
+      "official_guide_1524",
+      "official_guide_1526",
+      "official_guide_1527",
+      "official_guide_1528",
+      "official_guide_1529",
+      "official_guide_1530",
+      "official_guide_1531",
+      "official_guide_1532",
+      "official_guide_1534",
+      "official_guide_1535",
+      "official_notice_2927728",
+      "official_notice_2927757",
+      "official_notice_2927763",
+      "official_notice_2927769",
+      "official_notice_2927772",
+      "official_notice_2927775",
+      "official_notice_2927845",
+      "official_notice_2927847",
+      "official_notice_2927854",
+      "official_notice_2927876",
+      "official_notice_2927889",
+      "official_notice_2927901",
+      "official_update_2926947",
+      "official_update_2926971",
+      "official_update_2926972",
+      "official_update_2926990",
+      "official_update_2927196",
+      "official_update_2927208",
+      "official_update_2927233",
+      "official_update_2927263",
+      "official_update_2927335",
+      "official_update_2927522",
+      "official_update_2927617",
+      "official_update_2927691",
+      "official_update_2927756",
+      "official_update_2927822"
+    ],
+    "dev": [
+      "official_event_2927568",
+      "official_event_event_card_014",
+      "official_event_event_card_016",
+      "official_guide_1203",
+      "official_guide_1232",
+      "official_guide_1234",
+      "official_guide_1275",
+      "official_guide_1276",
+      "official_guide_1310",
+      "official_guide_1391",
+      "official_guide_1432",
+      "official_guide_1437",
+      "official_guide_1515",
+      "official_guide_1523",
+      "official_guide_1536",
+      "official_guide_1537",
+      "official_notice_2927758",
+      "official_notice_2927816",
+      "official_notice_2927860",
+      "official_notice_2927887",
+      "official_update_2927122",
+      "official_update_2927877"
+    ],
+    "eval": [
+      "official_event_event_card_001",
+      "official_event_event_card_004",
+      "official_event_event_card_005",
+      "official_event_event_card_009",
+      "official_event_event_card_010",
+      "official_guide_1202",
+      "official_guide_1206",
+      "official_guide_1233",
+      "official_guide_1239",
+      "official_guide_1255",
+      "official_guide_1272",
+      "official_guide_1273",
+      "official_guide_1277",
+      "official_guide_1278",
+      "official_guide_1279",
+      "official_guide_1280",
+      "official_guide_1282",
+      "official_guide_1283",
+      "official_guide_1300",
+      "official_guide_1326",
+      "official_guide_1390",
+      "official_guide_1425",
+      "official_guide_1428",
+      "official_guide_1433",
+      "official_guide_1475",
+      "official_guide_1488",
+      "official_guide_1493",
+      "official_guide_1525",
+      "official_guide_1533",
+      "official_guide_1538",
+      "official_notice_2838879",
+      "official_notice_2927771",
+      "official_notice_2927782",
+      "official_notice_2927848",
+      "official_notice_2927891",
+      "official_update_2926911",
+      "official_update_2927392",
+      "official_update_2927399",
+      "official_update_2927810"
+    ]
+  },
+  "parents": {
+    "official_notice_2838879": {
+      "parent_doc_id": "official_notice_2838879",
+      "doc_type": "account_payment",
+      "source_type": "official",
+      "title": "피싱 사기 피해 방지 안내 (24/8/6 수정)"
+    },
+    "official_notice_2927901": {
+      "parent_doc_id": "official_notice_2927901",
+      "doc_type": "notice",
+      "source_type": "official",
+      "title": "7/4(토) 클라이언트 패치 안내"
+    },
+    "official_notice_2927891": {
+      "parent_doc_id": "official_notice_2927891",
+      "doc_type": "notice",
+      "source_type": "official",
+      "title": "(16:48 추가) 7/2(목) 클라이언트 패치 안내"
+    },
+    "official_notice_2927845": {
+      "parent_doc_id": "official_notice_2927845",
+      "doc_type": "notice",
+      "source_type": "official",
+      "title": "제국기사 X 인파이터(여) 미니 콘테스트 수상작"
+    },
+    "official_notice_2927887": {
+      "parent_doc_id": "official_notice_2927887",
+      "doc_type": "bug_known_issue",
+      "source_type": "official",
+      "title": "DirectX 11 지원 관련 추가 안내"
+    },
+    "official_notice_2927889": {
+      "parent_doc_id": "official_notice_2927889",
+      "doc_type": "account_payment",
+      "source_type": "official",
+      "title": "7/2(목) 불량이용자 단속결과 안내"
+    },
+    "official_notice_2927876": {
+      "parent_doc_id": "official_notice_2927876",
+      "doc_type": "notice",
+      "source_type": "official",
+      "title": "7/2(목) 정기점검 안내"
+    },
+    "official_notice_2927860": {
+      "parent_doc_id": "official_notice_2927860",
+      "doc_type": "account_payment",
+      "source_type": "official",
+      "title": "퀵계좌이체로 결제 시 0.3% 즉시 할인"
+    },
+    "official_notice_2927854": {
+      "parent_doc_id": "official_notice_2927854",
+      "doc_type": "notice",
+      "source_type": "official",
+      "title": "(18:27 추가) 6/25(목) 클라이언트 패치 안내"
+    },
+    "official_notice_2927782": {
+      "parent_doc_id": "official_notice_2927782",
+      "doc_type": "notice",
+      "source_type": "official",
+      "title": "6/25(목) 세리아 특별 상점 물품 판매 안내"
+    },
+    "official_notice_2927848": {
+      "parent_doc_id": "official_notice_2927848",
+      "doc_type": "bug_known_issue",
+      "source_type": "official",
+      "title": "(11:18 추가) 6/25(목) 확인된 오류 현상"
+    },
+    "official_notice_2927847": {
+      "parent_doc_id": "official_notice_2927847",
+      "doc_type": "account_payment",
+      "source_type": "official",
+      "title": "6/25(목) 불량이용자 단속결과 안내"
+    },
+    "official_notice_2927816": {
+      "parent_doc_id": "official_notice_2927816",
+      "doc_type": "notice",
+      "source_type": "official",
+      "title": "6/25(목) 정기점검 안내"
+    },
+    "official_notice_2927763": {
+      "parent_doc_id": "official_notice_2927763",
+      "doc_type": "notice",
+      "source_type": "official",
+      "title": "세라 잘 주는 세리아 누나 당첨자"
+    },
+    "official_notice_2927757": {
+      "parent_doc_id": "official_notice_2927757",
+      "doc_type": "notice",
+      "source_type": "official",
+      "title": "6/19(금) 세리아 특별 상점 물품 판매 안내"
+    },
+    "official_notice_2927775": {
+      "parent_doc_id": "official_notice_2927775",
+      "doc_type": "notice",
+      "source_type": "official",
+      "title": "6/19(금) 넥슨 고객상담실 휴무 안내"
+    },
+    "official_notice_2927772": {
+      "parent_doc_id": "official_notice_2927772",
+      "doc_type": "notice",
+      "source_type": "official",
+      "title": "(18:30 추가) 6/18(목) 클라이언트 패치 안내"
+    },
+    "official_notice_2927771": {
+      "parent_doc_id": "official_notice_2927771",
+      "doc_type": "notice",
+      "source_type": "official",
+      "title": "(18:15 추가) 6/18(목) 확인된 오류 안내"
+    },
+    "official_notice_2927728": {
+      "parent_doc_id": "official_notice_2927728",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "세라 잘 주는 세리아 누나 이벤트"
+    },
+    "official_notice_2927769": {
+      "parent_doc_id": "official_notice_2927769",
+      "doc_type": "account_payment",
+      "source_type": "official",
+      "title": "6/18(목) 불량이용자 단속결과 안내"
+    },
+    "official_notice_2927758": {
+      "parent_doc_id": "official_notice_2927758",
+      "doc_type": "notice",
+      "source_type": "official",
+      "title": "6/18(목) 정기점검 안내"
+    },
+    "official_update_2927877": {
+      "parent_doc_id": "official_update_2927877",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "7/2(목) 정기점검 업데이트 안내"
+    },
+    "official_update_2927810": {
+      "parent_doc_id": "official_update_2927810",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "6/25(목) 정기점검 업데이트 안내"
+    },
+    "official_update_2927822": {
+      "parent_doc_id": "official_update_2927822",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "6/25(목) 던파ON 업데이트 안내"
+    },
+    "official_update_2927756": {
+      "parent_doc_id": "official_update_2927756",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "6/18(목) 정기점검 업데이트 안내"
+    },
+    "official_update_2927691": {
+      "parent_doc_id": "official_update_2927691",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "6/11(목) 정기점검 업데이트 안내"
+    },
+    "official_update_2927617": {
+      "parent_doc_id": "official_update_2927617",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "시즌 11 Act 2. 제국의 파도 ＆ 폭권"
+    },
+    "official_update_2927522": {
+      "parent_doc_id": "official_update_2927522",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "5/28(목) 정기점검 업데이트 안내"
+    },
+    "official_update_2927399": {
+      "parent_doc_id": "official_update_2927399",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "5/20(수) 퍼스트 서버 업데이트 안내"
+    },
+    "official_update_2927392": {
+      "parent_doc_id": "official_update_2927392",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "5/21(목) 정기점검 업데이트 안내"
+    },
+    "official_update_2927335": {
+      "parent_doc_id": "official_update_2927335",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "최후의 과업 업데이트"
+    },
+    "official_update_2927233": {
+      "parent_doc_id": "official_update_2927233",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "5/6(수) 퍼스트 서버 업데이트 안내"
+    },
+    "official_update_2927263": {
+      "parent_doc_id": "official_update_2927263",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "5/7(목) 정기점검 업데이트 안내"
+    },
+    "official_update_2927208": {
+      "parent_doc_id": "official_update_2927208",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "4/30(목) 던파ON 업데이트 안내"
+    },
+    "official_update_2927196": {
+      "parent_doc_id": "official_update_2927196",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "4/30(목) 정기점검 업데이트 안내"
+    },
+    "official_update_2927122": {
+      "parent_doc_id": "official_update_2927122",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "시즌 11 Act 1. 아포칼립스 : 안티엔바이"
+    },
+    "official_update_2926990": {
+      "parent_doc_id": "official_update_2926990",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "4/16(목) 던파ON 업데이트 안내"
+    },
+    "official_update_2926972": {
+      "parent_doc_id": "official_update_2926972",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "4/15(수) 퍼스트 서버 업데이트 안내"
+    },
+    "official_update_2926971": {
+      "parent_doc_id": "official_update_2926971",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "4/16(목) 정기점검 업데이트 안내"
+    },
+    "official_update_2926947": {
+      "parent_doc_id": "official_update_2926947",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "4/10(금) 던파ON 업데이트 안내"
+    },
+    "official_update_2926911": {
+      "parent_doc_id": "official_update_2926911",
+      "doc_type": "patch_note",
+      "source_type": "official",
+      "title": "4/9(목) 정기점검 업데이트 안내"
+    },
+    "official_event_event_card_001": {
+      "parent_doc_id": "official_event_event_card_001",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "함께해요! 레미디아 여프료시카"
+    },
+    "official_event_event_card_002": {
+      "parent_doc_id": "official_event_event_card_002",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "파도치는 폭권으로! 보급 작전"
+    },
+    "official_event_2927808": {
+      "parent_doc_id": "official_event_2927808",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "레바vs낡은창고 드로잉쇼 이모티콘"
+    },
+    "official_event_event_card_004": {
+      "parent_doc_id": "official_event_event_card_004",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "트리니티"
+    },
+    "official_event_event_card_005": {
+      "parent_doc_id": "official_event_event_card_005",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "2026 아라드 패스 웨딩 아바타 콤보 상자"
+    },
+    "official_event_event_card_006": {
+      "parent_doc_id": "official_event_event_card_006",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "여름맞이 7일간의 여정"
+    },
+    "official_event_event_card_007": {
+      "parent_doc_id": "official_event_event_card_007",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "썸머 부스트 업 with 인파이터(여)&브레이커"
+    },
+    "official_event_event_card_008": {
+      "parent_doc_id": "official_event_event_card_008",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "미라클의 해양 탐구 생활"
+    },
+    "official_event_event_card_009": {
+      "parent_doc_id": "official_event_event_card_009",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "오라클의 천해천 탐사 지원"
+    },
+    "official_event_event_card_010": {
+      "parent_doc_id": "official_event_event_card_010",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "썸머 블라썸의 여름을 부탁해!"
+    },
+    "official_event_event_card_011": {
+      "parent_doc_id": "official_event_event_card_011",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "무더위 탈출! COOL Summer PC방"
+    },
+    "official_event_event_card_012": {
+      "parent_doc_id": "official_event_event_card_012",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "넥플과 함께! 뉴 페이스! 핫 썸머!"
+    },
+    "official_event_event_card_013": {
+      "parent_doc_id": "official_event_event_card_013",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "제국기사 X 인파이터(여) 특별 선물"
+    },
+    "official_event_event_card_014": {
+      "parent_doc_id": "official_event_event_card_014",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "트로피컬 바캉스 패키지"
+    },
+    "official_event_event_card_015": {
+      "parent_doc_id": "official_event_event_card_015",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "파도 X 폭권 패키지"
+    },
+    "official_event_event_card_016": {
+      "parent_doc_id": "official_event_event_card_016",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "아라드 패스 2026 시즌3"
+    },
+    "official_event_event_card_017": {
+      "parent_doc_id": "official_event_event_card_017",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "썸머 특제 피로도 30 회복의 비약"
+    },
+    "official_event_2927568": {
+      "parent_doc_id": "official_event_2927568",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "마일리지샵 2026 시즌6"
+    },
+    "official_event_event_card_019": {
+      "parent_doc_id": "official_event_event_card_019",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "인파이터(여)&브레이커의 Special Gift"
+    },
+    "official_event_event_card_020": {
+      "parent_doc_id": "official_event_event_card_020",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "2026 나비 무도회 아바타 콤보 상자"
+    },
+    "official_event_event_card_021": {
+      "parent_doc_id": "official_event_event_card_021",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "세리아의 성장/정착지원 패키지"
+    },
+    "official_event_event_card_022": {
+      "parent_doc_id": "official_event_event_card_022",
+      "doc_type": "event",
+      "source_type": "official",
+      "title": "천해천 업데이트 프리뷰"
+    },
+    "official_guide_1375": {
+      "parent_doc_id": "official_guide_1375",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "모험 길라잡이(F7)"
+    },
+    "official_guide_1255": {
+      "parent_doc_id": "official_guide_1255",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "모험가 명성을 올리는 방법"
+    },
+    "official_guide_1432": {
+      "parent_doc_id": "official_guide_1432",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "질문 게시판 이용 방법"
+    },
+    "official_guide_1162": {
+      "parent_doc_id": "official_guide_1162",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "캐릭터생성"
+    },
+    "official_guide_1293": {
+      "parent_doc_id": "official_guide_1293",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "세리아의 방"
+    },
+    "official_guide_1292": {
+      "parent_doc_id": "official_guide_1292",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "인터페이스"
+    },
+    "official_guide_1296": {
+      "parent_doc_id": "official_guide_1296",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "조작법"
+    },
+    "official_guide_1294": {
+      "parent_doc_id": "official_guide_1294",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "피로도"
+    },
+    "official_guide_1290": {
+      "parent_doc_id": "official_guide_1290",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "전직과 각성"
+    },
+    "official_guide_1289": {
+      "parent_doc_id": "official_guide_1289",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "캐릭터 능력치"
+    },
+    "official_guide_1295": {
+      "parent_doc_id": "official_guide_1295",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "채팅명령어"
+    },
+    "official_guide_1326": {
+      "parent_doc_id": "official_guide_1326",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "던파ON 출석체크 방법"
+    },
+    "official_guide_1492": {
+      "parent_doc_id": "official_guide_1492",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "세트 포인트 시스템"
+    },
+    "official_guide_1495": {
+      "parent_doc_id": "official_guide_1495",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "장비 조율"
+    },
+    "official_guide_1493": {
+      "parent_doc_id": "official_guide_1493",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "무기고"
+    },
+    "official_guide_1494": {
+      "parent_doc_id": "official_guide_1494",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "장비 시뮬레이터"
+    },
+    "official_guide_1491": {
+      "parent_doc_id": "official_guide_1491",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "랭킹 시스템"
+    },
+    "official_guide_1525": {
+      "parent_doc_id": "official_guide_1525",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "스킬 체인 시스템"
+    },
+    "official_guide_1535": {
+      "parent_doc_id": "official_guide_1535",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "[시스템] 묵언의 진의"
+    },
+    "official_guide_1482": {
+      "parent_doc_id": "official_guide_1482",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "상급 던전 배니부 상점"
+    },
+    "official_guide_1179": {
+      "parent_doc_id": "official_guide_1179",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "전투 시스템"
+    },
+    "official_guide_1526": {
+      "parent_doc_id": "official_guide_1526",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "제압 시스템"
+    },
+    "official_guide_1537": {
+      "parent_doc_id": "official_guide_1537",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "최후의 과업"
+    },
+    "official_guide_1528": {
+      "parent_doc_id": "official_guide_1528",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "보상"
+    },
+    "official_guide_1527": {
+      "parent_doc_id": "official_guide_1527",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "보상"
+    },
+    "official_guide_1515": {
+      "parent_doc_id": "official_guide_1515",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "보상"
+    },
+    "official_guide_1479": {
+      "parent_doc_id": "official_guide_1479",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "<상급 던전> 죽음의 여신전"
+    },
+    "official_guide_1478": {
+      "parent_doc_id": "official_guide_1478",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "<상급 던전> 애쥬어 메인"
+    },
+    "official_guide_1475": {
+      "parent_doc_id": "official_guide_1475",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "콘텐츠 입장"
+    },
+    "official_guide_1484": {
+      "parent_doc_id": "official_guide_1484",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "기대 보상 배율"
+    },
+    "official_guide_1529": {
+      "parent_doc_id": "official_guide_1529",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "역설의 미궁"
+    },
+    "official_guide_1530": {
+      "parent_doc_id": "official_guide_1530",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "최후의 조율자 보상"
+    },
+    "official_guide_1531": {
+      "parent_doc_id": "official_guide_1531",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "조율의 경계 보상"
+    },
+    "official_guide_1522": {
+      "parent_doc_id": "official_guide_1522",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "월드보스 : 감염지 보상"
+    },
+    "official_guide_1521": {
+      "parent_doc_id": "official_guide_1521",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "종말의 경계"
+    },
+    "official_guide_1516": {
+      "parent_doc_id": "official_guide_1516",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "콘텐츠 진행"
+    },
+    "official_guide_1510": {
+      "parent_doc_id": "official_guide_1510",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "던전 보상"
+    },
+    "official_guide_1486": {
+      "parent_doc_id": "official_guide_1486",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "종말의 숭배자"
+    },
+    "official_guide_1490": {
+      "parent_doc_id": "official_guide_1490",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "위업의 기억"
+    },
+    "official_guide_1485": {
+      "parent_doc_id": "official_guide_1485",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "계시 : 천해를 품은 하늘 보상"
+    },
+    "official_guide_1489": {
+      "parent_doc_id": "official_guide_1489",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "생명의 순례"
+    },
+    "official_guide_1488": {
+      "parent_doc_id": "official_guide_1488",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "일반 던전 보상"
+    },
+    "official_guide_1534": {
+      "parent_doc_id": "official_guide_1534",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "목차"
+    },
+    "official_guide_1508": {
+      "parent_doc_id": "official_guide_1508",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "미의 여신 베누스"
+    },
+    "official_guide_1433": {
+      "parent_doc_id": "official_guide_1433",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "던전 클리어 보상"
+    },
+    "official_guide_1391": {
+      "parent_doc_id": "official_guide_1391",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "어둑섬"
+    },
+    "official_guide_1203": {
+      "parent_doc_id": "official_guide_1203",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "대마법사의 차원회랑"
+    },
+    "official_guide_1202": {
+      "parent_doc_id": "official_guide_1202",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "빼앗긴 땅, 이스핀즈"
+    },
+    "official_guide_1523": {
+      "parent_doc_id": "official_guide_1523",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "<제 6사도, 검은 질병의 디레지에 레이드>"
+    },
+    "official_guide_1520": {
+      "parent_doc_id": "official_guide_1520",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "콘텐츠 진행"
+    },
+    "official_guide_1512": {
+      "parent_doc_id": "official_guide_1512",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "만들어진 신 나벨"
+    },
+    "official_guide_1420": {
+      "parent_doc_id": "official_guide_1420",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "아스라한 : 안개의 신, 무(일반) 콘텐츠 정보"
+    },
+    "official_guide_1209": {
+      "parent_doc_id": "official_guide_1209",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "기계 혁명 : 바칼 레이드"
+    },
+    "official_guide_1536": {
+      "parent_doc_id": "official_guide_1536",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "장비 점수"
+    },
+    "official_guide_1532": {
+      "parent_doc_id": "official_guide_1532",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "서약 결정 제작 시스템"
+    },
+    "official_guide_1509": {
+      "parent_doc_id": "official_guide_1509",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "나벨 유일 장비(귀걸이)"
+    },
+    "official_guide_1219": {
+      "parent_doc_id": "official_guide_1219",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "장비 계승"
+    },
+    "official_guide_1230": {
+      "parent_doc_id": "official_guide_1230",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "강화"
+    },
+    "official_guide_1228": {
+      "parent_doc_id": "official_guide_1228",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "증폭"
+    },
+    "official_guide_1229": {
+      "parent_doc_id": "official_guide_1229",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "재련"
+    },
+    "official_guide_1220": {
+      "parent_doc_id": "official_guide_1220",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "마법 부여 / 카드 업그레이드 / 합성"
+    },
+    "official_guide_1227": {
+      "parent_doc_id": "official_guide_1227",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "NPC 장비 초월"
+    },
+    "official_guide_1236": {
+      "parent_doc_id": "official_guide_1236",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "아이템 종류"
+    },
+    "official_guide_1237": {
+      "parent_doc_id": "official_guide_1237",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "구입과 판매"
+    },
+    "official_guide_1238": {
+      "parent_doc_id": "official_guide_1238",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "등급"
+    },
+    "official_guide_1239": {
+      "parent_doc_id": "official_guide_1239",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "인벤토리"
+    },
+    "official_guide_1235": {
+      "parent_doc_id": "official_guide_1235",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "해체와 수리"
+    },
+    "official_guide_1232": {
+      "parent_doc_id": "official_guide_1232",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "재료 생산"
+    },
+    "official_guide_1234": {
+      "parent_doc_id": "official_guide_1234",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "아이템 잠금 (거래 잠금 / 정렬 잠금)"
+    },
+    "official_guide_1233": {
+      "parent_doc_id": "official_guide_1233",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "세라샵"
+    },
+    "official_guide_1538": {
+      "parent_doc_id": "official_guide_1538",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "광휘의 행로"
+    },
+    "official_guide_1524": {
+      "parent_doc_id": "official_guide_1524",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "안개 서약"
+    },
+    "official_guide_1178": {
+      "parent_doc_id": "official_guide_1178",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "몬스터 도감"
+    },
+    "official_guide_1505": {
+      "parent_doc_id": "official_guide_1505",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "일일/한정 미션"
+    },
+    "official_guide_1241": {
+      "parent_doc_id": "official_guide_1241",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "와이드 모드"
+    },
+    "official_guide_1256": {
+      "parent_doc_id": "official_guide_1256",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "모험단"
+    },
+    "official_guide_1259": {
+      "parent_doc_id": "official_guide_1259",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "호감도"
+    },
+    "official_guide_1258": {
+      "parent_doc_id": "official_guide_1258",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "사용 방법"
+    },
+    "official_guide_1257": {
+      "parent_doc_id": "official_guide_1257",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "이벤트 달력"
+    },
+    "official_guide_1253": {
+      "parent_doc_id": "official_guide_1253",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "음성채팅"
+    },
+    "official_guide_1252": {
+      "parent_doc_id": "official_guide_1252",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "무기형상 변환"
+    },
+    "official_guide_1246": {
+      "parent_doc_id": "official_guide_1246",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "이용 방법"
+    },
+    "official_guide_1242": {
+      "parent_doc_id": "official_guide_1242",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "가브리엘"
+    },
+    "official_guide_1243": {
+      "parent_doc_id": "official_guide_1243",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "백과사전"
+    },
+    "official_guide_1428": {
+      "parent_doc_id": "official_guide_1428",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "실루엣 설정"
+    },
+    "official_guide_1518": {
+      "parent_doc_id": "official_guide_1518",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "게임 종료 UI에서 확인하기"
+    },
+    "official_guide_1425": {
+      "parent_doc_id": "official_guide_1425",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "소모품 자동 사용"
+    },
+    "official_guide_1471": {
+      "parent_doc_id": "official_guide_1471",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "이용 방법"
+    },
+    "official_guide_1427": {
+      "parent_doc_id": "official_guide_1427",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "금고 재료 사용"
+    },
+    "official_guide_1437": {
+      "parent_doc_id": "official_guide_1437",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "콘텐츠 현황"
+    },
+    "official_guide_1426": {
+      "parent_doc_id": "official_guide_1426",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "버프 아이콘 간소화"
+    },
+    "official_guide_1470": {
+      "parent_doc_id": "official_guide_1470",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "이용 방법"
+    },
+    "official_guide_1506": {
+      "parent_doc_id": "official_guide_1506",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "코스튬 보관함"
+    },
+    "official_guide_1269": {
+      "parent_doc_id": "official_guide_1269",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "길드 미션"
+    },
+    "official_guide_1273": {
+      "parent_doc_id": "official_guide_1273",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "재료 구매"
+    },
+    "official_guide_1272": {
+      "parent_doc_id": "official_guide_1272",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "재료 구매"
+    },
+    "official_guide_1271": {
+      "parent_doc_id": "official_guide_1271",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "해체가"
+    },
+    "official_guide_1270": {
+      "parent_doc_id": "official_guide_1270",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "인형사"
+    },
+    "official_guide_1280": {
+      "parent_doc_id": "official_guide_1280",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "아바타"
+    },
+    "official_guide_1274": {
+      "parent_doc_id": "official_guide_1274",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "아바타 합성"
+    },
+    "official_guide_1277": {
+      "parent_doc_id": "official_guide_1277",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "아바타 해체"
+    },
+    "official_guide_1278": {
+      "parent_doc_id": "official_guide_1278",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "아바타 변환"
+    },
+    "official_guide_1275": {
+      "parent_doc_id": "official_guide_1275",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "아바타 마켓"
+    },
+    "official_guide_1279": {
+      "parent_doc_id": "official_guide_1279",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "엠블렘"
+    },
+    "official_guide_1276": {
+      "parent_doc_id": "official_guide_1276",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "엠블렘 합성"
+    },
+    "official_guide_1286": {
+      "parent_doc_id": "official_guide_1286",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "트레이드"
+    },
+    "official_guide_1284": {
+      "parent_doc_id": "official_guide_1284",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "개인상점"
+    },
+    "official_guide_1285": {
+      "parent_doc_id": "official_guide_1285",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "경매장"
+    },
+    "official_guide_1287": {
+      "parent_doc_id": "official_guide_1287",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "친구"
+    },
+    "official_guide_1283": {
+      "parent_doc_id": "official_guide_1283",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "입장 방법"
+    },
+    "official_guide_1282": {
+      "parent_doc_id": "official_guide_1282",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "싸우자"
+    },
+    "official_guide_1390": {
+      "parent_doc_id": "official_guide_1390",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "메모리 확보 방법"
+    },
+    "official_guide_1533": {
+      "parent_doc_id": "official_guide_1533",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "내장 그래픽 카드 사용 알림"
+    },
+    "official_guide_1260": {
+      "parent_doc_id": "official_guide_1260",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "던전앤라이프"
+    },
+    "official_guide_1310": {
+      "parent_doc_id": "official_guide_1310",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "영혼의 안식처"
+    },
+    "official_guide_1309": {
+      "parent_doc_id": "official_guide_1309",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "유폐의 나락"
+    },
+    "official_guide_1519": {
+      "parent_doc_id": "official_guide_1519",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "전직 변경의 서"
+    },
+    "official_guide_1422": {
+      "parent_doc_id": "official_guide_1422",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "별무리록 복원"
+    },
+    "official_guide_1169": {
+      "parent_doc_id": "official_guide_1169",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "융합 무기 제작"
+    },
+    "official_guide_1207": {
+      "parent_doc_id": "official_guide_1207",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "오즈마 레이드"
+    },
+    "official_guide_1204": {
+      "parent_doc_id": "official_guide_1204",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "핀드워"
+    },
+    "official_guide_1206": {
+      "parent_doc_id": "official_guide_1206",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "1. 무형의 시로코 레이드"
+    },
+    "official_guide_1205": {
+      "parent_doc_id": "official_guide_1205",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "프레이 - 이시스 레이드"
+    },
+    "official_guide_1300": {
+      "parent_doc_id": "official_guide_1300",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "루크 토벌전"
+    },
+    "official_guide_1311": {
+      "parent_doc_id": "official_guide_1311",
+      "doc_type": "game_guide",
+      "source_type": "official",
+      "title": "5. 상점"
+    }
+  },
+  "counts": {
+    "train": 127,
+    "dev": 22,
+    "eval": 39
+  }
+}

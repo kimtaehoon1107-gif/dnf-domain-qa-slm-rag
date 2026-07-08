@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+outputs/chroma/
+outputs/chroma*/
+outputs/slm_lora*/
+outputs/*.json
+outputs/*.jsonl
+outputs/*.csv
+outputs/*.md
+outputs/*.log
+outputs/*.err
+outputs/*.pid

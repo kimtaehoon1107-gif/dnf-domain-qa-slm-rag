@@ -1,0 +1,73 @@
+<View>
+  <Header value="DNF Domain QA Labeling"/>
+
+  <Style>
+    .block { margin: 12px 0; }
+    .muted { color: #666; font-size: 13px; }
+    .evidence { white-space: pre-wrap; line-height: 1.45; }
+  </Style>
+
+  <View className="block">
+    <Header value="Question"/>
+    <Text name="question" value="$question"/>
+  </View>
+
+  <View className="block">
+    <Header value="Reference Answer"/>
+    <Text name="expected_answer" value="$expected_answer"/>
+  </View>
+
+  <View className="block evidence">
+    <Header value="Candidate Evidence"/>
+    <Text name="candidate_evidence" value="$candidate_evidence"/>
+  </View>
+
+  <View className="block">
+    <Header value="Intent"/>
+    <Choices name="intent" toName="question" choice="single" required="true">
+      <Choice value="patch_note"/>
+      <Choice value="notice"/>
+      <Choice value="event"/>
+      <Choice value="game_system"/>
+      <Choice value="character_item"/>
+      <Choice value="operation_policy"/>
+      <Choice value="account_payment"/>
+      <Choice value="bug_known_issue"/>
+      <Choice value="recommendation"/>
+      <Choice value="unknown"/>
+    </Choices>
+  </View>
+
+  <View className="block">
+    <Header value="Answerability"/>
+    <Choices name="answerability" toName="question" choice="single" required="true">
+      <Choice value="true"/>
+      <Choice value="partial"/>
+      <Choice value="false"/>
+    </Choices>
+  </View>
+
+  <View className="block">
+    <Header value="Evidence Quality"/>
+    <Choices name="evidence_quality" toName="question" choice="single" required="true">
+      <Choice value="good"/>
+      <Choice value="partial"/>
+      <Choice value="poor"/>
+    </Choices>
+  </View>
+
+  <View className="block">
+    <Header value="Evidence Doc IDs"/>
+    <TextArea name="evidence_doc_ids" toName="question" rows="2" placeholder="Comma-separated document IDs that support the answer"/>
+  </View>
+
+  <View className="block">
+    <Header value="Corrected Answer"/>
+    <TextArea name="corrected_answer" toName="question" rows="4" placeholder="Write the grounded answer. For unanswerable rows, state that the collected documents are insufficient."/>
+  </View>
+
+  <View className="block">
+    <Header value="Reviewer Notes"/>
+    <TextArea name="review_notes" toName="question" rows="3" placeholder="Explain missing evidence, date ambiguity, hallucination risk, or disagreement."/>
+  </View>
+</View>
