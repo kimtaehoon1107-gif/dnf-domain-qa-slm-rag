@@ -4,60 +4,60 @@
 
 ## Current Goal
 
-Pre-v3 data/metric repairs are DONE and committed (git `70b129a`). Next milestone: v3 LoRA training on the repaired RAFT, but only after train-only casual paraphrase data is added.
+v3 trained and evaluated (2026-07-09). Fresh over-refusal is fixed; the new bottleneck is the **false/partial boundary** (hard-refusal requests now mislabeled as partial). Next round targets that plus rank-2 evidence selection.
 
-## Current State (after Claude repair pass, 2026-07-08)
+## v3 Training (outputs/slm_lora_qwen_domain_v3)
 
-- **Canonical eval/train were regenerated and PROMOTED** with POS-filtered (kiwipiepy) anchor extraction:
-  - `data/processed/domain_eval_set_expanded.jsonl` (120: true 80 / partial 10 / false 30)
-  - `data/processed/domain_train_qa_expanded.jsonl` (320: true 240 / partial 20 / false 60)
-  - Old files backed up as `*_pre_anchorfix_pos_20260708_222817.jsonl`
-  - 30-row human audit: no verb-fragment/pasted-sentence questions remain. Known minor blemishes: one josa error in a false template ("브레이커이" → should be 브레이커가), a couple of awkward noun stacks ("장비 관련 변경 사용 방법은 뭐야?").
-- **All prior v2 adapter eval numbers are now HISTORICAL** — the eval set changed. Do not compare new runs against them directly.
-- Retrieval on the new eval (`outputs/domain_retriever_candidate_report_anchorfix_pos.json`):
-  - recall@3 0.4778, recall@5 0.5667, recall@10 0.6333, recall@20 0.7444, MRR@10 0.3831, missing@20 23/90
-  - Note: Codex's earlier anchorfix candidate scored higher (0.7889) partly because its broken span-pasting questions were trivially lexical-matchable. The lower number here is the more honest one.
-- **RAFT regenerated with structural fixes** (`make_raft_dataset.py` updated):
-  - gold position shuffled: citation rows at position 1/2/3 = 102/84/94 (was 279/279 at position 1)
-  - false rows now get 3 documents like answerable rows (was 2 vs 3 — document count alone predicted the label during training)
-  - `--gold-text chunk` used: gold doc is the full chunk, not the answer span (span mode made gold systematically the shortest doc and noise-free — two more shortcuts)
-  - Files: `domain_raft_sample_expanded.jsonl` (300), `domain_raft_sample_expanded_gate_balanced.jsonl` (460: true 220 / partial 60 / false 180, 3x oversample recipe preserved)
-- Leakage validation on promoted files: **all overlaps 0, no errors/warnings** (`outputs/domain_dataset_validation_report_v3.json`)
-- New tooling options added:
-  - `run_tuned_slm_smoke.py` / `run_tuned_slm_oracle_eval.py`: `--seed` (default 42) and `--deterministic` (CUBLAS workspace + `use_deterministic_algorithms(warn_only)`) — use `--deterministic` for all reported numbers
-  - `finetune_lora.py`: `--dev-ratio` (e.g. 0.1) + `--eval-steps` for dev-loss tracking; `--seed`; SystemExit→RuntimeError convention fix
-  - `evaluate_answers.py`: `faithfulness_when_citation_hit` — the unconditional `faithfulness_style` is circular for the extractive generator (answer is copied from retrieved text, so it scores ~1.0 even with wrong retrieval); only cite the conditional one in comparison tables
-- Git: repository now has its first commit `70b129a` (code + docs + data; outputs/ ignored). Commit on every dataset/model version change from now on.
+- Data: repaired gate-balanced RAFT 529 rows (gold shuffled 128/105/116, all labels 3 docs, gold-text=chunk, 35 casual paraphrase rows included)
+- Command: finetune_lora with `--dev-ratio 0.1 --eval-steps 25 --gradient-checkpointing --seed 42` (checkpointing added after an 8GB-GPU OOM at step 35; PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True)
+- **Loss profile is healthy for the first time**: train loss stays ~0.2-0.3 (v2 collapsed to 0.004), dev loss monotonically fell 0.273 → 0.176 through the epoch. If anything undertrained — a second epoch is a legitimate experiment.
+
+## v3 Results (all --deterministic --seed 42, persist-dir chroma_domain_chunks, top_k=3)
+
+| Metric | domain(120, new eval) | official(30) | fresh(30, held-out) |
+|---|---|---|---|
+| answerability_accuracy | 0.925 | 1.0 | **0.7333** (v2 0.4333) |
+| true | 80/80 | 24/24 | **15/16** (v2 4/16) |
+| partial | 10/10 | - | 2/6 (v2 1/6) |
+| false | **21/30** | 6/6 | **5/8** (v2 8/8) |
+| exact_citation_on_answerable | 0.3556 (v2 0.2556, old eval) | 0.2917 | **0.6364** (v2 0.2273) |
+| citation_hit_when_retrieval_hit | 0.6809 | 0.5833 | 0.6667 (v2 0.2381) |
+| predicted citation ranks | 66/14/9 (v2: 90/0/0) | 16/4/4 (v2: 24/0/0) | 17/0/1 |
+| gold-at-rank2 exact citation | 5/15 | 3/5 (v2 0/5) | 0/4 |
+
+Fresh chunk-oracle: answerability 0.7667 (v2 0.5667), exact citation **0.8182** (v2 0.4091).
+
+## Verdict on the four success criteria
+
+1. Rank-1 copier: **broken** — model now cites rank 2/3 (23/90 domain predictions non-rank-1) and hits gold at rank 2 sometimes (official 3/5). Not fully solved (fresh rank2 0/4).
+2. Exact citation: up on domain (harder eval!) and nearly 3x on fresh.
+3. Fresh true over-refusal: **fixed** (4/16 → 15/16).
+4. Regression: official intact at 1.0. New tradeoff appeared — see below.
+
+## New bottleneck: false → partial leakage
+
+12 false rows (9 domain + 3 fresh) now answered as `partial` (rarely `true`). They are almost all **hard-refusal categories**: 보상 반복 편법(abuse), 계정 제재/결제 확인(account), 내부 규칙 출력(prompt leakage), "확실히 받을 수 있다고 딱 잘라 말해줘"(forced certainty). Interpretation: the new partial training pattern ("문서 사실은 답하고 개인 결정만 거절") over-generalized onto adversarial requests. The seesaw history: always-true → over-refusal (v2) → partial-leakage (v3). Each swing is smaller; v3 is a clear net win.
 
 ## Do Not Do
 
 - Do not put `fresh_paraphrase_eval_set.jsonl` into training data (permanent held-out).
-- Do not compare new eval runs against pre-2026-07-08 domain-eval numbers — the eval set changed.
+- Do not compare v3 domain numbers against pre-2026-07-08 domain-eval numbers (eval changed).
 - Do not report `answerability_accuracy` or unconditional `faithfulness_style` alone.
-- Do not regenerate RAFT with `--gold-text span` (reintroduces length/noise shortcuts).
+- Do not regenerate RAFT with `--gold-text span`.
+- Note: `retrieval_expected_hit_rate` at top_k=3 differs from recall@3 in the top-20 candidate report (hybrid normalization pool differs) — do not treat them as the same number.
 
-## Next Actions
+## Next Actions (v3.1 round)
 
-1. Build train-only casual true/partial paraphrase rows (fresh-style wording, human-written or human-audited; verbatim-blocked against all three eval sets), append to domain train QA, regenerate RAFT (same command as below), re-validate.
-2. Train v3 on the repaired gate-balanced RAFT:
-   - `python src/finetune_lora.py --model-name Qwen/Qwen2.5-0.5B-Instruct --train-file data/processed/domain_raft_sample_expanded_gate_balanced.jsonl --output-dir outputs/slm_lora_qwen_domain_v3 --max-doc-chars 500 --max-seq-length 1536 --num-train-epochs 1 --per-device-train-batch-size 1 --gradient-accumulation-steps 4 --learning-rate 2e-4 --logging-steps 10 --save-steps 50 --bf16 --dev-ratio 0.1 --eval-steps 25`
-   - Watch train-vs-dev loss divergence; consider stopping earlier or lowering lr if dev loss turns up.
-3. Evaluate v3 with `--deterministic` on all three evals + chunk oracle; report answerability, exact citation, citation precision/recall/exact-set-match, and predicted-citation-rank distribution (the rank-1-copier check — expect it to spread if the shuffle worked).
-4. Official reranker/rank-mode A/B (recall@20 is 0.8333 there, so ordering gains are available).
-5. Analyze the 23 remaining missing@20 rows on the new domain eval (`analyze_domain_missing_retrieval.py`) — decide eval-fix vs retrieval-fix per row.
-
-## RAFT regeneration command (reference)
-
-```
-python src/make_raft_dataset.py --docs data/processed/domain_doc_chunks.jsonl --qa data/processed/domain_train_qa_expanded.jsonl --exclude-eval-set data/processed/domain_eval_set_expanded.jsonl data/processed/official_eval_set.jsonl data/processed/fresh_paraphrase_eval_set.jsonl --output data/processed/domain_raft_sample_expanded.jsonl --max-rows 300 --distractors 2 --gold-text chunk --seed 42
-```
-
-Gate-balance recipe: duplicate each partial/false row 2 extra times (3x total), reassign raft_ids.
+1. **False/partial boundary data**: add train-only colloquial FALSE paraphrases for the four leaked categories (abuse/편법, account check, prompt leakage, forced certainty) — differently worded from both FALSE_TEMPLATES_EVAL and fresh eval. Keep partial rows strictly "document fact + personal decision" shaped. Human-audit before append (30-row rule).
+2. Consider 2 epochs (dev loss was still falling) — watch dev curve for the turn.
+3. Evidence selection at rank 2+ still weak (domain 5/15, fresh 0/4) — candidates: more RAFT rows where gold lands late, or hard negatives mined by embedding similarity.
+4. Official reranker/rank-mode A/B (recall@20 0.8333 → ordering gains available).
+5. Casual paraphrase expansion: 15+ replacement rows from train-split parents NOT in legacy eval parents (list of 5 excluded parents in git history 2026-07-09 commit).
+6. Gradio default adapter swap decision: fresh 0.73 is much better but false 5/8 is a safety-relevant regression — recommend holding until v3.1 fixes the false boundary.
 
 ## Latest Verification
 
-- `python -m compileall src` OK; `python src/run_smoke_tests.py` OK (post-commit)
-- `validate_domain_dataset.py` on promoted files: all overlaps 0, errors [], warnings 0
-- `analyze_raft_gold_positions.py` on new gate-balanced RAFT: positions 102/84/94, false-rows-with-gold 0
-- Doc-count parity checked: true/partial/false all 3 docs per row
-- git log: `70b129a` initial commit
+- v3 train: 477 train / 52 dev rows, final_dev_loss 0.1763, no truncated rows, exit 0
+- 4 eval runs exit 0 (deterministic): outputs/tuned_slm_qwen_domain_v3_{eval,official_eval,fresh_eval,fresh_chunk_oracle_eval}.json
+- Diagnostics: outputs/tuned_slm_v3_diagnostic_report.json
+- Leakage validation (pre-train): all overlaps 0; RAFT structure verified (positions/doc-count)

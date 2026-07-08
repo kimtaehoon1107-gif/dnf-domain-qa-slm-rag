@@ -89,6 +89,11 @@ def train(rows: list[dict[str, Any]], args: argparse.Namespace) -> None:
         target_modules=target_modules,
     )
     model = get_peft_model(model, lora_config)
+    if args.gradient_checkpointing:
+        # 8GB laptop GPU: full-chunk gold docs + mid-epoch dev evals OOM
+        # without checkpointing (v3 run died at step 35/120).
+        model.config.use_cache = False
+        model.enable_input_require_grads()
 
     def tokenize_row(row: dict[str, Any]) -> dict[str, list[int]]:
         prompt, completion = format_prompt_and_completion(row, args.max_doc_chars)
@@ -155,6 +160,8 @@ def train(rows: list[dict[str, Any]], args: argparse.Namespace) -> None:
         eval_strategy="steps" if dev_dataset is not None else "no",
         eval_steps=args.eval_steps if dev_dataset is not None else None,
         per_device_eval_batch_size=args.per_device_train_batch_size,
+        gradient_checkpointing=args.gradient_checkpointing,
+        gradient_checkpointing_kwargs={"use_reentrant": False} if args.gradient_checkpointing else None,
     )
 
     trainer = Trainer(
@@ -208,6 +215,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dev-ratio", type=float, default=0.0)
     parser.add_argument("--eval-steps", type=int, default=25)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--gradient-checkpointing", action="store_true")
     parser.add_argument("--bf16", action="store_true")
     parser.add_argument("--fp16", action="store_true")
     return parser.parse_args()
