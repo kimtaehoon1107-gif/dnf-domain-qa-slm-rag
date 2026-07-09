@@ -65,14 +65,20 @@ Fresh chunk-oracle: answerability 0.7667 (v2 0.5667), exact citation **0.8182** 
 - Do not regenerate RAFT with `--gold-text span`.
 - Note: `retrieval_expected_hit_rate` at top_k=3 differs from recall@3 in the top-20 candidate report (hybrid normalization pool differs) — do not treat them as the same number.
 
-## Next Actions (v3.3 candidates — pick ONE variable per round)
+## Post-v3.2 review consensus (Codex review + Claude verification, 2026-07-10)
 
-1. **Evidence-selection round** (citation accuracy is now the weakest axis): options — (a) 2-epoch experiment on unchanged v3.2 data (dev loss still falling at 0.137; more training may consolidate content-based selection), (b) hard negatives mined by embedding similarity so distractors are harder to distinguish from gold. Prefer (a) first: zero data-change, cheap, single variable.
-2. **Partial-category data**: fresh partial is 1/6 and fell this round. Current partial training rows are one template family; add diverse "document fact + personal decision" phrasings (human-audited).
-3. **Notice/patch yes/no true rows**: 0003/0004 family needs yes/no true questions on notice/patch_note train docs NOT in the legacy-excluded 5 (e.g. official_update_2927196 4/30 정기점검).
-4. Official reranker/rank-mode A/B still pending.
-5. Gradio default adapter swap: `slm_lora_qwen_domain_v3_2` is the best balanced candidate (safety profile: fresh false 7/8, oracle 8/8, domain false 29/30). Still recommend holding until citation accuracy recovers, but if a demo default is needed now, v3.2 is the pick.
-6. Small-eval caveat stands: fresh has 16 true / 6 partial / 8 false rows — single-row flips move percentages 6-17pp. Judge direction, not magnitude.
+- **Gradio default: HOLD, no exception.** Wrong-citation rates (domain 0.70, official 0.83 given any citation) make v3.2 unusable as a citation-forward demo. Earlier "if needed now, v3.2" hedge is withdrawn.
+- **Title-overlap warnings (29) triaged: all KEEP.** Checked every warned row: answer-from-title token overlap max 0.14 — all are body-fact questions using the title only as topic anchor (matches how fresh eval questions name products). Criterion for future rows: reject only if the answer is derivable from the title; also mix in some non-title phrasings for diversity.
+- **Promotion criteria for any new adapter** (per Codex review): fresh partial accuracy, exact citation, and predicted-citation-vs-gold hit — NOT dev loss, and "ranks spread" is not success; "gold hit" is.
+- fresh partial confirmed model/data-bound (oracle also 1/6): retrieval work cannot help this axis.
+
+## Next Actions (in flight / queued)
+
+1. 🔄 **2-epoch probe running**: `outputs/slm_lora_qwen_domain_v3_2_e2`, unchanged v3.2 data, single variable. Judge by the promotion criteria above.
+2. **Partial-diverse data round**: 20 candidate rows built (`outputs/domain_train_partial_diverse_candidate.jsonl`, span/split/dedup verified) — awaiting user audit before append. New phrasing families: 살까 말까/너라면/우선순위/가치 있어/뭐가 맞아, all "doc fact + personal decision" shaped, distinct from fresh partial wording.
+3. Notice/patch yes/no true rows (0003/0004 family) on non-legacy docs (e.g. official_update_2927196) — next data round after partial.
+4. Citation round after probe results: hard-negative mining or reranker A/B, judged by gold-hit not rank-spread.
+5. Small-eval caveat stands: fresh 16 true / 6 partial / 8 false — judge direction, not magnitude.
 
 ## Latest Verification
 
