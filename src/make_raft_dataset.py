@@ -227,6 +227,7 @@ def make_raft_rows(
                 "citations": gold_ids,
                 "answerability": answerability,
                 "intent": qa.get("intent", "unknown"),
+                "source_eval_type": qa.get("source_eval_type", ""),
                 "source_split": qa.get("split", ""),
                 "expected_doc_id": qa.get("expected_doc_id", ""),
                 "expected_chunk_ids": expected_chunk_ids(qa),
