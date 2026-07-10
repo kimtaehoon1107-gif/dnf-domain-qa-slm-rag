@@ -172,33 +172,63 @@ v2의 세 eval json 파일에서 세부 지표를 직접 추출:
 4. **"perfect score"는 의심부터 해야 한다.** "1.0"이 나올 때마다 파고들면 매번 새로운 리키지나 얕은 패턴 암기가 드러났다.
 5. **원인을 쪼개서 진단하지 않으면 다음 라운드도 같은 실수를 반복한다.** "데이터를 더 넣는" v3보다, "검색 문제인지 / 인용 선택 문제인지 / 구어체 이해 문제인지"를 오라클 실험으로 먼저 분리하는 게 훨씬 효율적이었다.
 
+### Phase 12 — 사전검증 체계 구축 + 데이터 전면 수리 (2026-07-08)
+
+Phase 11까지의 진단("문제는 모델이 아니라 데이터·평가 설계")을 바탕으로, 한 번에 고칠 수 있는 것을 전부 고친 대수리 단계.
+
+- **eval 질문 생성기 교체**: 블랙리스트 방식 앵커 필터가 한국어 활용형을 계속 놓쳐서("완료되었습니다"는 "합니다" 필터에 안 걸림), **kiwipiepy 형태소 분석 기반 필터**로 교체. 마지막 형태소가 용언/어미면 앵커 거부. 재생성된 domain eval은 30행 무작위 감수에서 깨진 질문 0건, recall@20이 0.52→0.74로 개선(이전 anchorfix 후보의 0.79는 깨진 질문의 원문 붙여넣기가 lexical 매칭을 부풀린 착시였음을 확인).
+- **RAFT 구조 결함 3종 수정**: ① gold 위치 셔플(279/279 1번 고정 → 133/111/124 분산), ② false 행도 문서 3개로 패리티(문서 개수만으로 라벨 예측 가능하던 confound 제거), ③ gold 텍스트를 정답 문장(span)이 아닌 청크 전체로(`--gold-text chunk`) — "제일 짧은 문서=정답" 길이 지름길 제거.
+- **인프라**: 추론 결정성 옵션(`--deterministic --seed`), 학습 dev split(`--dev-ratio`), 순환 faithfulness 지표 수정(citation-hit 조건부), **git 첫 커밋**(이후 모든 데이터/모델 버전이 커밋으로 추적됨).
+- 확립된 프로세스: **새 합성 데이터는 사용 전 30행 사람 감수, 새 지표는 "채점 기준이 출력과 독립인가" 자문, 새 학습은 dev 곡선 확인.**
+
+### Phase 13 — v3~v3.3 반복 개선: 시소를 수렴시키다 (2026-07-09~10)
+
+매 라운드 "실패 행 분석 → 그 가족만 겨냥한 소량 데이터(사람 감수) → 학습 → held-out 재평가"를 반복. **fresh(구어체 30행, 영구 held-out)** 가 유일한 진짜 성적표.
+
+| 라운드 | 바꾼 것 (한 변수씩) | fresh 전체 | true/partial/false | 배운 것 |
+|---|---|---:|---|---|
+| v3 | 수리된 RAFT + 구어체 true 35행 | 0.73 | 15/16, 2/6, 5/8 | 지름길 막히자 **첫 건강한 학습곡선**(dev loss 단조 하강). 부작용: 악용성 질문을 partial로 오판 |
+| v3.1 | 구어체 false 28행 (1배) | 0.63 | 11/16, 2/6, 6/8 | false 수복. 부작용: 예/아니오형 true 후퇴 — **모델이 표면 말투로 라벨 구분** |
+| v3.2 | 대조(contrastive) true 16행 — 거절과 같은 말투인데 답 가능한 질문 쌍 | 0.67 | 12/16, 1/6, 7/8 | 시소 정지 시작(회귀 없이 회복). 부작용처럼 보인 citation 하락은… |
+| probe | 데이터 그대로, **2에폭** | 0.70 | 12/16, 2/6, 7/8 | …학습량 부족이었음(fresh exact citation 0.32→0.59). dev loss 1.8에폭에서 평탄화 → **2에폭이 표준** |
+| **v3.3** | partial 다양화 20행 + 2에폭 | **0.80** | **14/16, 2/6, 8/8** | partial 데이터가 "사실 vs 결정" 경계를 선명하게 해 true/false까지 잡음. **false 8/8 + true 14/16 동시 달성(최초)** |
+
+핵심 교훈: **시소(한쪽 고치면 반대쪽 무너짐)는 데이터 물량이 아니라 대조 커버리지로 잡는다.** 표면 단서로 라벨을 못 맞히게 만들면 모델은 의미로 구분하는 법을 배운다 — RAFT gold 셔플과 동일한 원리의 재적용.
+
+### Phase 14 — v3.3 승격: Gradio 데모 교체 (2026-07-10)
+
+- v3.3이 승격 기준 3종(fresh partial, exact citation, gold 적중) 통과 → **Gradio 기본 어댑터로 교체**.
+- 교체 과정 더블체크에서 잠복 버그 2건 발견·수정: 기본 어댑터가 스모크용을 가리키고 있었고, `load_tuned_model()` 인자 불일치로 Tuned SLM 모드가 선택 즉시 크래시하는 상태였음(몇 라운드 전 시그니처 변경 때 Gradio 미갱신). UI 기본값도 평가 조건(domain 인덱스/top_k 3/500자/160토큰)으로 통일.
+- 실제 브라우저에서 Tuned SLM 모드 질문-응답 정상 동작 확인.
+- gate-balance 레시피(템플릿 3배/수기 다양화 1배)를 `src/make_gate_balanced.py`로 스크립트화(셸 히스토리에만 있던 재현성 구멍 제거), 백업 파일 26개 정리(git이 이력 보존).
+
 ---
 
-## 4. 현재 상태 스냅샷
+## 4. 현재 상태 스냅샷 (2026-07-10 기준)
 
-- **현재 어댑터**: `outputs/slm_lora_qwen_domain_gate_balanced_v2` — domain/official 라벨 정확도는 만점이지만, 실제 근거 인용 정확도는 25~33% 수준. fresh(구어체)는 라벨 정확도부터 43% 수준(노이즈 포함).
-- **원인 진단 완료**: (a) domain/official은 검색 순위 + 1등만 베끼는 학습 습관(데이터 설계 문제, 확정됨) 문제, (b) fresh는 그 위에 구어체/부분답변 이해 부족까지 겹친 문제.
-- **v3 학습은 아직 시작 안 함** — 원인 진단이 끝날 때까지 보류 중.
+- **서빙 중 어댑터**: `outputs/slm_lora_qwen_domain_v3_3` — fresh 0.80 (true 14/16, partial 2/6, false 8/8), domain 0.9917, official 1.0, fresh exact citation 0.59.
+- **남은 약점 2개**: ① partial 2/6 — 남은 오류 4행은 전부 "결정 요구가 문장을 주도"하는 문형이고 거절 쪽 오류(지어내기 아님)라 안전 방향. ② domain exact citation 0.36 — rank-1 편향은 소멸했으나 내용 기반 선택에 아직 여지.
+- **모든 수치는 `--deterministic --seed 42`로 재현 가능**, 매 버전 git 커밋으로 추적됨.
 
 ---
 
-## 5. 다음 계획 (합의된 순서)
+## 5. 다음 계획
 
-1. **candidate recall 분석**: top_k를 3/5/10/20으로 바꿔가며 정답 근거가 검색 후보에 실제로 얼마나 들어오는지 확인(검색 자체를 손봐야 하는지 판단).
-2. **RAFT 재설계**: 정답 문서 위치를 1번 고정에서 랜덤화하고, 정답보다 앞에 오답(distractor)도 배치해 모델이 "위치"가 아니라 "내용"으로 정답을 고르도록 재학습. (원인은 이미 확정됐으므로 바로 진행 가능)
-3. **구어체 학습 데이터 추가**: fresh eval은 계속 held-out으로 유지한 채, 비슷한 말투의 학습 전용 true/partial 질문을 새로 만들어 추가.
-4. 이후 검증부터는 `answerability_accuracy` 하나만 보지 않고 `exact_citation`, `retrieval_expected_hit_rate`를 항상 같이 리포트.
+1. **결정 요구 선행 partial 문형** ~10행 (마지막 남은 answerability 축) — 감수 게이트 필수
+2. **citation 개선 라운드**: hard negative mining 또는 reranker A/B — 판정은 "gold 적중"으로
+3. fresh eval 150행+ 확장(사람 작성), adversarial 안전성 테스트, candidate_k 표준화 — 장기 과제
+4. 3-way 비교(RAG-only vs LLM-RAG vs Tuned-SLM) 최종 정리 — `faithfulness_when_citation_hit`(조건부)만 사용
 
 ---
 
 ## 6. 산출물 총정리
 
-**코드**: `collect_guide_selenium.py`, `chunk_guide.py`, `retrieval_config.py`, `retrieve.py`, `build_index.py`, `generate_answer.py`, `make_domain_expanded_data.py`, `validate_domain_dataset.py`, `make_raft_dataset.py`, `finetune_lora.py`, `run_tuned_slm_smoke.py`, `analyze_tuned_slm_diagnostics.py`, `run_tuned_slm_oracle_eval.py`, `prompt_format.py`
+**코드**(src/): 수집·청킹·검색·생성 파이프라인 + `make_domain_expanded_data.py`(POS 필터), `make_raft_dataset.py`(gold 셔플/패리티/chunk 모드), `make_gate_balanced.py`(오버샘플 레시피), `finetune_lora.py`(dev split, checkpointing), `run_tuned_slm_smoke.py`·`run_tuned_slm_oracle_eval.py`(deterministic, span/chunk oracle), `evaluate_retriever_candidates.py`, `analyze_tuned_slm_diagnostics.py`, `analyze_raft_gold_positions.py`, `analyze_domain_missing_retrieval.py`, `validate_domain_dataset.py`(리키지 게이트)
 
-**데이터**: `official_eval_set.jsonl`(30), `domain_doc_chunks.jsonl`(1307청크), `domain_eval_set_expanded.jsonl`(120), `domain_train_qa_expanded.jsonl`(308), `domain_raft_sample_expanded.jsonl`(300), `domain_raft_sample_expanded_gate_balanced.jsonl`(456), `fresh_paraphrase_eval_set.jsonl`(30, 영구 held-out)
+**데이터**: `domain_doc_chunks.jsonl`(1307청크) · eval 3종: `domain_eval_set_expanded.jsonl`(120, POS 필터판) / `official_eval_set.jsonl`(30) / `fresh_paraphrase_eval_set.jsonl`(30, **영구 held-out**) · 학습: `domain_train_qa_expanded.jsonl`(419 = 템플릿 320 + 수기 감수 99행) → RAFT 419 → gate-balanced 593
 
-**모델/인덱스**: `slm_lora_qwen_domain`(v1, citation 잘림 버그), `slm_lora_qwen_domain_gate_balanced`(v1 gate-balanced, 리키지+과잉거절), `slm_lora_qwen_domain_gate_balanced_v2`(현재 최신), `chroma_domain_chunks`(1307, BGE-M3) 외 ablation용 인덱스 다수(정리 미착수)
+**모델**: `slm_lora_qwen_domain_v3_3`(**현재 서빙**) — 이력: v1(citation 잘림) → gate_balanced(과잉거절) → v2(리키지 정리, 템플릿 과적합) → v3/v3.1/v3.2/probe(위 표) → v3.3
 
-**문서**: [AGENTS.md](../AGENTS.md), [docs/guide_rag_stage1.md](guide_rag_stage1.md), [docs/tuned_slm_failure_diagnosis.md](tuned_slm_failure_diagnosis.md), 본 문서
+**문서**: [AGENTS.md](../AGENTS.md)(durable 교훈) · [docs/agent_handoff.md](agent_handoff.md)(현재 작업판) · [docs/model_comparison_report.md](model_comparison_report.md)(v3.x 비교표 포함) · [docs/tuned_slm_failure_diagnosis.md](tuned_slm_failure_diagnosis.md) · 본 문서
 
-**아직 미착수**: intent-router(shop_price/active_event/patch_note/notice/unanswerable/ood_safety) 구조화 모듈 — 초기에 설계했다가 RAG 품질/SLM 학습 작업 우선순위에 밀려 보류 중, 재개 시점 미정
+**아직 미착수**: intent-router 구조화 모듈(초기 설계 후 보류), shop_price 데이터 소스
