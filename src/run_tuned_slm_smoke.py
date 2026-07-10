@@ -140,6 +140,8 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
             top_k=args.top_k,
             model_name=args.embedding_model_name,
             rank_mode=args.rank_mode,
+            reranker_model=args.reranker_model,
+            rerank_candidates=args.rerank_candidates,
         )
         prompt = format_prompt(
             question=row["question"],
@@ -232,6 +234,7 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
         "device": device,
         "seed": args.seed,
         "deterministic": args.deterministic,
+        "reranker_model": args.reranker_model,
         "rows": len(details),
         "total_runtime_sec": round(time.perf_counter() - start, 3),
         "summary": {
@@ -305,6 +308,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--fp16", action="store_true")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--deterministic", action="store_true")
+    parser.add_argument("--reranker-model", default=None)
+    parser.add_argument("--rerank-candidates", type=int, default=20)
     return parser.parse_args()
 
 
