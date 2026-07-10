@@ -88,13 +88,27 @@ Fresh chunk-oracle: answerability 0.7667 (v2 0.5667), exact citation **0.8182** 
 
 Flips probe→v3.3: yes/no true rows 0003/0004/0013 all recovered; 0030 realtime-price false fixed; 0012 lost (its evidence doc is legacy-excluded → untrainable family, known limitation); partials 0018/0021 moved wrong-true → wrong-false (safer error direction). Unexpected mechanism: diverse partial data sharpened the fact-vs-decision boundary overall, fixing true/false rows rather than partial itself.
 
+## Root-cause diagnostics (2026-07-10, no-training checks — read before adding data)
+
+1. **Partial is NOT a data-volume problem.** Generated text on the 4 failing partial rows is the verbatim false-template refusal — the model never attempts decomposition. Causes: (a) **instruction-data concept mismatch**: `DEFAULT_RAG_INSTRUCTION` defines partial as "근거가 일부만 답하면" (evidence-coverage) while all partial training rows operationalize "질문이 사실+개인결정 혼합" (request-mix) — fix the instruction sentence at the next retraining; (b) **label-first output format** (`answerability:` is the first generated token) forces question classification before any generation — decision-led questions classify as false; (c) partial eval is 6 rows — nothing is judgeable until it is expanded. **Do not run a v3.4 partial-data round before (a)+(c).**
+2. **Citation 0.356 is retrieval-bound, not model-bound.** Wrong citations that are same-parent siblings: only 6/58 (10%) — not a measurement artifact. exact-citation ceiling at top_k=3 = recall@3 = 0.478; model achieves 0.356 (=74% of ceiling; 93% gold-hit when gold is rank 1). ~3/4 of the gap is retrieval recall, ~1/4 model selection. **The citation round is a retrieval round.**
+
+## Retrieval round result (2026-07-10)
+
+Reranker A/B (bge-reranker-v2-m3 over hybrid top-20, `src/evaluate_reranker.py`): recall@3 domain 0.478→0.622, official 0.417→0.50, fresh 0.955→1.0; recall@1 domain 0.267→0.467. **Retrieval clearly improved.** End-to-end with v3.3 unchanged: official exact citation 0.25→0.375, but domain flat (0.356) and fresh DOWN (0.59→0.45, acc 0.80→0.77). Interpretation: **distribution mismatch** — v3.3 was trained on hybrid-context RAFT (near-random distractors); reranked top-3 packs uniformly plausible documents (hard negatives) the model never trained against. `--reranker-model` is integrated in retrieve.py but **OFF by default** (Gradio unchanged, still hybrid + v3.3).
+
+This unifies three queued items into one evidence-backed v3.4 spec (do NOT run them separately):
+- RAFT contexts rebuilt from **reranked retrieval** (natural hard negatives — also resolves the long-open distractor-hardness question)
+- `DEFAULT_RAG_INSTRUCTION` partial clause rewritten to the request-mix concept
+- 2 epochs, existing oversample recipe
+
+Caveat re-confirmed: A/B recall@3 (0.622, top_k=20 pool) vs smoke retrieval_hit (0.578, top_k=3 pool) differ by candidate-pool size — standardize `candidate_k` before comparing retrieval numbers across scripts.
+
 ## Next Actions
 
-1. **Gradio default swap to v3.3** — recommended, awaiting user decision. Update docs/model_comparison_report.md with the v3.3 row when swapped.
-2. **Decision-led partial data**: the 4 remaining partial misses all LEAD with the decision ask ("대신 결정해줘", "누구한테 써야 제일 이득이야?") and get predicted false. Add ~10 partial rows whose sentence starts with the decision demand, fact request second. Human-audit gate as usual.
-3. Citation round still queued: domain exact citation 0.36 has headroom — hard-negative mining or reranker A/B, judged by gold-hit.
-4. 2 epochs is the training standard now (see probe finding). Keep casual/diverse rows at 1x, template rows at 3x.
-5. Small-eval caveat stands: fresh 16 true / 6 partial / 8 false — judge direction, not magnitude.
+1. **v3.4 (single round, evidence-backed spec above)**: reranked-context RAFT + instruction partial fix + 2ep. Success criteria: exact citation vs 0.622 ceiling, fresh answerability not regressing, partial judged only after eval expansion.
+2. **Partial/fresh eval expansion** (human-written) — prerequisite for judging partial; also strengthens all fresh claims.
+3. Standards stand: 2 epochs, diverse rows 1x (`make_gate_balanced.py`), template rows 3x, deterministic evals, direction-not-magnitude on fresh.
 
 ## Latest Verification
 
