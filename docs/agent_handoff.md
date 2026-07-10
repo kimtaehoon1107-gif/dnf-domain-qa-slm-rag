@@ -4,7 +4,11 @@
 
 ## Current Goal
 
-v3.2 trained and evaluated (2026-07-10). Contrastive true data dampened the seesaw: **kept all v3.1 refusal gains while recovering true rows** — first round with no answerability regression (except partial −1). Best balanced adapter so far: `outputs/slm_lora_qwen_domain_v3_2`. New weak axes: **partial category (fresh 1/6)** and **evidence selection accuracy** (rank-1 prior dissolved but content-based selection not yet learned).
+v3.3 trained and evaluated (2026-07-10). **Best adapter to date: `outputs/slm_lora_qwen_domain_v3_3`** (partial-diverse data + 2 epochs). fresh 0.80 (best ever), fresh false 8/8 with true 14/16 simultaneously (first time), citation held at probe-best levels. Recommendation: **swap Gradio default to v3.3** (user decision pending). Remaining weak axis: partial 2/6 — errors now on the safe side (refuse instead of invent).
+
+## Epoch probe finding (v3.2 data, 1 vs 2 epochs)
+
+2 epochs passed all three promotion criteria with zero regressions: fresh exact citation 0.32→0.59 (the v3.2 citation decline was under-training — rank-1 prior dissolved before content-based selection consolidated), partial 1/6→2/6, gold-hit up (domain rank1 25/27, rank2 7/15). Dev loss plateaus at ~1.75-1.9 epochs → **2 epochs is the standard now; 3 would likely overfit.**
 
 ## v3 / v3.1 / v3.2 comparison
 
@@ -72,12 +76,24 @@ Fresh chunk-oracle: answerability 0.7667 (v2 0.5667), exact citation **0.8182** 
 - **Promotion criteria for any new adapter** (per Codex review): fresh partial accuracy, exact citation, and predicted-citation-vs-gold hit — NOT dev loss, and "ranks spread" is not success; "gold hit" is.
 - fresh partial confirmed model/data-bound (oracle also 1/6): retrieval work cannot help this axis.
 
-## Next Actions (in flight / queued)
+## v3.3 results (all --deterministic --seed 42)
 
-1. 🔄 **2-epoch probe running**: `outputs/slm_lora_qwen_domain_v3_2_e2`, unchanged v3.2 data, single variable. Judge by the promotion criteria above.
-2. **Partial-diverse data round**: 20 candidate rows built (`outputs/domain_train_partial_diverse_candidate.jsonl`, span/split/dedup verified) — awaiting user audit before append. New phrasing families: 살까 말까/너라면/우선순위/가치 있어/뭐가 맞아, all "doc fact + personal decision" shaped, distinct from fresh partial wording.
-3. Notice/patch yes/no true rows (0003/0004 family) on non-legacy docs (e.g. official_update_2927196) — next data round after partial.
-4. Citation round after probe results: hard-negative mining or reranker A/B, judged by gold-hit not rank-spread.
+| | v3.2 (1ep) | probe (2ep) | v3.3 (2ep + 20 partial-diverse rows) |
+|---|---|---|---|
+| domain | 0.9917 | 0.9917 | 0.9917 (false 29/30) |
+| official | 1.0 | 1.0 | 1.0 |
+| fresh | 0.6667 | 0.70 | **0.80** (true 14/16, partial 2/6, false **8/8**) |
+| fresh oracle | 0.70 | 0.7667 | **0.80** |
+| exact citation f/d/o | 0.32/0.30/0.17 | 0.59/0.36/0.21 | 0.59/0.36/**0.25** |
+
+Flips probe→v3.3: yes/no true rows 0003/0004/0013 all recovered; 0030 realtime-price false fixed; 0012 lost (its evidence doc is legacy-excluded → untrainable family, known limitation); partials 0018/0021 moved wrong-true → wrong-false (safer error direction). Unexpected mechanism: diverse partial data sharpened the fact-vs-decision boundary overall, fixing true/false rows rather than partial itself.
+
+## Next Actions
+
+1. **Gradio default swap to v3.3** — recommended, awaiting user decision. Update docs/model_comparison_report.md with the v3.3 row when swapped.
+2. **Decision-led partial data**: the 4 remaining partial misses all LEAD with the decision ask ("대신 결정해줘", "누구한테 써야 제일 이득이야?") and get predicted false. Add ~10 partial rows whose sentence starts with the decision demand, fact request second. Human-audit gate as usual.
+3. Citation round still queued: domain exact citation 0.36 has headroom — hard-negative mining or reranker A/B, judged by gold-hit.
+4. 2 epochs is the training standard now (see probe finding). Keep casual/diverse rows at 1x, template rows at 3x.
 5. Small-eval caveat stands: fresh 16 true / 6 partial / 8 false — judge direction, not magnitude.
 
 ## Latest Verification
