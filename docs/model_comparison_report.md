@@ -112,6 +112,20 @@ Interpretation: cite-first formatting solved citation-field truncation, but not 
 |---|---:|---:|---:|---:|---:|---:|---:|
 | gate-balanced v2 Qwen LoRA | 30 | 1.0000 | 1.0000 | 1.0000 | 0.8000 | 0.5333 | 163.5 |
 
+## Tuned-SLM v3.x Rounds (2026-07-09/10, post eval-repair)
+
+All numbers below use the repaired POS-filtered domain eval (120), deterministic decoding (`--deterministic --seed 42`), `chroma_domain_chunks`, top_k=3. They are NOT comparable to pre-repair domain numbers above.
+
+| Adapter | data change | epochs | domain acc | official acc | fresh acc | fresh true/partial/false | fresh exact citation |
+|---|---|---:|---:|---:|---:|---|---:|
+| v3 | gold-shuffled RAFT + 35 casual rows | 1 | 0.925 | 1.0 | 0.7333 | 15/16, 2/6, 5/8 | 0.6364 |
+| v3.1 | +28 casual false rows | 1 | 0.9917 | 1.0 | 0.6333 | 11/16, 2/6, 6/8 | 0.5455 |
+| v3.2 | +16 contrastive yes/no true rows | 1 | 0.9917 | 1.0 | 0.6667 | 12/16, 1/6, 7/8 | 0.3182 |
+| v3.2-e2 (probe) | same as v3.2 | 2 | 0.9917 | 1.0 | 0.70 | 12/16, 2/6, 7/8 | 0.5909 |
+| **v3.3 (current default)** | +20 diverse partial rows | 2 | **0.9917** | **1.0** | **0.80** | **14/16, 2/6, 8/8** | **0.5909** |
+
+Key findings: the v3.2 citation dip was under-training (2 epochs restored it, dev loss plateaus ~1.8 epochs); diverse partial data sharpened the fact-vs-decision boundary, recovering yes/no true rows and perfecting fresh false. The Gradio default adapter is now `outputs/slm_lora_qwen_domain_v3_3` with matched inference settings (top_k=3, max_doc_chars=500, max_new_tokens=160, domain_chunks index). Remaining weak axes: fresh partial 2/6 (errors are safe-side refusals), domain exact citation 0.3556.
+
 ## Tuned-SLM Failure Diagnosis
 
 See `docs/tuned_slm_failure_diagnosis.md` for the v2 pre-v3 diagnosis. The short version: `answerability_acc` is not full answer quality. Exact citation on answerable rows is much lower:

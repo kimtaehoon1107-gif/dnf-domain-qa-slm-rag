@@ -57,7 +57,7 @@ MODE_LABELS = {
     "LLM-RAG": "llm_rag",
 }
 DEFAULT_TUNED_MODEL = os.environ.get("TUNED_SLM_MODEL", "Qwen/Qwen2.5-0.5B-Instruct")
-DEFAULT_ADAPTER_DIR = Path(os.environ.get("TUNED_SLM_ADAPTER_DIR", PROJECT_ROOT / "outputs" / "slm_lora_qwen_smoke"))
+DEFAULT_ADAPTER_DIR = Path(os.environ.get("TUNED_SLM_ADAPTER_DIR", PROJECT_ROOT / "outputs" / "slm_lora_qwen_domain_v3_3"))
 _TUNED_MODEL_CACHE = None
 
 
@@ -92,7 +92,12 @@ def load_cached_tuned_model():
     if _TUNED_MODEL_CACHE is None:
         if not DEFAULT_ADAPTER_DIR.exists():
             raise FileNotFoundError(f"Tuned SLM adapter not found: {DEFAULT_ADAPTER_DIR}")
-        _TUNED_MODEL_CACHE = load_tuned_model(DEFAULT_TUNED_MODEL, DEFAULT_ADAPTER_DIR)
+        import torch
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        _TUNED_MODEL_CACHE = load_tuned_model(
+            DEFAULT_TUNED_MODEL, DEFAULT_ADAPTER_DIR, device=device, fp16=device == "cuda"
+        )
     return _TUNED_MODEL_CACHE
 
 
@@ -179,13 +184,13 @@ with gr.Blocks(title="DNF Domain QA SLM/RAG v2") as demo:
     gr.Markdown("# DNF Domain QA SLM/RAG v2")
     with gr.Row():
         question = gr.Textbox(label="Question", placeholder="예: 공식 문서에서 잔여 오류 관련 핵심 내용은 뭐야?")
-        top_k = gr.Slider(label="Top K", minimum=1, maximum=10, step=1, value=5)
+        top_k = gr.Slider(label="Top K", minimum=1, maximum=10, step=1, value=3)
     with gr.Row():
-        index_name = gr.Dropdown(label="Index", choices=list(INDEXES), value="official_chunks_bge_m3")
+        index_name = gr.Dropdown(label="Index", choices=list(INDEXES), value="domain_chunks_bge_m3")
         rank_mode = gr.Dropdown(label="Rank Mode", choices=list(RANK_MODES), value=DEFAULT_RANK_MODE)
         mode = gr.Dropdown(label="Mode", choices=list(MODE_LABELS), value="RAG-only")
-        max_doc_chars = gr.Slider(label="Max Doc Chars", minimum=40, maximum=1200, step=20, value=300)
-        max_new_tokens = gr.Slider(label="Max New Tokens", minimum=16, maximum=256, step=8, value=64)
+        max_doc_chars = gr.Slider(label="Max Doc Chars", minimum=40, maximum=1200, step=20, value=500)
+        max_new_tokens = gr.Slider(label="Max New Tokens", minimum=16, maximum=256, step=8, value=160)
     submit = gr.Button("Run")
     response = gr.Code(label="Response", language="json")
     evidence = gr.Dataframe(
