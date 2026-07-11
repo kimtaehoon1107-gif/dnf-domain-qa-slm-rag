@@ -78,8 +78,10 @@ def split_grouped_rows(
 
     groups_by_label: dict[str, list[str]] = {}
     for key, members in groups.items():
-        label = str(members[0].get("answerability", "unknown"))
-        groups_by_label.setdefault(label, []).append(key)
+        label_signature = "+".join(
+            sorted({str(member.get("answerability", "unknown")) for member in members})
+        )
+        groups_by_label.setdefault(label_signature, []).append(key)
 
     dev_keys: set[str] = set()
     rng = random.Random(seed)
@@ -90,21 +92,36 @@ def split_grouped_rows(
         dev_keys.update(keys[:count])
 
     train_rows = [row for row in rows if dev_group_key(row, group_by) not in dev_keys]
-    # Dev measures unique examples. Oversampled copies remain useful only in train.
-    dev_rows = [groups[key][0] for key in sorted(dev_keys)]
+    # Dev measures every unique source QA in a held-out group. For source-level
+    # grouping this keeps one representative of oversampled copies; for parent
+    # grouping it preserves distinct QA from the same held-out document.
+    dev_rows = []
+    dev_source_keys: set[str] = set()
+    for key in sorted(dev_keys):
+        for row in groups[key]:
+            source_key = stable_row_fingerprint(row)
+            if source_key in dev_source_keys:
+                continue
+            dev_source_keys.add(source_key)
+            dev_rows.append(row)
     train_keys = {dev_group_key(row, group_by) for row in train_rows}
     dev_group_keys = {dev_group_key(row, group_by) for row in dev_rows}
     overlap = train_keys & dev_group_keys
     if overlap:
         raise RuntimeError(f"Grouped train/dev split leaked {len(overlap)} groups.")
 
+    train_parents = {str(row.get("expected_doc_id")) for row in train_rows if row.get("expected_doc_id")}
+    dev_parents = {str(row.get("expected_doc_id")) for row in dev_rows if row.get("expected_doc_id")}
     return train_rows, dev_rows, {
         "group_by": group_by,
         "input_groups": len(groups),
         "train_groups": len(train_keys),
         "dev_groups": len(dev_group_keys),
         "group_overlap": len(overlap),
-        "dev_duplicate_rows_removed": sum(len(groups[key]) - 1 for key in dev_keys),
+        "dev_duplicate_rows_removed": sum(len(groups[key]) for key in dev_keys) - len(dev_rows),
+        "train_parent_docs": len(train_parents),
+        "dev_parent_docs": len(dev_parents),
+        "parent_doc_overlap": len(train_parents & dev_parents),
         "dev_group_keys": sorted(dev_group_keys),
     }
 

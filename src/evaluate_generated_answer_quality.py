@@ -245,6 +245,8 @@ def main() -> None:
     args = parse_args()
     report = json.loads(args.report.read_text(encoding="utf-8"))
     result = evaluate(report, read_jsonl(args.eval_set))
+    result["source_report"] = str(args.report)
+    result["source_eval_set"] = str(args.eval_set)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({key: value for key, value in result.items() if key != "details"}, ensure_ascii=False, indent=2))

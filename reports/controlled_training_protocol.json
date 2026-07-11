@@ -7,10 +7,14 @@
     "source_qa": "data/processed/domain_train_qa_measurement_fixed.jsonl",
     "input_rows": 576,
     "unique_source_groups": 408,
-    "train_rows": 519,
-    "dev_rows": 39,
-    "dev_group_by": "source_qa_id",
+    "train_rows": 528,
+    "dev_rows": 32,
+    "dev_group_by": "parent_doc_id",
+    "input_groups": 159,
+    "train_groups": 145,
+    "dev_groups": 14,
     "train_dev_group_overlap": 0,
+    "train_dev_parent_overlap": 0,
     "gold_position_mismatches_between_arms": 0,
     "max_doc_chars": 900,
     "max_seq_length": 3072,
@@ -28,14 +32,14 @@
       "distractor_strategy": "random",
       "train_file": "data/processed/domain_raft_measurement_fixed_gate_balanced.jsonl",
       "train_file_sha256": "47cb14facd132eca393468f0b43cab543420e7d6a953b31d987c3ddcca6e93e4",
-      "adapter": "outputs/slm_lora_measurement_control"
+      "adapter": "outputs/slm_lora_measurement_control_parent_group"
     },
     "instruction_only": {
       "instruction_mode": "request_mix",
       "distractor_strategy": "random",
       "train_file": "data/processed/domain_raft_instruction_only_gate_balanced.jsonl",
       "train_file_sha256": "1efc1cfee09c858333dfb4053b9e57077383371f3201685404b3ff9c8247fd5b",
-      "adapter": "outputs/slm_lora_measurement_instruction_only"
+      "adapter": "outputs/slm_lora_measurement_instruction_only_parent_group"
     },
     "hard_negative_only": {
       "instruction_mode": "legacy",
@@ -43,8 +47,12 @@
       "train_file": "data/processed/domain_raft_hard_negative_only_gate_balanced.jsonl",
       "train_file_sha256": "552f46f82ec466bb0b24f9c8d85aa4430c2316f392e2dc97afbe2e198fb07c60",
       "hard_negative_sha256": "00a69bd0c3c8786a70a2681e6d9137736193ec9905f2fbe9a9c269a2a4ffa14d",
-      "adapter": "outputs/slm_lora_measurement_hard_negative_only"
+      "adapter": "outputs/slm_lora_measurement_hard_negative_only_parent_group"
     }
+  },
+  "excluded_exploratory_runs": {
+    "outputs/slm_lora_measurement_instruction_only": "Completed with source_qa_id grouping; 21/23 dev answerable parents also appeared in train, so it is excluded from model comparison.",
+    "outputs/slm_lora_measurement_control": "Stopped after the same-parent dev contamination was discovered."
   },
   "evaluation": {
     "development_sets": [

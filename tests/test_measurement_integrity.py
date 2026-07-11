@@ -51,6 +51,28 @@ class GroupedSplitTests(unittest.TestCase):
         self.assertEqual(report["group_overlap"], 0)
         self.assertGreater(report["dev_duplicate_rows_removed"], 0)
 
+    def test_parent_grouping_holds_out_whole_parent_and_keeps_unique_qa(self) -> None:
+        rows = []
+        for parent_index in range(10):
+            for question_index in range(2):
+                row = raft_row(f"p{parent_index}_q{question_index}", "true")
+                row["expected_doc_id"] = f"parent_{parent_index}"
+                rows.extend([dict(row), dict(row)])
+
+        train_rows, dev_rows, report = split_grouped_rows(
+            rows,
+            dev_ratio=0.2,
+            seed=42,
+            group_by="parent_doc_id",
+        )
+
+        train_parents = {row["expected_doc_id"] for row in train_rows}
+        dev_parents = {row["expected_doc_id"] for row in dev_rows}
+        self.assertFalse(train_parents & dev_parents)
+        self.assertEqual(report["parent_doc_overlap"], 0)
+        self.assertEqual(len(dev_rows), len(dev_parents) * 2)
+        self.assertEqual(len({row["source_qa_id"] for row in dev_rows}), len(dev_rows))
+
 
 class EvidenceWindowTests(unittest.TestCase):
     def test_query_specific_terms_select_late_window(self) -> None:
