@@ -1,5 +1,5 @@
 {
-  "status": "running",
+  "status": "complete_no_promotion",
   "date": "2026-07-11",
   "purpose": "Estimate instruction and hard-negative effects separately after repairing measurement leakage.",
   "common": {
@@ -77,5 +77,16 @@
       "hard_negative_effect": "hard_negative_only minus control under hybrid retrieval",
       "reranker_followup": "Only after the hybrid comparison, evaluate the best eligible arm with the fixed 512-token reranker."
     }
+  },
+  "result_report": "reports/controlled_training_results.json",
+  "result_document": "docs/controlled_training_results.md",
+  "promotion": {
+    "adapter": null,
+    "gradio_default_unchanged": "outputs/slm_lora_qwen_domain_v3_3",
+    "reranker_default": "off",
+    "unfiltered_hard_negative_arm": "rejected",
+    "answer_filtered_future_artifact": "data/processed/domain_raft_hard_negative_answer_filtered_gate_balanced.jsonl",
+    "answer_filtered_future_artifact_sha256": "2d70f65afa4e9ffc8e246d7d81fb59824b8aeaf255e5501015862087b59dcd5f",
+    "answer_filtered_negative_map_sha256": "86f59ae8aafbdfb528c8a6a8d4d67361de653bfc1f9e791722a9533d1caed852"
   }
 }

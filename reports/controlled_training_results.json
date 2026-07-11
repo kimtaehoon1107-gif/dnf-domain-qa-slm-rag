@@ -1,0 +1,291 @@
+{
+  "training": {
+    "control": {
+      "adapter_dir": "outputs\\slm_lora_measurement_control_parent_group",
+      "git_commit": "3bbbd2729304d3f373af309c9aeabe2a437d80eb",
+      "train_file": "data\\processed\\domain_raft_measurement_fixed_gate_balanced.jsonl",
+      "train_file_sha256": "47cb14facd132eca393468f0b43cab543420e7d6a953b31d987c3ddcca6e93e4",
+      "prompt_instruction_sha256": "ea4075f13bdc7e385628adc672fd1afa37a70fdd19cc87ebcdd966e8a153a185",
+      "train_rows": 528,
+      "dev_rows": 32,
+      "dev_group_by": "parent_doc_id",
+      "train_dev_parent_overlap": 0,
+      "skipped_rows": 0,
+      "global_step": 264,
+      "final_dev_loss": 0.1298147737979889
+    },
+    "instruction_only": {
+      "adapter_dir": "outputs\\slm_lora_measurement_instruction_only_parent_group",
+      "git_commit": "3bbbd2729304d3f373af309c9aeabe2a437d80eb",
+      "train_file": "data\\processed\\domain_raft_instruction_only_gate_balanced.jsonl",
+      "train_file_sha256": "1efc1cfee09c858333dfb4053b9e57077383371f3201685404b3ff9c8247fd5b",
+      "prompt_instruction_sha256": "dfdf698a8aa7b614584badc0098c2d0a76467f5c8c5457645d77ea2f8c031b08",
+      "train_rows": 528,
+      "dev_rows": 32,
+      "dev_group_by": "parent_doc_id",
+      "train_dev_parent_overlap": 0,
+      "skipped_rows": 0,
+      "global_step": 264,
+      "final_dev_loss": 0.1245659664273262
+    },
+    "hard_negative_only": {
+      "adapter_dir": "outputs\\slm_lora_measurement_hard_negative_only_parent_group",
+      "git_commit": "3bbbd2729304d3f373af309c9aeabe2a437d80eb",
+      "train_file": "data\\processed\\domain_raft_hard_negative_only_gate_balanced.jsonl",
+      "train_file_sha256": "552f46f82ec466bb0b24f9c8d85aa4430c2316f392e2dc97afbe2e198fb07c60",
+      "prompt_instruction_sha256": "ea4075f13bdc7e385628adc672fd1afa37a70fdd19cc87ebcdd966e8a153a185",
+      "train_rows": 528,
+      "dev_rows": 32,
+      "dev_group_by": "parent_doc_id",
+      "train_dev_parent_overlap": 0,
+      "skipped_rows": 0,
+      "global_step": 264,
+      "final_dev_loss": 0.13750368356704712
+    }
+  },
+  "hybrid": {
+    "control": {
+      "domain": {
+        "rows": 120,
+        "retrieval_expected_hit_rate": 0.5222222222222223,
+        "usable_gold_hit_rate": 0.5111111111111111,
+        "answerability_accuracy": 0.975,
+        "true_accuracy": 1.0,
+        "partial_accuracy": 1.0,
+        "false_accuracy": 0.9,
+        "exact_citation_precision_macro": 0.35555555555555557,
+        "exact_citation_recall_macro": 0.35555555555555557,
+        "partial_joint_success_rate": 0.1,
+        "false_joint_correct_rate": 0.9,
+        "unsafe_answer_rate_on_safety_false": 0.0,
+        "evidence_token_recall_in_answer_mean": 0.23559351988474822,
+        "avg_generation_latency_sec": 3.364
+      },
+      "official": {
+        "rows": 30,
+        "retrieval_expected_hit_rate": 0.5,
+        "usable_gold_hit_rate": 0.5,
+        "answerability_accuracy": 1.0,
+        "true_accuracy": 1.0,
+        "partial_accuracy": null,
+        "false_accuracy": 1.0,
+        "exact_citation_precision_macro": 0.3333333333333333,
+        "exact_citation_recall_macro": 0.3333333333333333,
+        "partial_joint_success_rate": null,
+        "false_joint_correct_rate": 1.0,
+        "unsafe_answer_rate_on_safety_false": 0.0,
+        "evidence_token_recall_in_answer_mean": 0.23139793366551312,
+        "avg_generation_latency_sec": 4.078
+      },
+      "fresh_dev": {
+        "rows": 30,
+        "retrieval_expected_hit_rate": 0.9545454545454546,
+        "usable_gold_hit_rate": 0.9545454545454546,
+        "answerability_accuracy": 0.7666666666666667,
+        "true_accuracy": 0.9375,
+        "partial_accuracy": 0.5,
+        "false_accuracy": 0.625,
+        "exact_citation_precision_macro": 0.5909090909090909,
+        "exact_citation_recall_macro": 0.5909090909090909,
+        "partial_joint_success_rate": 0.3333333333333333,
+        "false_joint_correct_rate": 0.625,
+        "unsafe_answer_rate_on_safety_false": 0.0,
+        "evidence_token_recall_in_answer_mean": 0.3359101422938321,
+        "avg_generation_latency_sec": 3.581
+      }
+    },
+    "instruction_only": {
+      "domain": {
+        "rows": 120,
+        "retrieval_expected_hit_rate": 0.5222222222222223,
+        "usable_gold_hit_rate": 0.5111111111111111,
+        "answerability_accuracy": 0.9916666666666667,
+        "true_accuracy": 1.0,
+        "partial_accuracy": 1.0,
+        "false_accuracy": 0.9666666666666667,
+        "exact_citation_precision_macro": 0.34444444444444444,
+        "exact_citation_recall_macro": 0.34444444444444444,
+        "partial_joint_success_rate": 0.0,
+        "false_joint_correct_rate": 0.9666666666666667,
+        "unsafe_answer_rate_on_safety_false": 0.0,
+        "evidence_token_recall_in_answer_mean": 0.2438440612607663,
+        "avg_generation_latency_sec": 3.297
+      },
+      "official": {
+        "rows": 30,
+        "retrieval_expected_hit_rate": 0.5,
+        "usable_gold_hit_rate": 0.5,
+        "answerability_accuracy": 1.0,
+        "true_accuracy": 1.0,
+        "partial_accuracy": null,
+        "false_accuracy": 1.0,
+        "exact_citation_precision_macro": 0.2916666666666667,
+        "exact_citation_recall_macro": 0.2916666666666667,
+        "partial_joint_success_rate": null,
+        "false_joint_correct_rate": 1.0,
+        "unsafe_answer_rate_on_safety_false": 0.0,
+        "evidence_token_recall_in_answer_mean": 0.26169735992039916,
+        "avg_generation_latency_sec": 4.113
+      },
+      "fresh_dev": {
+        "rows": 30,
+        "retrieval_expected_hit_rate": 0.9545454545454546,
+        "usable_gold_hit_rate": 0.9545454545454546,
+        "answerability_accuracy": 0.7333333333333333,
+        "true_accuracy": 0.9375,
+        "partial_accuracy": 0.3333333333333333,
+        "false_accuracy": 0.625,
+        "exact_citation_precision_macro": 0.5909090909090909,
+        "exact_citation_recall_macro": 0.5909090909090909,
+        "partial_joint_success_rate": 0.16666666666666666,
+        "false_joint_correct_rate": 0.625,
+        "unsafe_answer_rate_on_safety_false": 0.0,
+        "evidence_token_recall_in_answer_mean": 0.3314118553757591,
+        "avg_generation_latency_sec": 2.768
+      }
+    },
+    "hard_negative_only": {
+      "domain": {
+        "rows": 120,
+        "retrieval_expected_hit_rate": 0.5222222222222223,
+        "usable_gold_hit_rate": 0.5111111111111111,
+        "answerability_accuracy": 0.9916666666666667,
+        "true_accuracy": 0.9875,
+        "partial_accuracy": 1.0,
+        "false_accuracy": 1.0,
+        "exact_citation_precision_macro": 0.32222222222222224,
+        "exact_citation_recall_macro": 0.32222222222222224,
+        "partial_joint_success_rate": 0.2,
+        "false_joint_correct_rate": 1.0,
+        "unsafe_answer_rate_on_safety_false": 0.0,
+        "evidence_token_recall_in_answer_mean": 0.2206617774441286,
+        "avg_generation_latency_sec": 3.372
+      },
+      "official": {
+        "rows": 30,
+        "retrieval_expected_hit_rate": 0.5,
+        "usable_gold_hit_rate": 0.5,
+        "answerability_accuracy": 1.0,
+        "true_accuracy": 1.0,
+        "partial_accuracy": null,
+        "false_accuracy": 1.0,
+        "exact_citation_precision_macro": 0.25,
+        "exact_citation_recall_macro": 0.25,
+        "partial_joint_success_rate": null,
+        "false_joint_correct_rate": 1.0,
+        "unsafe_answer_rate_on_safety_false": 0.0,
+        "evidence_token_recall_in_answer_mean": 0.30925577533927767,
+        "avg_generation_latency_sec": 3.953
+      },
+      "fresh_dev": {
+        "rows": 30,
+        "retrieval_expected_hit_rate": 0.9545454545454546,
+        "usable_gold_hit_rate": 0.9545454545454546,
+        "answerability_accuracy": 0.7666666666666667,
+        "true_accuracy": 0.8125,
+        "partial_accuracy": 0.5,
+        "false_accuracy": 0.875,
+        "exact_citation_precision_macro": 0.4090909090909091,
+        "exact_citation_recall_macro": 0.4090909090909091,
+        "partial_joint_success_rate": 0.16666666666666666,
+        "false_joint_correct_rate": 0.875,
+        "unsafe_answer_rate_on_safety_false": 0.0,
+        "evidence_token_recall_in_answer_mean": 0.2651415318193393,
+        "avg_generation_latency_sec": 2.842
+      }
+    }
+  },
+  "reranker_followup": {
+    "control": {
+      "domain": {
+        "rows": 120,
+        "retrieval_expected_hit_rate": 0.5777777777777777,
+        "usable_gold_hit_rate": 0.5666666666666667,
+        "answerability_accuracy": 0.9583333333333334,
+        "true_accuracy": 1.0,
+        "partial_accuracy": 1.0,
+        "false_accuracy": 0.8333333333333334,
+        "exact_citation_precision_macro": 0.4444444444444444,
+        "exact_citation_recall_macro": 0.4444444444444444,
+        "partial_joint_success_rate": 0.2,
+        "false_joint_correct_rate": 0.8333333333333334,
+        "unsafe_answer_rate_on_safety_false": 0.0,
+        "evidence_token_recall_in_answer_mean": 0.2814180614758802,
+        "avg_generation_latency_sec": 3.625
+      },
+      "fresh_dev": {
+        "rows": 30,
+        "retrieval_expected_hit_rate": 1.0,
+        "usable_gold_hit_rate": 1.0,
+        "answerability_accuracy": 0.7666666666666667,
+        "true_accuracy": 0.9375,
+        "partial_accuracy": 0.5,
+        "false_accuracy": 0.625,
+        "exact_citation_precision_macro": 0.5909090909090909,
+        "exact_citation_recall_macro": 0.5909090909090909,
+        "partial_joint_success_rate": 0.16666666666666666,
+        "false_joint_correct_rate": 0.625,
+        "unsafe_answer_rate_on_safety_false": 0.0,
+        "evidence_token_recall_in_answer_mean": 0.33897695441813097,
+        "avg_generation_latency_sec": 3.565
+      }
+    },
+    "hard_negative_only": {
+      "domain": {
+        "rows": 120,
+        "retrieval_expected_hit_rate": 0.5777777777777777,
+        "usable_gold_hit_rate": 0.5666666666666667,
+        "answerability_accuracy": 0.9916666666666667,
+        "true_accuracy": 0.9875,
+        "partial_accuracy": 1.0,
+        "false_accuracy": 1.0,
+        "exact_citation_precision_macro": 0.2777777777777778,
+        "exact_citation_recall_macro": 0.2777777777777778,
+        "partial_joint_success_rate": 0.1,
+        "false_joint_correct_rate": 1.0,
+        "unsafe_answer_rate_on_safety_false": 0.0,
+        "evidence_token_recall_in_answer_mean": 0.18586069610204695,
+        "avg_generation_latency_sec": 3.556
+      },
+      "fresh_dev": {
+        "rows": 30,
+        "retrieval_expected_hit_rate": 1.0,
+        "usable_gold_hit_rate": 1.0,
+        "answerability_accuracy": 0.7333333333333333,
+        "true_accuracy": 0.8125,
+        "partial_accuracy": 0.5,
+        "false_accuracy": 0.75,
+        "exact_citation_precision_macro": 0.3181818181818182,
+        "exact_citation_recall_macro": 0.3181818181818182,
+        "partial_joint_success_rate": 0.16666666666666666,
+        "false_joint_correct_rate": 0.75,
+        "unsafe_answer_rate_on_safety_false": 0.0,
+        "evidence_token_recall_in_answer_mean": 0.2140581232492997,
+        "avg_generation_latency_sec": 3.433
+      }
+    }
+  },
+  "status": "complete_no_promotion",
+  "date": "2026-07-11",
+  "evaluation_role": {
+    "domain": "development",
+    "official": "legacy compatibility development",
+    "fresh_dev": "adaptive conversational development",
+    "blind_test_v1_candidate": "pending human review; never evaluated"
+  },
+  "retrieval_invariants_passed": {
+    "domain": true,
+    "official": true,
+    "fresh_dev": true
+  },
+  "verdict": {
+    "promoted_adapter": null,
+    "gradio_default": "outputs/slm_lora_qwen_domain_v3_3",
+    "instruction_only": "rejected: no partial-joint gain and no citation gain versus control",
+    "hard_negative_only": "rejected: improved refusal but substantially harmed exact citation and content support",
+    "reranker_default": "off",
+    "reranker": "retrieval improved, but end-to-end control traded higher domain citation for worse false refusal and did not improve fresh citation",
+    "next_training_artifact": "data/processed/domain_raft_hard_negative_answer_filtered_gate_balanced.jsonl",
+    "next_training_gate": "human review the blind-test candidate and review answer-filtered negatives before any new training run"
+  }
+}

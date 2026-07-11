@@ -16,7 +16,8 @@
 4. **`answerability_accuracy` 단독으로 성능 판단 금지.** true/false/partial 라벨만 맞는지 보는 지표라, `exact_citation`/`retrieval_expected_hit_rate` 없이 보면 과대평가됨(실측: domain answerability_accuracy=1.0인데 exact_citation=0.2556). 세 지표를 항상 같이 리포트.
 5. **Oracle eval(`run_tuned_slm_oracle_eval.py`)은 `evidence_span`(정답 문장만 오려낸 짧은 텍스트)을 넣어줌, 청크 전체가 아님.** oracle=1.0은 "SLM이 완벽하다"가 아니라 "노이즈 없는 정답 문장이 주어지면 형식을 잘 지킨다"는 뜻. `chunk_oracle`과 `span_oracle`을 구분해서 해석할 것.
 6. **RAFT 학습 데이터에서 gold 문서 위치가 항상 1번이면 모델이 "1등만 베끼는" 습관을 학습함.** 실측: `domain_raft_sample_expanded_gate_balanced.jsonl`의 citations 보유 279행 전부 gold가 documents[0]. 새 RAFT를 만들 때는 gold 위치를 반드시 랜덤화하고 gold 앞에도 distractor를 배치할 것.
-7. **`fresh_paraphrase_eval_set.jsonl`은 영구 held-out.** 어떤 학습 데이터 생성 스크립트를 돌리든 `--exclude-eval-set`/`--legacy-eval-set`에 이 파일을 반드시 포함시킬 것. 이 파일이 구어체/일반화 성능을 재는 유일한 척도임.
+7. **`fresh_paraphrase_eval_set.jsonl`은 adaptive dev이며 학습에는 계속 금지.** 개별 실패가 반복적으로 모델/데이터 변경을 이끌었으므로 최종 blind 성능으로 부르지 말 것. `data/review/blind_test_v1_candidate.jsonl`은 사람 검수·freeze 전에는 검색/생성 평가도 금지하며 모든 학습 컨텍스트에서 제외할 것.
+8. **Hard negative는 answer-aware 필터가 필수.** gold/same-parent 제외만으로는 부족하다. 다른 부모 문서가 같은 사실을 반복해 valid evidence가 distractor로 들어갈 수 있으므로 exact `evidence_span` 및 높은 evidence-token overlap을 제거해야 한다. 미필터 arm은 실측상 거절은 좋아졌지만 exact citation을 크게 망쳤다.
 
 ## Repo Map (src/)
 
@@ -67,8 +68,8 @@ python src/analyze_tuned_slm_diagnostics.py --report domain=outputs/_domain.json
 ## Known limitations / next
 
 - **검색 recall 문제**: domain eval에서 gold 근거가 top-3 후보에 없는 경우가 58/90(64%). candidate_k 확장/hybrid 튜닝 우선 필요, reranker는 그 다음.
-- **RAFT gold-position 편향**: 학습 데이터가 gold를 항상 1번에 둬서 모델이 "rank-1 copier"가 됨 — RAFT 재설계(gold 위치 랜덤화) 필요.
-- **fresh(구어체) 성능 취약**: false 거절은 잘하지만 true/partial 구어체 질문 과잉 거절(gate-balancing의 부작용). 구어체 train-only paraphrase 데이터 추가 필요.
+- **부분답변 품질 취약**: current adaptive fresh dev가 6행뿐이고 partial joint success가 낮다. 신규 blind 후보 검수와 partial 질문 확장이 다음 데이터 게이트다.
+- **Hard-negative 후속은 보류**: answer-filtered artifact까지는 생성·검증됐지만 사람 검토 전 즉시 재학습하지 않는다. 기존 미필터 arm은 비승격.
 - intent router(`shop_price/active_event/patch_note/notice/unanswerable/ood_safety`) 미구현, shop_price 구조화 데이터 소스 미해결.
 - ablation용 인덱스/데이터 파일 다수 미정리(위 표 참조).
 

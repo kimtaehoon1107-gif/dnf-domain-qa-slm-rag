@@ -188,3 +188,23 @@ Normalized export rows include:
 - `review_notes`
 - `source_split`
 - `source_payload`
+
+## Blind-test Review Fields
+
+Pending blind candidates live under `data/review/`, not the active eval directory. Each row adds:
+
+- `evaluation_role`: `blind_test_candidate`
+- `review_status`: `pending`, then `approved` only after human review
+- `review_notes`: reviewer corrections/rationale
+- `auto_review_flags`: mechanical warnings such as long answer, generic title, or possible UI noise
+
+`review_status=pending` rows must be excluded from train/RAFT contexts and must not be passed to retrieval or generation. The file becomes a final test only after human approval and a frozen SHA-256 manifest.
+
+## Hard-negative Mining Fields
+
+`domain_hard_negatives*.jsonl` maps one `source_qa_id` to ranked candidates with `doc_id`, `parent_doc_id`, retrieval rank, reranker score, selection tier, and evidence-token recall. A valid negative must not be:
+
+- the gold chunk or any chunk from the gold parent;
+- any held-out/blind-test chunk or parent;
+- an exact `evidence_span` match;
+- a candidate whose evidence-token recall reaches the configured answer-like threshold.

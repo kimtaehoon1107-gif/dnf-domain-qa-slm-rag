@@ -4,6 +4,17 @@ DNF Domain QA SLM/RAG v2 is a portfolio project for document-grounded Dungeon & 
 
 The goal is not to present a generic chatbot. The goal is to show a reproducible QA/RAG/SLM pipeline where unsupported questions can be refused and evidence quality can be measured.
 
+## Latest Verified Status (2026-07-11)
+
+- Measurement repair is complete: parent-document train/dev split, group overlap `0`, parent overlap `0`, query-aware 900-character evidence windows, and `100%` training-gold visibility.
+- Reranker A/B is standardized at `candidate_k=100`; BGE reranker 512 improves domain retrieval hit@3 from `0.522` to `0.578`.
+- Three controlled Qwen 0.5B arms were trained with identical data groups/hyperparameters: control, instruction-only, and hard-negative-only.
+- No new adapter passed promotion gates. Instruction-only did not improve partial joint success or citation; the unfiltered hard-negative arm improved refusal but damaged exact citation.
+- Root cause: 12 mined distractors contained the exact gold evidence span and 63/320 answerable rows had a distractor with at least 50% evidence-token recall. Answer-aware mining now removes this label contamination.
+- Gradio therefore remains on `outputs/slm_lora_qwen_domain_v3_3`, with reranker off. `fresh_paraphrase_eval_set.jsonl` is now called `fresh_dev`; the new blind candidate is pending human review and has never been evaluated by a model.
+
+See `docs/controlled_training_results.md`, `docs/evaluation_policy.md`, and `reports/controlled_training_results.json` for the current evidence and verdict.
+
 ## Current Scope
 
 - v1 baseline analysis: `docs/v1_baseline_failure_analysis.md`
@@ -11,6 +22,8 @@ The goal is not to present a generic chatbot. The goal is to show a reproducible
 - labeling guide and Label Studio config: `docs/labeling_guide.md`, `labeling/`
 - experiment report: `docs/experiment_report.md`
 - model comparison report: `docs/model_comparison_report.md`
+- controlled measurement-repair results: `docs/controlled_training_results.md`
+- evaluation/blind-test policy: `docs/evaluation_policy.md`
 - tuned-SLM failure diagnosis: `docs/tuned_slm_failure_diagnosis.md`
 - BGE-M3 retrieval ablation: `docs/retrieval_bge_m3_ablation.md`
 - official chunking ablation: `docs/official_chunking_ablation.md`
@@ -35,10 +48,16 @@ The goal is not to present a generic chatbot. The goal is to show a reproducible
 | `data/processed/official_raft_sample.jsonl` | 41 | official RAFT rows with gold/distractor evidence and refusal examples |
 | `data/processed/domain_doc_chunks.jsonl` | 1,307 | official + guide chunks for expanded domain benchmark |
 | `data/processed/domain_eval_set_expanded.jsonl` | 120 | expanded held-out eval: true 80, partial 10, false 30 |
-| `data/processed/fresh_paraphrase_eval_set.jsonl` | 30 | hand-written fresh paraphrase/OOD eval: true 16, partial 6, false 8 |
-| `data/processed/domain_train_qa_expanded.jsonl` | 308 | train-only expanded QA rows after excluding fresh held-out parents/questions |
-| `data/processed/domain_raft_sample_expanded.jsonl` | 300 | expanded RAFT rows: true 222, partial 19, false 59 |
-| `data/processed/domain_raft_sample_expanded_gate_balanced.jsonl` | 456 | gate-balanced RAFT rows: true 222, partial 57, false 177 |
+| `data/processed/fresh_paraphrase_eval_set.jsonl` | 30 | adaptive conversational dev (`fresh_dev`): true 16, partial 6, false 8 |
+| `data/review/blind_test_v1_candidate.jsonl` | 100 | pending human review; never use for model selection or training |
+| `data/processed/domain_train_qa_expanded.jsonl` | 419 | historical expanded train QA before the measurement quality gate |
+| `data/processed/domain_train_qa_measurement_fixed.jsonl` | 408 | quality-gated train QA used by the controlled experiment |
+| `data/processed/domain_raft_sample_expanded.jsonl` | 419 | historical expanded RAFT rows |
+| `data/processed/domain_raft_sample_expanded_gate_balanced.jsonl` | 593 | historical gate-balanced RAFT rows |
+| `data/processed/domain_raft_measurement_fixed_gate_balanced.jsonl` | 576 | control arm: legacy instruction + random distractors |
+| `data/processed/domain_raft_instruction_only_gate_balanced.jsonl` | 576 | instruction-only controlled arm |
+| `data/processed/domain_raft_hard_negative_only_gate_balanced.jsonl` | 576 | rejected unfiltered hard-negative audit artifact |
+| `data/processed/domain_raft_hard_negative_answer_filtered_gate_balanced.jsonl` | 576 | validated future candidate; not trained in this round |
 | `outputs/domain_review_samples.csv` | 100 | review sample for expanded eval/RAFT question quality |
 | `labeling/domain_review_tasks.jsonl` | 100 | JSONL review tasks for labeling/rewrite workflows |
 

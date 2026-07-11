@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -18,6 +19,38 @@ from retrieval_config import (
     RANK_MODES,
 )
 from retrieve import apply_reranker, retrieve
+
+
+TOKEN_PATTERN = re.compile(r"[0-9A-Za-z가-힣]+")
+DEFAULT_MAX_EVIDENCE_TOKEN_RECALL = 0.5
+
+
+def normalize_space(text: Any) -> str:
+    return " ".join(str(text or "").split())
+
+
+def evidence_token_recall(text: Any, evidence_span: Any) -> float:
+    evidence_tokens = {
+        token.lower() for token in TOKEN_PATTERN.findall(str(evidence_span or "")) if len(token) >= 2
+    }
+    if len(evidence_tokens) < 4:
+        return 0.0
+    text_tokens = {token.lower() for token in TOKEN_PATTERN.findall(str(text or "")) if len(token) >= 2}
+    return len(evidence_tokens & text_tokens) / len(evidence_tokens)
+
+
+def candidate_contains_answer(
+    hit: dict[str, Any],
+    evidence_span: str,
+    max_evidence_token_recall: float,
+) -> bool:
+    normalized_span = normalize_space(evidence_span)
+    if not normalized_span:
+        return False
+    normalized_text = normalize_space(hit.get("text", ""))
+    if normalized_span in normalized_text:
+        return True
+    return evidence_token_recall(normalized_text, normalized_span) >= max_evidence_token_recall
 
 
 def parent_id(row: dict[str, Any]) -> str:
@@ -52,6 +85,8 @@ def filter_hard_negatives(
     heldout_chunk_ids: set[str],
     heldout_parent_ids: set[str],
     limit: int,
+    evidence_span: str = "",
+    max_evidence_token_recall: float = DEFAULT_MAX_EVIDENCE_TOKEN_RECALL,
 ) -> list[dict[str, Any]]:
     selected = []
     seen = set()
@@ -64,6 +99,8 @@ def filter_hard_negatives(
             continue
         if doc_id in heldout_chunk_ids or doc_parent in heldout_parent_ids:
             continue
+        if candidate_contains_answer(hit, evidence_span, max_evidence_token_recall):
+            continue
         seen.add(doc_id)
         selected.append(
             {
@@ -75,6 +112,7 @@ def filter_hard_negatives(
                 "lexical_score": hit.get("lexical_score"),
                 "title": str(hit.get("title") or ""),
                 "selection_tier": str(hit.get("selection_tier") or "unknown"),
+                "evidence_token_recall": evidence_token_recall(hit.get("text", ""), evidence_span),
             }
         )
         if len(selected) >= limit:
@@ -119,6 +157,8 @@ def mine(args: argparse.Namespace) -> tuple[list[dict[str, Any]], dict[str, Any]
             heldout_chunk_ids=heldout_chunks,
             heldout_parent_ids=heldout_parents,
             limit=args.negatives_per_row,
+            evidence_span=str(row.get("evidence_span") or ""),
+            max_evidence_token_recall=args.max_evidence_token_recall,
         )
         if len(negatives) < args.negatives_per_row:
             insufficient.append(source_qa_id)
@@ -153,6 +193,7 @@ def mine(args: argparse.Namespace) -> tuple[list[dict[str, Any]], dict[str, Any]
             "reranker_max_length": args.reranker_max_length,
             "reranker_batch_size": args.reranker_batch_size,
             "negatives_per_row": args.negatives_per_row,
+            "max_evidence_token_recall": args.max_evidence_token_recall,
             "fallback": "hybrid ranks after the reranked head; never random",
         },
     }
@@ -184,6 +225,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--reranker-max-length", type=int, default=DEFAULT_RERANKER_MAX_LENGTH)
     parser.add_argument("--reranker-batch-size", type=int, default=DEFAULT_RERANKER_BATCH_SIZE)
     parser.add_argument("--negatives-per-row", type=int, default=3)
+    parser.add_argument(
+        "--max-evidence-token-recall",
+        type=float,
+        default=DEFAULT_MAX_EVIDENCE_TOKEN_RECALL,
+        help="Reject answerable-row candidates that contain this fraction of evidence tokens.",
+    )
     return parser.parse_args()
 
 

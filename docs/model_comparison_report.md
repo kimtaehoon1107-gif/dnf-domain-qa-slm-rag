@@ -167,3 +167,21 @@ Before claiming tuned-SLM quality:
 3. Rebalance SLM training to reduce over-refusal while preserving false/OOD refusal.
 4. Improve retrieval/reranking only after the fresh answerability failure is addressed.
 5. Compare `RAG-only`, `LLM-RAG`, and `Tuned-SLM` in Gradio with the same held-out eval assumptions.
+
+## Measurement-Repaired Controlled Round (2026-07-11)
+
+The previous row-level dev split was invalid for oversampled data and still optimistic at the document level. The repaired round uses a parent-document-held-out split (`528 train / 32 dev`, parent overlap `0`), a shared 900-character query-aware evidence window, `candidate_k=100`, identical gold positions, two epochs, and deterministic evaluation.
+
+| arm | changed variable | final parent-dev loss | domain exact citation | domain partial joint | domain false joint | fresh_dev exact citation | fresh_dev partial joint | fresh_dev false joint |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| control | none (legacy + random) | 0.1298 | **0.3556** | 0.10 | 0.90 | **0.5909** | **0.3333** | 0.625 |
+| instruction-only | request-mix instruction | **0.1246** | 0.3444 | 0.00 | 0.9667 | **0.5909** | 0.1667 | 0.625 |
+| hard-negative-only | reranker-mined distractors | 0.1375 | 0.3222 | **0.20** | **1.00** | 0.4091 | 0.1667 | **0.875** |
+
+No arm is promoted. Lower dev loss did not predict the requested partial/citation improvement. The instruction change improved some refusal rows but reduced partial joint success. The hard-negative arm strengthened refusal at the cost of evidence selection.
+
+Reranker follow-up confirms the tradeoff. On domain, control exact citation rises `0.3556 → 0.4444`, but false joint falls `0.90 → 0.8333`; on fresh_dev, retrieval reaches `1.0` while exact citation stays `0.5909`. The hard-negative arm falls to `0.2778` domain and `0.3182` fresh_dev exact citation under reranking.
+
+Root cause was training-label contamination: 12 distractors contained the exact gold evidence span, and 63/320 answerable rows had a distractor with at least 50% evidence-token recall. Answer-aware mining now removes both classes (`0` remaining), but that cleaned artifact was intentionally not trained in this round.
+
+Full report: [controlled_training_results.md](controlled_training_results.md). `fresh_paraphrase_eval_set.jsonl` is now `fresh_dev`, not a final blind test. Gradio remains on v3.3 with reranker off.

@@ -1,0 +1,34 @@
+{
+  "status": "root_cause_confirmed",
+  "date": "2026-07-11",
+  "training_artifact": "data/processed/domain_raft_hard_negative_only.jsonl",
+  "answerable_rows": 320,
+  "distractor_contains_exact_evidence_span_instances": 12,
+  "rows_with_max_distractor_evidence_token_recall_at_least_0_5": 63,
+  "mean_max_distractor_evidence_token_recall": 0.324,
+  "query_overlap": {
+    "random_distractor_mean_term_hits": 0.259,
+    "random_distractor_zero_hit_rate": 0.778,
+    "hard_negative_mean_term_hits": 1.515,
+    "hard_negative_zero_hit_rate": 0.162
+  },
+  "end_to_end_failure": {
+    "fresh_dev_reranker_exact_citation_control": 0.5909090909090909,
+    "fresh_dev_reranker_exact_citation_hard_negative": 0.3181818181818182,
+    "domain_reranker_exact_citation_control": 0.4444444444444444,
+    "domain_reranker_exact_citation_hard_negative": 0.2777777777777778
+  },
+  "verdict": "The unfiltered hard-negative arm is rejected. It improved refusal accuracy by labeling highly relevant contexts as false/distractor, but some distractors were valid duplicate evidence. This taught over-refusal and damaged evidence selection.",
+  "fix": "Future mining rejects exact evidence-span matches and candidates with evidence-token recall >= 0.5 before selecting negatives. The rejected arm remains immutable for auditability.",
+  "answer_filtered_negative_map": "data/processed/domain_hard_negatives_answer_filtered.jsonl",
+  "answer_filtered_negative_map_sha256": "86f59ae8aafbdfb528c8a6a8d4d67361de653bfc1f9e791722a9533d1caed852",
+  "answer_filtered_raft": "data/processed/domain_raft_hard_negative_answer_filtered_gate_balanced.jsonl",
+  "answer_filtered_raft_sha256": "2d70f65afa4e9ffc8e246d7d81fb59824b8aeaf255e5501015862087b59dcd5f",
+  "answer_filtered_validation": {
+    "rows": 576,
+    "exact_span_contamination": 0,
+    "evidence_token_recall_ge_0_5": 0,
+    "heldout_parent_overlap": 0,
+    "gold_visibility": 1.0
+  }
+}

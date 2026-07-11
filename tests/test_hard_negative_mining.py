@@ -39,6 +39,34 @@ class HardNegativeFilterTests(unittest.TestCase):
         selected = filter_hard_negatives(hits, set(), set(), set(), set(), limit=3)
         self.assertEqual([row["doc_id"] for row in selected], ["safe", "other"])
 
+    def test_rejects_semantically_duplicate_answer_evidence(self) -> None:
+        evidence = "입장 레벨 115 이상이며 모험가 명성 90000 이상이 필요합니다"
+        hits = [
+            {
+                "doc_id": "duplicate_answer",
+                "rank": 1,
+                "text": "이 콘텐츠는 입장 레벨 115 이상이며 모험가 명성 90000 이상이 필요합니다.",
+                "metadata": {"parent_doc_id": "p1"},
+            },
+            {
+                "doc_id": "safe",
+                "rank": 2,
+                "text": "이벤트 보상은 우편으로 지급됩니다.",
+                "metadata": {"parent_doc_id": "p2"},
+            },
+        ]
+        selected = filter_hard_negatives(
+            hits,
+            set(),
+            set(),
+            set(),
+            set(),
+            limit=1,
+            evidence_span=evidence,
+            max_evidence_token_recall=0.5,
+        )
+        self.assertEqual([row["doc_id"] for row in selected], ["safe"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -232,3 +232,25 @@ Phase 11까지의 진단("문제는 모델이 아니라 데이터·평가 설계
 **문서**: [AGENTS.md](../AGENTS.md)(durable 교훈) · [docs/agent_handoff.md](agent_handoff.md)(현재 작업판) · [docs/model_comparison_report.md](model_comparison_report.md)(v3.x 비교표 포함) · [docs/tuned_slm_failure_diagnosis.md](tuned_slm_failure_diagnosis.md) · 본 문서
 
 **아직 미착수**: intent-router 구조화 모듈(초기 설계 후 보류), shop_price 데이터 소스
+
+---
+
+## Phase 15 — 측정 복구와 3-arm 통제 실험 (2026-07-11)
+
+이번 단계는 새 버전 숫자를 만드는 대신 기존 측정의 신뢰도를 먼저 복구했다.
+
+- **train/dev 복구**: 오버샘플 복제본이 row split을 가로지르던 문제를 그룹 split으로 수정한 뒤, 같은 부모 문서의 다른 QA까지 train/dev에 섞이는 것을 추가 발견했다. 최종 실험은 `parent_doc_id` 단위로 분리해 `528 train / 32 dev`, parent/group overlap `0`, 누락 `0`을 달성했다. 모든 adapter manifest는 커밋 `3bbbd27`, 데이터/prompt SHA-256, 전체 loss 곡선을 기록한다.
+- **evidence window 복구**: train/eval/oracle이 문서 첫 500자를 자르던 경로를 공용 query-aware window로 교체했다. 900자 기준 RAFT gold visibility는 `368/368`이다.
+- **reranker 정렬**: `candidate_k=100`, BGE reranker 512로 통일한 공정 A/B에서 domain hit@3 `0.522→0.578`; 1024는 512보다 나빠 비채택했다.
+- **평가 역할 교정**: 기존 fresh 30행은 여러 번 실패 기반 수정에 사용됐으므로 `fresh_dev`로 재분류했다. 신규 blind 후보 100행(true/partial/false 60/20/20)은 `review_status=pending`, SHA-256 동결 상태이며 모델에 한 번도 질의하지 않았다. 샘플에서 어색한 자동 질문이 확인되어 사람 rewrite/승인 전 사용 금지다.
+- **통제 학습**: control / instruction-only / hard-negative-only를 같은 split·하이퍼파라미터로 학습했다. instruction-only는 partial/citation 개선에 실패했고, hard-negative는 거절을 강화했지만 exact citation을 크게 악화시켜 둘 다 비승격했다.
+- **hard-negative 근본 원인**: answerable 320행 중 12개 distractor가 gold span을 그대로 포함했고 63행은 evidence token recall ≥0.5였다. valid evidence를 오답으로 가르친 라벨 오염이다. answer-aware 필터 후 재채굴본은 408행·1,224 negatives, exact/high-overlap 오염 `0`, 누수 `0`, visibility `1.0`으로 검증했지만 즉시 재학습하지 않았다.
+
+최종 판정은 **새 adapter 승격 없음**이다. Gradio는 v3.3, reranker off를 유지한다. 상세 수치는 [controlled_training_results.md](controlled_training_results.md), 실험 프로토콜은 [evaluation_policy.md](evaluation_policy.md)와 `reports/controlled_training_protocol.json`에 있다.
+
+### 다음 게이트
+
+1. `data/review/blind_test_v1_review_sample_30.jsonl`부터 사람이 읽고, 전체 100행을 rewrite/approve한 뒤 새 SHA-256으로 freeze.
+2. answer-filtered negatives를 라벨 샘플링 검수. valid alternate evidence가 더 없는지 확인하기 전 재학습 금지.
+3. partial 평가를 사람이 작성한 문항으로 확장. 여섯 행짜리 fresh partial 수치로 모델 방향을 결정하지 않기.
+4. 위 두 검수 게이트를 통과할 때만 answer-filtered hard-negative 단일 arm을 한 번 학습하고, 새 blind test는 최종 1회만 실행.
