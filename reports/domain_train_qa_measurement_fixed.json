@@ -1,0 +1,60 @@
+{
+  "input": "data\\processed\\domain_train_qa_expanded.jsonl",
+  "output": "data\\processed\\domain_train_qa_measurement_fixed.jsonl",
+  "input_rows": 419,
+  "output_rows": 408,
+  "excluded_rows": 11,
+  "excluded": [
+    {
+      "qa_id": "domain_train_0006",
+      "reasons": "ui_noise"
+    },
+    {
+      "qa_id": "domain_train_0020",
+      "reasons": "answer_chars=260>200"
+    },
+    {
+      "qa_id": "domain_train_0025",
+      "reasons": "answer_chars=226>200"
+    },
+    {
+      "qa_id": "domain_train_0069",
+      "reasons": "answer_chars=260>200"
+    },
+    {
+      "qa_id": "domain_train_0083",
+      "reasons": "answer_chars=260>200"
+    },
+    {
+      "qa_id": "domain_train_0097",
+      "reasons": "answer_chars=259>200"
+    },
+    {
+      "qa_id": "domain_train_0136",
+      "reasons": "answer_chars=260>200"
+    },
+    {
+      "qa_id": "domain_train_0218",
+      "reasons": "answer_chars=218>200"
+    },
+    {
+      "qa_id": "domain_train_0243",
+      "reasons": "answer_chars=246>200,ui_noise,evidence_not_visible_at_900_chars"
+    },
+    {
+      "qa_id": "domain_train_0259",
+      "reasons": "answer_chars=333>200"
+    },
+    {
+      "qa_id": "domain_train_0260",
+      "reasons": "answer_chars=204>200"
+    }
+  ],
+  "answerability_counts": {
+    "true": 276,
+    "partial": 44,
+    "false": 88
+  },
+  "max_answer_chars": 200,
+  "max_doc_chars": 900
+}

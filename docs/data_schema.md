@@ -116,6 +116,7 @@ Example:
 ```json
 {
   "raft_id": "raft_0001",
+  "source_qa_id": "official_train_0001",
   "instruction": "제공된 공식 문서 근거만 사용해 질문에 답하라...",
   "question": "공식 문서에서 7일간, 기간 관련 핵심 내용은 뭐야?",
   "documents": [
@@ -133,6 +134,7 @@ Example:
     }
   ],
   "answer": "여름맞이 7일간의 여정 이벤트 기간: 2026-06-04 ~ 2026-08-27.",
+  "evidence_span": "여름맞이 7일간의 여정 이벤트 기간: 2026-06-04 ~ 2026-08-27.",
   "citations": ["official_event_event_card_006__chunk_001"],
   "answerability": "true",
   "intent": "event",
@@ -144,6 +146,8 @@ Example:
 
 Official RAFT must not include parent docs or chunks used in the held-out official eval set.
 Expanded domain RAFT must not include parent docs or chunks used in `domain_eval_set_expanded.jsonl`; this is checked by `src/validate_domain_dataset.py`.
+`source_qa_id` is preserved through gate balancing so LoRA train/dev splits can keep all oversampled copies in one group.
+Training and inference select the same question-relevant text window from every RAFT document; `evidence_span` enables visibility validation without changing the selected window.
 
 ## Metrics
 

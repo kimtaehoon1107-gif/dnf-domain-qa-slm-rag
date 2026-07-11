@@ -1,0 +1,73 @@
+{
+  "status": "running",
+  "date": "2026-07-11",
+  "purpose": "Estimate instruction and hard-negative effects separately after repairing measurement leakage.",
+  "common": {
+    "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "source_qa": "data/processed/domain_train_qa_measurement_fixed.jsonl",
+    "input_rows": 576,
+    "unique_source_groups": 408,
+    "train_rows": 519,
+    "dev_rows": 39,
+    "dev_group_by": "source_qa_id",
+    "train_dev_group_overlap": 0,
+    "gold_position_mismatches_between_arms": 0,
+    "max_doc_chars": 900,
+    "max_seq_length": 3072,
+    "epochs": 2,
+    "learning_rate": 0.0002,
+    "gradient_accumulation_steps": 4,
+    "seed": 42,
+    "candidate_k": 100,
+    "rank_mode": "hybrid",
+    "heldout_context_overlap": 0
+  },
+  "arms": {
+    "control": {
+      "instruction_mode": "legacy",
+      "distractor_strategy": "random",
+      "train_file": "data/processed/domain_raft_measurement_fixed_gate_balanced.jsonl",
+      "train_file_sha256": "47cb14facd132eca393468f0b43cab543420e7d6a953b31d987c3ddcca6e93e4",
+      "adapter": "outputs/slm_lora_measurement_control"
+    },
+    "instruction_only": {
+      "instruction_mode": "request_mix",
+      "distractor_strategy": "random",
+      "train_file": "data/processed/domain_raft_instruction_only_gate_balanced.jsonl",
+      "train_file_sha256": "1efc1cfee09c858333dfb4053b9e57077383371f3201685404b3ff9c8247fd5b",
+      "adapter": "outputs/slm_lora_measurement_instruction_only"
+    },
+    "hard_negative_only": {
+      "instruction_mode": "legacy",
+      "distractor_strategy": "hard_negative",
+      "train_file": "data/processed/domain_raft_hard_negative_only_gate_balanced.jsonl",
+      "train_file_sha256": "552f46f82ec466bb0b24f9c8d85aa4430c2316f392e2dc97afbe2e198fb07c60",
+      "hard_negative_sha256": "00a69bd0c3c8786a70a2681e6d9137736193ec9905f2fbe9a9c269a2a4ffa14d",
+      "adapter": "outputs/slm_lora_measurement_hard_negative_only"
+    }
+  },
+  "evaluation": {
+    "development_sets": [
+      "data/processed/domain_eval_set_expanded.jsonl",
+      "data/processed/official_eval_set.jsonl",
+      "data/processed/fresh_paraphrase_eval_set.jsonl"
+    ],
+    "fresh_role": "adaptive_dev",
+    "blind_candidate": "data/review/blind_test_v1_candidate.jsonl",
+    "blind_candidate_model_evaluation_allowed": false,
+    "primary_metrics": [
+      "answerability_by_label",
+      "exact_citation_precision_macro",
+      "exact_citation_recall_macro",
+      "partial_joint_success_rate",
+      "false_joint_correct_rate",
+      "unsafe_answer_rate_on_safety_false",
+      "evidence_token_recall_in_answer_mean"
+    ],
+    "comparisons": {
+      "instruction_effect": "instruction_only minus control under hybrid retrieval",
+      "hard_negative_effect": "hard_negative_only minus control under hybrid retrieval",
+      "reranker_followup": "Only after the hybrid comparison, evaluate the best eligible arm with the fixed 512-token reranker."
+    }
+  }
+}

@@ -2,6 +2,12 @@ MINILM_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 BGE_M3_MODEL = "BAAI/bge-m3"
 
 DEFAULT_EMBEDDING_MODEL = BGE_M3_MODEL
+DEFAULT_CANDIDATE_K = 100
 
 DEFAULT_RANK_MODE = "hybrid"
 RANK_MODES = ("lexical_first", "semantic", "hybrid", "rrf")
+
+DEFAULT_RERANKER_MODEL = "BAAI/bge-reranker-v2-m3"
+DEFAULT_RERANK_CANDIDATES = 20
+DEFAULT_RERANKER_MAX_LENGTH = 512
+DEFAULT_RERANKER_BATCH_SIZE = 4

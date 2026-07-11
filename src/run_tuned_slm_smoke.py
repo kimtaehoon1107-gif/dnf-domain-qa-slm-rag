@@ -10,9 +10,17 @@ from pathlib import Path
 from typing import Any
 
 from io_utils import read_jsonl
-from prompt_format import format_prompt
+from prompt_format import RAG_INSTRUCTIONS, evidence_span_visible, format_prompt, instruction_for_mode
 from retrieve import retrieve
-from retrieval_config import DEFAULT_EMBEDDING_MODEL, DEFAULT_RANK_MODE, RANK_MODES
+from retrieval_config import (
+    DEFAULT_CANDIDATE_K,
+    DEFAULT_EMBEDDING_MODEL,
+    DEFAULT_RANK_MODE,
+    DEFAULT_RERANK_CANDIDATES,
+    DEFAULT_RERANKER_BATCH_SIZE,
+    DEFAULT_RERANKER_MAX_LENGTH,
+    RANK_MODES,
+)
 
 
 CHUNK_ID_PATTERN = re.compile(r"[A-Za-z0-9_]+__chunk_\d+")
@@ -36,6 +44,7 @@ def parse_generated_fields(text: str) -> dict[str, Any]:
         "has_citations_field": bool(citations_match),
         "parsed_citations": CHUNK_ID_PATTERN.findall(citations_text),
         "has_answer_field": bool(answer_match),
+        "parsed_answer": answer_text,
         "parsed_answer_chars": len(answer_text),
     }
 
@@ -139,14 +148,18 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
             persist_dir=args.persist_dir,
             top_k=args.top_k,
             model_name=args.embedding_model_name,
+            candidate_k=args.candidate_k,
             rank_mode=args.rank_mode,
             reranker_model=args.reranker_model,
             rerank_candidates=args.rerank_candidates,
+            reranker_max_length=args.reranker_max_length,
+            reranker_batch_size=args.reranker_batch_size,
         )
         prompt = format_prompt(
             question=row["question"],
             documents=contexts_to_documents(contexts),
             max_doc_chars=args.max_doc_chars,
+            instruction=instruction_for_mode(args.instruction_mode),
         )
         row_start = time.perf_counter()
         answer = generate_answer(
@@ -164,6 +177,26 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
             if expected_chunk_ids
             else any(doc_id in [parent_doc_id(hit) for hit in contexts] for doc_id in expected_parent_ids)
         )
+        gold_contexts = [
+            hit
+            for hit in contexts
+            if (
+                str(hit.get("doc_id")) in expected_chunk_ids
+                if expected_chunk_ids
+                else parent_doc_id(hit) in expected_parent_ids
+            )
+        ]
+        has_evidence_span = bool(str(row.get("evidence_span") or "").strip())
+        gold_evidence_visible = (
+            evidence_span_visible(
+                question=row["question"],
+                documents=gold_contexts,
+                evidence_span=row.get("evidence_span", ""),
+                max_doc_chars=args.max_doc_chars,
+            )
+            if has_evidence_span
+            else None
+        )
         detail = {
             "eval_id": row.get("eval_id"),
             "question": row["question"],
@@ -173,6 +206,8 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
             "retrieved_parent_doc_ids": [parent_doc_id(hit) for hit in contexts],
             "retrieved_chunk_ids": [hit["doc_id"] for hit in contexts],
             "retrieval_expected_hit": retrieval_expected_hit,
+            "gold_evidence_visible": gold_evidence_visible,
+            "usable_gold_hit": bool(retrieval_expected_hit and gold_evidence_visible),
             "generated_answer": answer,
             "latency_sec": round(time.perf_counter() - row_start, 3),
         }
@@ -192,6 +227,13 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
             retrieval_hits.append(
                 any(doc_id in row["retrieved_parent_doc_ids"] for doc_id in row["expected_evidence_doc_ids"])
             )
+    visibility_rows = [row for row in answerable_details if row["gold_evidence_visible"] is not None]
+    visible_when_retrieved = [
+        bool(row["gold_evidence_visible"])
+        for row in visibility_rows
+        if row["retrieval_expected_hit"]
+    ]
+    usable_gold_hits = [bool(row["usable_gold_hit"]) for row in visibility_rows]
     answerability_format_hits = [bool(row["has_answerability_field"]) for row in details]
     answerability_correct = [
         str(row.get("parsed_answerability") or "").lower()
@@ -229,12 +271,25 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
     answer_chars = [row["parsed_answer_chars"] for row in details if row["has_answer_field"]]
 
     return {
+        "report_schema_version": 2,
         "model_name": args.model_name,
         "adapter_dir": str(args.adapter_dir),
+        "eval_set": str(args.eval_set),
+        "persist_dir": str(args.persist_dir),
+        "embedding_model_name": args.embedding_model_name,
+        "rank_mode": args.rank_mode,
+        "top_k": args.top_k,
+        "candidate_k": args.candidate_k,
+        "max_doc_chars": args.max_doc_chars,
+        "max_new_tokens": args.max_new_tokens,
+        "instruction_mode": args.instruction_mode,
         "device": device,
         "seed": args.seed,
         "deterministic": args.deterministic,
         "reranker_model": args.reranker_model,
+        "rerank_candidates": args.rerank_candidates,
+        "reranker_max_length": args.reranker_max_length,
+        "reranker_batch_size": args.reranker_batch_size,
         "rows": len(details),
         "total_runtime_sec": round(time.perf_counter() - start, 3),
         "summary": {
@@ -242,6 +297,16 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
             "retrieval_expected_hit_rate": (
                 sum(retrieval_hits) / len(retrieval_hits)
                 if retrieval_hits
+                else None
+            ),
+            "usable_gold_hit_rate": (
+                sum(usable_gold_hits) / len(usable_gold_hits)
+                if usable_gold_hits
+                else None
+            ),
+            "evidence_visibility_when_retrieved": (
+                sum(visible_when_retrieved) / len(visible_when_retrieved)
+                if visible_when_retrieved
                 else None
             ),
             "answerability_field_rate": (
@@ -302,14 +367,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, default=Path("outputs/tuned_slm_qwen_smoke_eval.json"))
     parser.add_argument("--limit", type=int, default=1)
     parser.add_argument("--top-k", type=int, default=2)
+    parser.add_argument("--candidate-k", type=int, default=DEFAULT_CANDIDATE_K)
     parser.add_argument("--max-doc-chars", type=int, default=300)
     parser.add_argument("--max-new-tokens", type=int, default=64)
+    parser.add_argument("--instruction-mode", choices=tuple(RAG_INSTRUCTIONS), default="legacy")
     parser.add_argument("--device", default="auto")
     parser.add_argument("--fp16", action="store_true")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--deterministic", action="store_true")
     parser.add_argument("--reranker-model", default=None)
-    parser.add_argument("--rerank-candidates", type=int, default=20)
+    parser.add_argument("--rerank-candidates", type=int, default=DEFAULT_RERANK_CANDIDATES)
+    parser.add_argument("--reranker-max-length", type=int, default=DEFAULT_RERANKER_MAX_LENGTH)
+    parser.add_argument("--reranker-batch-size", type=int, default=DEFAULT_RERANKER_BATCH_SIZE)
     return parser.parse_args()
 
 

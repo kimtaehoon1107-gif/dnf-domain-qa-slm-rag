@@ -893,6 +893,7 @@ def parse_args() -> argparse.Namespace:
         default=[
             Path("data/processed/official_eval_set.jsonl"),
             Path("data/processed/fresh_paraphrase_eval_set.jsonl"),
+            Path("data/review/blind_test_v1_candidate.jsonl"),
         ],
         help="Existing held-out eval set(s) whose parent docs must never enter the domain train split.",
     )

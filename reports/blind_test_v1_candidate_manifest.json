@@ -1,0 +1,35 @@
+{
+  "status": "pending_human_review",
+  "evaluation_role": "blind_test_candidate",
+  "model_evaluation_allowed": false,
+  "note": "Do not run retrieval or SLM evaluation on this candidate before human review and freeze.",
+  "seed": 42,
+  "source_files": {
+    "data\\processed\\domain_doc_chunks.jsonl": "40c4437034352331209430751a7568bc2da8620764587f65ae8a758a543ce3da",
+    "data\\processed\\domain_train_qa_measurement_fixed.jsonl": "b82e31465e2c48464cca672b2dddbdc517e0f6f5b071d8654fa3fb4af5f46a7b",
+    "data\\processed\\domain_eval_set_expanded.jsonl": "db9d85b5def0d96a2d76ffbbae11182290417678456df191e33dfe78af525e24",
+    "data\\processed\\official_eval_set.jsonl": "8bf9b7fc74a6c81aaf5c853328422d546b76f640ec89041d49f925f69efa32cd",
+    "data\\processed\\fresh_paraphrase_eval_set.jsonl": "25b46604f2327f3dc40d366cd83e1162c3767aaa36f1f52c753fba88f9749fe8"
+  },
+  "output": "data\\review\\blind_test_v1_candidate.jsonl",
+  "output_sha256": "252bc2b7432e65309e5bb681ab7f4759566bb195558cf45a3d20a2c92978ffd6",
+  "review_sample": "data\\review\\blind_test_v1_review_sample_30.jsonl",
+  "review_sample_sha256": "4dfd03b28756972de399e0fd81de3593123299021928e586eb53c7e62e7839f6",
+  "rows": 100,
+  "answerability_counts": {
+    "true": 60,
+    "partial": 20,
+    "false": 20
+  },
+  "auto_review_flag_counts": {
+    "generic_source_title": 10,
+    "high_title_overlap": 21,
+    "long_gold_answer": 5
+  },
+  "candidate_parent_docs": 41,
+  "max_rows_per_parent": 2,
+  "available_parent_docs": 69,
+  "train_eval_parent_overlap": 0,
+  "train_eval_chunk_overlap": 0,
+  "train_eval_question_overlap": 0
+}

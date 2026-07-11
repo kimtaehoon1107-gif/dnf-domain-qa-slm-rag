@@ -8,11 +8,18 @@ from pathlib import Path
 from typing import Any
 
 from io_utils import read_jsonl
-from retrieve import retrieve
-from retrieval_config import DEFAULT_EMBEDDING_MODEL, DEFAULT_RANK_MODE, RANK_MODES
+from retrieve import apply_reranker, retrieve
+from retrieval_config import (
+    DEFAULT_CANDIDATE_K,
+    DEFAULT_EMBEDDING_MODEL,
+    DEFAULT_RANK_MODE,
+    DEFAULT_RERANKER_BATCH_SIZE,
+    DEFAULT_RERANKER_MAX_LENGTH,
+    DEFAULT_RERANKER_MODEL,
+    RANK_MODES,
+)
 
 
-DEFAULT_RERANKER = "BAAI/bge-reranker-v2-m3"
 DEFAULT_CUTOFFS = (1, 3, 5, 10)
 
 
@@ -36,19 +43,10 @@ def min_gold_rank(retrieved_ids: list[str], expected_ids: list[str]) -> int | No
     return min(ranks) if ranks else None
 
 
-def load_reranker(model_name: str, device: str):
-    try:
-        from sentence_transformers import CrossEncoder
-    except ImportError as exc:
-        raise RuntimeError("sentence-transformers is required for reranking.") from exc
-    return CrossEncoder(model_name, max_length=512, device=device)
-
-
 def evaluate(args: argparse.Namespace) -> dict[str, Any]:
     import torch
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    reranker = load_reranker(args.reranker_model, device)
 
     rows = read_jsonl(args.eval_set)
     answerable = [row for row in rows if expected_match_ids(row)[0]]
@@ -68,6 +66,7 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
             persist_dir=args.persist_dir,
             top_k=args.candidate_top_k,
             model_name=args.model_name,
+            candidate_k=args.candidate_k,
             rank_mode=args.rank_mode,
         )
         expected_ids, match_scope = expected_match_ids(row)
@@ -77,9 +76,13 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
                 return [str(hit["doc_id"]) for hit in ordered_hits]
             return [parent_doc_id(hit) for hit in ordered_hits]
 
-        pairs = [(row["question"], f"{hit.get('title','')}\n{hit.get('text','')}") for hit in hits]
-        scores = reranker.predict(pairs)
-        reranked = [hit for _, hit in sorted(zip(scores, hits), key=lambda item: -float(item[0]))]
+        reranked = apply_reranker(
+            row["question"],
+            hits,
+            args.reranker_model,
+            max_length=args.reranker_max_length,
+            batch_size=args.reranker_batch_size,
+        )
 
         rank_before = min_gold_rank(match_ids(hits), expected_ids)
         rank_after = min_gold_rank(match_ids(reranked), expected_ids)
@@ -104,15 +107,21 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
     summary: dict[str, Any] = {
         "answerable_rows": total,
         "reranker_model": args.reranker_model,
+        "reranker_max_length": args.reranker_max_length,
+        "reranker_batch_size": args.reranker_batch_size,
         "candidate_top_k": args.candidate_top_k,
+        "candidate_k": args.candidate_k,
+        "embedding_model_name": args.model_name,
+        "rank_mode": args.rank_mode,
+        "device": device,
         "mrr@10_before": before_mrr / total,
         "mrr@10_after": after_mrr / total,
         "gold_rank_distribution_before": dict(sorted(before_ranks.items())),
         "gold_rank_distribution_after": dict(sorted(after_ranks.items())),
     }
     for c in cutoffs:
-        summary[f"recall@{c}_before"] = before_hits[c] / total
-        summary[f"recall@{c}_after"] = after_hits[c] / total
+        summary[f"hit_rate@{c}_before"] = before_hits[c] / total
+        summary[f"hit_rate@{c}_after"] = after_hits[c] / total
 
     return {
         "eval_set": str(args.eval_set),
@@ -128,8 +137,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--persist-dir", type=Path, default=Path("outputs/chroma_domain_chunks"))
     parser.add_argument("--model-name", default=DEFAULT_EMBEDDING_MODEL)
     parser.add_argument("--rank-mode", choices=RANK_MODES, default=DEFAULT_RANK_MODE)
-    parser.add_argument("--reranker-model", default=DEFAULT_RERANKER)
+    parser.add_argument("--reranker-model", default=DEFAULT_RERANKER_MODEL)
     parser.add_argument("--candidate-top-k", type=int, default=20)
+    parser.add_argument("--candidate-k", type=int, default=DEFAULT_CANDIDATE_K)
+    parser.add_argument("--reranker-max-length", type=int, default=DEFAULT_RERANKER_MAX_LENGTH)
+    parser.add_argument("--reranker-batch-size", type=int, default=DEFAULT_RERANKER_BATCH_SIZE)
     parser.add_argument("--output", type=Path, required=True)
     return parser.parse_args()
 

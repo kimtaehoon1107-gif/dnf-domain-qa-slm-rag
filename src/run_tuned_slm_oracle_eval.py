@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from io_utils import read_jsonl
-from prompt_format import format_prompt
+from prompt_format import RAG_INSTRUCTIONS, evidence_span_visible, format_prompt, instruction_for_mode
 from run_tuned_slm_smoke import generate_answer, load_tuned_model, parse_generated_fields, setup_determinism
 
 
@@ -90,6 +90,7 @@ def run_oracle(args: argparse.Namespace) -> dict[str, Any]:
             question=row["question"],
             documents=documents,
             max_doc_chars=args.max_doc_chars,
+            instruction=instruction_for_mode(args.instruction_mode),
         )
         row_start = time.perf_counter()
         answer = generate_answer(
@@ -103,6 +104,16 @@ def run_oracle(args: argparse.Namespace) -> dict[str, Any]:
         expected_chunks = expected_chunk_ids(row)
         parsed_citations = set(parsed["parsed_citations"])
         expected_chunk_set = set(expected_chunks)
+        oracle_visible = (
+            evidence_span_visible(
+                question=row["question"],
+                documents=documents,
+                evidence_span=row.get("evidence_span", ""),
+                max_doc_chars=args.max_doc_chars,
+            )
+            if expected_chunks
+            else True
+        )
         detail = {
             "eval_id": row.get("eval_id"),
             "question": row["question"],
@@ -110,6 +121,7 @@ def run_oracle(args: argparse.Namespace) -> dict[str, Any]:
             "expected_chunk_ids": expected_chunks,
             "oracle_chunk_ids": [doc["doc_id"] for doc in documents],
             "oracle_has_gold": bool(documents) if expected_chunks else True,
+            "oracle_has_visible_gold": oracle_visible,
             "generated_answer": answer,
             "latency_sec": round(time.perf_counter() - row_start, 3),
         }
@@ -146,11 +158,17 @@ def run_oracle(args: argparse.Namespace) -> dict[str, Any]:
     answer_chars = [row["parsed_answer_chars"] for row in details if row["has_answer_field"]]
 
     return {
+        "report_schema_version": 2,
         "model_name": args.model_name,
         "adapter_dir": str(args.adapter_dir),
         "eval_set": str(args.eval_set),
         "chunks": str(args.chunks),
         "oracle_mode": args.oracle_mode,
+        "max_doc_chars": args.max_doc_chars,
+        "max_new_tokens": args.max_new_tokens,
+        "instruction_mode": args.instruction_mode,
+        "seed": args.seed,
+        "deterministic": args.deterministic,
         "device": device,
         "rows": len(details),
         "total_runtime_sec": round(time.perf_counter() - start, 3),
@@ -160,6 +178,11 @@ def run_oracle(args: argparse.Namespace) -> dict[str, Any]:
             "answerable_rows": len(answerable),
             "oracle_gold_context_rate": (
                 sum(1 for row in answerable if row["oracle_has_gold"]) / len(answerable)
+                if answerable
+                else None
+            ),
+            "oracle_visible_gold_rate": (
+                sum(1 for row in answerable if row["oracle_has_visible_gold"]) / len(answerable)
                 if answerable
                 else None
             ),
@@ -187,6 +210,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--limit", type=int, default=10_000)
     parser.add_argument("--max-doc-chars", type=int, default=500)
     parser.add_argument("--max-new-tokens", type=int, default=160)
+    parser.add_argument("--instruction-mode", choices=tuple(RAG_INSTRUCTIONS), default="legacy")
     parser.add_argument("--device", default="auto")
     parser.add_argument("--fp16", action="store_true")
     parser.add_argument("--seed", type=int, default=42)

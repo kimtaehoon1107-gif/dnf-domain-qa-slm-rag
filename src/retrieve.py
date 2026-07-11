@@ -16,7 +16,15 @@ import chromadb
 from chromadb.utils import embedding_functions
 
 from build_index import COLLECTION_NAME
-from retrieval_config import DEFAULT_EMBEDDING_MODEL, DEFAULT_RANK_MODE, RANK_MODES
+from retrieval_config import (
+    DEFAULT_CANDIDATE_K,
+    DEFAULT_EMBEDDING_MODEL,
+    DEFAULT_RANK_MODE,
+    DEFAULT_RERANK_CANDIDATES,
+    DEFAULT_RERANKER_BATCH_SIZE,
+    DEFAULT_RERANKER_MAX_LENGTH,
+    RANK_MODES,
+)
 
 
 TOKEN_PATTERN = re.compile(r"[0-9A-Za-z가-힣]+")
@@ -34,17 +42,23 @@ def get_collection(persist_dir: Path, model_name: str = DEFAULT_EMBEDDING_MODEL)
 
 
 @lru_cache(maxsize=2)
-def get_reranker(model_name: str):
+def get_reranker(model_name: str, max_length: int):
     from sentence_transformers import CrossEncoder
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    return CrossEncoder(model_name, max_length=512, device=device)
+    return CrossEncoder(model_name, max_length=max_length, device=device)
 
 
-def apply_reranker(question: str, hits: list[dict], reranker_model: str) -> list[dict]:
-    reranker = get_reranker(reranker_model)
+def apply_reranker(
+    question: str,
+    hits: list[dict],
+    reranker_model: str,
+    max_length: int = DEFAULT_RERANKER_MAX_LENGTH,
+    batch_size: int = DEFAULT_RERANKER_BATCH_SIZE,
+) -> list[dict]:
+    reranker = get_reranker(reranker_model, max_length)
     pairs = [(question, f"{hit.get('title', '')}\n{hit.get('text', '')}") for hit in hits]
-    scores = reranker.predict(pairs)
+    scores = reranker.predict(pairs, batch_size=batch_size)
     for hit, score in zip(hits, scores):
         hit["rerank_score"] = float(score)
     return sorted(hits, key=lambda hit: -hit["rerank_score"])
@@ -109,16 +123,26 @@ def retrieve(
     persist_dir: Path = Path("outputs/chroma"),
     top_k: int = 5,
     model_name: str = DEFAULT_EMBEDDING_MODEL,
-    candidate_k: int | None = None,
+    candidate_k: int | None = DEFAULT_CANDIDATE_K,
     rank_mode: str = DEFAULT_RANK_MODE,
     reranker_model: str | None = None,
-    rerank_candidates: int = 20,
+    rerank_candidates: int = DEFAULT_RERANK_CANDIDATES,
+    reranker_max_length: int = DEFAULT_RERANKER_MAX_LENGTH,
+    reranker_batch_size: int = DEFAULT_RERANKER_BATCH_SIZE,
 ) -> list[dict]:
+    if top_k <= 0:
+        raise ValueError("top_k must be positive.")
+    if candidate_k is not None and candidate_k < top_k:
+        raise ValueError("candidate_k must be greater than or equal to top_k.")
+    if reranker_model and rerank_candidates < top_k:
+        raise ValueError("rerank_candidates must be greater than or equal to top_k.")
+    if reranker_max_length <= 0 or reranker_batch_size <= 0:
+        raise ValueError("reranker_max_length and reranker_batch_size must be positive.")
     collection = get_collection(persist_dir, model_name)
     doc_count = collection.count()
     if doc_count == 0:
         return []
-    n_results = min(candidate_k or max(top_k * 20, 100), doc_count)
+    n_results = min(candidate_k or max(top_k * 20, DEFAULT_CANDIDATE_K), doc_count)
     result = collection.query(query_texts=[question], n_results=n_results)
 
     hits = []
@@ -142,9 +166,13 @@ def retrieve(
         )
     ranked_hits = apply_rank_mode(hits, rank_mode)
     if reranker_model:
-        # Cross-encoder pass over the top candidates: measured recall@3
-        # 0.478 -> 0.622 (domain) / 0.955 -> 1.0 (fresh) with bge-reranker-v2-m3.
-        ranked_hits = apply_reranker(question, ranked_hits[:rerank_candidates], reranker_model)
+        ranked_hits = apply_reranker(
+            question,
+            ranked_hits[:rerank_candidates],
+            reranker_model,
+            max_length=reranker_max_length,
+            batch_size=reranker_batch_size,
+        )
     for rank, hit in enumerate(ranked_hits[:top_k], start=1):
         hit["rank"] = rank
         hit["rank_mode"] = rank_mode
@@ -156,11 +184,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("question")
     parser.add_argument("--persist-dir", type=Path, default=Path("outputs/chroma"))
     parser.add_argument("--top-k", type=int, default=5)
-    parser.add_argument("--candidate-k", type=int, default=None)
+    parser.add_argument("--candidate-k", type=int, default=DEFAULT_CANDIDATE_K)
     parser.add_argument("--model-name", default=DEFAULT_EMBEDDING_MODEL)
     parser.add_argument("--rank-mode", choices=RANK_MODES, default=DEFAULT_RANK_MODE)
     parser.add_argument("--reranker-model", default=None)
-    parser.add_argument("--rerank-candidates", type=int, default=20)
+    parser.add_argument("--rerank-candidates", type=int, default=DEFAULT_RERANK_CANDIDATES)
+    parser.add_argument("--reranker-max-length", type=int, default=DEFAULT_RERANKER_MAX_LENGTH)
+    parser.add_argument("--reranker-batch-size", type=int, default=DEFAULT_RERANKER_BATCH_SIZE)
     return parser.parse_args()
 
 
@@ -175,6 +205,10 @@ def main() -> None:
         model_name=args.model_name,
         candidate_k=args.candidate_k,
         rank_mode=args.rank_mode,
+        reranker_model=args.reranker_model,
+        rerank_candidates=args.rerank_candidates,
+        reranker_max_length=args.reranker_max_length,
+        reranker_batch_size=args.reranker_batch_size,
     )
     print(json.dumps(hits, ensure_ascii=False, indent=2))
 

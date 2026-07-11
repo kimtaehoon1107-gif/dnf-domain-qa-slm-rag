@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from io_utils import read_jsonl
+from prompt_format import evidence_span_visible
 
 
 TOKEN_PATTERN = re.compile(r"[0-9A-Za-z가-힣]+")
@@ -95,6 +96,8 @@ def validate_qa_rows(
         answer = normalize_space(row.get("gold_answer") or row.get("expected_answer") or "")
         if not answer or is_generic_answer(answer):
             errors.append(f"{row_id}: answerable/partial row has generic or empty answer")
+        elif len(answer) > 200:
+            warnings.append(f"{row_id}: gold answer has {len(answer)} chars > 200")
 
         max_overlap = max(
             title_overlap_ratio(row.get("question", ""), chunks_by_id[chunk_id].get("title", ""))
@@ -110,9 +113,12 @@ def validate_raft(
     chunks_by_id: dict[str, dict[str, Any]],
     eval_chunks: set[str],
     eval_parents: set[str],
-) -> tuple[list[str], list[str]]:
+    max_doc_chars: int,
+) -> tuple[list[str], list[str], dict[str, int | float | None]]:
     errors: list[str] = []
     warnings: list[str] = []
+    visibility_total = 0
+    visibility_hits = 0
     for row in raft_rows:
         row_id = str(row.get("raft_id", "<missing-raft-id>"))
         answerability = str(row.get("answerability", "true")).lower()
@@ -141,11 +147,33 @@ def validate_raft(
             if any(str(doc.get("role")) == "gold" for doc in documents):
                 errors.append(f"{row_id}: false row has gold evidence")
         else:
+            if not str(row.get("source_qa_id") or "").strip():
+                errors.append(f"{row_id}: answerable/partial row has no source_qa_id")
             if not citations:
                 errors.append(f"{row_id}: answerable/partial row has no citation")
             if not any(str(doc.get("role")) == "gold" for doc in documents):
                 warnings.append(f"{row_id}: answerable/partial row has no gold context role")
-    return errors, warnings
+            span = normalize_space(row.get("evidence_span", ""))
+            if not span:
+                errors.append(f"{row_id}: answerable/partial RAFT row has no evidence_span")
+            else:
+                visibility_total += 1
+                gold_documents = [doc for doc in documents if str(doc.get("doc_id")) in citations]
+                visible = evidence_span_visible(
+                    question=str(row.get("question", "")),
+                    documents=gold_documents,
+                    evidence_span=span,
+                    max_doc_chars=max_doc_chars,
+                )
+                visibility_hits += int(visible)
+                if not visible:
+                    errors.append(f"{row_id}: gold evidence is not visible in the {max_doc_chars}-char prompt window")
+    return errors, warnings, {
+        "rows": visibility_total,
+        "visible_rows": visibility_hits,
+        "visible_rate": visibility_hits / visibility_total if visibility_total else None,
+        "max_doc_chars": max_doc_chars,
+    }
 
 
 def duplicate_values(rows: list[dict[str, Any]], key: str) -> dict[str, int]:
@@ -187,6 +215,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--train-qa", type=Path, default=Path("data/processed/domain_train_qa_expanded.jsonl"))
     parser.add_argument("--raft", type=Path, default=Path("data/processed/domain_raft_sample_expanded.jsonl"))
     parser.add_argument("--title-overlap-cap", type=float, default=0.35)
+    parser.add_argument("--max-doc-chars", type=int, default=900)
     parser.add_argument(
         "--legacy-eval-set",
         type=Path,
@@ -194,6 +223,7 @@ def parse_args() -> argparse.Namespace:
         default=[
             Path("data/processed/official_eval_set.jsonl"),
             Path("data/processed/fresh_paraphrase_eval_set.jsonl"),
+            Path("data/review/blind_test_v1_candidate.jsonl"),
         ],
         help="Additional held-out eval set(s) that domain train/RAFT must not overlap with.",
     )
@@ -251,12 +281,14 @@ def main() -> None:
             f"{len(legacy_train_question_overlap)} questions"
         )
 
+    raft_visibility = {"rows": 0, "visible_rows": 0, "visible_rate": None, "max_doc_chars": args.max_doc_chars}
     if raft_rows:
-        raft_errors, raft_warnings = validate_raft(
+        raft_errors, raft_warnings, raft_visibility = validate_raft(
             raft_rows,
             chunks_by_id,
             eval_chunks | legacy_chunks,
             eval_parents | legacy_parents,
+            args.max_doc_chars,
         )
         errors.extend(raft_errors)
         warnings.extend(raft_warnings)
@@ -301,6 +333,7 @@ def main() -> None:
         "eval_answerability_counts": dict(Counter(str(row.get("answerability", "")) for row in eval_rows)),
         "train_answerability_counts": dict(Counter(str(row.get("answerability", "")) for row in train_rows)),
         "raft_answerability_counts": dict(Counter(str(row.get("answerability", "")) for row in raft_rows)),
+        "raft_gold_evidence_visibility": raft_visibility,
         "eval_expected_chunks": len(eval_chunks),
         "train_expected_chunks": len(train_chunks),
         "train_eval_parent_overlap": len(parent_overlap),

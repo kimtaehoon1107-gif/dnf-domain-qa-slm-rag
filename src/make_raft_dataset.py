@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from io_utils import read_jsonl, write_jsonl
-from prompt_format import DEFAULT_RAG_INSTRUCTION
+from prompt_format import DEFAULT_RAG_INSTRUCTION, RAG_INSTRUCTIONS, instruction_for_mode
 
 
 GENERIC_ANSWER_HINTS = (
@@ -14,6 +14,7 @@ GENERIC_ANSWER_HINTS = (
     "공식 문서를 근거로 답변해야",
 )
 DEFAULT_NO_ANSWER = "수집된 공식 문서만으로는 해당 질문에 답변할 충분한 근거가 없습니다."
+CONTEXT_MAX_CHARS = 1200
 
 def truncate(text: str, max_chars: int) -> str:
     text = " ".join(str(text).split())
@@ -123,16 +124,42 @@ def sample_distractor_ids(
     docs_by_id: dict[str, dict[str, Any]],
     gold_docs: list[dict[str, Any]],
     distractors: int,
+    preferred_doc_ids: list[str] | None = None,
+    allow_random_fill: bool = True,
 ) -> list[str]:
     gold_ids = {str(doc["doc_id"]) for doc in gold_docs}
     gold_parent_ids = {parent_id(doc) for doc in gold_docs}
-    distractor_ids = [
+    eligible_ids = [
         doc_id
         for doc_id in available_doc_ids
         if doc_id not in gold_ids and parent_id(docs_by_id[doc_id]) not in gold_parent_ids
     ]
-    rng.shuffle(distractor_ids)
-    return distractor_ids[:distractors]
+    eligible = set(eligible_ids)
+    selected = []
+    for doc_id in preferred_doc_ids or []:
+        if doc_id in eligible and doc_id not in selected:
+            selected.append(doc_id)
+        if len(selected) >= distractors:
+            return selected
+    if allow_random_fill:
+        remaining = [doc_id for doc_id in eligible_ids if doc_id not in selected]
+        rng.shuffle(remaining)
+        selected.extend(remaining[: distractors - len(selected)])
+    return selected
+
+
+def hard_negative_map(rows: list[dict[str, Any]]) -> dict[str, list[str]]:
+    mapped = {}
+    for row in rows:
+        source_qa_id = str(row.get("source_qa_id") or "")
+        if not source_qa_id:
+            continue
+        mapped[source_qa_id] = [
+            str(item.get("doc_id"))
+            for item in row.get("hard_negatives", [])
+            if isinstance(item, dict) and item.get("doc_id")
+        ]
+    return mapped
 
 
 def make_raft_rows(
@@ -146,8 +173,12 @@ def make_raft_rows(
     excluded_chunk_ids: set[str],
     excluded_parent_ids: set[str],
     gold_text: str = "span",
+    instruction: str = DEFAULT_RAG_INSTRUCTION,
+    hard_negatives_by_source: dict[str, list[str]] | None = None,
+    require_hard_negatives: bool = False,
 ) -> list[dict[str, Any]]:
-    rng = random.Random(seed)
+    distractor_rng = random.Random(seed)
+    context_order_rng = random.Random(seed + 1)
     docs_by_id = {str(doc["doc_id"]): doc for doc in docs}
     available_docs = [
         doc
@@ -156,6 +187,7 @@ def make_raft_rows(
     ]
     available_doc_ids = [str(doc["doc_id"]) for doc in available_docs]
     rows = []
+    hard_negatives_by_source = hard_negatives_by_source or {}
 
     for qa in qa_rows:
         if not row_is_trainable(qa, train_splits=train_splits, allow_unsplit=allow_unsplit):
@@ -164,15 +196,30 @@ def make_raft_rows(
         if not answer:
             continue
         answerability = str(qa.get("answerability", "true"))
+        source_qa_id = str(qa.get("qa_id") or qa.get("eval_id") or "")
+        preferred_ids = hard_negatives_by_source.get(source_qa_id, [])
         gold_ids = gold_ids_for_row(qa)
         if answerability == "false":
-            distractor_ids = list(available_doc_ids)
-            rng.shuffle(distractor_ids)
+            required_docs = max(1, distractors + 1)
+            distractor_ids = sample_distractor_ids(
+                rng=distractor_rng,
+                available_doc_ids=available_doc_ids,
+                docs_by_id=docs_by_id,
+                gold_docs=[],
+                distractors=required_docs,
+                preferred_doc_ids=preferred_ids,
+                allow_random_fill=not require_hard_negatives,
+            )
+            if require_hard_negatives and len(distractor_ids) < required_docs:
+                raise RuntimeError(
+                    f"Not enough hard negatives for {source_qa_id}: "
+                    f"{len(distractor_ids)}/{required_docs}."
+                )
             # Same document count as answerable rows (1 gold + N distractors):
             # otherwise document count alone predicts the label during training
             # (v2 data had false=2 docs vs answerable=3 docs).
             context_docs = [
-                make_context_doc(docs_by_id[doc_id], "distractor", max_chars=900)
+                make_context_doc(docs_by_id[doc_id], "distractor", max_chars=CONTEXT_MAX_CHARS)
                 for doc_id in distractor_ids[: max(1, distractors + 1)]
             ]
             if not context_docs:
@@ -193,44 +240,57 @@ def make_raft_rows(
                 continue
 
             distractor_ids = sample_distractor_ids(
-                rng=rng,
+                rng=distractor_rng,
                 available_doc_ids=available_doc_ids,
                 docs_by_id=docs_by_id,
                 gold_docs=gold_docs,
                 distractors=distractors,
+                preferred_doc_ids=preferred_ids,
+                allow_random_fill=not require_hard_negatives,
             )
+            if require_hard_negatives and len(distractor_ids) < distractors:
+                raise RuntimeError(
+                    f"Not enough hard negatives for {source_qa_id}: "
+                    f"{len(distractor_ids)}/{distractors}."
+                )
             # gold_text="span" puts only the answer sentence in the gold doc,
             # which makes gold systematically the shortest document — a length
             # shortcut on top of unrealistic (noise-free) evidence. "chunk"
             # uses the full chunk text like inference-time retrieval does.
             evidence_span = str(qa.get("evidence_span") or "") if gold_text == "span" else ""
-            gold_max_chars = 1200 if gold_text == "span" else 900
+            gold_max_chars = CONTEXT_MAX_CHARS
             context_docs = [
                 make_context_doc(doc, "gold", max_chars=gold_max_chars, evidence_span=evidence_span)
                 for doc in gold_docs
             ]
             context_docs.extend(
-                make_context_doc(docs_by_id[doc_id], "distractor", max_chars=900)
+                make_context_doc(docs_by_id[doc_id], "distractor", max_chars=CONTEXT_MAX_CHARS)
                 for doc_id in distractor_ids
             )
             # Shuffle so gold is not always document 1: v2 data had gold at
             # position 1 in 279/279 rows and the model learned to cite rank 1
             # mechanically instead of selecting evidence by content.
-            rng.shuffle(context_docs)
+            # Keep context position independent from distractor-selection RNG.
+            # Controlled random-vs-hard-negative arms must see the gold chunk
+            # at the same position for each source QA.
+            context_order_rng.shuffle(context_docs)
         rows.append(
             {
                 "raft_id": "",
-                "instruction": qa.get("instruction") or DEFAULT_RAG_INSTRUCTION,
+                "source_qa_id": source_qa_id,
+                "instruction": qa.get("instruction") or instruction,
                 "question": qa["question"],
                 "documents": context_docs,
                 "answer": answer,
                 "citations": gold_ids,
                 "answerability": answerability,
+                "evidence_span": str(qa.get("evidence_span") or ""),
                 "intent": qa.get("intent", "unknown"),
                 "source_eval_type": qa.get("source_eval_type", ""),
                 "source_split": qa.get("split", ""),
                 "expected_doc_id": qa.get("expected_doc_id", ""),
                 "expected_chunk_ids": expected_chunk_ids(qa),
+                "distractor_strategy": "hard_negative" if preferred_ids else "random",
             }
         )
     return select_balanced_rows(rows, max_rows=max_rows)
@@ -245,6 +305,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-rows", type=int, default=50)
     parser.add_argument("--distractors", type=int, default=2)
     parser.add_argument("--gold-text", choices=("span", "chunk"), default="span")
+    parser.add_argument("--instruction-mode", choices=tuple(RAG_INSTRUCTIONS), default="legacy")
+    parser.add_argument("--hard-negatives", type=Path, default=None)
+    parser.add_argument("--require-hard-negatives", action="store_true")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--train-splits", default="train")
     parser.add_argument("--allow-unsplit", action="store_true")
@@ -261,6 +324,8 @@ def main() -> None:
     for eval_set_path in args.exclude_eval_set:
         eval_rows.extend(read_jsonl(eval_set_path))
     excluded_chunk_ids, excluded_parent_ids = excluded_ids(eval_rows)
+    hard_negative_rows = read_jsonl(args.hard_negatives) if args.hard_negatives else []
+    hard_negatives_by_source = hard_negative_map(hard_negative_rows)
     rows = make_raft_rows(
         docs=docs,
         qa_rows=qa_rows,
@@ -272,6 +337,9 @@ def main() -> None:
         excluded_chunk_ids=excluded_chunk_ids,
         excluded_parent_ids=excluded_parent_ids,
         gold_text=args.gold_text,
+        instruction=instruction_for_mode(args.instruction_mode),
+        hard_negatives_by_source=hard_negatives_by_source,
+        require_hard_negatives=args.require_hard_negatives,
     )
     write_jsonl(args.output, rows)
     print(
@@ -282,6 +350,11 @@ def main() -> None:
                 "excluded_eval_sets": [str(path) for path in args.exclude_eval_set],
                 "excluded_eval_chunks": len(excluded_chunk_ids),
                 "excluded_eval_parent_docs": len(excluded_parent_ids),
+                "instruction_mode": args.instruction_mode,
+                "seed": args.seed,
+                "context_order_seed": args.seed + 1,
+                "hard_negatives": str(args.hard_negatives) if args.hard_negatives else None,
+                "require_hard_negatives": args.require_hard_negatives,
             },
             ensure_ascii=False,
             indent=2,
