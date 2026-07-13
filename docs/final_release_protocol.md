@@ -1,5 +1,14 @@
 # Final Release Protocol
 
+## Recorded Outcome
+
+The single final run completed. `checkpoint-250` won the frozen checkpoint
+selection tuple, but both it and the step-264 final checkpoint failed the
+fresh-false and explicit-unsupported-abstention development gates. Per this
+protocol, domain/official expansion and the frozen blind were not run. Training
+is closed; see `docs/final_release_results.md` and
+`reports/final_random_control_release_decision.json`.
+
 ## Scope
 
 This is the final controlled training cycle. Retrieval experiments are closed.

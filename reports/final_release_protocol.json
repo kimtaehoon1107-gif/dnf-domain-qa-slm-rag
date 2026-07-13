@@ -1,6 +1,6 @@
 {
-  "status": "frozen_before_final_training",
-  "training_runs_remaining": 1,
+  "status": "closed_blind_not_opened",
+  "training_runs_remaining": 0,
   "retrieval": {
     "embedding_model": "BAAI/bge-m3",
     "rank_mode": "hybrid",
@@ -63,5 +63,17 @@
     "queries_before_all_dev_gates_pass": 0,
     "maximum_final_runs": 1,
     "post_blind_tuning_allowed": false
+  },
+  "outcome": {
+    "training_completed_steps": 264,
+    "comparison_winner": "checkpoint_250",
+    "release_candidate": null,
+    "failed_pre_gates": [
+      "fresh_false_joint",
+      "unsupported_explicit_abstention"
+    ],
+    "domain_official_evaluated": false,
+    "blind_queried": false,
+    "decision_report": "reports/final_random_control_release_decision.json"
   }
 }
