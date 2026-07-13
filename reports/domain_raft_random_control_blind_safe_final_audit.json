@@ -1,0 +1,17 @@
+{
+  "status": "ok",
+  "raft_rows": 576,
+  "distractor_count": 1359,
+  "max_evidence_token_recall": 0.4444444444444444,
+  "threshold": 0.5,
+  "missing_docs": 0,
+  "exact_span_occurrences": 0,
+  "high_overlap_occurrences": 0,
+  "human_blocked_occurrences": 0,
+  "same_parent_occurrences": 0,
+  "errors": [],
+  "docs": "data\\processed\\domain_doc_chunks.jsonl",
+  "raft": "data\\processed\\domain_raft_random_control_blind_safe_final_gate_balanced.jsonl",
+  "raft_sha256": "a092f49e13654fc2c69dc3b352dec6e8ddfa6aa0a3108f3b8214d22fa18b6730",
+  "human_review": "data\\review\\hard_negative_blind_safe_review_30.csv"
+}
