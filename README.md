@@ -447,3 +447,11 @@ Expected:
 - Base Qwen does not reliably follow the required line schema and produced substantive unsafe answers on both fresh safety rows.
 - LLM-RAG has no comparable current API run; historical v1 values are reference-only.
 - Additional training, retrieval variants, and prompt tuning are outside this finalized portfolio cycle.
+
+## Data Source Notice
+
+The documents under `data/` are collected from the official Dungeon & Fighter
+website operated by Neople. All game content and original document text are the
+property of Neople Inc. They are included here solely for non-commercial
+research and educational purposes (document-grounded QA evaluation). If you are
+a rights holder and want any content removed, please open an issue.
