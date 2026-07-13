@@ -14,7 +14,12 @@ from generate_answer import build_grounded_answer
 from prompt_format import format_prompt
 from retrieve import retrieve
 from retrieval_config import BGE_M3_MODEL, DEFAULT_RANK_MODE, MINILM_MODEL, RANK_MODES
-from run_tuned_slm_smoke import contexts_to_documents, generate_answer, load_tuned_model
+from run_tuned_slm_smoke import (
+    contexts_to_documents,
+    generate_answer,
+    load_generation_model,
+    load_tuned_model,
+)
 
 
 INDEXES = {
@@ -53,12 +58,22 @@ INDEXES = {
 }
 MODE_LABELS = {
     "RAG-only": "rag_only",
+    "Base SLM + RAG": "base_slm",
     "Tuned SLM": "tuned_slm",
     "LLM-RAG": "llm_rag",
 }
 DEFAULT_TUNED_MODEL = os.environ.get("TUNED_SLM_MODEL", "Qwen/Qwen2.5-0.5B-Instruct")
-DEFAULT_ADAPTER_DIR = Path(os.environ.get("TUNED_SLM_ADAPTER_DIR", PROJECT_ROOT / "outputs" / "slm_lora_qwen_domain_v3_3"))
+DEFAULT_ADAPTER_DIR = Path(
+    os.environ.get(
+        "TUNED_SLM_ADAPTER_DIR",
+        PROJECT_ROOT
+        / "outputs"
+        / "slm_lora_random_control_blind_safe_final"
+        / "checkpoint-250",
+    )
+)
 _TUNED_MODEL_CACHE = None
+_BASE_MODEL_CACHE = None
 
 
 def chroma_persist_path(path: Path) -> Path:
@@ -101,6 +116,21 @@ def load_cached_tuned_model():
     return _TUNED_MODEL_CACHE
 
 
+def load_cached_base_model():
+    global _BASE_MODEL_CACHE
+    if _BASE_MODEL_CACHE is None:
+        import torch
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        _BASE_MODEL_CACHE = load_generation_model(
+            DEFAULT_TUNED_MODEL,
+            adapter_dir=None,
+            device=device,
+            fp16=device == "cuda",
+        )
+    return _BASE_MODEL_CACHE
+
+
 def rag_only_response(question: str, contexts: list[dict]) -> dict:
     response = build_grounded_answer(question, contexts).to_dict()
     return {"mode": "rag_only", **response}
@@ -124,6 +154,27 @@ def tuned_slm_response(question: str, contexts: list[dict], max_doc_chars: int, 
         "mode": "tuned_slm",
         "model": DEFAULT_TUNED_MODEL,
         "adapter_dir": str(DEFAULT_ADAPTER_DIR),
+        "raw_generation": answer,
+    }
+
+
+def base_slm_response(question: str, contexts: list[dict], max_doc_chars: int, max_new_tokens: int) -> dict:
+    torch_module, tokenizer, model = load_cached_base_model()
+    prompt = format_prompt(
+        question=question,
+        documents=contexts_to_documents(contexts),
+        max_doc_chars=max_doc_chars,
+    )
+    answer = generate_answer(
+        torch_module=torch_module,
+        tokenizer=tokenizer,
+        model=model,
+        prompt=prompt,
+        max_new_tokens=max_new_tokens,
+    )
+    return {
+        "mode": "base_slm",
+        "model": DEFAULT_TUNED_MODEL,
         "raw_generation": answer,
     }
 
@@ -162,6 +213,8 @@ def answer_question(
     try:
         if mode == "rag_only":
             response = rag_only_response(question, contexts)
+        elif mode == "base_slm":
+            response = base_slm_response(question, contexts, int(max_doc_chars), int(max_new_tokens))
         elif mode == "tuned_slm":
             response = tuned_slm_response(question, contexts, int(max_doc_chars), int(max_new_tokens))
         else:
@@ -189,8 +242,8 @@ with gr.Blocks(title="DNF Domain QA SLM/RAG v2") as demo:
         index_name = gr.Dropdown(label="Index", choices=list(INDEXES), value="domain_chunks_bge_m3")
         rank_mode = gr.Dropdown(label="Rank Mode", choices=list(RANK_MODES), value=DEFAULT_RANK_MODE)
         mode = gr.Dropdown(label="Mode", choices=list(MODE_LABELS), value="RAG-only")
-        max_doc_chars = gr.Slider(label="Max Doc Chars", minimum=40, maximum=1200, step=20, value=500)
-        max_new_tokens = gr.Slider(label="Max New Tokens", minimum=16, maximum=256, step=8, value=160)
+        max_doc_chars = gr.Slider(label="Max Doc Chars", minimum=40, maximum=1200, step=20, value=900)
+        max_new_tokens = gr.Slider(label="Max New Tokens", minimum=16, maximum=256, step=8, value=256)
     submit = gr.Button("Run")
     response = gr.Code(label="Response", language="json")
     evidence = gr.Dataframe(

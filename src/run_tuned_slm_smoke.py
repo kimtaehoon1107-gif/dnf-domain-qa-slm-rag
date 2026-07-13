@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 from typing import Any
 
+from generate_answer import build_grounded_answer
 from io_utils import read_jsonl
 from prompt_format import (
     RAG_INSTRUCTIONS,
@@ -31,6 +32,7 @@ from retrieval_config import (
 
 CHUNK_ID_PATTERN = re.compile(r"[A-Za-z0-9_]+__chunk_\d+")
 CONTEXT_MODES = ("chunk", "sibling_window")
+GENERATOR_MODES = ("tuned_slm", "base_slm", "rag_only")
 
 
 def parent_doc_id(hit: dict[str, Any]) -> str:
@@ -171,7 +173,12 @@ def setup_determinism(torch_module, seed: int, deterministic: bool) -> None:
             torch_module.backends.cudnn.benchmark = False
 
 
-def load_tuned_model(model_name: str, adapter_dir: Path, device: str, fp16: bool):
+def load_generation_model(
+    model_name: str,
+    adapter_dir: Path | None,
+    device: str,
+    fp16: bool,
+):
     try:
         import torch
         from peft import PeftModel
@@ -183,9 +190,9 @@ def load_tuned_model(model_name: str, adapter_dir: Path, device: str, fp16: bool
             "Tuned-SLM smoke dependencies are missing. Install them with: pip install -r requirements-train.txt"
         ) from exc
 
-    tokenizer_source: str | Path = (
-        adapter_dir if (adapter_dir / "tokenizer_config.json").exists() else model_name
-    )
+    tokenizer_source: str | Path = model_name
+    if adapter_dir is not None and (adapter_dir / "tokenizer_config.json").exists():
+        tokenizer_source = adapter_dir
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_source, trust_remote_code=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -194,10 +201,28 @@ def load_tuned_model(model_name: str, adapter_dir: Path, device: str, fp16: bool
     if fp16 and device.startswith("cuda"):
         model_kwargs["torch_dtype"] = torch.float16
     base_model = AutoModelForCausalLM.from_pretrained(model_name, **model_kwargs)
-    model = PeftModel.from_pretrained(base_model, adapter_dir)
+    model = (
+        PeftModel.from_pretrained(base_model, adapter_dir)
+        if adapter_dir is not None
+        else base_model
+    )
     model.to(device)
     model.eval()
     return torch, tokenizer, model
+
+
+def load_tuned_model(model_name: str, adapter_dir: Path, device: str, fp16: bool):
+    return load_generation_model(model_name, adapter_dir, device, fp16)
+
+
+def format_rag_only_generation(question: str, contexts: list[dict[str, Any]]) -> str:
+    response = build_grounded_answer(question, contexts)
+    citations = ", ".join(response.evidence)
+    return (
+        f"answerability: {response.answerability}\n"
+        f"citations: {citations}\n"
+        f"answer: {response.answer}"
+    )
 
 
 def generate_answer(
@@ -225,14 +250,23 @@ def generate_answer(
 
 def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
     rows = read_jsonl(args.eval_set)[: args.limit]
-    try:
-        import torch
-    except ImportError as exc:
-        raise RuntimeError("PyTorch is required for tuned-SLM evaluation.") from exc
+    torch_module = tokenizer = model = None
+    device = "rule_based"
+    if args.generator_mode != "rag_only":
+        try:
+            import torch
+        except ImportError as exc:
+            raise RuntimeError("PyTorch is required for SLM evaluation.") from exc
 
-    device = resolve_device(torch, args.device)
-    setup_determinism(torch, seed=args.seed, deterministic=args.deterministic)
-    torch_module, tokenizer, model = load_tuned_model(args.model_name, args.adapter_dir, device, args.fp16)
+        device = resolve_device(torch, args.device)
+        setup_determinism(torch, seed=args.seed, deterministic=args.deterministic)
+        adapter_dir = args.adapter_dir if args.generator_mode == "tuned_slm" else None
+        torch_module, tokenizer, model = load_generation_model(
+            args.model_name,
+            adapter_dir,
+            device,
+            args.fp16,
+        )
     chunks_by_id: dict[str, dict[str, Any]] = {}
     siblings_by_parent_index: dict[tuple[str, int], dict[str, Any]] = {}
     if args.context_mode == "sibling_window":
@@ -276,12 +310,16 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
             instruction=instruction_for_mode(args.instruction_mode),
         )
         row_start = time.perf_counter()
-        answer = generate_answer(
-            torch_module=torch_module,
-            tokenizer=tokenizer,
-            model=model,
-            prompt=prompt,
-            max_new_tokens=args.max_new_tokens,
+        answer = (
+            format_rag_only_generation(row["question"], generation_contexts)
+            if args.generator_mode == "rag_only"
+            else generate_answer(
+                torch_module=torch_module,
+                tokenizer=tokenizer,
+                model=model,
+                prompt=prompt,
+                max_new_tokens=args.max_new_tokens,
+            )
         )
         parsed_fields = parse_generated_fields(answer)
         expected_chunk_ids = [str(item) for item in row.get("expected_chunk_ids", []) if item]
@@ -427,8 +465,9 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
 
     return {
         "report_schema_version": 2,
+        "generator_mode": args.generator_mode,
         "model_name": args.model_name,
-        "adapter_dir": str(args.adapter_dir),
+        "adapter_dir": str(args.adapter_dir) if args.generator_mode == "tuned_slm" else "",
         "eval_set": str(args.eval_set),
         "persist_dir": str(args.persist_dir),
         "embedding_model_name": args.embedding_model_name,
@@ -535,6 +574,7 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run a minimal tuned-SLM LoRA adapter generation smoke test.")
+    parser.add_argument("--generator-mode", choices=GENERATOR_MODES, default="tuned_slm")
     parser.add_argument("--model-name", default="Qwen/Qwen2.5-0.5B-Instruct")
     parser.add_argument("--adapter-dir", type=Path, default=Path("outputs/slm_lora_qwen_smoke"))
     parser.add_argument("--eval-set", type=Path, default=Path("data/processed/official_eval_set.jsonl"))
