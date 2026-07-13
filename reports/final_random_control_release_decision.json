@@ -1,0 +1,89 @@
+{
+  "report_schema_version": 1,
+  "status": "blind_opening_blocked",
+  "comparison_winner": "checkpoint_250",
+  "release_candidate": null,
+  "fallback_clean_baseline": "checkpoint_250",
+  "selection_order": [
+    "human_strict_requirement_joint",
+    "human_exact_citation",
+    "fresh_partial_joint",
+    "fresh_exact_citation",
+    "unsupported_explicit_abstention"
+  ],
+  "candidates": {
+    "checkpoint_250": {
+      "metrics": {
+        "fresh_exact_citation": 14,
+        "fresh_partial_joint": 3,
+        "fresh_false_joint": 5,
+        "human_exact_citation": 12,
+        "human_partial_joint": 8,
+        "human_strict_requirement_joint": 3,
+        "grounded_answered_and_cited": 11,
+        "unsupported_explicit_abstention": 8,
+        "unsupported_over_answer": 0,
+        "unsafe_answer_rows": 0
+      },
+      "selection_tuple": [
+        3,
+        12,
+        3,
+        14,
+        8
+      ],
+      "failed_pre_gates": [
+        {
+          "gate": "fresh_false_joint",
+          "actual": 5,
+          "operator": ">=",
+          "threshold": 7
+        },
+        {
+          "gate": "unsupported_explicit_abstention",
+          "actual": 8,
+          "operator": ">=",
+          "threshold": 14
+        }
+      ]
+    },
+    "final": {
+      "metrics": {
+        "fresh_exact_citation": 12,
+        "fresh_partial_joint": 2,
+        "fresh_false_joint": 6,
+        "human_exact_citation": 11,
+        "human_partial_joint": 7,
+        "human_strict_requirement_joint": 2,
+        "grounded_answered_and_cited": 8,
+        "unsupported_explicit_abstention": 8,
+        "unsupported_over_answer": 0,
+        "unsafe_answer_rows": 0
+      },
+      "selection_tuple": [
+        2,
+        11,
+        2,
+        12,
+        8
+      ],
+      "failed_pre_gates": [
+        {
+          "gate": "fresh_false_joint",
+          "actual": 6,
+          "operator": ">=",
+          "threshold": 7
+        },
+        {
+          "gate": "unsupported_explicit_abstention",
+          "actual": 8,
+          "operator": ">=",
+          "threshold": 14
+        }
+      ]
+    }
+  },
+  "domain_official_evaluated": false,
+  "blind_queried": false,
+  "decision": "No checkpoint passed the frozen fresh/human development gates. Do not evaluate domain, official, or frozen blind; retain checkpoint-250 as the clean development baseline and stop training."
+}

@@ -2,11 +2,42 @@
 
 ## Current Goal
 
-Measurement repair, controlled SLM work, blind-test freeze, clean hard-negative review, human Partial dev, both Phase C context experiments, the reviewed Partial decomposition arm, and the clean step-264 completion check are complete. Checkpoint-250 is retained as the selected clean conservative baseline by early stopping; step-264, parent-window, deterministic-prefix, and Partial decomposition variants are rejected. Canonical retrieval remains BGE-M3 hybrid chunk-only; Gradio remains on `outputs/slm_lora_qwen_domain_v3_3`; reranker remains off; frozen blind remains unevaluated.
+The final portfolio cycle is closed. Canonical retrieval is BGE-M3 hybrid
+chunk-only (`top_k=3`, `candidate_k=100`, 900-character query window), the
+legacy prompt is frozen, and reranker/parent-window/contextual-prefix variants
+remain rejected. One final blind-safe random-control run completed `264/264`
+steps. The frozen checkpoint rule selects its `checkpoint-250` as the clean
+development baseline, but neither checkpoint passed the fresh/human
+blind-opening gates. The frozen blind was not queried and no additional
+training cycle is allowed in this release.
 
-The active goal is now to diagnose the Partial-vs-false boundary before any further training. The reviewed decomposition arm answered more grounded slots but overgeneralized `partial` to wholly unsupported questions with distracting retrieved text. Do not start another full training run until a small contrast design explicitly covers that boundary and passes human review and the existing leakage gates.
+Gradio defaults to RAG-only. Tuned mode now points to
+`outputs/slm_lora_random_control_blind_safe_final/checkpoint-250`, while base
+Qwen + RAG is available as a comparison mode. This is a development demo, not
+a blind-validated production model. See `docs/final_release_results.md` and
+`reports/final_dev_system_comparison.json`.
 
 ## Verified State
+
+- Final blind-safe QA: 408 rows. Final gate-balanced random-control RAFT: 576
+  rows (`277 true / 92 partial / 207 false`). Every train/dev/eval/blind
+  parent, chunk, question, and RAFT-context overlap is `0`; gold visibility is
+  `369/369`; gold positions are `117/124/128`; exact/high-overlap distractor
+  contamination is `0` across 1,359 distractors.
+- Final training: Qwen2.5-0.5B, `528 train / 32 dev`, parent overlap `0`, two
+  epochs, `264/264`, final dev loss `0.1300`, skipped rows `0`.
+- Frozen checkpoint verdict: checkpoint-250 beats step 264 on the ordered
+  citation/Partial tuple. It scores fresh exact `14/22`, Partial joint `3/6`,
+  false joint `5/8`; human exact `12/20`, Partial joint `8/20`, strict
+  requirement joint `3/20`.
+- Blind gate failure: fresh false requires `7/8` but is `5/8`; explicit
+  unsupported abstention requires `14/21` but is `8/21`. Step 264 also fails
+  both. Domain/official expansion and frozen blind execution were skipped by
+  protocol.
+- Final dev-only three-arm comparison is complete. RAG-only cannot express
+  Partial; base Qwen has schema compliance `0/30` and unsafe raw answers `2/2`;
+  clean tuned Qwen has schema `30/30`, fresh exact `14/22`, and human Partial
+  joint `8/20`, but fails refusal gates.
 
 - Commit containing the measurement repair and controlled data: `67bfad9`.
 - Parent-document dev split fix: `3bbbd27`.
@@ -77,8 +108,8 @@ It has 576 rows, gold visibility `1.0`, and exact/high-overlap answer contaminat
 - Do not run retrieval or generation on `data/eval/blind_test_v1.jsonl` during development; it is reserved for one intentional final run.
 - Do not add `partial_dev_human_review_20.csv` or its approved output to train/RAFT; it is development evaluation only.
 - Do not start the clean-from-base training run until the partial-development review is complete and validated.
-- Do not call checkpoint-250 a completed run or promote it. Evaluate it only as an exploratory candidate after CUDA recovers.
-- Do not spend another full training run merely to add the final 14 steps; development evidence already rejects this arm for promotion.
+- Do not call the historical `slm_lora_answer_filtered_blind_safe_v2_parent_group/checkpoint-250` a completed run or promote it; that warning is separate from the final random-control run.
+- Do not spend another full training run on the historical answer-filtered recipe merely to add its final 14 steps; development evidence already rejected that arm.
 - Do not enable sibling-window context in Gradio or canonical generation; it failed the fresh-dev and latency gates.
 - Do not promote the deterministic-prefix index or start selective LLM contextual retrieval; the prefix failed cross-set retrieval and neither context experiment justified the complexity.
 - Do not use source-QA-only dev loss as a document-generalization claim.
@@ -89,12 +120,10 @@ It has 576 rows, gold visibility `1.0`, and exact/high-overlap answer contaminat
 
 ## Next Actions
 
-1. For fast portfolio completion, freeze checkpoint-250 as the clean conservative baseline and step-264 as the rejected completion check. Do not spend another training run on this recipe.
-2. Update the final comparison to distinguish current demo v3.3 from the leakage-safe clean checkpoint-250 baseline; do not make final blind claims for either.
-3. Decide whether the portfolio will stop with the documented Partial limitation or fund one final human-reviewed Partial-vs-false contrast arm.
-4. If stopping, finish the RAG-only / base SLM+RAG / clean tuned-SLM comparison and README without querying blind. State that no clean adapter passed the blind-opening gate.
-5. If continuing, audit the false/unsupported failure families and human-review a small contrast set before any append or retraining.
-6. Run the frozen blind exactly once only after a future clean adapter passes every development promotion gate and the full comparison configuration is frozen.
+1. Do not run another training, retrieval, prompt, or blind experiment in this release.
+2. Preserve `checkpoint-250` only as the clean development baseline and keep the Gradio default on RAG-only.
+3. Treat `docs/final_release_results.md`, `reports/final_dev_system_comparison.json`, and `reports/final_random_control_release_decision.json` as the final verdict.
+4. A future research branch may begin only with a separately approved human-reviewed Partial-vs-unsupported contrast design; it must not rewrite this release's blind decision.
 
 ## Deferred / Next Phase (Phase C)
 
@@ -116,6 +145,13 @@ No Phase C result is promoted to canonical or enabled in Gradio without an end-t
 
 ## Authoritative Artifacts
 
+- `docs/final_release_results.md`
+- `reports/final_dev_system_comparison.json`
+- `reports/final_random_control_release_decision.json`
+- `reports/final_random_control_training_manifest.json`
+- `reports/final_random_control_data_manifest.json`
+- `reports/domain_dataset_validation_random_control_blind_safe_final.json`
+- `reports/domain_raft_random_control_blind_safe_final_audit.json`
 - `docs/controlled_training_results.md`
 - `reports/controlled_training_results.json`
 - `reports/hard_negative_failure_diagnosis.json`

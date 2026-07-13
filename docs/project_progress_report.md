@@ -206,23 +206,20 @@ Phase 11까지의 진단("문제는 모델이 아니라 데이터·평가 설계
 
 ## 4. 현재 상태 스냅샷 (2026-07-13 기준)
 
-- **서빙 중 어댑터**: `outputs/slm_lora_qwen_domain_v3_3`. 이후 통제 arm은 모두 비승격이며 Gradio 기본값을 바꾸지 않았다.
-- **현재 비교 기준**: clean checkpoint-250. 사람 작성 Partial dev 20행과 요구사항 52개(grounded 31 / unsupported 21)를 기준으로 slot 단위 실패를 측정한다.
-- **최근 통제 실험**: 검수된 Partial decomposition 23행만 추가한 arm은 grounded slot과 fresh partial을 개선했지만, domain false joint `30/30→21/30`, fresh false joint `7/8→5/8`, 안전 위반 `0→2`, unsupported explicit abstention `14/21→9/21`로 회귀해 비승격했다.
-- **clean baseline 선택**: 중단됐던 checkpoint-250을 동일 상태에서 `264/264`까지 완료했지만 fresh citation `11/22→9/22`, human Partial citation `10/20→6/20`, human Partial joint `6/20→4/20`으로 악화됐다. 따라서 checkpoint-250을 dev-gated early-stopped clean baseline으로 유지하고 step-264는 비승격했다.
-- **frozen blind**: `data/eval/blind_test_v1.jsonl` 100행은 아직 검색/생성 평가에 사용하지 않았다. 개발 게이트를 모두 통과한 clean adapter의 최종 1회 평가용이다.
-- **현재 병목**: 검색 자체보다 mixed-evidence Partial과 wholly-unsupported 질문의 구분. 무관한 검색 문장을 supported half로 오인해 `partial`과 citation을 내는 과일반화가 확인됐다.
-- **모든 비교 수치는 `--deterministic --seed 42`로 재현하며**, answerability 단독이 아니라 exact citation, requirement joint, false joint, safety를 함께 판정한다.
+- **최종 실행 구성**: BGE-M3 hybrid, `top_k=3`, `candidate_k=100`, chunk-only 900자, legacy prompt, reranker off로 동결했다.
+- **최종 데이터**: blind-safe QA 408행과 random-control RAFT 576행(`277 true / 92 partial / 207 false`). 모든 train/dev/eval/blind parent·chunk·question·context 누수는 `0`, gold visibility는 `369/369`, gold 위치는 `117/124/128`, 1,359개 distractor의 정답성 오염은 `0`이다.
+- **마지막 학습**: Qwen2.5-0.5B를 base부터 1회 학습해 `264/264`를 완료했다(`528 train / 32 dev`, final dev loss `0.1300`). 고정된 선택 규칙은 `checkpoint-250`을 clean 개발 baseline으로 선택했다.
+- **blind 미개봉**: checkpoint-250은 fresh false joint `5/8`(기준 `7/8`)과 unsupported explicit abstention `8/21`(기준 `14/21`)로 실패했다. step-264도 같은 두 게이트를 실패해 domain/official 확대와 frozen blind 평가는 실행하지 않았다.
+- **최종 3축 dev 비교**: RAG-only는 Partial을 표현하지 못했고, base Qwen은 schema `0/30`과 safety raw-answer `2/2` 실패를 보였다. clean tuned Qwen은 fresh exact `14/22`, Partial joint `3/6`, human Partial exact `12/20`, joint `8/20`으로 개선됐지만 최종 거절 게이트는 넘지 못했다.
+- **Gradio**: 기본 모드는 RAG-only다. Tuned SLM은 clean `outputs/slm_lora_random_control_blind_safe_final/checkpoint-250` 개발 baseline을 사용하며 Base SLM + RAG 비교 모드도 제공한다. blind 성능 주장은 하지 않는다.
 
 ---
 
 ## 5. 다음 계획
 
-1. false/unsafe 회귀와 unsupported omission을 분리해 행별 진단한다.
-2. mixed-evidence Partial마다 wholly-unsupported 대조 질문을 붙인 소형 train-only 후보를 만들고 사람 검수한다.
-3. 대조 데이터가 false/safety를 보존하면서 grounded slot을 개선할 수 있다는 근거가 생길 때만 같은 베이스 모델로 한 번 재학습한다.
-4. 네 dev 게이트를 모두 통과한 뒤에만 frozen blind를 최종 1회 실행한다.
-5. 최종 3-way 비교(RAG-only / base SLM+RAG / tuned SLM+RAG)와 포트폴리오 README를 갱신한다.
+1. 현재 포트폴리오 릴리스에서는 추가 학습·검색·프롬프트·blind 실험을 하지 않는다.
+2. 최종 판정은 `docs/final_release_results.md`와 `reports/final_dev_system_comparison.json`에 고정한다.
+3. 향후 별도 연구를 시작한다면 사람 검수된 Partial-vs-unsupported 대조 설계부터 새 브랜치에서 진행하며, 이번 blind 미개봉 결정을 소급 변경하지 않는다.
 
 ---
 
@@ -230,11 +227,11 @@ Phase 11까지의 진단("문제는 모델이 아니라 데이터·평가 설계
 
 **코드**(src/): 수집·청킹·검색·생성 파이프라인 + `make_domain_expanded_data.py`(POS 필터), `make_raft_dataset.py`(gold 셔플/패리티/chunk 모드), `make_gate_balanced.py`(오버샘플 레시피), `finetune_lora.py`(dev split, checkpointing), `run_tuned_slm_smoke.py`·`run_tuned_slm_oracle_eval.py`(deterministic, span/chunk oracle), `evaluate_retriever_candidates.py`, `analyze_tuned_slm_diagnostics.py`, `analyze_raft_gold_positions.py`, `analyze_domain_missing_retrieval.py`, `validate_domain_dataset.py`(리키지 게이트)
 
-**데이터**: `domain_doc_chunks.jsonl`(1307청크) · eval 3종: `domain_eval_set_expanded.jsonl`(120, POS 필터판) / `official_eval_set.jsonl`(30) / `fresh_paraphrase_eval_set.jsonl`(30, **영구 held-out**) · 학습: `domain_train_qa_expanded.jsonl`(419 = 템플릿 320 + 수기 감수 99행) → RAFT 419 → gate-balanced 593
+**데이터**: `domain_doc_chunks.jsonl`(1307청크) · dev: `domain_eval_set_expanded.jsonl`(120) / `official_eval_set.jsonl`(30) / `fresh_paraphrase_eval_set.jsonl`(30, adaptive dev) / `partial_dev_human_v1.jsonl`(20) · frozen blind: `data/eval/blind_test_v1.jsonl`(100, 미개봉) · 최종 학습: blind-safe QA 408 → random-control gate-balanced RAFT 576
 
-**모델**: `slm_lora_qwen_domain_v3_3`(**현재 서빙**) — 이력: v1(citation 잘림) → gate_balanced(과잉거절) → v2(리키지 정리, 템플릿 과적합) → v3/v3.1/v3.2/probe(위 표) → v3.3
+**모델**: `slm_lora_random_control_blind_safe_final/checkpoint-250`(clean 개발 baseline, blind 비검증) — Gradio 기본 모드는 RAG-only이며 v3.3은 역사적 비교 산출물로만 보존
 
-**문서**: [AGENTS.md](../AGENTS.md)(durable 교훈) · [docs/agent_handoff.md](agent_handoff.md)(현재 작업판) · [docs/model_comparison_report.md](model_comparison_report.md)(v3.x 비교표 포함) · [docs/tuned_slm_failure_diagnosis.md](tuned_slm_failure_diagnosis.md) · 본 문서
+**문서**: [AGENTS.md](../AGENTS.md)(durable 교훈) · [docs/agent_handoff.md](agent_handoff.md)(현재 작업판) · [docs/final_release_results.md](final_release_results.md)(최종 판정) · [docs/model_comparison_report.md](model_comparison_report.md)(전체 비교 이력) · 본 문서
 
 **아직 미착수**: intent-router 구조화 모듈(초기 설계 후 보류), shop_price 데이터 소스
 

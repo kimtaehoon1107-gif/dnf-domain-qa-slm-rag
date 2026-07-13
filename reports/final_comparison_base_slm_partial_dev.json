@@ -1,0 +1,914 @@
+{
+  "report_schema_version": 2,
+  "generator_mode": "base_slm",
+  "model_name": "Qwen/Qwen2.5-0.5B-Instruct",
+  "adapter_dir": "",
+  "eval_set": "data\\processed\\partial_dev_human_v1.jsonl",
+  "persist_dir": "outputs\\chroma_domain_chunks",
+  "embedding_model_name": "BAAI/bge-m3",
+  "rank_mode": "hybrid",
+  "top_k": 3,
+  "candidate_k": 100,
+  "max_doc_chars": 900,
+  "max_new_tokens": 256,
+  "instruction_mode": "legacy",
+  "context_mode": "chunk",
+  "chunks": "",
+  "generation_max_doc_chars": 900,
+  "device": "cuda",
+  "seed": 42,
+  "deterministic": true,
+  "reranker_model": null,
+  "rerank_candidates": 20,
+  "reranker_max_length": 512,
+  "reranker_batch_size": 4,
+  "rows": 20,
+  "total_runtime_sec": 166.29,
+  "summary": {
+    "answerable_rows": 20,
+    "retrieval_expected_hit_rate": 0.9,
+    "usable_gold_hit_rate": 0.9,
+    "generation_context_expected_hit_rate": 0.9,
+    "generation_usable_gold_hit_rate": 0.9,
+    "generation_evidence_visibility_when_context_hit": 1.0,
+    "evidence_visibility_when_retrieved": 1.0,
+    "answerability_field_rate": 0.0,
+    "answerability_accuracy": 0.0,
+    "answerability_by_label": {
+      "partial": {
+        "correct": 0,
+        "total": 20,
+        "accuracy": 0.0
+      }
+    },
+    "citations_field_rate": 0.0,
+    "answer_field_rate": 0.0,
+    "parsed_chunk_citation_rate": 0.0,
+    "citation_hit_when_retrieval_hit": 0.0,
+    "citation_in_retrieved_rate": null,
+    "avg_answer_chars": 0.0,
+    "avg_generation_latency_sec": 7.735
+  },
+  "details": [
+    {
+      "eval_id": "partial_dev_human_0001",
+      "question": "트리니티 이벤트는 언제까지 진행되고, 내 계정 상황에서 참여하는 게 이득인지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_004"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_004__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_004",
+        "official_event_event_card_001",
+        "official_notice_2927771"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_004__chunk_001",
+        "official_event_event_card_001__chunk_001",
+        "official_notice_2927771__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_004__chunk_001",
+        "official_event_event_card_001__chunk_001",
+        "official_notice_2927771__chunk_001"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "트리니티 이벤트는 2026년 6월 18일부터 2026년 7월 30일까지 진행됩니다. 이벤트는 트리니티-달성자 전직별 11~100위 캐릭터 대상으로 진행됩니다. 이벤트는 주간 접속 보상과 누적 시간을 제공하며, 이벤트 UI 내 [받기] 버튼 클릭 시 우편함으로 지급됩니다. 또한, 이벤트 FAQ 보기 이벤트 더 보기 보안 경고 알림 OTP신청 보안관리 게임시작 1:1 문의 바로가기 1:1 문의 바로가기 부분에서 확인할 수 있습니다. 트리니티 이벤트는 트리니티-달성자 전직별 11~100위 캐릭터 대상으로 진행됩니다. 이벤트는 주간 접속 보상과 누적 시간을 제공하며, 이벤트 UI 내 [받기] 버튼 클릭 시 우편함으로 지급됩니다. 또한, 이벤트 FAQ 보기 이벤트",
+      "latency_sec": 7.621,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0002",
+      "question": "웨딩 아바타 콤보 상자의 판매 기간과 풀세트 상자 구성을 알려주고, 내 캐릭터에 사는 게 좋을지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_005"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_005__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_005",
+        "official_event_event_card_005",
+        "official_event_event_card_020"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_005__chunk_001",
+        "official_event_event_card_005__chunk_002",
+        "official_event_event_card_020__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_005__chunk_001",
+        "official_event_event_card_005__chunk_002",
+        "official_event_event_card_020__chunk_001"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "웨딩 아바타 콤보 상자 판매 기간은 2026년 6월 18일부터 2026년 8월 13일까지입니다. 풀세트 상자 또한 판매 기간이 있으며, 판매 기간은 2026년 6월 18일부터 2026년 8월 13일까지입니다. \n\n웨딩 아바타 콤보 상자 판매 기간은 2026년 6월 18일부터 2026년 8월 13일까지입니다. 풀세트 상자 또한 판매 기간이 있으며, 판매 기간은 2026년 6월 18일부터 2026년 8월 13일까지입니다. \n\n웨딩 아바타 콤보 상자 판매 기간은 2026년 6월 18일부터 2026년 8월 13일까지입니다. 풀세트 상자 또한 판매 기간이 있으며, 판",
+      "latency_sec": 7.588,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0003",
+      "question": "오라클 탐사 지원의 기초 데이터를 얻을 수 있는 던전을 설명해주면서, 내 캐릭터는 어디를 도는 게 좋을지도 골라줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_009"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_009__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_009",
+        "official_event_event_card_009",
+        "official_event_event_card_008"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_009__chunk_001",
+        "official_event_event_card_009__chunk_002",
+        "official_event_event_card_008__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_009__chunk_001",
+        "official_event_event_card_009__chunk_002",
+        "official_event_event_card_008__chunk_001"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "1. 천해천 탐사 지원 던전은 계정 단위로 참여 가능하며, 각 보상의 거래 타입 및 삭제일 등은 보상 설명 자세히 보기 팝업 및 인게임 내 툴팁을 참고해주세요.\n2. 천천히 탐사하는 것이 좋습니다. 천천히 탐사하는 것은 천해천의 적정 레벨 던전과 상급 던전에서만 획득할 수 있습니다. 천천히 탐사하는 것은 천해를 품은 하늘 던전 포함입니다.\n3. 천천히 탐사하는 것은 천천히 탐사하는 것은 천천히 탐사하는 것은 천천히 탐사하는 것은 천천히 탐사하는 것은 천천히 탐사하는 것입니다. 천천히 탐사하는 것은 천천히 탐사하는 것은 천천히 탐사하는 것은 천천히 탐사하는 것은 천천히 탐사하는 것입니다. 천천히 탐사하는 것은 천천히 탐",
+      "latency_sec": 7.828,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0004",
+      "question": "이스핀즈는 재입장 횟수를 몇 번 다 쓰면 공략에 실패하는지 알려주고, 내 캐릭터로 계속 도전할지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1202"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1202__chunk_003"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1202",
+        "official_guide_1203",
+        "official_guide_1420"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1202__chunk_003",
+        "official_guide_1203__chunk_003",
+        "official_guide_1420__chunk_035"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1202__chunk_003",
+        "official_guide_1203__chunk_003",
+        "official_guide_1420__chunk_035"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "- 재입장 횟수 30회를 모두 소모하면 콘텐츠 공략에 실패합니다.\n- 콘텐츠 실패 던전 재입장 횟수 30회를 모두 소모하면 콘텐츠 공략에 실패합니다. \n\n### Citing Document\n官方文档: [retrieved] official_guide_1202__chunk_003 | 빼앗긴 땅, 이스핀즈\nofficial_guide_1203__chunk_003 | 대마법사의 차원회랑\nofficial_guide_1420__chunk_035 | 아스라한 : 안개의 신, 무(일반) 콘텐츠 정보\n\n### Explanation of Citation\n官方文档: [retrieved] official_guide_1202__chunk_003 | 빼앗긴 땅, 이스핀즈\nofficial_guide_1203__chunk_003 | 대마법사의 차원회랑\nofficial_guide_1420__chunk_035 | 아스라한 : 안개의 신",
+      "latency_sec": 7.02,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0005",
+      "question": "무형의 시로코 레이드의 입장 명성·재료·최대 인원을 정리해주고, 내 캐릭터가 갈 만한지도 판단해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1206"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1206__chunk_003"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1206",
+        "official_guide_1206",
+        "official_guide_1206"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1206__chunk_003",
+        "official_guide_1206__chunk_017",
+        "official_guide_1206__chunk_016"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1206__chunk_003",
+        "official_guide_1206__chunk_017",
+        "official_guide_1206__chunk_016"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "1. 무형의 시로코 레이드의 입장 명성: 10,815\n   - **재료**: `정화의 성물`\n   - **최대 인원**: 16명\n\n2. 무형의 시로코 레이드의 입장 재료: `정화의 성물`\n\n3. 무형의 시로코 레이드의 입장 제한: 100Lv 이상의 캐릭터로 참여할 수 있으며, 시로코 레이드 일반 모드 1회 이상 클리어 후 참여할 수 있습니다.\n   \n4. 무형의 시로코 레이드의 입장 제한: 액트퀘스트 `각자의 자리로` 클리어 시 레이드 채널에 입장할 수 있습니다.\n   \n5. 무형의 시로코 레이드의 입장 제한: 캐릭터당 주 1회/일일 1회 클리어가 가능합니다.\n   \n6. 무형의 시로코 레이드의 입장 제한: 하드 모드의 주간/일",
+      "latency_sec": 7.445,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0006",
+      "question": "세라는 현금으로 얼마고 세라샵에서 뭘 살 수 있는지 알려주면서, 내가 지금 충전하는 게 좋을지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1233"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1233__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1233",
+        "official_event_2927568",
+        "official_notice_2927763"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1233__chunk_001",
+        "official_event_2927568__chunk_001",
+        "official_notice_2927763__chunk_004"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1233__chunk_001",
+        "official_event_2927568__chunk_001",
+        "official_notice_2927763__chunk_004"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "세라는 현금으로 충전할 수 있으며, 세라샵에서 다양한 아이템을 구매할 수 있습니다. 하지만 세라샵에서 구매한 세라는 시간이 지남에 따라 적립률이 감소합니다. 따라서 세라샵에서 구매한 세라는 시간이 지남에 따라 적립률이 낮아질 수 있습니다. 또한, 세라샵에서 구매한 세라는 시간이 지남에 따라 적립률이 감소합니다. 따라서 세라샵에서 구매한 세라는 시간이 지남에 따라 적립률이 낮아질 수 있습니다. 또한, 세라샵에서 구매한 세라는 시간이 지남에 따라 적립률이 감소합니다. 따라서 세라샵에서 구매한 세라는 시간이 지남에 따라 적립률이 낮아질 수 있습니다. 또한, 세라샵에서 구매한 세라는 시간이 지남에 따라 적립률이 감소합니다. 따라서 세라샵에서 구매한 세라는 시간이 지남에 따라 적립률이 낮아질 수 있습니다. 또한, 세라샵에서 구매한 세라는 시간이",
+      "latency_sec": 7.681,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0007",
+      "question": "인벤토리의 칭호 관리 영역에서 관리할 수 있는 항목을 설명하고, 내가 뭘 먼저 정리해야 할지도 골라줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1239"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1239__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1239",
+        "official_guide_1233",
+        "official_update_2927399"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1239__chunk_001",
+        "official_guide_1233__chunk_007",
+        "official_update_2927399__chunk_016"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1239__chunk_001",
+        "official_guide_1233__chunk_007",
+        "official_update_2927399__chunk_016"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "인벤토리의 칭호 관리 영역에서 관리할 수 있는 항목은 다음과 같습니다:\n\n1. 소유 중인 장비/소모품/재료/전문재료/퀘스트 탭의 내용을 확인할 수 있습니다.\n2. 무게 게이지 확인 / 소지중인 아이템 검색 / 아이템 정렬 / 인벤토리 확장을 진행할 수 있습니다.\n3. 소지중인 코인 / 세라 / 승점 / 골드를 확인할 수 있습니다.\n4. 소유 중인 쿠폰이 여러 개일 경우 유효 기간이 가장 짧은 순으로 우선 표시됩니다.\n5. 무기고 등록 단축키 추가로 무기고 등록 창을 열 수 있습니다.\n6. 아바타 프리셋 - 아바타 부위 슬롯 선택 시, 선택한 부위만 모아볼 수 있는 기능이 추가됩니다.\n7. 아바타 프리셋 - 해당 기능은 아바타 필터 설정 기능을 대체하며, 툴팁 간소화 기능이 있습니다. \n\n이 항",
+      "latency_sec": 7.184,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0008",
+      "question": "서약과 결정을 어디서 얻는지 알려준 다음, 내 캐릭터가 이 콘텐츠를 우선 돌아야 할지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1255"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1255__chunk_007"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_update_2926972",
+        "official_guide_1532",
+        "official_guide_1255"
+      ],
+      "retrieved_chunk_ids": [
+        "official_update_2926972__chunk_013",
+        "official_guide_1532__chunk_014",
+        "official_guide_1255__chunk_007"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_update_2926972__chunk_013",
+        "official_guide_1532__chunk_014",
+        "official_guide_1255__chunk_007"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "서약 결정 업그레이드 시스템은 고유 서약 결정 업그레이드 시스템과 고유 서약 결정의 메뉴를 통해 고유 서약 결정 업그레이드를 진행할 수 있습니다. 이 시스템은 고유 서약 결정 업그레이드 시스템과 고유 서약 결정의 메뉴를 통해 고유 서약 결정 업그레이드를 진행할 수 있습니다. 이 시스템은 고유 서약 결정 업그레이드 시스템과 고유 서약 결정의 메뉴를 통해 고유 서약 결정 업그레이드를 진행할 수 있습니다. 이 시스템은 고유 서약 결정 업그레이드 시스템과 고유 서약 결정의 메뉴를 통해 고유 서약 결정 업그레이드를 진행할 수 있습니다. 이 시스템은 고유 서약 결정 업그레이드 시스템과 고유 서약 결정의 메뉴를 통해 고유 서약 결정 업그레이드를 진행할 수 있습니다. 이 시스템은 고유 서약 결정 업그레이드 시스템과 고유 서약 결정",
+      "latency_sec": 6.966,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0009",
+      "question": "전문직업 포기 비용과 여러 번 변경할 때의 차이를 알려주고, 내가 지금 바꾸는 게 좋을지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1272"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1272__chunk_003"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1273",
+        "official_guide_1272",
+        "official_guide_1271"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1273__chunk_003",
+        "official_guide_1272__chunk_003",
+        "official_guide_1271__chunk_003"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1273__chunk_003",
+        "official_guide_1272__chunk_003",
+        "official_guide_1271__chunk_003"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "비교할 수 있는 정보 없음. 그러나 전문직업 포기 비용은 10,000 골드이며, 변경 횟수에 따라 소모 골드가 증가합니다. 따라서 전문직업 포기 후에는 전문직업 퀘스트를 다시 수행하여 원하는 전문직업을 습득할 수 있습니다. 또한, 재료 구매 전문직업 포기하기 전문직업을 바꾸려면 NPC 아벨로에게 찾아가 전문직업 포기를 선택하면 됩니다. \n\n따라서, 현재 바꾸는 게 좋을지는 불확실합니다. 전문직업 포기 후에는 전문직업 퀘스트를 다시 수행하여 원하는 전문직업을 습득할 수 있습니다. 또한, 재료 구매 전문직업 포기하기 전문직업을 바꾸려면 NPC 아벨로에게 찾아가 전문직업 포기를 선택하면 됩니다. \n\n따라서, 현재 바꾸는 게 좋을지는 불확실합니다. 전문직업 포기 후에는 전문직업 퀘스트를 다시 수행하여 원하는 전",
+      "latency_sec": 7.014,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0010",
+      "question": "마법부여 상점 설치 방법을 설명해주면서, 수수료와 설치 위치도 내 상황에 맞게 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1273"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1273__chunk_010"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1273",
+        "official_guide_1311",
+        "official_guide_1482"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1273__chunk_010",
+        "official_guide_1311__chunk_002",
+        "official_guide_1482__chunk_005"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1273__chunk_010",
+        "official_guide_1311__chunk_002",
+        "official_guide_1482__chunk_005"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "네, 마법부여 상점 설치 방법은 다음과 같습니다:\n\n1. 재료 구매: 재료 구매 마법부여 상점 설치 마법부여 상점을 설치하여 다른 모험가로부터 수수료를 받아 수입을 올리거나 숙련도를 상승시킬 수 있습니다.\n2. 수수료 입력: 전문직업(J) → 상점 설치 클릭 → 수수료 입력 → 원하는 위치를 선택하면 마법부여 상점이 설치됩니다.\n3. 마법부여 상점은 녹색으로 표시되는 영역에 설치할 수 있습니다. 내구도가 0이면 마법부여 상점을 이용할 수 없습니다. NPC 아벨로에게 내구도 회복 후 이용 가능합니다. \n\n마법부여 상점은 5. 상점 입장 방법 85레벨 이상의 캐릭터로 에픽 퀘스트 '심장을 파괴하라' 클리어 후 입장할 수 있습니다. 총 6개의 던전으로 구성되어 있습니다. 던전 입장 시 피로도 4와 마그토늄 8개가 던전",
+      "latency_sec": 7.125,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0011",
+      "question": "7월 2일 점검 시간을 알려주고, 내 일정에 맞춰 언제 접속할지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_notice_2927876"
+      ],
+      "expected_chunk_ids": [
+        "official_notice_2927876__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_notice_2927876",
+        "official_update_2927877",
+        "official_update_2927877"
+      ],
+      "retrieved_chunk_ids": [
+        "official_notice_2927876__chunk_001",
+        "official_update_2927877__chunk_003",
+        "official_update_2927877__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_notice_2927876__chunk_001",
+        "official_update_2927877__chunk_003",
+        "official_update_2927877__chunk_001"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "7월 2일 점검 시간은 05:30 ~ 10:00입니다. \n\n- **날짜**: 2026년 7월 2일\n- **시간**: 05:30 ~ 10:00\n\n이 정보는 현재 일정에 맞게 접속 가능합니다. \n- **연락처**: [이메일]\n- **전화번호**: [전화번호]\n\n이 정보는 현재 일정에 맞게 접속 가능합니다.\n- **연락처**: [이메일]\n- **전화번호**: [전화번호]\n\n이 정보는 현재 일정에 맞게 접속 가능합니다.\n- **연락처**: [이메일]\n- **전화번호**: [전화번호]\n\n이 정보는 현재 일정에 맞게 접속 가능합니다.\n- **연락처**: [이메일]\n- **전화번호**: [전화번호]\n\n이 정보는 현재 일정에 맞게 접속 가능합니다.\n- **연락처**: [이메일]\n- **전화번호**: [전화번호]\n\n이 정보는 현재 일정에 맞게 접속 가능합니다",
+      "latency_sec": 7.374,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0012",
+      "question": "보너스 창고 보급품과 보너스 보급품의 사용 가능 캐릭터를 구분해주고, 브레이커를 키우는 게 좋을지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_002"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_002__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_002",
+        "official_event_event_card_007",
+        "official_event_event_card_014"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_002__chunk_001",
+        "official_event_event_card_007__chunk_001",
+        "official_event_event_card_014__chunk_006"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_002__chunk_001",
+        "official_event_event_card_007__chunk_001",
+        "official_event_event_card_014__chunk_006"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "보너스 창고 보급품과 보너스 보급품의 사용 가능 캐릭터를 구분하기 위해 다음과 같은 요소들을 고려해야 합니다:\n\n1. 보급품의 브레이커와 인파이터(여)를 구분하는 것이 중요합니다.\n2. 보급품의 사용 가능 캐릭터를 구분하는 것은 보다 중요한 요소입니다.\n\n따라서, 보너스 창고 보급품과 보너스 보급품의 사용 가능 캐릭터를 구분하기 위해서는 다음과 같이 추가적인 정보를 제공해야 합니다:\n\n1. 보급품의 브레이커와 인파이터(여)를 구분하는 요소:\n   - 보급품의 브레이커는 보다 일반적인 캐릭터로, 보다 많은 캐릭터들이 사용할 수 있습니다.\n   - 보급품의 인파이터(여)는 보다 특정한 캐릭터로, 보다 적당한 캐릭터들이 사용할 수 있습니다.\n\n2. 보급품의 사용 가능 캐릭터를 구분하는",
+      "latency_sec": 8.278,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0013",
+      "question": "웨딩 아바타 풀세트 상자에서 받는 구성을 알려주면서, 그 아바타가 내 캐릭터에 어울릴지도 골라줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_005"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_005__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_005",
+        "official_event_event_card_005",
+        "official_event_event_card_020"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_005__chunk_001",
+        "official_event_event_card_005__chunk_002",
+        "official_event_event_card_020__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_005__chunk_001",
+        "official_event_event_card_005__chunk_002",
+        "official_event_event_card_020__chunk_001"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "웨딩 아바타 풀세트 상자에서 받는 구성을 알려주는 것은 다음과 같습니다:\n\n1. **구성**: 아바타는 피부를 제외한 모든 부위 아바타에 엠블렘 소켓이 있으며, 피부를 제외한 모든 부위 아바타에 엠블렘 소켓이 있습니다.\n   \n2. **교환가능**: 아바타는 교환가능, 해체가능, 합성가능, 염색 가능, 기간 무제한 아이템입니다.\n   \n3. **교환가능**: 아바타는 교환가능, 해체가능, 합성가능, 염색 가능, 기간 무제한 아이템입니다.\n   \n4. **교환가능**: 아바타는 교환가능, 해체가능, 합성가능, 염색 가능, 기간 무제한 아이템입니다.\n   \n5. **교환가능**: 아바타는 교환가능, 해체가능, 합성가능, 염색 가능, 기간 무제한 아이템입니다.\n   \n6. **교환가",
+      "latency_sec": 7.947,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0014",
+      "question": "몬스터의 무력화 게이지가 모두 차감되면 어떻게 되는지 설명하고, 내 세팅을 바꿔야 할지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1179"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1179__chunk_002"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1179",
+        "official_guide_1179",
+        "official_update_2927335"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1179__chunk_002",
+        "official_guide_1179__chunk_003",
+        "official_update_2927335__chunk_009"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1179__chunk_002",
+        "official_guide_1179__chunk_003",
+        "official_update_2927335__chunk_009"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "몬스터의 무력화 게이지가 모두 차감되면 몬스터는 일정 시간 동안 그로기 상태가 되며, 더 큰 피해를 입니다. 무력화 게이지가 모두 차감된 몬스터는 일정 시간 동안 그로기 상태가 되고 더 큰 피해를 입습니다. 무력화 게이지는 몬스터에게 입힌 피해량이 비례하여 차감됩니다. \n\n- [retrieved] official_guide_1179__chunk_002 | 전투 시스템\n- [retrieved] official_guide_1179__chunk_003 | 전투 시스템\n\n### Citation\nNone provided. \n(추가)\n```json\n{\n  \"answer\": \"몬스터의 무력화 게이지가 모두 차감되면 몬스터는 일정 시간 동안 그로기 상태가 되며, 더 큰 피해를 입니다. 무력화 게이지가 모두 차감된 몬스터는 일정 시간 동안 그로기 상태가 되고 더 큰 피해를 입습니다. 무력화 게이지는 몬스터",
+      "latency_sec": 8.276,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0015",
+      "question": "썸머 부스트 업 캡슐의 지정 대상과 횟수를 정리해주고, 내 계정에서는 누구에게 쓰는 게 좋을지도 골라줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_007"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_007__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_007",
+        "official_event_event_card_007",
+        "official_event_event_card_007"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_007__chunk_001",
+        "official_event_event_card_007__chunk_002",
+        "official_event_event_card_007__chunk_003"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_007__chunk_001",
+        "official_event_event_card_007__chunk_002",
+        "official_event_event_card_007__chunk_003"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "1. 썸머 부스트 업 캡슐은 캐릭터가 지금까지 달성한 가장 높은 명성 수치를 의미합니다.\n2. 썸머 부스트 업 캡슐은 세리아방에서만 사용 가능합니다.\n3. 썸머 부스트 업 캡슐 사용 가능 캐릭터로 접속 시 이벤트 창에서 적합한 캡슐의 받기 버튼에 강조 연출이 표시됩니다.\n4. 썸머 부스트 업 캡슐은 세리아방에서만 사용 가능합니다.\n5. 썸머 부스트 업 캡슐 사용 후에 이벤트 캐릭터로 지정된 캐릭터는 이벤트 기간 중 다른 캐릭터로 변경할 수 없습니다.\n6. 썸머 부스트 업 캡슐 사용 가능 캐릭터로 접속 시 이벤트 창에서 적합한 캡슐의 받기 버튼에 강조 연출이 표시됩니다.\n7. 썸머 부",
+      "latency_sec": 8.791,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0016",
+      "question": "일반 우편과 경매장 구매 우편의 보관 기간을 알려주고, 내가 지금 바로 받아야 하는지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1293"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1293__chunk_005"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1285",
+        "official_guide_1293",
+        "official_guide_1285"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1285__chunk_002",
+        "official_guide_1293__chunk_005",
+        "official_guide_1285__chunk_004"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1285__chunk_002",
+        "official_guide_1293__chunk_005",
+        "official_guide_1285__chunk_004"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "- 경매장: 경매장 물품 판매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장: 경매장 물품 구매하기\n- 경매장",
+      "latency_sec": 8.567,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0017",
+      "question": "외부에서 결제 재화를 요구받았을 때의 확인·신고 방법을 알려주면서, 내가 받은 연락이 진짜인지도 판단해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_notice_2838879"
+      ],
+      "expected_chunk_ids": [
+        "official_notice_2838879__chunk_002"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_notice_2838879",
+        "official_notice_2838879",
+        "official_guide_1432"
+      ],
+      "retrieved_chunk_ids": [
+        "official_notice_2838879__chunk_001",
+        "official_notice_2838879__chunk_002",
+        "official_guide_1432__chunk_005"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_notice_2838879__chunk_001",
+        "official_notice_2838879__chunk_002",
+        "official_guide_1432__chunk_005"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "죄송합니다, 질문에 대한 답변을 제공할 수 없습니다. 질문에 대한 답변을 필요로 합니다. 질문에 대한 답변을 원하시는 경우, 질문에 대한 답변을 제공해주시면 감사하겠습니다. 질문에 대한 답변을 원하시는 경우, 질문에 대한 답변을 제공해주시면 감사하겠습니다. 질문에 대한 답변을 원하시는 경우, 질문에 대한 답변을 제공해주시면 감사하겠습니다. 질문에 대한 답변을 원하시는 경우, 질문에 대한 답변을 제공해주시면 감사하겠습니다. 질문에 대한 답변을 원하시는 경우, 질문에 대한 답변을 제공해주시면 감사하겠습니다. 질문에 대한 답변을 원하시는 경우, 질문에 대한 답변을 제공해주시면 감사하겠습니다. 질문에 대한 답변을 원하시는 경우, 질문에 대한 답변을 제공해주시면 감사하겠습니다. 질문에 대한 답변을 원하시는 경우, 질문에 대한 답변을 제공해주시면 감사하겠습니다. 질문에 대한 답변을 원하시는 경우, 질문에 대한 답변을 제공해주시면 감사하겠습니다. 질문에 대한 답변을 원하시는 경우, 질문에 대한 답변을 제공해주시면 감사하겠습니다. 질문에 대한 답변을 원하시는 경우, 질문에 대한 답변",
+      "latency_sec": 8.296,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0018",
+      "question": "레미디아 여프료시카 이벤트는 언제까지고, 내 계정에서 참여할 가치가 있는지도 판단해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_001"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_001__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_001",
+        "official_event_event_card_012",
+        "official_event_event_card_006"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_001__chunk_001",
+        "official_event_event_card_012__chunk_001",
+        "official_event_event_card_006__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_001__chunk_001",
+        "official_event_event_card_012__chunk_001",
+        "official_event_event_card_006__chunk_001"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "2026년 6월 4일부터 2026년 8월 27일까지 참여 가능하며, 이벤트의 하루 기준은 매일 오전 06시 - 다음날 오전 06시입니다. 던파에 접속하여 캐릭터 선택 후 세리아방에 입장하면 출석으로 인정됩니다. 이벤트 기간 내 누적 7일 접속 시 모든 보상을 획득할 수 있습니다. 게임 접속 후 [보상받기]를 클릭하면 보상을 받을 수 있으며, 지급된 보상은 우편함에서 확인 가능합니다. 각 보상의 삭제일은 인게임 툴팁 및 보상 자세히 보기를 확인해 주세요. 이벤트 FAQ 보기 이벤트 더 보기 보안 경고 알림 OTP신청 보안관리 게임시작 1:1 문의 바로가기 1:1 문의 바로가기\n\n### Citation\n[참조] official_event_event_card_001__chunk_001 | 함께해요! 레미디아 여프료시카\n함",
+      "latency_sec": 8.44,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0019",
+      "question": "레기온 보상을 받으면 통합 보상 횟수가 어떻게 되는지 알려주고, 내 캐릭터는 어떤 레기온부터 돌지 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1202"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1202__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1433",
+        "official_guide_1433",
+        "official_guide_1527"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1433__chunk_003",
+        "official_guide_1433__chunk_004",
+        "official_guide_1527__chunk_002"
+      ],
+      "retrieval_expected_hit": false,
+      "gold_evidence_visible": false,
+      "usable_gold_hit": false,
+      "generation_context_chunk_ids": [
+        "official_guide_1433__chunk_003",
+        "official_guide_1433__chunk_004",
+        "official_guide_1527__chunk_002"
+      ],
+      "generation_context_expected_hit": false,
+      "generation_gold_evidence_visible": false,
+      "generation_usable_gold_hit": false,
+      "generated_answer": "1. **레기온 보상을 받는 방법**:\n   - 레기온 보상을 받는 방법은 다음과 같습니다.\n     1. **통합 보상 횟수**: 레기온 보상을 획득 시 통합 보상 횟수가 차감됩니다.\n     2. **통합 보상 횟수**: 레기온 보상을 획득 시 통합 보상 횟수가 차감됩니다.\n     3. **통합 보상 횟수**: 레기온 보상을 획득 시 통합 보상 횟수가 차감됩니다.\n     4. **통합 보상 횟수**: 레기온 보상을 획득 시 통합 보상 횟수가 차감됩니다.\n     5. **통합 보상 횟수**: 레기온 보상을 획득 시 통합 보상 횟수가 차감됩니다.\n     6. **통합 보상 횟수**: 레기온 보상을 획득 시 통합 보상 횟수가 차감됩니다.\n     7. **통합 보상 횟수**: 레기",
+      "latency_sec": 8.188,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0020",
+      "question": "장비 인벤토리 옆 무기고 아이콘의 동작을 설명해주고, 내가 무기고를 먼저 정리해야 할지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_update_2926911"
+      ],
+      "expected_chunk_ids": [
+        "official_update_2926911__chunk_002"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1239",
+        "official_guide_1493",
+        "official_guide_1493"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1239__chunk_001",
+        "official_guide_1493__chunk_002",
+        "official_guide_1493__chunk_001"
+      ],
+      "retrieval_expected_hit": false,
+      "gold_evidence_visible": false,
+      "usable_gold_hit": false,
+      "generation_context_chunk_ids": [
+        "official_guide_1239__chunk_001",
+        "official_guide_1493__chunk_002",
+        "official_guide_1493__chunk_001"
+      ],
+      "generation_context_expected_hit": false,
+      "generation_gold_evidence_visible": false,
+      "generation_usable_gold_hit": false,
+      "generated_answer": "- **동작:** 무기고에 등록된 장비를 기준으로 달성 세트 포인트를 확인할 수 있습니다.\n- **정리:** 무기고에 등록된 장비를 기준으로 달성 세트 포인트를 확인할 수 있습니다. \n\n- **동작:** 무기고에 등록된 장비를 기준으로 달성 세트 포인트를 확인할 수 있습니다.\n- **정리:** 무기고에 등록된 장비를 기준으로 달성 세트 포인트를 확인할 수 있습니다. \n\n- **동작:** 무기고에 등록된 장비를 기준으로 달성 세트 포인트를 확인할 수 있습니다.\n- **정리:** 무기고에 등록된 장비를 기준으로 달성 세트 포인트를 확인할 수 있습니다. \n\n- **동작:** 무기고에 등록된 장비를 기준으로 달성 세트 포인트를 확인할 수 있습니다.\n- **정리:** 무기고에 등록된 장비를 기준으로 달성 세트 포인트를 확인할",
+      "latency_sec": 7.08,
+      "parsed_answerability": "",
+      "has_answerability_field": false,
+      "has_citations_field": false,
+      "parsed_citations": [],
+      "has_answer_field": false,
+      "parsed_answer": "",
+      "parsed_answer_chars": 0,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    }
+  ]
+}

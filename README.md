@@ -4,16 +4,16 @@ DNF Domain QA SLM/RAG v2 is a portfolio project for document-grounded Dungeon & 
 
 The goal is not to present a generic chatbot. The goal is to show a reproducible QA/RAG/SLM pipeline where unsupported questions can be refused and evidence quality can be measured.
 
-## Latest Verified Status (2026-07-11)
+## Latest Verified Status (2026-07-13)
 
-- Measurement repair is complete: parent-document train/dev split, group overlap `0`, parent overlap `0`, query-aware 900-character evidence windows, and `100%` training-gold visibility.
-- Reranker A/B is standardized at `candidate_k=100`; BGE reranker 512 improves domain retrieval hit@3 from `0.522` to `0.578`.
-- Three controlled Qwen 0.5B arms were trained with identical data groups/hyperparameters: control, instruction-only, and hard-negative-only.
-- No new adapter passed promotion gates. Instruction-only did not improve partial joint success or citation; the unfiltered hard-negative arm improved refusal but damaged exact citation.
-- Root cause: 12 mined distractors contained the exact gold evidence span and 63/320 answerable rows had a distractor with at least 50% evidence-token recall. Answer-aware mining now removes this label contamination.
-- Gradio therefore remains on `outputs/slm_lora_qwen_domain_v3_3`, with reranker off. `fresh_paraphrase_eval_set.jsonl` is now called `fresh_dev`; the new blind candidate is pending human review and has never been evaluated by a model.
+- Canonical retrieval is frozen at BGE-M3 + hybrid, `top_k=3`, `candidate_k=100`, chunk-only 900-character context, without reranker, parent window, or contextual prefix.
+- The final random-control RAFT has 576 rows and passes parent/chunk/question/context leakage checks against every dev set and the frozen blind. Gold visibility is `369/369`; 1,359 distractors contain no exact or high-overlap answer evidence.
+- One final Qwen2.5-0.5B LoRA run completed `264/264` steps. The frozen checkpoint rule selects step 250 over step 264 on citation and Partial metrics.
+- No checkpoint passed the blind-opening gates. Step 250 scored fresh false joint `5/8` and explicit unsupported abstention `8/21`, below the required `7/8` and `14/21`. The frozen blind was not queried.
+- The final dev-only comparison now includes RAG-only, base Qwen + RAG, and clean tuned Qwen + RAG under the same retrieval and prompt configuration. Tuned Qwen improves structured Partial/citation behavior, but is not a blind-validated release model.
+- Gradio defaults to RAG-only. Tuned mode uses the clean blind-safe step-250 development baseline; base Qwen + RAG is exposed as a comparison mode.
 
-See `docs/controlled_training_results.md`, `docs/evaluation_policy.md`, and `reports/controlled_training_results.json` for the current evidence and verdict.
+See `docs/final_release_results.md` and `reports/final_dev_system_comparison.json` for the final evidence and verdict.
 
 ## Current Scope
 
@@ -22,6 +22,7 @@ See `docs/controlled_training_results.md`, `docs/evaluation_policy.md`, and `rep
 - labeling guide and Label Studio config: `docs/labeling_guide.md`, `labeling/`
 - experiment report: `docs/experiment_report.md`
 - model comparison report: `docs/model_comparison_report.md`
+- final clean release verdict: `docs/final_release_results.md`
 - controlled measurement-repair results: `docs/controlled_training_results.md`
 - evaluation/blind-test policy: `docs/evaluation_policy.md`
 - tuned-SLM failure diagnosis: `docs/tuned_slm_failure_diagnosis.md`
@@ -49,7 +50,8 @@ See `docs/controlled_training_results.md`, `docs/evaluation_policy.md`, and `rep
 | `data/processed/domain_doc_chunks.jsonl` | 1,307 | official + guide chunks for expanded domain benchmark |
 | `data/processed/domain_eval_set_expanded.jsonl` | 120 | expanded held-out eval: true 80, partial 10, false 30 |
 | `data/processed/fresh_paraphrase_eval_set.jsonl` | 30 | adaptive conversational dev (`fresh_dev`): true 16, partial 6, false 8 |
-| `data/review/blind_test_v1_candidate.jsonl` | 100 | pending human review; never use for model selection or training |
+| `data/processed/partial_dev_human_v1.jsonl` | 20 | human-reviewed Partial development set; never use for training |
+| `data/eval/blind_test_v1.jsonl` | 100 | frozen, reviewed blind set; not queried because final dev gates failed |
 | `data/processed/domain_train_qa_expanded.jsonl` | 419 | historical expanded train QA before the measurement quality gate |
 | `data/processed/domain_train_qa_measurement_fixed.jsonl` | 408 | quality-gated train QA used by the controlled experiment |
 | `data/processed/domain_raft_sample_expanded.jsonl` | 419 | historical expanded RAFT rows |
@@ -58,6 +60,7 @@ See `docs/controlled_training_results.md`, `docs/evaluation_policy.md`, and `rep
 | `data/processed/domain_raft_instruction_only_gate_balanced.jsonl` | 576 | instruction-only controlled arm |
 | `data/processed/domain_raft_hard_negative_only_gate_balanced.jsonl` | 576 | rejected unfiltered hard-negative audit artifact |
 | `data/processed/domain_raft_hard_negative_answer_filtered_gate_balanced.jsonl` | 576 | validated future candidate; not trained in this round |
+| `data/processed/domain_raft_random_control_blind_safe_final_gate_balanced.jsonl` | 576 | final blind-safe random-control RAFT used for the last clean run |
 | `outputs/domain_review_samples.csv` | 100 | review sample for expanded eval/RAFT question quality |
 | `labeling/domain_review_tasks.jsonl` | 100 | JSONL review tasks for labeling/rewrite workflows |
 
@@ -408,6 +411,7 @@ python app/gradio_app.py
 Modes:
 
 - `RAG-only`
+- `Base SLM + RAG`
 - `Tuned SLM`
 - `LLM-RAG` reserved placeholder
 
@@ -415,14 +419,11 @@ For tuned mode, optionally set:
 
 ```powershell
 $env:TUNED_SLM_MODEL="Qwen/Qwen2.5-0.5B-Instruct"
-$env:TUNED_SLM_ADAPTER_DIR="outputs/slm_lora_qwen_domain_gate_balanced"
+$env:TUNED_SLM_ADAPTER_DIR="outputs/slm_lora_random_control_blind_safe_final/checkpoint-250"
 ```
 
-For the clean v2 candidate, use:
-
-```powershell
-$env:TUNED_SLM_ADAPTER_DIR="outputs/slm_lora_qwen_domain_gate_balanced_v2"
-```
+The tuned default is a clean development baseline. It failed the frozen
+blind-opening gates, so the demo does not imply final held-out performance.
 
 ## Smoke Tests
 
@@ -439,9 +440,10 @@ Expected:
 }
 ```
 
-## Next Work
+## Final Limitations
 
-1. Human-review `outputs/domain_review_samples.csv` and apply any manual rewrites worth preserving.
-2. Add casual true paraphrases to RAFT without leaking `fresh_paraphrase_eval_set.jsonl`.
-3. Rebalance SLM training to reduce over-refusal while preserving false/OOD refusal.
-4. Run BGE reranker A/B only after the fresh eval failure mode is addressed.
+- The frozen blind was intentionally not opened because no clean checkpoint passed every development gate.
+- The selected clean step-250 baseline still under-refuses unsupported slots and wholly unsupported fresh questions.
+- Base Qwen does not reliably follow the required line schema and produced substantive unsafe answers on both fresh safety rows.
+- LLM-RAG has no comparable current API run; historical v1 values are reference-only.
+- Additional training, retrieval variants, and prompt tuning are outside this finalized portfolio cycle.

@@ -1,0 +1,951 @@
+{
+  "report_schema_version": 2,
+  "model_name": "Qwen/Qwen2.5-0.5B-Instruct",
+  "adapter_dir": "outputs\\slm_lora_random_control_blind_safe_final\\checkpoint-250",
+  "eval_set": "data\\processed\\partial_dev_human_v1.jsonl",
+  "persist_dir": "outputs\\chroma_domain_chunks",
+  "embedding_model_name": "BAAI/bge-m3",
+  "rank_mode": "hybrid",
+  "top_k": 3,
+  "candidate_k": 100,
+  "max_doc_chars": 900,
+  "max_new_tokens": 256,
+  "instruction_mode": "legacy",
+  "context_mode": "chunk",
+  "chunks": "",
+  "generation_max_doc_chars": 900,
+  "device": "cuda",
+  "seed": 42,
+  "deterministic": true,
+  "reranker_model": null,
+  "rerank_candidates": 20,
+  "reranker_max_length": 512,
+  "reranker_batch_size": 4,
+  "rows": 20,
+  "total_runtime_sec": 127.502,
+  "summary": {
+    "answerable_rows": 20,
+    "retrieval_expected_hit_rate": 0.9,
+    "usable_gold_hit_rate": 0.9,
+    "generation_context_expected_hit_rate": 0.9,
+    "generation_usable_gold_hit_rate": 0.9,
+    "generation_evidence_visibility_when_context_hit": 1.0,
+    "evidence_visibility_when_retrieved": 1.0,
+    "answerability_field_rate": 1.0,
+    "answerability_accuracy": 0.95,
+    "answerability_by_label": {
+      "partial": {
+        "correct": 19,
+        "total": 20,
+        "accuracy": 0.95
+      }
+    },
+    "citations_field_rate": 1.0,
+    "answer_field_rate": 1.0,
+    "parsed_chunk_citation_rate": 0.95,
+    "citation_hit_when_retrieval_hit": 0.6666666666666666,
+    "citation_in_retrieved_rate": 1.0,
+    "avg_answer_chars": 114.5,
+    "avg_generation_latency_sec": 5.878
+  },
+  "details": [
+    {
+      "eval_id": "partial_dev_human_0001",
+      "question": "트리니티 이벤트는 언제까지 진행되고, 내 계정 상황에서 참여하는 게 이득인지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_004"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_004__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_004",
+        "official_event_event_card_001",
+        "official_notice_2927771"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_004__chunk_001",
+        "official_event_event_card_001__chunk_001",
+        "official_notice_2927771__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_004__chunk_001",
+        "official_event_event_card_001__chunk_001",
+        "official_notice_2927771__chunk_001"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_event_event_card_001__chunk_001\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 이벤트 기간은 2026년 6月18日(목)부터 2026년 7月30日(목)까지입니다. 다만 계정 상황에서 참여할지는 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "latency_sec": 6.006,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_event_event_card_001__chunk_001"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 이벤트 기간은 2026년 6月18日(목)부터 2026년 7月30日(목)까지입니다. 다만 계정 상황에서 참여할지는 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "parsed_answer_chars": 114,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0002",
+      "question": "웨딩 아바타 콤보 상자의 판매 기간과 풀세트 상자 구성을 알려주고, 내 캐릭터에 사는 게 좋을지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_005"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_005__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_005",
+        "official_event_event_card_005",
+        "official_event_event_card_020"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_005__chunk_001",
+        "official_event_event_card_005__chunk_002",
+        "official_event_event_card_020__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_005__chunk_001",
+        "official_event_event_card_005__chunk_002",
+        "official_event_event_card_020__chunk_001"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_event_event_card_005__chunk_001\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 판매 기간은 2026년 6월 18일(목) 점검 후 ~ 8월 13일(목) 점검 전입니다. 다만 구매가 개인 캐릭터에 가장 좋을지는 수집된 공식 문서만으로 대신 결정할 수 없습니다.",
+      "latency_sec": 6.434,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_event_event_card_005__chunk_001"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 판매 기간은 2026년 6월 18일(목) 점검 후 ~ 8월 13일(목) 점검 전입니다. 다만 구매가 개인 캐릭터에 가장 좋을지는 수집된 공식 문서만으로 대신 결정할 수 없습니다.",
+      "parsed_answer_chars": 126,
+      "parsed_citation_hit": true,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0003",
+      "question": "오라클 탐사 지원의 기초 데이터를 얻을 수 있는 던전을 설명해주면서, 내 캐릭터는 어디를 도는 게 좋을지도 골라줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_009"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_009__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_009",
+        "official_event_event_card_009",
+        "official_event_event_card_008"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_009__chunk_001",
+        "official_event_event_card_009__chunk_002",
+        "official_event_event_card_008__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_009__chunk_001",
+        "official_event_event_card_009__chunk_002",
+        "official_event_event_card_008__chunk_001"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_event_event_card_009__chunk_001\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 천천천히 확인해주시면 됩니다. 다만 캐릭터 기준의 도는 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "latency_sec": 4.312,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_event_event_card_009__chunk_001"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 천천천히 확인해주시면 됩니다. 다만 캐릭터 기준의 도는 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "parsed_answer_chars": 82,
+      "parsed_citation_hit": true,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0004",
+      "question": "이스핀즈는 재입장 횟수를 몇 번 다 쓰면 공략에 실패하는지 알려주고, 내 캐릭터로 계속 도전할지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1202"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1202__chunk_003"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1202",
+        "official_guide_1203",
+        "official_guide_1420"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1202__chunk_003",
+        "official_guide_1203__chunk_003",
+        "official_guide_1420__chunk_035"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1202__chunk_003",
+        "official_guide_1203__chunk_003",
+        "official_guide_1420__chunk_035"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_guide_1202__chunk_003\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 레이드 실패 시 주간 입장 제한 횟수가 복구됩니다 다만 개인 캐릭터 기준의 최적 캐릭터 수는 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "latency_sec": 4.969,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_guide_1202__chunk_003"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 레이드 실패 시 주간 입장 제한 횟수가 복구됩니다 다만 개인 캐릭터 기준의 최적 캐릭터 수는 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "parsed_answer_chars": 103,
+      "parsed_citation_hit": true,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0005",
+      "question": "무형의 시로코 레이드의 입장 명성·재료·최대 인원을 정리해주고, 내 캐릭터가 갈 만한지도 판단해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1206"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1206__chunk_003"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1206",
+        "official_guide_1206",
+        "official_guide_1206"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1206__chunk_003",
+        "official_guide_1206__chunk_017",
+        "official_guide_1206__chunk_016"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1206__chunk_003",
+        "official_guide_1206__chunk_017",
+        "official_guide_1206__chunk_016"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_guide_1206__chunk_003\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 입장 재료 정화의 성물 ※ 레이드 상점 - 시로코 항목에서 구매 가능 모험가 명성 10,815 던전 규칙 * 16명의 캐릭터가 참여할 수 있습니다 다만 개인 캐릭터 기준의 최적 선택은 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "latency_sec": 6.846,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_guide_1206__chunk_003"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 입장 재료 정화의 성물 ※ 레이드 상점 - 시로코 항목에서 구매 가능 모험가 명성 10,815 던전 규칙 * 16명의 캐릭터가 참여할 수 있습니다 다만 개인 캐릭터 기준의 최적 선택은 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "parsed_answer_chars": 154,
+      "parsed_citation_hit": true,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0006",
+      "question": "세라는 현금으로 얼마고 세라샵에서 뭘 살 수 있는지 알려주면서, 내가 지금 충전하는 게 좋을지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1233"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1233__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1233",
+        "official_event_2927568",
+        "official_notice_2927763"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1233__chunk_001",
+        "official_event_2927568__chunk_001",
+        "official_notice_2927763__chunk_004"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1233__chunk_001",
+        "official_event_2927568__chunk_001",
+        "official_notice_2927763__chunk_004"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_notice_2927763__chunk_004\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 세라 상품권 선물 시 소비되는 세라에는 마일리지를 적립하지 않습니다. 다만 구매가 개인에게 가장 좋을지는 수집된 공식 문서만으로 대신 결정할 수 없습니다.",
+      "latency_sec": 4.885,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_notice_2927763__chunk_004"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 세라 상품권 선물 시 소비되는 세라에는 마일리지를 적립하지 않습니다. 다만 구매가 개인에게 가장 좋을지는 수집된 공식 문서만으로 대신 결정할 수 없습니다.",
+      "parsed_answer_chars": 113,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0007",
+      "question": "인벤토리의 칭호 관리 영역에서 관리할 수 있는 항목을 설명하고, 내가 뭘 먼저 정리해야 할지도 골라줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1239"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1239__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1239",
+        "official_guide_1233",
+        "official_update_2927399"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1239__chunk_001",
+        "official_guide_1233__chunk_007",
+        "official_update_2927399__chunk_016"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1239__chunk_001",
+        "official_guide_1233__chunk_007",
+        "official_update_2927399__chunk_016"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_guide_1239__chunk_001\nanswer: 인벤토리창은 [I]키를 눌러 열거나 닫을 수 있습니다",
+      "latency_sec": 2.813,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_guide_1239__chunk_001"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "인벤토리창은 [I]키를 눌러 열거나 닫을 수 있습니다",
+      "parsed_answer_chars": 29,
+      "parsed_citation_hit": true,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0008",
+      "question": "서약과 결정을 어디서 얻는지 알려준 다음, 내 캐릭터가 이 콘텐츠를 우선 돌아야 할지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1255"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1255__chunk_007"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_update_2926972",
+        "official_guide_1532",
+        "official_guide_1255"
+      ],
+      "retrieved_chunk_ids": [
+        "official_update_2926972__chunk_013",
+        "official_guide_1532__chunk_014",
+        "official_guide_1255__chunk_007"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_update_2926972__chunk_013",
+        "official_guide_1532__chunk_014",
+        "official_guide_1255__chunk_007"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_guide_1255__chunk_007\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 모험가 명성을 올리는 방법 서약 / 결정 115레벨 천해천 콘텐츠 플레이 시 '서약'과 '결정'을 획득할 수 있습니다 다만 개인 캐릭터 기준의 최적 선택은 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "latency_sec": 7.026,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_guide_1255__chunk_007"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 모험가 명성을 올리는 방법 서약 / 결정 115레벨 천해천 콘텐츠 플레이 시 '서약'과 '결정'을 획득할 수 있습니다 다만 개인 캐릭터 기준의 최적 선택은 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "parsed_answer_chars": 138,
+      "parsed_citation_hit": true,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0009",
+      "question": "전문직업 포기 비용과 여러 번 변경할 때의 차이를 알려주고, 내가 지금 바꾸는 게 좋을지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1272"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1272__chunk_003"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1273",
+        "official_guide_1272",
+        "official_guide_1271"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1273__chunk_003",
+        "official_guide_1272__chunk_003",
+        "official_guide_1271__chunk_003"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1273__chunk_003",
+        "official_guide_1272__chunk_003",
+        "official_guide_1271__chunk_003"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_guide_1273__chunk_003\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 전문직업 포기 비용은 10,000 골드이며, 변경 횟수에 따라 소모 골드가 증가합니다 다만 개인 캐릭터 기준의 최적 선택은 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "latency_sec": 5.642,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_guide_1273__chunk_003"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 전문직업 포기 비용은 10,000 골드이며, 변경 횟수에 따라 소모 골드가 증가합니다 다만 개인 캐릭터 기준의 최적 선택은 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "parsed_answer_chars": 120,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0010",
+      "question": "마법부여 상점 설치 방법을 설명해주면서, 수수료와 설치 위치도 내 상황에 맞게 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1273"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1273__chunk_010"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1273",
+        "official_guide_1311",
+        "official_guide_1482"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1273__chunk_010",
+        "official_guide_1311__chunk_002",
+        "official_guide_1482__chunk_005"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1273__chunk_010",
+        "official_guide_1311__chunk_002",
+        "official_guide_1482__chunk_005"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_guide_1273__chunk_010\nanswer: 마법부여 상점 설치 마법부여 상점을 설치하여 다른 모험가로부터 수수료를 받아 수입을 올리거나 숙련도를 상승시킬 수 있습니다 다만 수수료와 설치 위치는 수집된 공식 문서만으로 대신 결정할 수 없습니다.",
+      "latency_sec": 5.017,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_guide_1273__chunk_010"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "마법부여 상점 설치 마법부여 상점을 설치하여 다른 모험가로부터 수수료를 받아 수입을 올리거나 숙련도를 상승시킬 수 있습니다 다만 수수료와 설치 위치는 수집된 공식 문서만으로 대신 결정할 수 없습니다.",
+      "parsed_answer_chars": 111,
+      "parsed_citation_hit": true,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0011",
+      "question": "7월 2일 점검 시간을 알려주고, 내 일정에 맞춰 언제 접속할지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_notice_2927876"
+      ],
+      "expected_chunk_ids": [
+        "official_notice_2927876__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_notice_2927876",
+        "official_update_2927877",
+        "official_update_2927877"
+      ],
+      "retrieved_chunk_ids": [
+        "official_notice_2927876__chunk_001",
+        "official_update_2927877__chunk_003",
+        "official_update_2927877__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_notice_2927876__chunk_001",
+        "official_update_2927877__chunk_003",
+        "official_update_2927877__chunk_001"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: false\ncitations: \nanswer: 수집된 공식 문서만으로는 해당 질문에 답하기에 충분한 근거가 없습니다.",
+      "latency_sec": 2.147,
+      "parsed_answerability": "false",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [],
+      "has_answer_field": true,
+      "parsed_answer": "수집된 공식 문서만으로는 해당 질문에 답하기에 충분한 근거가 없습니다.",
+      "parsed_answer_chars": 39,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": false
+    },
+    {
+      "eval_id": "partial_dev_human_0012",
+      "question": "보너스 창고 보급품과 보너스 보급품의 사용 가능 캐릭터를 구분해주고, 브레이커를 키우는 게 좋을지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_002"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_002__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_002",
+        "official_event_event_card_007",
+        "official_event_event_card_014"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_002__chunk_001",
+        "official_event_event_card_007__chunk_001",
+        "official_event_event_card_014__chunk_006"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_002__chunk_001",
+        "official_event_event_card_007__chunk_001",
+        "official_event_event_card_014__chunk_006"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_event_event_card_002__chunk_001\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 보너스 창고의 보급품은 브레이커 혹은 인파이터(여)만 사용할 수 있고 3단계 보급품은 모든 캐릭터에서 사용 가능합니다. 다만 어느 쪽이 더 좋을지는 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "latency_sec": 6.308,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_event_event_card_002__chunk_001"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 보너스 창고의 보급품은 브레이커 혹은 인파이터(여)만 사용할 수 있고 3단계 보급품은 모든 캐릭터에서 사용 가능합니다. 다만 어느 쪽이 더 좋을지는 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "parsed_answer_chars": 134,
+      "parsed_citation_hit": true,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0013",
+      "question": "웨딩 아바타 풀세트 상자에서 받는 구성을 알려주면서, 그 아바타가 내 캐릭터에 어울릴지도 골라줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_005"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_005__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_005",
+        "official_event_event_card_005",
+        "official_event_event_card_020"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_005__chunk_001",
+        "official_event_event_card_005__chunk_002",
+        "official_event_event_card_020__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_005__chunk_001",
+        "official_event_event_card_005__chunk_002",
+        "official_event_event_card_020__chunk_001"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_event_event_card_005__chunk_002\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 아바타 풀세트 상자(교환가능)는 2026년 8월 13일 06시 일괄 삭제됩니다 다만 개인 캐릭터 기준의 어울리는 구성을 수집할 수 없습니다.",
+      "latency_sec": 5.729,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_event_event_card_005__chunk_002"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 아바타 풀세트 상자(교환가능)는 2026년 8월 13일 06시 일괄 삭제됩니다 다만 개인 캐릭터 기준의 어울리는 구성을 수집할 수 없습니다.",
+      "parsed_answer_chars": 105,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0014",
+      "question": "몬스터의 무력화 게이지가 모두 차감되면 어떻게 되는지 설명하고, 내 세팅을 바꿔야 할지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1179"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1179__chunk_002"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1179",
+        "official_guide_1179",
+        "official_update_2927335"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1179__chunk_002",
+        "official_guide_1179__chunk_003",
+        "official_update_2927335__chunk_009"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1179__chunk_002",
+        "official_guide_1179__chunk_003",
+        "official_update_2927335__chunk_009"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_guide_1179__chunk_002\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 무력화 게이지가 모두 차감된 몬스터는 일정 시간 동안 그로기 상태가 되고 더 큰 피해를 입니다 다만 개인 캐릭터 기준의 최적 설정은 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "latency_sec": 6.419,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_guide_1179__chunk_002"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 무력화 게이지가 모두 차감된 몬스터는 일정 시간 동안 그로기 상태가 되고 더 큰 피해를 입니다 다만 개인 캐릭터 기준의 최적 설정은 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "parsed_answer_chars": 125,
+      "parsed_citation_hit": true,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0015",
+      "question": "썸머 부스트 업 캡슐의 지정 대상과 횟수를 정리해주고, 내 계정에서는 누구에게 쓰는 게 좋을지도 골라줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_007"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_007__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_007",
+        "official_event_event_card_007",
+        "official_event_event_card_007"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_007__chunk_001",
+        "official_event_event_card_007__chunk_002",
+        "official_event_event_card_007__chunk_003"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_007__chunk_001",
+        "official_event_event_card_007__chunk_002",
+        "official_event_event_card_007__chunk_003"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_event_event_card_007__chunk_001\nanswer: 썸머 부스트 업 캡슐은 최고 명성 63,257 미만의 전체 대상 캐릭터 1종 / 인파이터(여) 캐릭터 1종 / 브레이커 캐릭터 1종, 총 3번 지정 가능합니다 다만 캐릭터 사용량은 계정귀속 상태로 지급되므로 개인 계정에서는 수집된 공식 문서만으로는 해당 질문에 답하기에 충분한 근거가 없습니다.",
+      "latency_sec": 9.706,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_event_event_card_007__chunk_001"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "썸머 부스트 업 캡슐은 최고 명성 63,257 미만의 전체 대상 캐릭터 1종 / 인파이터(여) 캐릭터 1종 / 브레이커 캐릭터 1종, 총 3번 지정 가능합니다 다만 캐릭터 사용량은 계정귀속 상태로 지급되므로 개인 계정에서는 수집된 공식 문서만으로는 해당 질문에 답하기에 충분한 근거가 없습니다.",
+      "parsed_answer_chars": 164,
+      "parsed_citation_hit": true,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0016",
+      "question": "일반 우편과 경매장 구매 우편의 보관 기간을 알려주고, 내가 지금 바로 받아야 하는지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1293"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1293__chunk_005"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1285",
+        "official_guide_1293",
+        "official_guide_1285"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1285__chunk_002",
+        "official_guide_1293__chunk_005",
+        "official_guide_1285__chunk_004"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_guide_1285__chunk_002",
+        "official_guide_1293__chunk_005",
+        "official_guide_1285__chunk_004"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_guide_1293__chunk_005\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 경매장 구매 아이템은 180일간 보관됩니다. 다만 구매 기간은 수집된 공식 문서만으로 대신 결정할 수 없습니다.",
+      "latency_sec": 5.264,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_guide_1293__chunk_005"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 경매장 구매 아이템은 180일간 보관됩니다. 다만 구매 기간은 수집된 공식 문서만으로 대신 결정할 수 없습니다.",
+      "parsed_answer_chars": 89,
+      "parsed_citation_hit": true,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0017",
+      "question": "외부에서 결제 재화를 요구받았을 때의 확인·신고 방법을 알려주면서, 내가 받은 연락이 진짜인지도 판단해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_notice_2838879"
+      ],
+      "expected_chunk_ids": [
+        "official_notice_2838879__chunk_002"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_notice_2838879",
+        "official_notice_2838879",
+        "official_guide_1432"
+      ],
+      "retrieved_chunk_ids": [
+        "official_notice_2838879__chunk_001",
+        "official_notice_2838879__chunk_002",
+        "official_guide_1432__chunk_005"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_notice_2838879__chunk_001",
+        "official_notice_2838879__chunk_002",
+        "official_guide_1432__chunk_005"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_notice_2838879__chunk_001\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 외부 메신저를 통한 거래를 유도하며 비정상적인 거래가 확인되었고 해결되지 않을 경우 금융 거래가 정지될 것이라는 언급 등 피해자의 불안감을 증폭시켜 아이템이나 현금을 갈취하는 방식입니다 다만 개인 캐릭터 기준의 신고 여부는 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "latency_sec": 8.629,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_notice_2838879__chunk_001"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 외부 메신저를 통한 거래를 유도하며 비정상적인 거래가 확인되었고 해결되지 않을 경우 금융 거래가 정지될 것이라는 언급 등 피해자의 불안감을 증폭시켜 아이템이나 현금을 갈취하는 방식입니다 다만 개인 캐릭터 기준의 신고 여부는 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "parsed_answer_chars": 176,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0018",
+      "question": "레미디아 여프료시카 이벤트는 언제까지고, 내 계정에서 참여할 가치가 있는지도 판단해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_001"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_001__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_001",
+        "official_event_event_card_012",
+        "official_event_event_card_006"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_001__chunk_001",
+        "official_event_event_card_012__chunk_001",
+        "official_event_event_card_006__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_001__chunk_001",
+        "official_event_event_card_012__chunk_001",
+        "official_event_event_card_006__chunk_001"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_event_event_card_001__chunk_001\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 이벤트 기간은 2026년 7월 2일부터 2026년 7월 30일까지이며 계정 단위로 참여할 수 있습니다. 다만 참여 가치에 대한 개인적 판단은 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "latency_sec": 6.636,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_event_event_card_001__chunk_001"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 이벤트 기간은 2026년 7월 2일부터 2026년 7월 30일까지이며 계정 단위로 참여할 수 있습니다. 다만 참여 가치에 대한 개인적 판단은 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "parsed_answer_chars": 130,
+      "parsed_citation_hit": true,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0019",
+      "question": "레기온 보상을 받으면 통합 보상 횟수가 어떻게 되는지 알려주고, 내 캐릭터는 어떤 레기온부터 돌지 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_guide_1202"
+      ],
+      "expected_chunk_ids": [
+        "official_guide_1202__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1433",
+        "official_guide_1433",
+        "official_guide_1527"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1433__chunk_003",
+        "official_guide_1433__chunk_004",
+        "official_guide_1527__chunk_002"
+      ],
+      "retrieval_expected_hit": false,
+      "gold_evidence_visible": false,
+      "usable_gold_hit": false,
+      "generation_context_chunk_ids": [
+        "official_guide_1433__chunk_003",
+        "official_guide_1433__chunk_004",
+        "official_guide_1527__chunk_002"
+      ],
+      "generation_context_expected_hit": false,
+      "generation_gold_evidence_visible": false,
+      "generation_usable_gold_hit": false,
+      "generated_answer": "answerability: partial\ncitations: official_guide_1433__chunk_003\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 레기온 통합 보상 횟수가 0이 되면 다른 레기온 콘텐츠를 플레이할 수 없습니다 다만 개인 캐릭터 기준의 레기온은 수집된 공식 문서만으로 대신 결정할 수 없습니다.",
+      "latency_sec": 6.427,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_guide_1433__chunk_003"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 레기온 통합 보상 횟수가 0이 되면 다른 레기온 콘텐츠를 플레이할 수 없습니다 다만 개인 캐릭터 기준의 레기온은 수집된 공식 문서만으로 대신 결정할 수 없습니다.",
+      "parsed_answer_chars": 117,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0020",
+      "question": "장비 인벤토리 옆 무기고 아이콘의 동작을 설명해주고, 내가 무기고를 먼저 정리해야 할지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_update_2926911"
+      ],
+      "expected_chunk_ids": [
+        "official_update_2926911__chunk_002"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_guide_1239",
+        "official_guide_1493",
+        "official_guide_1493"
+      ],
+      "retrieved_chunk_ids": [
+        "official_guide_1239__chunk_001",
+        "official_guide_1493__chunk_002",
+        "official_guide_1493__chunk_001"
+      ],
+      "retrieval_expected_hit": false,
+      "gold_evidence_visible": false,
+      "usable_gold_hit": false,
+      "generation_context_chunk_ids": [
+        "official_guide_1239__chunk_001",
+        "official_guide_1493__chunk_002",
+        "official_guide_1493__chunk_001"
+      ],
+      "generation_context_expected_hit": false,
+      "generation_gold_evidence_visible": false,
+      "generation_usable_gold_hit": false,
+      "generated_answer": "answerability: partial\ncitations: official_guide_1493__chunk_002\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: ⑥ 각 탭을 선택하여 소지중인 코인 / 세라 / 승점 / 골드를 확인할 수 있습니다 다만 개인 캐릭터 기준의 최적 정리 방법은 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "latency_sec": 6.337,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_guide_1493__chunk_002"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: ⑥ 각 탭을 선택하여 소지중인 코인 / 세라 / 승점 / 골드를 확인할 수 있습니다 다만 개인 캐릭터 기준의 최적 정리 방법은 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "parsed_answer_chars": 122,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": true
+    }
+  ]
+}

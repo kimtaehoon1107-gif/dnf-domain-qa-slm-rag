@@ -6,6 +6,29 @@ This report separates three things that should not be mixed:
 - `LLM-RAG`: the v1 `dnf-llm-eval` baseline results.
 - `Tuned-SLM`: the v2 target path. The current LoRA/Qwen runs now include expanded, official, and fresh paraphrase/OOD comparisons, but still need train-only casual paraphrase data before production-style quality claims.
 
+## Final Development Comparison (2026-07-13)
+
+The final comparable table uses one frozen configuration: BGE-M3 hybrid,
+`top_k=3`, `candidate_k=100`, chunk-only 900-character context, the shared
+legacy prompt, deterministic seed 42, and 256 generated tokens. It is a
+development comparison, not a blind result.
+
+| System | fresh schema | fresh exact | fresh Partial joint | fresh false joint | human exact | human Partial joint | strict requirement joint | unsafe |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| RAG-only | 30/30 | 14/22 | 0/6 | 5/8 | 6/20 | 0/20 | 0/20 | 0 |
+| Base Qwen + RAG | 0/30 | 0/22 | 0/6 | 0/8 | 0/20 | 0/20 | 0/20 | 2 |
+| Clean tuned Qwen + RAG | 30/30 | 14/22 | 3/6 | 5/8 | 12/20 | 8/20 | 3/20 | 0 |
+
+The clean tuned arm is
+`outputs/slm_lora_random_control_blind_safe_final/checkpoint-250`. It improves
+format, citation, and mixed Partial behavior over both comparison arms, but it
+failed the predeclared blind-opening gates: fresh false joint was `5/8` rather
+than `7/8`, and explicit unsupported abstention was `8/21` rather than `14/21`.
+The completed step-264 checkpoint also failed. The frozen blind was not queried.
+
+Full verdict: `docs/final_release_results.md`. Machine-readable comparison:
+`reports/final_dev_system_comparison.json`.
+
 ## Evaluation Axes
 
 | Axis | Metric | Purpose |
@@ -122,9 +145,9 @@ All numbers below use the repaired POS-filtered domain eval (120), deterministic
 | v3.1 | +28 casual false rows | 1 | 0.9917 | 1.0 | 0.6333 | 11/16, 2/6, 6/8 | 0.5455 |
 | v3.2 | +16 contrastive yes/no true rows | 1 | 0.9917 | 1.0 | 0.6667 | 12/16, 1/6, 7/8 | 0.3182 |
 | v3.2-e2 (probe) | same as v3.2 | 2 | 0.9917 | 1.0 | 0.70 | 12/16, 2/6, 7/8 | 0.5909 |
-| **v3.3 (current default)** | +20 diverse partial rows | 2 | **0.9917** | **1.0** | **0.80** | **14/16, 2/6, 8/8** | **0.5909** |
+| **v3.3 (historical demo default)** | +20 diverse partial rows | 2 | **0.9917** | **1.0** | **0.80** | **14/16, 2/6, 8/8** | **0.5909** |
 
-Key findings: the v3.2 citation dip was under-training (2 epochs restored it, dev loss plateaus ~1.8 epochs); diverse partial data sharpened the fact-vs-decision boundary, recovering yes/no true rows and perfecting fresh false. The Gradio default adapter is now `outputs/slm_lora_qwen_domain_v3_3` with matched inference settings (top_k=3, max_doc_chars=500, max_new_tokens=160, domain_chunks index). Remaining weak axes: fresh partial 2/6 (errors are safe-side refusals), domain exact citation 0.3556.
+Key findings: the v3.2 citation dip was under-training (2 epochs restored it, dev loss plateaus ~1.8 epochs); diverse partial data sharpened the fact-vs-decision boundary, recovering yes/no true rows and perfecting fresh false. At that historical stage, Gradio used `outputs/slm_lora_qwen_domain_v3_3` with top_k 3, 500-character context, and 160 generated tokens. The final clean release section above supersedes that demo configuration.
 
 ## Tuned-SLM Failure Diagnosis
 
@@ -158,7 +181,10 @@ Interpretation: retrieval finds the expected chunk for 21/22 answerable-or-parti
 
 Data caveat: `outputs/slm_lora_qwen_domain_gate_balanced` predates fresh-exclusion cleanup and is retained only as a failure-analysis baseline. `outputs/slm_lora_qwen_domain_gate_balanced_v2` is the current clean candidate.
 
-## Next Benchmark Gate
+## Historical Benchmark Gate (Superseded)
+
+The following list records the earlier plan. The final blind-safe cycle and its
+failed blind-opening decision now supersede it.
 
 Before claiming tuned-SLM quality:
 
@@ -184,4 +210,4 @@ Reranker follow-up confirms the tradeoff. On domain, control exact citation rise
 
 Root cause was training-label contamination: 12 distractors contained the exact gold evidence span, and 63/320 answerable rows had a distractor with at least 50% evidence-token recall. Answer-aware mining now removes both classes (`0` remaining), but that cleaned artifact was intentionally not trained in this round.
 
-Full report: [controlled_training_results.md](controlled_training_results.md). `fresh_paraphrase_eval_set.jsonl` is now `fresh_dev`, not a final blind test. Gradio remains on v3.3 with reranker off.
+Full historical report: [controlled_training_results.md](controlled_training_results.md). `fresh_paraphrase_eval_set.jsonl` is `fresh_dev`, not a final blind test. The final Gradio tuned mode now uses the blind-safe step-250 development baseline, with reranker off.
