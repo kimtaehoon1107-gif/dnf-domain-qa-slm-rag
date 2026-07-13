@@ -1,6 +1,8 @@
 import argparse
+import csv
 import json
 import random
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -15,6 +17,54 @@ GENERIC_ANSWER_HINTS = (
 )
 DEFAULT_NO_ANSWER = "수집된 공식 문서만으로는 해당 질문에 답변할 충분한 근거가 없습니다."
 CONTEXT_MAX_CHARS = 1200
+TOKEN_PATTERN = re.compile(r"[0-9A-Za-z가-힣]+")
+DEFAULT_MAX_EVIDENCE_TOKEN_RECALL = 0.5
+
+
+def normalize_space(text: Any) -> str:
+    return " ".join(str(text or "").split())
+
+
+def evidence_token_recall(text: Any, evidence_span: Any) -> float:
+    evidence_tokens = {
+        token.lower() for token in TOKEN_PATTERN.findall(str(evidence_span or "")) if len(token) >= 2
+    }
+    if len(evidence_tokens) < 4:
+        return 0.0
+    text_tokens = {token.lower() for token in TOKEN_PATTERN.findall(str(text or "")) if len(token) >= 2}
+    return len(evidence_tokens & text_tokens) / len(evidence_tokens)
+
+
+def candidate_contains_answer(
+    doc: dict[str, Any],
+    evidence_span: str,
+    max_evidence_token_recall: float,
+) -> bool:
+    normalized_span = normalize_space(evidence_span)
+    if not normalized_span:
+        return False
+    normalized_text = normalize_space(doc.get("text", ""))
+    if normalized_span in normalized_text:
+        return True
+    return evidence_token_recall(normalized_text, normalized_span) >= max_evidence_token_recall
+
+
+def load_human_blocklist(path: Path | None) -> dict[str, set[str]]:
+    if path is None:
+        return {}
+    blocked: dict[str, set[str]] = {}
+    with path.open("r", encoding="utf-8-sig", newline="") as handle:
+        for row in csv.DictReader(handle):
+            source_qa_id = str(row.get("source_qa_id") or "").strip()
+            if not source_qa_id:
+                continue
+            for index in range(1, 4):
+                if str(row.get(f"negative_{index}_valid_non_answer") or "").strip().lower() != "no":
+                    continue
+                doc_id = str(row.get(f"negative_{index}_doc_id") or "").strip()
+                if doc_id:
+                    blocked.setdefault(source_qa_id, set()).add(doc_id)
+    return blocked
 
 def truncate(text: str, max_chars: int) -> str:
     text = " ".join(str(text).split())
@@ -126,13 +176,24 @@ def sample_distractor_ids(
     distractors: int,
     preferred_doc_ids: list[str] | None = None,
     allow_random_fill: bool = True,
+    evidence_span: str = "",
+    max_evidence_token_recall: float = DEFAULT_MAX_EVIDENCE_TOKEN_RECALL,
+    blocked_doc_ids: set[str] | None = None,
 ) -> list[str]:
     gold_ids = {str(doc["doc_id"]) for doc in gold_docs}
     gold_parent_ids = {parent_id(doc) for doc in gold_docs}
+    blocked_doc_ids = blocked_doc_ids or set()
     eligible_ids = [
         doc_id
         for doc_id in available_doc_ids
-        if doc_id not in gold_ids and parent_id(docs_by_id[doc_id]) not in gold_parent_ids
+        if doc_id not in gold_ids
+        and doc_id not in blocked_doc_ids
+        and parent_id(docs_by_id[doc_id]) not in gold_parent_ids
+        and not candidate_contains_answer(
+            docs_by_id[doc_id],
+            evidence_span=evidence_span,
+            max_evidence_token_recall=max_evidence_token_recall,
+        )
     ]
     eligible = set(eligible_ids)
     selected = []
@@ -176,6 +237,8 @@ def make_raft_rows(
     instruction: str = DEFAULT_RAG_INSTRUCTION,
     hard_negatives_by_source: dict[str, list[str]] | None = None,
     require_hard_negatives: bool = False,
+    human_blocklist_by_source: dict[str, set[str]] | None = None,
+    max_evidence_token_recall: float = DEFAULT_MAX_EVIDENCE_TOKEN_RECALL,
 ) -> list[dict[str, Any]]:
     distractor_rng = random.Random(seed)
     context_order_rng = random.Random(seed + 1)
@@ -188,6 +251,7 @@ def make_raft_rows(
     available_doc_ids = [str(doc["doc_id"]) for doc in available_docs]
     rows = []
     hard_negatives_by_source = hard_negatives_by_source or {}
+    human_blocklist_by_source = human_blocklist_by_source or {}
 
     for qa in qa_rows:
         if not row_is_trainable(qa, train_splits=train_splits, allow_unsplit=allow_unsplit):
@@ -198,6 +262,7 @@ def make_raft_rows(
         answerability = str(qa.get("answerability", "true"))
         source_qa_id = str(qa.get("qa_id") or qa.get("eval_id") or "")
         preferred_ids = hard_negatives_by_source.get(source_qa_id, [])
+        blocked_doc_ids = human_blocklist_by_source.get(source_qa_id, set())
         gold_ids = gold_ids_for_row(qa)
         if answerability == "false":
             required_docs = max(1, distractors + 1)
@@ -209,6 +274,7 @@ def make_raft_rows(
                 distractors=required_docs,
                 preferred_doc_ids=preferred_ids,
                 allow_random_fill=not require_hard_negatives,
+                blocked_doc_ids=blocked_doc_ids,
             )
             if require_hard_negatives and len(distractor_ids) < required_docs:
                 raise RuntimeError(
@@ -247,6 +313,9 @@ def make_raft_rows(
                 distractors=distractors,
                 preferred_doc_ids=preferred_ids,
                 allow_random_fill=not require_hard_negatives,
+                evidence_span=str(qa.get("evidence_span") or ""),
+                max_evidence_token_recall=max_evidence_token_recall,
+                blocked_doc_ids=blocked_doc_ids,
             )
             if require_hard_negatives and len(distractor_ids) < distractors:
                 raise RuntimeError(
@@ -313,6 +382,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--instruction-mode", choices=tuple(RAG_INSTRUCTIONS), default="legacy")
     parser.add_argument("--hard-negatives", type=Path, default=None)
     parser.add_argument("--require-hard-negatives", action="store_true")
+    parser.add_argument("--human-review", type=Path, default=None)
+    parser.add_argument(
+        "--max-evidence-token-recall",
+        type=float,
+        default=DEFAULT_MAX_EVIDENCE_TOKEN_RECALL,
+    )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--train-splits", default="train")
     parser.add_argument("--allow-unsplit", action="store_true")
@@ -331,6 +406,7 @@ def main() -> None:
     excluded_chunk_ids, excluded_parent_ids = excluded_ids(eval_rows)
     hard_negative_rows = read_jsonl(args.hard_negatives) if args.hard_negatives else []
     hard_negatives_by_source = hard_negative_map(hard_negative_rows)
+    human_blocklist_by_source = load_human_blocklist(args.human_review)
     rows = make_raft_rows(
         docs=docs,
         qa_rows=qa_rows,
@@ -345,6 +421,8 @@ def main() -> None:
         instruction=instruction_for_mode(args.instruction_mode),
         hard_negatives_by_source=hard_negatives_by_source,
         require_hard_negatives=args.require_hard_negatives,
+        human_blocklist_by_source=human_blocklist_by_source,
+        max_evidence_token_recall=args.max_evidence_token_recall,
     )
     write_jsonl(args.output, rows)
     print(
@@ -358,6 +436,8 @@ def main() -> None:
                 "instruction_mode": args.instruction_mode,
                 "seed": args.seed,
                 "context_order_seed": args.seed + 1,
+                "human_review": str(args.human_review) if args.human_review else None,
+                "max_evidence_token_recall": args.max_evidence_token_recall,
                 "hard_negatives": str(args.hard_negatives) if args.hard_negatives else None,
                 "require_hard_negatives": args.require_hard_negatives,
             },

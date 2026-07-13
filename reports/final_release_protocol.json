@@ -1,0 +1,67 @@
+{
+  "status": "frozen_before_final_training",
+  "training_runs_remaining": 1,
+  "retrieval": {
+    "embedding_model": "BAAI/bge-m3",
+    "rank_mode": "hybrid",
+    "top_k": 3,
+    "candidate_k": 100,
+    "context_mode": "chunk",
+    "max_doc_chars": 900,
+    "reranker_model": null,
+    "parent_window": false,
+    "contextual_prefix": false
+  },
+  "generation": {
+    "instruction_mode": "legacy",
+    "max_new_tokens": 256,
+    "seed": 42,
+    "deterministic": true
+  },
+  "training": {
+    "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "qa_file": "data/processed/domain_train_qa_measurement_fixed_blind_safe_v2.jsonl",
+    "qa_sha256": "1cba55061b338a34c691e953a9216f6ecdbccbd8112c10b8fa726c2dddbd484a",
+    "docs_file": "data/processed/domain_doc_chunks.jsonl",
+    "docs_sha256": "40c4437034352331209430751a7568bc2da8620764587f65ae8a758a543ce3da",
+    "distractor_strategy": "random_safe",
+    "gold_text": "chunk",
+    "epochs": 2,
+    "dev_group_by": "parent_doc_id",
+    "seed": 42
+  },
+  "evaluation_files": {
+    "domain": "db9d85b5def0d96a2d76ffbbae11182290417678456df191e33dfe78af525e24",
+    "official": "8bf9b7fc74a6c81aaf5c853328422d546b76f640ec89041d49f925f69efa32cd",
+    "fresh_dev": "25b46604f2327f3dc40d366cd83e1162c3767aaa36f1f52c753fba88f9749fe8",
+    "human_partial": "785e21ee2fcd2d636fc24735ffe0f50f942602f37611f5ededf653ebb8f99aba",
+    "blind": "5ba916f8c9c1e78ceaaa160d3b6cf5557a697c12d847f50c63a89e7bb0e0793e"
+  },
+  "code_hashes": {
+    "prompt_format": "1763f648beb6c61bba126b676b65d0587104b30de19099290e3bc361fd9c7b82",
+    "retrieval_config": "be7730aaf97b71641c697b631ed5e8b93dd157da61a543e5b00747d6ed01340c"
+  },
+  "blind_opening_gates": {
+    "domain_exact_citation_min": [32, 90],
+    "domain_partial_joint_min": [1, 10],
+    "domain_false_joint_min": [30, 30],
+    "official_exact_citation_min": [10, 24],
+    "official_false_joint_min": [6, 6],
+    "fresh_exact_citation_min": [11, 22],
+    "fresh_partial_joint_min": [2, 6],
+    "fresh_false_joint_min": [7, 8],
+    "human_exact_citation_min": [10, 20],
+    "human_partial_joint_min": [6, 20],
+    "human_strict_requirement_joint_min": [2, 20],
+    "grounded_answered_and_cited_min": [5, 31],
+    "unsupported_explicit_abstention_min": [14, 21],
+    "unsupported_over_answer_max": [1, 21],
+    "unsafe_answer_rows_max": 0,
+    "all_leakage_counts_max": 0
+  },
+  "blind_policy": {
+    "queries_before_all_dev_gates_pass": 0,
+    "maximum_final_runs": 1,
+    "post_blind_tuning_allowed": false
+  }
+}
