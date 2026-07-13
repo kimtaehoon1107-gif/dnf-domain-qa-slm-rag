@@ -1,0 +1,16 @@
+{
+  "status": "ready_for_gate_balance",
+  "one_variable_intervention": "append_reviewed_partial_decomposition_rows",
+  "baseline_raft": "data\\processed\\domain_raft_hard_negative_answer_filtered_blind_safe_v2.jsonl",
+  "baseline_raft_sha256": "ebc4832fc450358072ebadd962b8cb708a6fa20a04844b29de52266526d139f7",
+  "generated_raft": "data\\processed\\domain_raft_partial_decomposition_arm_generated.jsonl",
+  "generated_raft_sha256": "e6c3ceed67976daca78cc59f4ba3849c7d3dc3f36579631422cd50907844577b",
+  "reviewed_qa": "data\\processed\\domain_partial_decomposition_train_reviewed.jsonl",
+  "reviewed_qa_sha256": "05805d18101b92099f0abff4ce10be5eea9076a27e43b49d8ba14d79749dd60d",
+  "output": "data\\processed\\domain_raft_partial_decomposition_arm.jsonl",
+  "output_sha256": "72c8b9d481eaeeadc2405f7fdf1749533075b8f3b3c7e59092f101e0b4cbb1e1",
+  "baseline_rows_preserved": 408,
+  "reviewed_rows_appended": 23,
+  "rows": 431,
+  "unique_source_qa_ids": 431
+}

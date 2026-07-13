@@ -1,0 +1,78 @@
+{
+  "status": "complete_rejected",
+  "experiment": "chunk_only_vs_immediate_sibling_window",
+  "adapter": "outputs/slm_lora_answer_filtered_blind_safe_v2_parent_group/checkpoint-250",
+  "invariants": {
+    "retrieval_configuration_changed": false,
+    "retrieval_id_mismatches": 0,
+    "citation_ids_exposed": "retrieved anchor chunks only",
+    "canonical_index_changed": false,
+    "gradio_changed": false,
+    "frozen_blind_queried": false
+  },
+  "window": {
+    "neighbors": "same parent_doc_id, chunk_index -1/+1",
+    "per_chunk_query_window_chars": 900,
+    "duplicate_retrieved_siblings_removed": true,
+    "generation_max_doc_chars_per_anchor": 3212
+  },
+  "results": {
+    "human_partial_dev": {
+      "rows": 20,
+      "rows_with_added_siblings": 18,
+      "added_sibling_occurrences": 55,
+      "answers_changed": 13,
+      "chunk_only": {
+        "retrieval_expected_hit_rate": 0.9,
+        "exact_citation_recall_macro": 0.5,
+        "partial_joint_success_rate": 0.3,
+        "evidence_token_recall_in_answer_mean": 0.20580927294002738,
+        "avg_generation_latency_sec": 4.581
+      },
+      "sibling_window": {
+        "retrieval_expected_hit_rate": 0.9,
+        "generation_context_expected_hit_rate": 0.9,
+        "exact_citation_recall_macro": 0.6,
+        "partial_joint_success_rate": 0.3,
+        "evidence_token_recall_in_answer_mean": 0.2355077560080757,
+        "avg_generation_latency_sec": 6.518
+      }
+    },
+    "fresh_dev": {
+      "rows": 30,
+      "rows_with_added_siblings": 28,
+      "added_sibling_occurrences": 67,
+      "answers_changed": 10,
+      "chunk_only": {
+        "retrieval_expected_hit_rate": 0.9545454545454546,
+        "exact_citation_recall_macro": 0.5,
+        "partial_joint_success_rate": 0.0,
+        "false_joint_correct_rate": 0.875,
+        "evidence_token_recall_in_answer_mean": 0.30664007338472576,
+        "unsupported_substantive_answer_rate_on_false": 0.0,
+        "avg_generation_latency_sec": 3.18
+      },
+      "sibling_window": {
+        "retrieval_expected_hit_rate": 0.9545454545454546,
+        "generation_context_expected_hit_rate": 0.9545454545454546,
+        "exact_citation_recall_macro": 0.4090909090909091,
+        "partial_joint_success_rate": 0.0,
+        "false_joint_correct_rate": 0.875,
+        "evidence_token_recall_in_answer_mean": 0.26123009121003776,
+        "unsupported_substantive_answer_rate_on_false": 0.125,
+        "avg_generation_latency_sec": 12.659
+      }
+    }
+  },
+  "stopped_expansion": {
+    "domain_full_window_not_run": true,
+    "official_full_window_not_run": true,
+    "reason": "The predeclared cross-set no-regression gate failed on fresh_dev; further generation cannot change the rejection decision."
+  },
+  "decision": {
+    "promote_parent_window": false,
+    "change_canonical": false,
+    "change_gradio": false,
+    "next": "Run a separate deterministic contextual-prefix index A/B."
+  }
+}

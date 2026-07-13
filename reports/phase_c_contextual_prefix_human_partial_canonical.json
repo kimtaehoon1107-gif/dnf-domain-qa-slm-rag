@@ -1,0 +1,788 @@
+{
+  "eval_set": "data\\processed\\partial_dev_human_v1.jsonl",
+  "persist_dir": "outputs\\chroma_domain_chunks",
+  "model_name": "BAAI/bge-m3",
+  "summary": {
+    "answerable_rows": 20,
+    "rank_mode": "hybrid",
+    "top_k_single_retrieve": 10,
+    "candidate_k": 100,
+    "mrr@10": 0.8016666666666665,
+    "avg_query_latency_sec": 0.09010026999967521,
+    "p95_query_latency_sec": 0.10064369999599876,
+    "latency_excludes_model_load": true,
+    "gold_rank_distribution": {
+      "missing": 1,
+      "rank_1": 14,
+      "rank_2": 3,
+      "rank_3": 1,
+      "rank_5": 1
+    },
+    "hit_rate@1": 0.7,
+    "hit_rate@3": 0.9,
+    "hit_rate@5": 0.95,
+    "hit_rate@10": 0.95
+  },
+  "details": [
+    {
+      "eval_id": "partial_dev_human_0001",
+      "question": "트리니티 이벤트는 언제까지 진행되고, 내 계정 상황에서 참여하는 게 이득인지도 정해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_004__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_event_event_card_004__chunk_001",
+        "official_event_event_card_001__chunk_001",
+        "official_notice_2927771__chunk_001",
+        "official_event_event_card_006__chunk_001",
+        "official_update_2927810__chunk_001",
+        "official_notice_2927772__chunk_001",
+        "official_notice_2927854__chunk_001",
+        "official_event_event_card_012__chunk_001",
+        "official_event_event_card_008__chunk_001",
+        "official_update_2927877__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_event_event_card_004",
+        "official_event_event_card_001",
+        "official_notice_2927771",
+        "official_event_event_card_006",
+        "official_update_2927810",
+        "official_notice_2927772",
+        "official_notice_2927854",
+        "official_event_event_card_012",
+        "official_event_event_card_008",
+        "official_update_2927877"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0002",
+      "question": "웨딩 아바타 콤보 상자의 판매 기간과 풀세트 상자 구성을 알려주고, 내 캐릭터에 사는 게 좋을지도 정해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_005__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_event_event_card_005__chunk_001",
+        "official_event_event_card_005__chunk_002",
+        "official_event_event_card_020__chunk_001",
+        "official_event_event_card_020__chunk_002",
+        "official_event_event_card_021__chunk_001",
+        "official_event_event_card_021__chunk_002",
+        "official_guide_1275__chunk_004",
+        "official_guide_1275__chunk_003",
+        "official_guide_1280__chunk_002",
+        "official_event_event_card_014__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_event_event_card_005",
+        "official_event_event_card_005",
+        "official_event_event_card_020",
+        "official_event_event_card_020",
+        "official_event_event_card_021",
+        "official_event_event_card_021",
+        "official_guide_1275",
+        "official_guide_1275",
+        "official_guide_1280",
+        "official_event_event_card_014"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0003",
+      "question": "오라클 탐사 지원의 기초 데이터를 얻을 수 있는 던전을 설명해주면서, 내 캐릭터는 어디를 도는 게 좋을지도 골라줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_009__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_event_event_card_009__chunk_001",
+        "official_event_event_card_009__chunk_002",
+        "official_event_event_card_008__chunk_001",
+        "official_guide_1375__chunk_003",
+        "official_guide_1300__chunk_002",
+        "official_guide_1260__chunk_011",
+        "official_guide_1300__chunk_001",
+        "official_update_2927399__chunk_018",
+        "official_guide_1206__chunk_004",
+        "official_update_2927392__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_event_event_card_009",
+        "official_event_event_card_009",
+        "official_event_event_card_008",
+        "official_guide_1375",
+        "official_guide_1300",
+        "official_guide_1260",
+        "official_guide_1300",
+        "official_update_2927399",
+        "official_guide_1206",
+        "official_update_2927392"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0004",
+      "question": "이스핀즈는 재입장 횟수를 몇 번 다 쓰면 공략에 실패하는지 알려주고, 내 캐릭터로 계속 도전할지도 정해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1202__chunk_003"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1202__chunk_003",
+        "official_guide_1203__chunk_003",
+        "official_guide_1420__chunk_035",
+        "official_guide_1202__chunk_002",
+        "official_guide_1202__chunk_001",
+        "official_update_2927335__chunk_007",
+        "official_guide_1527__chunk_003",
+        "official_guide_1537__chunk_004",
+        "official_guide_1522__chunk_005",
+        "official_guide_1528__chunk_003"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1202",
+        "official_guide_1203",
+        "official_guide_1420",
+        "official_guide_1202",
+        "official_guide_1202",
+        "official_update_2927335",
+        "official_guide_1527",
+        "official_guide_1537",
+        "official_guide_1522",
+        "official_guide_1528"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0005",
+      "question": "무형의 시로코 레이드의 입장 명성·재료·최대 인원을 정리해주고, 내 캐릭터가 갈 만한지도 판단해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1206__chunk_003"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1206__chunk_003",
+        "official_guide_1206__chunk_017",
+        "official_guide_1206__chunk_016",
+        "official_guide_1206__chunk_026",
+        "official_guide_1206__chunk_001",
+        "official_guide_1206__chunk_014",
+        "official_guide_1206__chunk_018",
+        "official_guide_1206__chunk_011",
+        "official_guide_1206__chunk_004",
+        "official_guide_1206__chunk_008"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1206",
+        "official_guide_1206",
+        "official_guide_1206",
+        "official_guide_1206",
+        "official_guide_1206",
+        "official_guide_1206",
+        "official_guide_1206",
+        "official_guide_1206",
+        "official_guide_1206",
+        "official_guide_1206"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0006",
+      "question": "세라는 현금으로 얼마고 세라샵에서 뭘 살 수 있는지 알려주면서, 내가 지금 충전하는 게 좋을지도 정해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1233__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1233__chunk_001",
+        "official_event_2927568__chunk_001",
+        "official_notice_2927763__chunk_004",
+        "official_guide_1233__chunk_005",
+        "official_guide_1284__chunk_001",
+        "official_update_2927196__chunk_006",
+        "official_event_event_card_021__chunk_003",
+        "official_guide_1233__chunk_004",
+        "official_notice_2927728__chunk_001",
+        "official_guide_1233__chunk_006"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1233",
+        "official_event_2927568",
+        "official_notice_2927763",
+        "official_guide_1233",
+        "official_guide_1284",
+        "official_update_2927196",
+        "official_event_event_card_021",
+        "official_guide_1233",
+        "official_notice_2927728",
+        "official_guide_1233"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0007",
+      "question": "인벤토리의 칭호 관리 영역에서 관리할 수 있는 항목을 설명하고, 내가 뭘 먼저 정리해야 할지도 골라줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1239__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1239__chunk_001",
+        "official_guide_1233__chunk_007",
+        "official_update_2927399__chunk_016",
+        "official_update_2926971__chunk_007",
+        "official_update_2927196__chunk_006",
+        "official_guide_1209__chunk_019",
+        "official_guide_1236__chunk_007",
+        "official_guide_1236__chunk_002",
+        "official_guide_1275__chunk_004",
+        "official_guide_1437__chunk_004"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1239",
+        "official_guide_1233",
+        "official_update_2927399",
+        "official_update_2926971",
+        "official_update_2927196",
+        "official_guide_1209",
+        "official_guide_1236",
+        "official_guide_1236",
+        "official_guide_1275",
+        "official_guide_1437"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0008",
+      "question": "서약과 결정을 어디서 얻는지 알려준 다음, 내 캐릭터가 이 콘텐츠를 우선 돌아야 할지도 정해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1255__chunk_007"
+      ],
+      "gold_rank": 3,
+      "retrieved_chunk_ids": [
+        "official_update_2926972__chunk_013",
+        "official_guide_1532__chunk_014",
+        "official_guide_1255__chunk_007",
+        "official_guide_1532__chunk_018",
+        "official_update_2926972__chunk_004",
+        "official_update_2926972__chunk_008",
+        "official_update_2926972__chunk_003",
+        "official_guide_1532__chunk_015",
+        "official_update_2927208__chunk_001",
+        "official_update_2927399__chunk_015"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2926972",
+        "official_guide_1532",
+        "official_guide_1255",
+        "official_guide_1532",
+        "official_update_2926972",
+        "official_update_2926972",
+        "official_update_2926972",
+        "official_guide_1532",
+        "official_update_2927208",
+        "official_update_2927399"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0009",
+      "question": "전문직업 포기 비용과 여러 번 변경할 때의 차이를 알려주고, 내가 지금 바꾸는 게 좋을지도 정해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1272__chunk_003"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1273__chunk_003",
+        "official_guide_1272__chunk_003",
+        "official_guide_1271__chunk_003",
+        "official_guide_1270__chunk_003",
+        "official_guide_1290__chunk_002",
+        "official_guide_1273__chunk_006",
+        "official_guide_1272__chunk_007",
+        "official_guide_1534__chunk_037",
+        "official_guide_1534__chunk_012",
+        "official_guide_1519__chunk_003"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1273",
+        "official_guide_1272",
+        "official_guide_1271",
+        "official_guide_1270",
+        "official_guide_1290",
+        "official_guide_1273",
+        "official_guide_1272",
+        "official_guide_1534",
+        "official_guide_1534",
+        "official_guide_1519"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0010",
+      "question": "마법부여 상점 설치 방법을 설명해주면서, 수수료와 설치 위치도 내 상황에 맞게 정해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1273__chunk_010"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1273__chunk_010",
+        "official_guide_1311__chunk_002",
+        "official_guide_1482__chunk_005",
+        "official_guide_1482__chunk_003",
+        "official_guide_1482__chunk_002",
+        "official_guide_1482__chunk_010",
+        "official_guide_1482__chunk_008",
+        "official_guide_1220__chunk_005",
+        "official_guide_1311__chunk_003",
+        "official_guide_1271__chunk_005"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1273",
+        "official_guide_1311",
+        "official_guide_1482",
+        "official_guide_1482",
+        "official_guide_1482",
+        "official_guide_1482",
+        "official_guide_1482",
+        "official_guide_1220",
+        "official_guide_1311",
+        "official_guide_1271"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0011",
+      "question": "7월 2일 점검 시간을 알려주고, 내 일정에 맞춰 언제 접속할지도 정해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_notice_2927876__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_notice_2927876__chunk_001",
+        "official_update_2927877__chunk_003",
+        "official_update_2927877__chunk_001",
+        "official_notice_2927891__chunk_001",
+        "official_update_2927877__chunk_002",
+        "official_notice_2927889__chunk_001",
+        "official_notice_2927816__chunk_001",
+        "official_notice_2927758__chunk_001",
+        "official_event_event_card_001__chunk_001",
+        "official_update_2926911__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2927876",
+        "official_update_2927877",
+        "official_update_2927877",
+        "official_notice_2927891",
+        "official_update_2927877",
+        "official_notice_2927889",
+        "official_notice_2927816",
+        "official_notice_2927758",
+        "official_event_event_card_001",
+        "official_update_2926911"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0012",
+      "question": "보너스 창고 보급품과 보너스 보급품의 사용 가능 캐릭터를 구분해주고, 브레이커를 키우는 게 좋을지도 정해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_002__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_event_event_card_002__chunk_001",
+        "official_event_event_card_007__chunk_001",
+        "official_event_event_card_014__chunk_006",
+        "official_update_2927691__chunk_008",
+        "official_guide_1258__chunk_003",
+        "official_event_event_card_015__chunk_005",
+        "official_event_event_card_015__chunk_003",
+        "official_update_2927691__chunk_002",
+        "official_update_2927233__chunk_004",
+        "official_event_event_card_014__chunk_003"
+      ],
+      "retrieved_parent_ids": [
+        "official_event_event_card_002",
+        "official_event_event_card_007",
+        "official_event_event_card_014",
+        "official_update_2927691",
+        "official_guide_1258",
+        "official_event_event_card_015",
+        "official_event_event_card_015",
+        "official_update_2927691",
+        "official_update_2927233",
+        "official_event_event_card_014"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0013",
+      "question": "웨딩 아바타 풀세트 상자에서 받는 구성을 알려주면서, 그 아바타가 내 캐릭터에 어울릴지도 골라줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_005__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_event_event_card_005__chunk_001",
+        "official_event_event_card_005__chunk_002",
+        "official_event_event_card_020__chunk_001",
+        "official_guide_1280__chunk_002",
+        "official_guide_1274__chunk_001",
+        "official_event_event_card_020__chunk_002",
+        "official_guide_1274__chunk_003",
+        "official_event_event_card_021__chunk_002",
+        "official_guide_1280__chunk_004",
+        "official_guide_1280__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_event_event_card_005",
+        "official_event_event_card_005",
+        "official_event_event_card_020",
+        "official_guide_1280",
+        "official_guide_1274",
+        "official_event_event_card_020",
+        "official_guide_1274",
+        "official_event_event_card_021",
+        "official_guide_1280",
+        "official_guide_1280"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0014",
+      "question": "몬스터의 무력화 게이지가 모두 차감되면 어떻게 되는지 설명하고, 내 세팅을 바꿔야 할지도 정해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1179__chunk_002"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1179__chunk_002",
+        "official_guide_1179__chunk_003",
+        "official_update_2927335__chunk_009",
+        "official_update_2927233__chunk_003",
+        "official_guide_1179__chunk_011",
+        "official_guide_1526__chunk_004",
+        "official_guide_1537__chunk_010",
+        "official_guide_1523__chunk_011",
+        "official_guide_1179__chunk_010",
+        "official_update_2927335__chunk_008"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1179",
+        "official_guide_1179",
+        "official_update_2927335",
+        "official_update_2927233",
+        "official_guide_1179",
+        "official_guide_1526",
+        "official_guide_1537",
+        "official_guide_1523",
+        "official_guide_1179",
+        "official_update_2927335"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0015",
+      "question": "썸머 부스트 업 캡슐의 지정 대상과 횟수를 정리해주고, 내 계정에서는 누구에게 쓰는 게 좋을지도 골라줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_007__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_event_event_card_007__chunk_001",
+        "official_event_event_card_007__chunk_002",
+        "official_event_event_card_007__chunk_003",
+        "official_event_event_card_010__chunk_001",
+        "official_event_event_card_012__chunk_001",
+        "official_event_event_card_017__chunk_001",
+        "official_event_event_card_012__chunk_002",
+        "official_update_2927691__chunk_006",
+        "official_guide_1520__chunk_002",
+        "official_update_2926972__chunk_016"
+      ],
+      "retrieved_parent_ids": [
+        "official_event_event_card_007",
+        "official_event_event_card_007",
+        "official_event_event_card_007",
+        "official_event_event_card_010",
+        "official_event_event_card_012",
+        "official_event_event_card_017",
+        "official_event_event_card_012",
+        "official_update_2927691",
+        "official_guide_1520",
+        "official_update_2926972"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0016",
+      "question": "일반 우편과 경매장 구매 우편의 보관 기간을 알려주고, 내가 지금 바로 받아야 하는지도 정해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1293__chunk_005"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1285__chunk_002",
+        "official_guide_1293__chunk_005",
+        "official_guide_1285__chunk_004",
+        "official_guide_1285__chunk_003",
+        "official_guide_1285__chunk_001",
+        "official_guide_1420__chunk_045",
+        "official_guide_1488__chunk_008",
+        "official_guide_1220__chunk_008",
+        "official_guide_1420__chunk_031",
+        "official_guide_1326__chunk_005"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1285",
+        "official_guide_1293",
+        "official_guide_1285",
+        "official_guide_1285",
+        "official_guide_1285",
+        "official_guide_1420",
+        "official_guide_1488",
+        "official_guide_1220",
+        "official_guide_1420",
+        "official_guide_1326"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0017",
+      "question": "외부에서 결제 재화를 요구받았을 때의 확인·신고 방법을 알려주면서, 내가 받은 연락이 진짜인지도 판단해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_notice_2838879__chunk_002"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_notice_2838879__chunk_001",
+        "official_notice_2838879__chunk_002",
+        "official_guide_1432__chunk_005",
+        "official_event_event_card_013__chunk_002",
+        "official_guide_1273__chunk_008",
+        "official_notice_2927889__chunk_001",
+        "official_notice_2927847__chunk_001",
+        "official_guide_1427__chunk_002",
+        "official_notice_2927769__chunk_001",
+        "official_guide_1220__chunk_008"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2838879",
+        "official_notice_2838879",
+        "official_guide_1432",
+        "official_event_event_card_013",
+        "official_guide_1273",
+        "official_notice_2927889",
+        "official_notice_2927847",
+        "official_guide_1427",
+        "official_notice_2927769",
+        "official_guide_1220"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0018",
+      "question": "레미디아 여프료시카 이벤트는 언제까지고, 내 계정에서 참여할 가치가 있는지도 판단해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_001__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_event_event_card_001__chunk_001",
+        "official_event_event_card_012__chunk_001",
+        "official_event_event_card_006__chunk_001",
+        "official_event_event_card_008__chunk_001",
+        "official_notice_2927728__chunk_001",
+        "official_event_2927808__chunk_001",
+        "official_event_event_card_021__chunk_001",
+        "official_event_2927568__chunk_001",
+        "official_event_event_card_004__chunk_001",
+        "official_guide_1207__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_event_event_card_001",
+        "official_event_event_card_012",
+        "official_event_event_card_006",
+        "official_event_event_card_008",
+        "official_notice_2927728",
+        "official_event_2927808",
+        "official_event_event_card_021",
+        "official_event_2927568",
+        "official_event_event_card_004",
+        "official_guide_1207"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "partial_dev_human_0019",
+      "question": "레기온 보상을 받으면 통합 보상 횟수가 어떻게 되는지 알려주고, 내 캐릭터는 어떤 레기온부터 돌지 정해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1202__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1433__chunk_003",
+        "official_guide_1433__chunk_004",
+        "official_guide_1527__chunk_002",
+        "official_guide_1528__chunk_002",
+        "official_update_2926972__chunk_016",
+        "official_guide_1534__chunk_004",
+        "official_guide_1391__chunk_001",
+        "official_guide_1515__chunk_003",
+        "official_guide_1508__chunk_002",
+        "official_update_2927335__chunk_014"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1433",
+        "official_guide_1433",
+        "official_guide_1527",
+        "official_guide_1528",
+        "official_update_2926972",
+        "official_guide_1534",
+        "official_guide_1391",
+        "official_guide_1515",
+        "official_guide_1508",
+        "official_update_2927335"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "partial_dev_human_0020",
+      "question": "장비 인벤토리 옆 무기고 아이콘의 동작을 설명해주고, 내가 무기고를 먼저 정리해야 할지도 정해줘?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2926911__chunk_002"
+      ],
+      "gold_rank": 5,
+      "retrieved_chunk_ids": [
+        "official_guide_1239__chunk_001",
+        "official_guide_1493__chunk_002",
+        "official_guide_1493__chunk_001",
+        "official_update_2927196__chunk_005",
+        "official_update_2926911__chunk_002",
+        "official_guide_1493__chunk_003",
+        "official_update_2927691__chunk_005",
+        "official_update_2926971__chunk_006",
+        "official_guide_1493__chunk_005",
+        "official_guide_1243__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1239",
+        "official_guide_1493",
+        "official_guide_1493",
+        "official_update_2927196",
+        "official_update_2926911",
+        "official_guide_1493",
+        "official_update_2927691",
+        "official_update_2926971",
+        "official_guide_1493",
+        "official_guide_1243"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": true,
+      "hit@10": true
+    }
+  ]
+}

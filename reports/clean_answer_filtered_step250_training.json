@@ -1,0 +1,41 @@
+{
+  "status": "interrupted_candidate_not_promoted",
+  "purpose": "Clean-from-base answer-filtered hard-negative controlled arm",
+  "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "train_file": "data/processed/domain_raft_hard_negative_answer_filtered_blind_safe_v2_gate_balanced.jsonl",
+  "train_file_sha256": "491951a8b974a2d3c44ccdd8298987d7e4603ba77e662f235bd2ca9cc5eb6def",
+  "checkpoint": "outputs/slm_lora_answer_filtered_blind_safe_v2_parent_group/checkpoint-250",
+  "adapter_sha256": "8071e30a80dc2de33f8ee5080f5b44ae0158b0ff57565ccc8b3992d0d7adabd9",
+  "trainer_state_sha256": "fd8f37a439799c7280e0a0bc443334e2508a5f0f9919c1273df8d55d1264d656",
+  "global_step": 250,
+  "planned_steps": 264,
+  "epoch": 1.893939393939394,
+  "last_dev_loss": 0.13670340180397034,
+  "config": {
+    "max_doc_chars": 900,
+    "max_seq_length": 3072,
+    "epochs": 2,
+    "learning_rate": 0.0002,
+    "gradient_accumulation_steps": 4,
+    "dev_ratio": 0.1,
+    "dev_group_by": "parent_doc_id",
+    "eval_steps": 25,
+    "seed": 42,
+    "gradient_checkpointing": true,
+    "fp16": true
+  },
+  "split": {
+    "train_rows": 528,
+    "dev_rows": 32,
+    "parent_doc_overlap": 0,
+    "skipped_rows": 0
+  },
+  "interruption": {
+    "initial_run": "External command timeout occurred after checkpoint-250 was saved.",
+    "resume_attempt": "Transformers 5.9 attempted to load scaler.pt while accelerator.scaler was None. A copied checkpoint without scaler.pt loaded, but dataloader replay exceeded the follow-up time budget and did not produce a new checkpoint or manifest.",
+    "process_cleanup": "The surviving background Python processes were explicitly stopped after the bounded wait.",
+    "cuda_after_cleanup": "unavailable_until_driver_or_system_restart"
+  },
+  "interpretation": "This is a valid 250-step exploratory adapter, not the planned 264-step completed controlled arm. It must not be promoted or described as a completed two-epoch run.",
+  "blind_test_queried": false
+}

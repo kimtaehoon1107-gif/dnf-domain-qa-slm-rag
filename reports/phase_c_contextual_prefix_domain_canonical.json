@@ -1,0 +1,3452 @@
+{
+  "eval_set": "data\\processed\\domain_eval_set_expanded.jsonl",
+  "persist_dir": "outputs\\chroma_domain_chunks",
+  "model_name": "BAAI/bge-m3",
+  "summary": {
+    "answerable_rows": 90,
+    "rank_mode": "hybrid",
+    "top_k_single_retrieve": 10,
+    "candidate_k": 100,
+    "mrr@10": 0.4239197530864198,
+    "avg_query_latency_sec": 0.06305647666619431,
+    "p95_query_latency_sec": 0.07074229999852832,
+    "latency_excludes_model_load": true,
+    "gold_rank_distribution": {
+      "missing": 31,
+      "rank_1": 27,
+      "rank_10": 2,
+      "rank_2": 15,
+      "rank_3": 5,
+      "rank_4": 2,
+      "rank_5": 4,
+      "rank_8": 3,
+      "rank_9": 1
+    },
+    "hit_rate@1": 0.3,
+    "hit_rate@3": 0.5222222222222223,
+    "hit_rate@5": 0.5888888888888889,
+    "hit_rate@10": 0.6555555555555556
+  },
+  "details": [
+    {
+      "eval_id": "domain_eval_0001",
+      "question": "외부 결제 요구 주의사항은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_notice_2838879__chunk_002"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_notice_2838879__chunk_001",
+        "official_notice_2838879__chunk_002",
+        "official_notice_2927860__chunk_001",
+        "official_notice_2927854__chunk_001",
+        "official_update_2926911__chunk_008",
+        "official_guide_1286__chunk_002",
+        "official_guide_1285__chunk_004",
+        "official_guide_1285__chunk_003",
+        "official_guide_1326__chunk_004",
+        "official_guide_1326__chunk_005"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2838879",
+        "official_notice_2838879",
+        "official_notice_2927860",
+        "official_notice_2927854",
+        "official_update_2926911",
+        "official_guide_1286",
+        "official_guide_1285",
+        "official_guide_1285",
+        "official_guide_1326",
+        "official_guide_1326"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0002",
+      "question": "개인정보/인증번호 요구 주의사항은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_notice_2838879__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_notice_2838879__chunk_001",
+        "official_event_event_card_013__chunk_002",
+        "official_event_event_card_013__chunk_001",
+        "official_notice_2838879__chunk_002",
+        "official_update_2926971__chunk_008",
+        "official_notice_2927847__chunk_001",
+        "official_notice_2927769__chunk_001",
+        "official_notice_2927889__chunk_001",
+        "official_guide_1285__chunk_003",
+        "official_notice_2927901__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2838879",
+        "official_event_event_card_013",
+        "official_event_event_card_013",
+        "official_notice_2838879",
+        "official_update_2926971",
+        "official_notice_2927847",
+        "official_notice_2927769",
+        "official_notice_2927889",
+        "official_guide_1285",
+        "official_notice_2927901"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0003",
+      "question": "이벤트 기간은 어떻게 안내돼?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_001__chunk_001"
+      ],
+      "gold_rank": 5,
+      "retrieved_chunk_ids": [
+        "official_guide_1257__chunk_001",
+        "official_guide_1257__chunk_003",
+        "official_guide_1257__chunk_002",
+        "official_notice_2927728__chunk_001",
+        "official_event_event_card_001__chunk_001",
+        "official_event_event_card_004__chunk_001",
+        "official_event_event_card_008__chunk_001",
+        "official_notice_2927758__chunk_001",
+        "official_event_event_card_019__chunk_001",
+        "official_notice_2927816__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1257",
+        "official_guide_1257",
+        "official_guide_1257",
+        "official_notice_2927728",
+        "official_event_event_card_001",
+        "official_event_event_card_004",
+        "official_event_event_card_008",
+        "official_notice_2927758",
+        "official_event_event_card_019",
+        "official_notice_2927816"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0004",
+      "question": "레기온 콘텐츠 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1202__chunk_001"
+      ],
+      "gold_rank": 3,
+      "retrieved_chunk_ids": [
+        "official_guide_1534__chunk_004",
+        "official_guide_1520__chunk_001",
+        "official_guide_1202__chunk_001",
+        "official_update_2926972__chunk_016",
+        "official_guide_1508__chunk_002",
+        "official_guide_1427__chunk_002",
+        "official_guide_1433__chunk_002",
+        "official_guide_1203__chunk_001",
+        "official_guide_1437__chunk_001",
+        "official_update_2926972__chunk_014"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1534",
+        "official_guide_1520",
+        "official_guide_1202",
+        "official_update_2926972",
+        "official_guide_1508",
+        "official_guide_1427",
+        "official_guide_1433",
+        "official_guide_1203",
+        "official_guide_1437",
+        "official_update_2926972"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0005",
+      "question": "장비 관련 변경 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2926911__chunk_002"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1494__chunk_004",
+        "official_guide_1494__chunk_003",
+        "official_guide_1494__chunk_005",
+        "official_guide_1519__chunk_003",
+        "official_guide_1495__chunk_002",
+        "official_guide_1495__chunk_004",
+        "official_guide_1495__chunk_001",
+        "official_update_2927196__chunk_005",
+        "official_guide_1219__chunk_003",
+        "official_guide_1495__chunk_005"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1494",
+        "official_guide_1494",
+        "official_guide_1494",
+        "official_guide_1519",
+        "official_guide_1495",
+        "official_guide_1495",
+        "official_guide_1495",
+        "official_update_2927196",
+        "official_guide_1219",
+        "official_guide_1495"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0006",
+      "question": "피싱 피해 신고/문의 주의사항은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_notice_2838879__chunk_002"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_notice_2838879__chunk_001",
+        "official_notice_2838879__chunk_002",
+        "official_notice_2927847__chunk_001",
+        "official_notice_2927889__chunk_001",
+        "official_notice_2927769__chunk_001",
+        "official_guide_1260__chunk_007",
+        "official_guide_1289__chunk_007",
+        "official_guide_1285__chunk_004",
+        "official_guide_1260__chunk_010",
+        "official_guide_1289__chunk_008"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2838879",
+        "official_notice_2838879",
+        "official_notice_2927847",
+        "official_notice_2927889",
+        "official_notice_2927769",
+        "official_guide_1260",
+        "official_guide_1289",
+        "official_guide_1285",
+        "official_guide_1260",
+        "official_guide_1289"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0007",
+      "question": "비인가 프로그램 사용 주의사항은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_notice_2838879__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_notice_2927769__chunk_001",
+        "official_notice_2927889__chunk_001",
+        "official_notice_2927847__chunk_001",
+        "official_guide_1427__chunk_003",
+        "official_guide_1533__chunk_001",
+        "official_update_2926971__chunk_006",
+        "official_guide_1508__chunk_004",
+        "official_guide_1512__chunk_008",
+        "official_event_event_card_021__chunk_003",
+        "official_guide_1519__chunk_003"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2927769",
+        "official_notice_2927889",
+        "official_notice_2927847",
+        "official_guide_1427",
+        "official_guide_1533",
+        "official_update_2926971",
+        "official_guide_1508",
+        "official_guide_1512",
+        "official_event_event_card_021",
+        "official_guide_1519"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0008",
+      "question": "판매 기간은 어떻게 안내돼?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_005__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1237__chunk_004",
+        "official_notice_2927782__chunk_001",
+        "official_notice_2927757__chunk_001",
+        "official_guide_1237__chunk_002",
+        "official_guide_1233__chunk_004",
+        "official_guide_1285__chunk_003",
+        "official_event_event_card_013__chunk_002",
+        "official_guide_1489__chunk_008",
+        "official_guide_1489__chunk_018",
+        "official_guide_1275__chunk_004"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1237",
+        "official_notice_2927782",
+        "official_notice_2927757",
+        "official_guide_1237",
+        "official_guide_1233",
+        "official_guide_1285",
+        "official_event_event_card_013",
+        "official_guide_1489",
+        "official_guide_1489",
+        "official_guide_1275"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0009",
+      "question": "레기온 통합에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1202__chunk_001"
+      ],
+      "gold_rank": 8,
+      "retrieved_chunk_ids": [
+        "official_update_2926972__chunk_014",
+        "official_update_2926972__chunk_016",
+        "official_update_2927392__chunk_003",
+        "official_guide_1534__chunk_004",
+        "official_update_2927196__chunk_006",
+        "official_update_2927335__chunk_013",
+        "official_update_2926972__chunk_020",
+        "official_guide_1202__chunk_001",
+        "official_guide_1433__chunk_001",
+        "official_update_2927335__chunk_014"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2926972",
+        "official_update_2926972",
+        "official_update_2927392",
+        "official_guide_1534",
+        "official_update_2927196",
+        "official_update_2927335",
+        "official_update_2926972",
+        "official_guide_1202",
+        "official_guide_1433",
+        "official_update_2927335"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0010",
+      "question": "버그수정 던전 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2926911__chunk_003"
+      ],
+      "gold_rank": 4,
+      "retrieved_chunk_ids": [
+        "official_update_2927392__chunk_003",
+        "official_guide_1510__chunk_015",
+        "official_guide_1510__chunk_013",
+        "official_update_2926911__chunk_003",
+        "official_update_2927392__chunk_004",
+        "official_update_2927196__chunk_005",
+        "official_update_2927810__chunk_001",
+        "official_guide_1488__chunk_007",
+        "official_guide_1433__chunk_007",
+        "official_guide_1488__chunk_008"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2927392",
+        "official_guide_1510",
+        "official_guide_1510",
+        "official_update_2926911",
+        "official_update_2927392",
+        "official_update_2927196",
+        "official_update_2927810",
+        "official_guide_1488",
+        "official_guide_1433",
+        "official_guide_1488"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0011",
+      "question": "외부 메신저 거래 유도 사기 주의사항은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_notice_2838879__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_notice_2838879__chunk_001",
+        "official_notice_2838879__chunk_002",
+        "official_guide_1234__chunk_002",
+        "official_guide_1234__chunk_003",
+        "official_guide_1234__chunk_001",
+        "official_notice_2927847__chunk_001",
+        "official_notice_2927889__chunk_001",
+        "official_notice_2927769__chunk_001",
+        "official_guide_1286__chunk_002",
+        "official_update_2927810__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2838879",
+        "official_notice_2838879",
+        "official_guide_1234",
+        "official_guide_1234",
+        "official_guide_1234",
+        "official_notice_2927847",
+        "official_notice_2927889",
+        "official_notice_2927769",
+        "official_guide_1286",
+        "official_update_2927810"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0012",
+      "question": "해체가능 합성가능은 어떻게 안내돼?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_005__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1235__chunk_002",
+        "official_guide_1271__chunk_004",
+        "official_guide_1276__chunk_003",
+        "official_guide_1235__chunk_004",
+        "official_guide_1235__chunk_003",
+        "official_guide_1277__chunk_003",
+        "official_guide_1516__chunk_019",
+        "official_guide_1271__chunk_001",
+        "official_guide_1220__chunk_010",
+        "official_guide_1271__chunk_005"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1235",
+        "official_guide_1271",
+        "official_guide_1276",
+        "official_guide_1235",
+        "official_guide_1235",
+        "official_guide_1277",
+        "official_guide_1516",
+        "official_guide_1271",
+        "official_guide_1220",
+        "official_guide_1271"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0013",
+      "question": "던전 재입장 횟수에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1202__chunk_003"
+      ],
+      "gold_rank": 8,
+      "retrieved_chunk_ids": [
+        "official_guide_1433__chunk_003",
+        "official_guide_1433__chunk_004",
+        "official_guide_1510__chunk_002",
+        "official_guide_1510__chunk_003",
+        "official_guide_1488__chunk_002",
+        "official_guide_1479__chunk_003",
+        "official_guide_1478__chunk_003",
+        "official_guide_1202__chunk_003",
+        "official_guide_1203__chunk_003",
+        "official_guide_1202__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1433",
+        "official_guide_1433",
+        "official_guide_1510",
+        "official_guide_1510",
+        "official_guide_1488",
+        "official_guide_1479",
+        "official_guide_1478",
+        "official_guide_1202",
+        "official_guide_1203",
+        "official_guide_1202"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0014",
+      "question": "카테고리 변경사항 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927399__chunk_009"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_update_2927399__chunk_009",
+        "official_guide_1437__chunk_004",
+        "official_guide_1519__chunk_003",
+        "official_update_2927233__chunk_007",
+        "official_guide_1285__chunk_002",
+        "official_update_2926990__chunk_001",
+        "official_update_2927196__chunk_005",
+        "official_update_2927691__chunk_005",
+        "official_update_2927208__chunk_002",
+        "official_guide_1238__chunk_003"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2927399",
+        "official_guide_1437",
+        "official_guide_1519",
+        "official_update_2927233",
+        "official_guide_1285",
+        "official_update_2926990",
+        "official_update_2927196",
+        "official_update_2927691",
+        "official_update_2927208",
+        "official_guide_1238"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0015",
+      "question": "아이템 삭제 일정은 어떻게 안내돼?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_005__chunk_002"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1234__chunk_004",
+        "official_guide_1234__chunk_001",
+        "official_guide_1518__chunk_002",
+        "official_guide_1518__chunk_001",
+        "official_guide_1234__chunk_002",
+        "official_notice_2927816__chunk_001",
+        "official_guide_1518__chunk_003",
+        "official_guide_1326__chunk_005",
+        "official_notice_2927876__chunk_001",
+        "official_guide_1234__chunk_005"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1234",
+        "official_guide_1234",
+        "official_guide_1518",
+        "official_guide_1518",
+        "official_guide_1234",
+        "official_notice_2927816",
+        "official_guide_1518",
+        "official_guide_1326",
+        "official_notice_2927876",
+        "official_guide_1234"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0016",
+      "question": "작전 시작에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1202__chunk_006"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_event_event_card_002__chunk_001",
+        "official_guide_1202__chunk_006",
+        "official_guide_1523__chunk_008",
+        "official_guide_1516__chunk_003",
+        "official_guide_1420__chunk_009",
+        "official_notice_2927887__chunk_001",
+        "official_event_event_card_013__chunk_002",
+        "official_guide_1512__chunk_004",
+        "official_guide_1209__chunk_019",
+        "official_guide_1209__chunk_016"
+      ],
+      "retrieved_parent_ids": [
+        "official_event_event_card_002",
+        "official_guide_1202",
+        "official_guide_1523",
+        "official_guide_1516",
+        "official_guide_1420",
+        "official_notice_2927887",
+        "official_event_event_card_013",
+        "official_guide_1512",
+        "official_guide_1209",
+        "official_guide_1209"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0017",
+      "question": "장비 관련 변경 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1202__chunk_009"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1494__chunk_004",
+        "official_guide_1219__chunk_001",
+        "official_guide_1494__chunk_003",
+        "official_guide_1495__chunk_001",
+        "official_guide_1258__chunk_002",
+        "official_guide_1227__chunk_001",
+        "official_guide_1494__chunk_005",
+        "official_guide_1519__chunk_003",
+        "official_guide_1219__chunk_003",
+        "official_guide_1219__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1494",
+        "official_guide_1219",
+        "official_guide_1494",
+        "official_guide_1495",
+        "official_guide_1258",
+        "official_guide_1227",
+        "official_guide_1494",
+        "official_guide_1519",
+        "official_guide_1219",
+        "official_guide_1219"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0018",
+      "question": "장비 관련 변경 조건이나 제한은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1202__chunk_009"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1494__chunk_003",
+        "official_guide_1219__chunk_003",
+        "official_guide_1494__chunk_004",
+        "official_guide_1519__chunk_003",
+        "official_guide_1495__chunk_002",
+        "official_guide_1494__chunk_005",
+        "official_guide_1495__chunk_005",
+        "official_guide_1219__chunk_001",
+        "official_guide_1495__chunk_004",
+        "official_guide_1495__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1494",
+        "official_guide_1219",
+        "official_guide_1494",
+        "official_guide_1519",
+        "official_guide_1495",
+        "official_guide_1494",
+        "official_guide_1495",
+        "official_guide_1219",
+        "official_guide_1495",
+        "official_guide_1495"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0019",
+      "question": "1페이즈 제한시간 조건이나 제한은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1206__chunk_003"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1206__chunk_003",
+        "official_guide_1207__chunk_002",
+        "official_guide_1420__chunk_005",
+        "official_guide_1520__chunk_005",
+        "official_guide_1420__chunk_036",
+        "official_guide_1433__chunk_005",
+        "official_guide_1206__chunk_005",
+        "official_guide_1206__chunk_017",
+        "official_guide_1206__chunk_007",
+        "official_guide_1523__chunk_038"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1206",
+        "official_guide_1207",
+        "official_guide_1420",
+        "official_guide_1520",
+        "official_guide_1420",
+        "official_guide_1433",
+        "official_guide_1206",
+        "official_guide_1206",
+        "official_guide_1206",
+        "official_guide_1523"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0020",
+      "question": "모험가 명성 조건 조건이나 제한은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1206__chunk_003"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1255__chunk_002",
+        "official_guide_1255__chunk_001",
+        "official_guide_1255__chunk_003",
+        "official_guide_1255__chunk_005",
+        "official_guide_1255__chunk_006",
+        "official_guide_1255__chunk_004",
+        "official_guide_1255__chunk_008",
+        "official_guide_1255__chunk_010",
+        "official_guide_1255__chunk_007",
+        "official_guide_1255__chunk_009"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0021",
+      "question": "전투 후퇴 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1206__chunk_003"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1527__chunk_005",
+        "official_guide_1515__chunk_006",
+        "official_guide_1475__chunk_006",
+        "official_guide_1528__chunk_005",
+        "official_guide_1425__chunk_003",
+        "official_guide_1516__chunk_012",
+        "official_guide_1179__chunk_011",
+        "official_guide_1179__chunk_009",
+        "official_guide_1478__chunk_006",
+        "official_guide_1537__chunk_006"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1527",
+        "official_guide_1515",
+        "official_guide_1475",
+        "official_guide_1528",
+        "official_guide_1425",
+        "official_guide_1516",
+        "official_guide_1179",
+        "official_guide_1179",
+        "official_guide_1478",
+        "official_guide_1537"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0022",
+      "question": "전투마다 횟수 조건이나 제한은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1206__chunk_003"
+      ],
+      "gold_rank": 3,
+      "retrieved_chunk_ids": [
+        "official_guide_1204__chunk_002",
+        "official_guide_1207__chunk_002",
+        "official_guide_1206__chunk_003",
+        "official_guide_1523__chunk_005",
+        "official_guide_1205__chunk_002",
+        "official_guide_1520__chunk_002",
+        "official_guide_1534__chunk_004",
+        "official_guide_1420__chunk_035",
+        "official_guide_1523__chunk_002",
+        "official_guide_1537__chunk_003"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1204",
+        "official_guide_1207",
+        "official_guide_1206",
+        "official_guide_1523",
+        "official_guide_1205",
+        "official_guide_1520",
+        "official_guide_1534",
+        "official_guide_1420",
+        "official_guide_1523",
+        "official_guide_1537"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0023",
+      "question": "공유 의식에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1206__chunk_004"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1206__chunk_004",
+        "official_update_2927399__chunk_018",
+        "official_update_2927208__chunk_001",
+        "official_guide_1206__chunk_008",
+        "official_update_2927691__chunk_008",
+        "official_update_2927691__chunk_007",
+        "official_update_2926972__chunk_017",
+        "official_guide_1522__chunk_005",
+        "official_guide_1528__chunk_002",
+        "official_guide_1534__chunk_004"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1206",
+        "official_update_2927399",
+        "official_update_2927208",
+        "official_guide_1206",
+        "official_update_2927691",
+        "official_update_2927691",
+        "official_update_2926972",
+        "official_guide_1522",
+        "official_guide_1528",
+        "official_guide_1534"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0024",
+      "question": "던전 입장에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1206__chunk_004"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1488__chunk_002",
+        "official_guide_1510__chunk_003",
+        "official_guide_1510__chunk_002",
+        "official_guide_1433__chunk_003",
+        "official_guide_1433__chunk_004",
+        "official_guide_1510__chunk_001",
+        "official_guide_1432__chunk_001",
+        "official_guide_1510__chunk_005",
+        "official_guide_1433__chunk_006",
+        "official_guide_1510__chunk_013"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1488",
+        "official_guide_1510",
+        "official_guide_1510",
+        "official_guide_1433",
+        "official_guide_1433",
+        "official_guide_1510",
+        "official_guide_1432",
+        "official_guide_1510",
+        "official_guide_1433",
+        "official_guide_1510"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0025",
+      "question": "세라 화폐 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1233__chunk_001"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_notice_2927728__chunk_001",
+        "official_guide_1233__chunk_001",
+        "official_notice_2927763__chunk_004",
+        "official_notice_2927763__chunk_002",
+        "official_notice_2927763__chunk_001",
+        "official_notice_2927763__chunk_003",
+        "official_guide_1427__chunk_003",
+        "official_event_2927568__chunk_001",
+        "official_guide_1246__chunk_002",
+        "official_event_event_card_021__chunk_003"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2927728",
+        "official_guide_1233",
+        "official_notice_2927763",
+        "official_notice_2927763",
+        "official_notice_2927763",
+        "official_notice_2927763",
+        "official_guide_1427",
+        "official_event_2927568",
+        "official_guide_1246",
+        "official_event_event_card_021"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0026",
+      "question": "장비 관련 변경에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1233__chunk_002"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1494__chunk_005",
+        "official_guide_1494__chunk_004",
+        "official_guide_1494__chunk_003",
+        "official_guide_1495__chunk_004",
+        "official_guide_1495__chunk_002",
+        "official_guide_1509__chunk_001",
+        "official_update_2927196__chunk_005",
+        "official_notice_2927887__chunk_001",
+        "official_guide_1519__chunk_003",
+        "official_guide_1495__chunk_005"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1494",
+        "official_guide_1494",
+        "official_guide_1494",
+        "official_guide_1495",
+        "official_guide_1495",
+        "official_guide_1509",
+        "official_update_2927196",
+        "official_notice_2927887",
+        "official_guide_1519",
+        "official_guide_1495"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0027",
+      "question": "슬롯 교환 조건이나 제한은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1233__chunk_004"
+      ],
+      "gold_rank": 8,
+      "retrieved_chunk_ids": [
+        "official_guide_1537__chunk_014",
+        "official_guide_1531__chunk_006",
+        "official_guide_1530__chunk_012",
+        "official_guide_1532__chunk_013",
+        "official_guide_1484__chunk_003",
+        "official_guide_1326__chunk_003",
+        "official_guide_1391__chunk_010",
+        "official_guide_1233__chunk_004",
+        "official_guide_1482__chunk_008",
+        "official_guide_1531__chunk_004"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1537",
+        "official_guide_1531",
+        "official_guide_1530",
+        "official_guide_1532",
+        "official_guide_1484",
+        "official_guide_1326",
+        "official_guide_1391",
+        "official_guide_1233",
+        "official_guide_1482",
+        "official_guide_1531"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0028",
+      "question": "판매 종료 시간에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1233__chunk_004"
+      ],
+      "gold_rank": 4,
+      "retrieved_chunk_ids": [
+        "official_notice_2927782__chunk_001",
+        "official_notice_2927757__chunk_001",
+        "official_guide_1518__chunk_002",
+        "official_guide_1233__chunk_004",
+        "official_guide_1518__chunk_001",
+        "official_guide_1518__chunk_003",
+        "official_guide_1237__chunk_004",
+        "official_event_event_card_017__chunk_001",
+        "official_guide_1519__chunk_001",
+        "official_notice_2927816__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2927782",
+        "official_notice_2927757",
+        "official_guide_1518",
+        "official_guide_1233",
+        "official_guide_1518",
+        "official_guide_1518",
+        "official_guide_1237",
+        "official_event_event_card_017",
+        "official_guide_1519",
+        "official_notice_2927816"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0029",
+      "question": "구매/장바구니 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1233__chunk_005"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1427__chunk_002",
+        "official_guide_1233__chunk_005",
+        "official_guide_1427__chunk_001",
+        "official_guide_1427__chunk_003",
+        "official_guide_1273__chunk_010",
+        "official_guide_1425__chunk_002",
+        "official_guide_1258__chunk_003",
+        "official_guide_1425__chunk_001",
+        "official_guide_1273__chunk_006",
+        "official_guide_1273__chunk_005"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1427",
+        "official_guide_1233",
+        "official_guide_1427",
+        "official_guide_1427",
+        "official_guide_1273",
+        "official_guide_1425",
+        "official_guide_1258",
+        "official_guide_1425",
+        "official_guide_1273",
+        "official_guide_1273"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0030",
+      "question": "구매/장바구니에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1233__chunk_005"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1233__chunk_005",
+        "official_guide_1273__chunk_008",
+        "official_guide_1273__chunk_006",
+        "official_guide_1273__chunk_009",
+        "official_guide_1285__chunk_002",
+        "official_guide_1220__chunk_008",
+        "official_guide_1427__chunk_002",
+        "official_update_2926971__chunk_001",
+        "official_update_2927263__chunk_002",
+        "official_guide_1530__chunk_016"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1233",
+        "official_guide_1273",
+        "official_guide_1273",
+        "official_guide_1273",
+        "official_guide_1285",
+        "official_guide_1220",
+        "official_guide_1427",
+        "official_update_2926971",
+        "official_update_2927263",
+        "official_guide_1530"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0031",
+      "question": "UI에서만 경우도에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1239__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1259__chunk_007",
+        "official_update_2926971__chunk_004",
+        "official_update_2927196__chunk_005",
+        "official_update_2927196__chunk_006",
+        "official_guide_1292__chunk_001",
+        "official_update_2926971__chunk_005",
+        "official_update_2926971__chunk_002",
+        "official_update_2927392__chunk_005",
+        "official_guide_1522__chunk_001",
+        "official_update_2926971__chunk_008"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1259",
+        "official_update_2926971",
+        "official_update_2927196",
+        "official_update_2927196",
+        "official_guide_1292",
+        "official_update_2926971",
+        "official_update_2926971",
+        "official_update_2927392",
+        "official_guide_1522",
+        "official_update_2926971"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0032",
+      "question": "무게 게이지에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1239__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_update_2927196__chunk_006",
+        "official_guide_1490__chunk_007",
+        "official_update_2927756__chunk_002",
+        "official_update_2926911__chunk_004",
+        "official_update_2927196__chunk_005",
+        "official_guide_1493__chunk_002",
+        "official_guide_1509__chunk_014",
+        "official_guide_1532__chunk_014",
+        "official_update_2926972__chunk_020",
+        "official_update_2926911__chunk_005"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2927196",
+        "official_guide_1490",
+        "official_update_2927756",
+        "official_update_2926911",
+        "official_update_2927196",
+        "official_guide_1493",
+        "official_guide_1509",
+        "official_guide_1532",
+        "official_update_2926972",
+        "official_update_2926911"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0033",
+      "question": "번호 탭을에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1239__chunk_001"
+      ],
+      "gold_rank": 5,
+      "retrieved_chunk_ids": [
+        "official_event_event_card_013__chunk_002",
+        "official_guide_1292__chunk_001",
+        "official_update_2926971__chunk_008",
+        "official_guide_1209__chunk_019",
+        "official_guide_1239__chunk_001",
+        "official_update_2926971__chunk_007",
+        "official_notice_2838879__chunk_001",
+        "official_guide_1432__chunk_001",
+        "official_guide_1432__chunk_005",
+        "official_guide_1532__chunk_014"
+      ],
+      "retrieved_parent_ids": [
+        "official_event_event_card_013",
+        "official_guide_1292",
+        "official_update_2926971",
+        "official_guide_1209",
+        "official_guide_1239",
+        "official_update_2926971",
+        "official_notice_2838879",
+        "official_guide_1432",
+        "official_guide_1432",
+        "official_guide_1532"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0034",
+      "question": "소울 큐브 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1239__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1246__chunk_003",
+        "official_guide_1236__chunk_009",
+        "official_guide_1482__chunk_006",
+        "official_guide_1530__chunk_015",
+        "official_guide_1532__chunk_008",
+        "official_guide_1537__chunk_016",
+        "official_guide_1425__chunk_001",
+        "official_guide_1493__chunk_006",
+        "official_guide_1235__chunk_003",
+        "official_guide_1425__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1246",
+        "official_guide_1236",
+        "official_guide_1482",
+        "official_guide_1530",
+        "official_guide_1532",
+        "official_guide_1537",
+        "official_guide_1425",
+        "official_guide_1493",
+        "official_guide_1235",
+        "official_guide_1425"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0035",
+      "question": "칭호 데미지 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1239__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1179__chunk_009",
+        "official_guide_1236__chunk_007",
+        "official_event_event_card_014__chunk_003",
+        "official_guide_1425__chunk_003",
+        "official_guide_1425__chunk_002",
+        "official_update_2927233__chunk_003",
+        "official_guide_1230__chunk_008",
+        "official_guide_1289__chunk_009",
+        "official_guide_1494__chunk_005",
+        "official_guide_1228__chunk_006"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1179",
+        "official_guide_1236",
+        "official_event_event_card_014",
+        "official_guide_1425",
+        "official_guide_1425",
+        "official_update_2927233",
+        "official_guide_1230",
+        "official_guide_1289",
+        "official_guide_1494",
+        "official_guide_1228"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0036",
+      "question": "코인 세라에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1239__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1233__chunk_001",
+        "official_notice_2927763__chunk_004",
+        "official_notice_2927763__chunk_003",
+        "official_guide_1233__chunk_012",
+        "official_guide_1523__chunk_005",
+        "official_guide_1420__chunk_005",
+        "official_guide_1520__chunk_005",
+        "official_guide_1522__chunk_005",
+        "official_event_event_card_015__chunk_006",
+        "official_guide_1209__chunk_018"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1233",
+        "official_notice_2927763",
+        "official_notice_2927763",
+        "official_guide_1233",
+        "official_guide_1523",
+        "official_guide_1420",
+        "official_guide_1520",
+        "official_guide_1522",
+        "official_event_event_card_015",
+        "official_guide_1209"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0037",
+      "question": "장비 아이템 강화/증폭/재련에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1255__chunk_004"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1255__chunk_004",
+        "official_guide_1228__chunk_002",
+        "official_guide_1230__chunk_001",
+        "official_guide_1228__chunk_001",
+        "official_guide_1495__chunk_002",
+        "official_guide_1230__chunk_005",
+        "official_guide_1236__chunk_006",
+        "official_guide_1228__chunk_005",
+        "official_guide_1495__chunk_004",
+        "official_guide_1536__chunk_008"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1255",
+        "official_guide_1228",
+        "official_guide_1230",
+        "official_guide_1228",
+        "official_guide_1495",
+        "official_guide_1230",
+        "official_guide_1236",
+        "official_guide_1228",
+        "official_guide_1495",
+        "official_guide_1536"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0038",
+      "question": "서약 / 결정 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1255__chunk_007"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1532__chunk_014",
+        "official_guide_1532__chunk_010",
+        "official_guide_1532__chunk_002",
+        "official_guide_1532__chunk_015",
+        "official_guide_1532__chunk_001",
+        "official_guide_1532__chunk_005",
+        "official_guide_1532__chunk_012",
+        "official_guide_1532__chunk_016",
+        "official_guide_1532__chunk_004",
+        "official_guide_1532__chunk_007"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0039",
+      "question": "서약 / 결정에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1255__chunk_007"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1532__chunk_014",
+        "official_guide_1532__chunk_001",
+        "official_guide_1532__chunk_005",
+        "official_guide_1532__chunk_015",
+        "official_guide_1532__chunk_012",
+        "official_guide_1532__chunk_011",
+        "official_guide_1532__chunk_007",
+        "official_guide_1532__chunk_010",
+        "official_guide_1532__chunk_006",
+        "official_guide_1532__chunk_018"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0040",
+      "question": "전문직업 재습득에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1272__chunk_003"
+      ],
+      "gold_rank": 5,
+      "retrieved_chunk_ids": [
+        "official_guide_1273__chunk_002",
+        "official_guide_1272__chunk_002",
+        "official_guide_1271__chunk_002",
+        "official_guide_1273__chunk_003",
+        "official_guide_1272__chunk_003",
+        "official_guide_1270__chunk_002",
+        "official_guide_1273__chunk_006",
+        "official_guide_1271__chunk_003",
+        "official_guide_1272__chunk_007",
+        "official_guide_1270__chunk_003"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1273",
+        "official_guide_1272",
+        "official_guide_1271",
+        "official_guide_1273",
+        "official_guide_1272",
+        "official_guide_1270",
+        "official_guide_1273",
+        "official_guide_1271",
+        "official_guide_1272",
+        "official_guide_1270"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0041",
+      "question": "전문직업 포기 비용에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1272__chunk_003"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1273__chunk_003",
+        "official_guide_1272__chunk_003",
+        "official_guide_1271__chunk_003",
+        "official_guide_1270__chunk_003",
+        "official_guide_1271__chunk_002",
+        "official_guide_1272__chunk_007",
+        "official_guide_1273__chunk_002",
+        "official_guide_1273__chunk_006",
+        "official_guide_1272__chunk_002",
+        "official_guide_1270__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1273",
+        "official_guide_1272",
+        "official_guide_1271",
+        "official_guide_1270",
+        "official_guide_1271",
+        "official_guide_1272",
+        "official_guide_1273",
+        "official_guide_1273",
+        "official_guide_1272",
+        "official_guide_1270"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0042",
+      "question": "연금술사 전문직업 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1272__chunk_005"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1272__chunk_005",
+        "official_guide_1272__chunk_001",
+        "official_guide_1272__chunk_007",
+        "official_guide_1272__chunk_012",
+        "official_guide_1236__chunk_010",
+        "official_guide_1273__chunk_011",
+        "official_guide_1235__chunk_002",
+        "official_guide_1220__chunk_004",
+        "official_guide_1273__chunk_006",
+        "official_guide_1271__chunk_003"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1272",
+        "official_guide_1272",
+        "official_guide_1272",
+        "official_guide_1272",
+        "official_guide_1236",
+        "official_guide_1273",
+        "official_guide_1235",
+        "official_guide_1220",
+        "official_guide_1273",
+        "official_guide_1271"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0043",
+      "question": "전문직업 선택에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1272__chunk_007"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1272__chunk_007",
+        "official_guide_1273__chunk_006",
+        "official_guide_1273__chunk_003",
+        "official_guide_1272__chunk_003",
+        "official_guide_1271__chunk_003",
+        "official_guide_1270__chunk_003",
+        "official_guide_1273__chunk_002",
+        "official_guide_1272__chunk_002",
+        "official_guide_1270__chunk_002",
+        "official_guide_1271__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1272",
+        "official_guide_1273",
+        "official_guide_1273",
+        "official_guide_1272",
+        "official_guide_1271",
+        "official_guide_1270",
+        "official_guide_1273",
+        "official_guide_1272",
+        "official_guide_1270",
+        "official_guide_1271"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0044",
+      "question": "제작할 포션 선택 조건이나 제한은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1272__chunk_008"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1272__chunk_008",
+        "official_guide_1272__chunk_009",
+        "official_guide_1534__chunk_006",
+        "official_guide_1433__chunk_005",
+        "official_update_2927335__chunk_008",
+        "official_event_event_card_015__chunk_001",
+        "official_guide_1508__chunk_004",
+        "official_update_2927233__chunk_002",
+        "official_guide_1537__chunk_009",
+        "official_guide_1532__chunk_009"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1272",
+        "official_guide_1272",
+        "official_guide_1534",
+        "official_guide_1433",
+        "official_update_2927335",
+        "official_event_event_card_015",
+        "official_guide_1508",
+        "official_update_2927233",
+        "official_guide_1537",
+        "official_guide_1532"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0045",
+      "question": "변환 아이템 선택에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1272__chunk_010"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1252__chunk_001",
+        "official_guide_1272__chunk_010",
+        "official_guide_1252__chunk_005",
+        "official_guide_1506__chunk_002",
+        "official_guide_1532__chunk_015",
+        "official_guide_1493__chunk_003",
+        "official_update_2926972__chunk_010",
+        "official_guide_1489__chunk_015",
+        "official_guide_1278__chunk_001",
+        "official_guide_1489__chunk_011"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1252",
+        "official_guide_1272",
+        "official_guide_1252",
+        "official_guide_1506",
+        "official_guide_1532",
+        "official_guide_1493",
+        "official_update_2926972",
+        "official_guide_1489",
+        "official_guide_1278",
+        "official_guide_1489"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0046",
+      "question": "마법부여 추출기 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1273__chunk_005"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1273__chunk_005",
+        "official_guide_1258__chunk_002",
+        "official_guide_1220__chunk_003",
+        "official_guide_1272__chunk_006",
+        "official_guide_1220__chunk_005",
+        "official_guide_1255__chunk_005",
+        "official_guide_1534__chunk_031",
+        "official_guide_1489__chunk_014",
+        "official_guide_1220__chunk_001",
+        "official_guide_1220__chunk_006"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1273",
+        "official_guide_1258",
+        "official_guide_1220",
+        "official_guide_1272",
+        "official_guide_1220",
+        "official_guide_1255",
+        "official_guide_1534",
+        "official_guide_1489",
+        "official_guide_1220",
+        "official_guide_1220"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0047",
+      "question": "마법부여 상점 설치 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1273__chunk_010"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1273__chunk_010",
+        "official_guide_1427__chunk_002",
+        "official_guide_1482__chunk_003",
+        "official_guide_1482__chunk_005",
+        "official_guide_1482__chunk_007",
+        "official_guide_1482__chunk_006",
+        "official_guide_1311__chunk_002",
+        "official_guide_1271__chunk_005",
+        "official_guide_1220__chunk_003",
+        "official_guide_1258__chunk_003"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1273",
+        "official_guide_1427",
+        "official_guide_1482",
+        "official_guide_1482",
+        "official_guide_1482",
+        "official_guide_1482",
+        "official_guide_1311",
+        "official_guide_1271",
+        "official_guide_1220",
+        "official_guide_1258"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0048",
+      "question": "교환불가 클론 레어 아바타로 변환에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1278__chunk_003"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1278__chunk_003",
+        "official_event_event_card_015__chunk_004",
+        "official_guide_1278__chunk_001",
+        "official_event_event_card_014__chunk_001",
+        "official_event_event_card_015__chunk_002",
+        "official_guide_1280__chunk_004",
+        "official_event_event_card_015__chunk_003",
+        "official_event_event_card_016__chunk_001",
+        "official_event_event_card_021__chunk_002",
+        "official_event_event_card_016__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1278",
+        "official_event_event_card_015",
+        "official_guide_1278",
+        "official_event_event_card_014",
+        "official_event_event_card_015",
+        "official_guide_1280",
+        "official_event_event_card_015",
+        "official_event_event_card_016",
+        "official_event_event_card_021",
+        "official_event_event_card_016"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0049",
+      "question": "플래티넘 엠블렘에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1279__chunk_006"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1279__chunk_006",
+        "official_guide_1277__chunk_004",
+        "official_guide_1279__chunk_004",
+        "official_update_2927196__chunk_003",
+        "official_guide_1277__chunk_003",
+        "official_guide_1276__chunk_003",
+        "official_event_event_card_014__chunk_004",
+        "official_guide_1283__chunk_016",
+        "official_update_2927877__chunk_001",
+        "official_notice_2927876__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1279",
+        "official_guide_1277",
+        "official_guide_1279",
+        "official_update_2927196",
+        "official_guide_1277",
+        "official_guide_1276",
+        "official_event_event_card_014",
+        "official_guide_1283",
+        "official_update_2927877",
+        "official_notice_2927876"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0050",
+      "question": "인벤토리 단축키에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1280__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1239__chunk_001",
+        "official_guide_1296__chunk_003",
+        "official_update_2926911__chunk_002",
+        "official_update_2927691__chunk_001",
+        "official_update_2927196__chunk_005",
+        "official_guide_1234__chunk_005",
+        "official_update_2926971__chunk_008",
+        "official_update_2926971__chunk_002",
+        "official_update_2927756__chunk_003",
+        "official_guide_1518__chunk_003"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1239",
+        "official_guide_1296",
+        "official_update_2926911",
+        "official_update_2927691",
+        "official_update_2927196",
+        "official_guide_1234",
+        "official_update_2926971",
+        "official_update_2926971",
+        "official_update_2927756",
+        "official_guide_1518"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0051",
+      "question": "클론 아바타에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1280__chunk_004"
+      ],
+      "gold_rank": 3,
+      "retrieved_chunk_ids": [
+        "official_guide_1278__chunk_003",
+        "official_event_event_card_014__chunk_001",
+        "official_guide_1280__chunk_004",
+        "official_guide_1278__chunk_001",
+        "official_event_event_card_015__chunk_002",
+        "official_event_event_card_015__chunk_004",
+        "official_event_event_card_021__chunk_002",
+        "official_event_event_card_016__chunk_001",
+        "official_event_event_card_016__chunk_002",
+        "official_update_2926911__chunk_007"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1278",
+        "official_event_event_card_014",
+        "official_guide_1280",
+        "official_guide_1278",
+        "official_event_event_card_015",
+        "official_event_event_card_015",
+        "official_event_event_card_021",
+        "official_event_event_card_016",
+        "official_event_event_card_016",
+        "official_update_2926911"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0052",
+      "question": "결투 신청에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1282__chunk_001"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1283__chunk_003",
+        "official_guide_1282__chunk_001",
+        "official_guide_1283__chunk_006",
+        "official_guide_1432__chunk_001",
+        "official_event_event_card_013__chunk_002",
+        "official_guide_1269__chunk_003",
+        "official_event_event_card_013__chunk_001",
+        "official_guide_1283__chunk_002",
+        "official_guide_1283__chunk_008",
+        "official_guide_1283__chunk_010"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1283",
+        "official_guide_1282",
+        "official_guide_1283",
+        "official_guide_1432",
+        "official_event_event_card_013",
+        "official_guide_1269",
+        "official_event_event_card_013",
+        "official_guide_1283",
+        "official_guide_1283",
+        "official_guide_1283"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0053",
+      "question": "진행방식 레벨에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1282__chunk_001"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1505__chunk_002",
+        "official_guide_1282__chunk_001",
+        "official_guide_1283__chunk_002",
+        "official_guide_1534__chunk_011",
+        "official_guide_1488__chunk_002",
+        "official_guide_1375__chunk_001",
+        "official_guide_1375__chunk_003",
+        "official_guide_1508__chunk_006",
+        "official_guide_1206__chunk_003",
+        "official_update_2927399__chunk_007"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1505",
+        "official_guide_1282",
+        "official_guide_1283",
+        "official_guide_1534",
+        "official_guide_1488",
+        "official_guide_1375",
+        "official_guide_1375",
+        "official_guide_1508",
+        "official_guide_1206",
+        "official_update_2927399"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0054",
+      "question": "패배 패널티에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1282__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1282__chunk_001",
+        "official_guide_1282__chunk_002",
+        "official_guide_1527__chunk_005",
+        "official_guide_1230__chunk_003",
+        "official_guide_1420__chunk_006",
+        "official_guide_1512__chunk_010",
+        "official_guide_1520__chunk_019",
+        "official_guide_1475__chunk_006",
+        "official_guide_1228__chunk_007",
+        "official_guide_1478__chunk_006"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1282",
+        "official_guide_1282",
+        "official_guide_1527",
+        "official_guide_1230",
+        "official_guide_1420",
+        "official_guide_1512",
+        "official_guide_1520",
+        "official_guide_1475",
+        "official_guide_1228",
+        "official_guide_1478"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0055",
+      "question": "하지만 상황 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1282__chunk_001"
+      ],
+      "gold_rank": 9,
+      "retrieved_chunk_ids": [
+        "official_guide_1427__chunk_003",
+        "official_guide_1425__chunk_003",
+        "official_guide_1427__chunk_002",
+        "official_guide_1425__chunk_002",
+        "official_guide_1179__chunk_007",
+        "official_guide_1179__chunk_009",
+        "official_guide_1179__chunk_010",
+        "official_guide_1510__chunk_006",
+        "official_guide_1282__chunk_001",
+        "official_guide_1534__chunk_011"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1427",
+        "official_guide_1425",
+        "official_guide_1427",
+        "official_guide_1425",
+        "official_guide_1179",
+        "official_guide_1179",
+        "official_guide_1179",
+        "official_guide_1510",
+        "official_guide_1282",
+        "official_guide_1534"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0056",
+      "question": "50레벨 크리에이터에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1282__chunk_002"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_update_2927399__chunk_003",
+        "official_guide_1260__chunk_001",
+        "official_event_event_card_015__chunk_001",
+        "official_guide_1283__chunk_002",
+        "official_update_2927399__chunk_007",
+        "official_event_event_card_016__chunk_002",
+        "official_event_event_card_015__chunk_002",
+        "official_guide_1512__chunk_002",
+        "official_guide_1520__chunk_002",
+        "official_update_2927399__chunk_006"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2927399",
+        "official_guide_1260",
+        "official_event_event_card_015",
+        "official_guide_1283",
+        "official_update_2927399",
+        "official_event_event_card_016",
+        "official_event_event_card_015",
+        "official_guide_1512",
+        "official_guide_1520",
+        "official_update_2927399"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0057",
+      "question": "패배 시에 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1282__chunk_002"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1206__chunk_018",
+        "official_guide_1282__chunk_002",
+        "official_guide_1516__chunk_011",
+        "official_guide_1235__chunk_003",
+        "official_guide_1209__chunk_007",
+        "official_guide_1282__chunk_001",
+        "official_guide_1512__chunk_012",
+        "official_guide_1482__chunk_007",
+        "official_update_2927399__chunk_014",
+        "official_guide_1523__chunk_011"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1206",
+        "official_guide_1282",
+        "official_guide_1516",
+        "official_guide_1235",
+        "official_guide_1209",
+        "official_guide_1282",
+        "official_guide_1512",
+        "official_guide_1482",
+        "official_update_2927399",
+        "official_guide_1523"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0058",
+      "question": "랭크 결투장에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1283__chunk_002"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1283__chunk_002",
+        "official_guide_1283__chunk_003",
+        "official_guide_1283__chunk_007",
+        "official_guide_1283__chunk_006",
+        "official_guide_1283__chunk_005",
+        "official_guide_1283__chunk_015",
+        "official_guide_1283__chunk_004",
+        "official_guide_1283__chunk_009",
+        "official_update_2927263__chunk_001",
+        "official_guide_1491__chunk_004"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1283",
+        "official_guide_1283",
+        "official_guide_1283",
+        "official_guide_1283",
+        "official_guide_1283",
+        "official_guide_1283",
+        "official_guide_1283",
+        "official_guide_1283",
+        "official_update_2927263",
+        "official_guide_1491"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0059",
+      "question": "자유 결투장에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1283__chunk_002"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1283__chunk_002",
+        "official_guide_1283__chunk_008",
+        "official_guide_1432__chunk_001",
+        "official_guide_1532__chunk_014",
+        "official_guide_1283__chunk_015",
+        "official_guide_1283__chunk_003",
+        "official_guide_1233__chunk_009",
+        "official_guide_1534__chunk_038",
+        "official_guide_1534__chunk_014",
+        "official_guide_1534__chunk_011"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1283",
+        "official_guide_1283",
+        "official_guide_1432",
+        "official_guide_1532",
+        "official_guide_1283",
+        "official_guide_1283",
+        "official_guide_1233",
+        "official_guide_1534",
+        "official_guide_1534",
+        "official_guide_1534"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0060",
+      "question": "미션 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1283__chunk_007"
+      ],
+      "gold_rank": 10,
+      "retrieved_chunk_ids": [
+        "official_guide_1505__chunk_001",
+        "official_guide_1269__chunk_006",
+        "official_guide_1269__chunk_008",
+        "official_guide_1505__chunk_002",
+        "official_guide_1269__chunk_001",
+        "official_guide_1425__chunk_001",
+        "official_guide_1269__chunk_010",
+        "official_guide_1425__chunk_003",
+        "official_guide_1269__chunk_003",
+        "official_guide_1283__chunk_007"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1505",
+        "official_guide_1269",
+        "official_guide_1269",
+        "official_guide_1505",
+        "official_guide_1269",
+        "official_guide_1425",
+        "official_guide_1269",
+        "official_guide_1425",
+        "official_guide_1269",
+        "official_guide_1283"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0061",
+      "question": "시즈키의 도장 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1283__chunk_009"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1283__chunk_009",
+        "official_guide_1283__chunk_006",
+        "official_guide_1283__chunk_011",
+        "official_guide_1283__chunk_010",
+        "official_guide_1425__chunk_002",
+        "official_guide_1425__chunk_003",
+        "official_guide_1425__chunk_001",
+        "official_guide_1206__chunk_004",
+        "official_guide_1283__chunk_015",
+        "official_guide_1206__chunk_023"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1283",
+        "official_guide_1283",
+        "official_guide_1283",
+        "official_guide_1283",
+        "official_guide_1425",
+        "official_guide_1425",
+        "official_guide_1425",
+        "official_guide_1206",
+        "official_guide_1283",
+        "official_guide_1206"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0062",
+      "question": "레이지 모드에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1283__chunk_012"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1283__chunk_012",
+        "official_guide_1206__chunk_011",
+        "official_guide_1206__chunk_014",
+        "official_update_2927392__chunk_005",
+        "official_guide_1283__chunk_013",
+        "official_event_event_card_007__chunk_002",
+        "official_update_2927392__chunk_004",
+        "official_guide_1207__chunk_016",
+        "official_guide_1209__chunk_020",
+        "official_update_2926911__chunk_004"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1283",
+        "official_guide_1206",
+        "official_guide_1206",
+        "official_update_2927392",
+        "official_guide_1283",
+        "official_event_event_card_007",
+        "official_update_2927392",
+        "official_guide_1207",
+        "official_guide_1209",
+        "official_update_2926911"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0063",
+      "question": "결투장 레이드 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1283__chunk_015"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1209__chunk_020",
+        "official_guide_1209__chunk_022",
+        "official_guide_1523__chunk_021",
+        "official_guide_1207__chunk_015",
+        "official_guide_1206__chunk_014",
+        "official_guide_1523__chunk_005",
+        "official_guide_1523__chunk_017",
+        "official_guide_1523__chunk_008",
+        "official_guide_1523__chunk_028",
+        "official_guide_1205__chunk_006"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1209",
+        "official_guide_1209",
+        "official_guide_1523",
+        "official_guide_1207",
+        "official_guide_1206",
+        "official_guide_1523",
+        "official_guide_1523",
+        "official_guide_1523",
+        "official_guide_1523",
+        "official_guide_1205"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0064",
+      "question": "상점 던전 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1300__chunk_004"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1311__chunk_002",
+        "official_guide_1482__chunk_007",
+        "official_guide_1237__chunk_001",
+        "official_guide_1482__chunk_003",
+        "official_guide_1482__chunk_008",
+        "official_guide_1311__chunk_003",
+        "official_guide_1311__chunk_001",
+        "official_guide_1488__chunk_008",
+        "official_guide_1510__chunk_014",
+        "official_guide_1311__chunk_004"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1311",
+        "official_guide_1482",
+        "official_guide_1237",
+        "official_guide_1482",
+        "official_guide_1482",
+        "official_guide_1311",
+        "official_guide_1311",
+        "official_guide_1488",
+        "official_guide_1510",
+        "official_guide_1311"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0065",
+      "question": "어둠 근원 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1300__chunk_004"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1258__chunk_002",
+        "official_guide_1300__chunk_004",
+        "official_guide_1534__chunk_025",
+        "official_guide_1534__chunk_046",
+        "official_guide_1258__chunk_001",
+        "official_guide_1235__chunk_003",
+        "official_update_2926972__chunk_010",
+        "official_guide_1486__chunk_013",
+        "official_guide_1433__chunk_012",
+        "official_guide_1537__chunk_017"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1258",
+        "official_guide_1300",
+        "official_guide_1534",
+        "official_guide_1534",
+        "official_guide_1258",
+        "official_guide_1235",
+        "official_update_2926972",
+        "official_guide_1486",
+        "official_guide_1433",
+        "official_guide_1537"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0066",
+      "question": "던파ON 포인트 교환소 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1326__chunk_001"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1326__chunk_003",
+        "official_guide_1326__chunk_001",
+        "official_update_2927208__chunk_001",
+        "official_guide_1326__chunk_004",
+        "official_guide_1326__chunk_005",
+        "official_guide_1427__chunk_003",
+        "official_guide_1326__chunk_002",
+        "official_update_2926990__chunk_001",
+        "official_guide_1427__chunk_002",
+        "official_event_event_card_012__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1326",
+        "official_guide_1326",
+        "official_update_2927208",
+        "official_guide_1326",
+        "official_guide_1326",
+        "official_guide_1427",
+        "official_guide_1326",
+        "official_update_2926990",
+        "official_guide_1427",
+        "official_event_event_card_012"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0067",
+      "question": "던파ON 포인트 교환소에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1326__chunk_003"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1326__chunk_003",
+        "official_guide_1326__chunk_001",
+        "official_guide_1326__chunk_004",
+        "official_update_2927208__chunk_001",
+        "official_guide_1326__chunk_005",
+        "official_update_2926990__chunk_001",
+        "official_update_2926947__chunk_001",
+        "official_update_2927822__chunk_001",
+        "official_guide_1326__chunk_002",
+        "official_update_2927208__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1326",
+        "official_guide_1326",
+        "official_guide_1326",
+        "official_update_2927208",
+        "official_guide_1326",
+        "official_update_2926990",
+        "official_update_2926947",
+        "official_update_2927822",
+        "official_guide_1326",
+        "official_update_2927208"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0068",
+      "question": "포인트 교환소 이용 방법 조건이나 제한은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1326__chunk_003"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1326__chunk_003",
+        "official_guide_1326__chunk_001",
+        "official_guide_1326__chunk_004",
+        "official_guide_1326__chunk_005",
+        "official_guide_1537__chunk_014",
+        "official_guide_1427__chunk_003",
+        "official_guide_1219__chunk_003",
+        "official_guide_1433__chunk_005",
+        "official_guide_1260__chunk_011",
+        "official_guide_1275__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1326",
+        "official_guide_1326",
+        "official_guide_1326",
+        "official_guide_1326",
+        "official_guide_1537",
+        "official_guide_1427",
+        "official_guide_1219",
+        "official_guide_1433",
+        "official_guide_1260",
+        "official_guide_1275"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0069",
+      "question": "사용 방법 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1425__chunk_002"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1470__chunk_002",
+        "official_guide_1471__chunk_002",
+        "official_guide_1390__chunk_002",
+        "official_guide_1427__chunk_002",
+        "official_guide_1432__chunk_002",
+        "official_guide_1432__chunk_003",
+        "official_guide_1471__chunk_003",
+        "official_guide_1246__chunk_003",
+        "official_guide_1432__chunk_004",
+        "official_guide_1432__chunk_005"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1470",
+        "official_guide_1471",
+        "official_guide_1390",
+        "official_guide_1427",
+        "official_guide_1432",
+        "official_guide_1432",
+        "official_guide_1471",
+        "official_guide_1246",
+        "official_guide_1432",
+        "official_guide_1432"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0070",
+      "question": "참고 사항 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1425__chunk_003"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1427__chunk_003",
+        "official_guide_1425__chunk_003",
+        "official_guide_1258__chunk_003",
+        "official_guide_1426__chunk_003",
+        "official_guide_1425__chunk_002",
+        "official_guide_1427__chunk_002",
+        "official_guide_1470__chunk_002",
+        "official_guide_1425__chunk_001",
+        "official_guide_1292__chunk_001",
+        "official_guide_1255__chunk_010"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1427",
+        "official_guide_1425",
+        "official_guide_1258",
+        "official_guide_1426",
+        "official_guide_1425",
+        "official_guide_1427",
+        "official_guide_1470",
+        "official_guide_1425",
+        "official_guide_1292",
+        "official_guide_1255"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0071",
+      "question": "전투 가시성 개선에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1428__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1428__chunk_001",
+        "official_guide_1179__chunk_009",
+        "official_guide_1179__chunk_010",
+        "official_update_2927399__chunk_018",
+        "official_update_2927399__chunk_017",
+        "official_update_2926971__chunk_008",
+        "official_update_2926971__chunk_005",
+        "official_update_2927756__chunk_001",
+        "official_update_2926911__chunk_005",
+        "official_update_2927522__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1428",
+        "official_guide_1179",
+        "official_guide_1179",
+        "official_update_2927399",
+        "official_update_2927399",
+        "official_update_2926971",
+        "official_update_2926971",
+        "official_update_2927756",
+        "official_update_2926911",
+        "official_update_2927522"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0072",
+      "question": "ESC 이펙트 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1428__chunk_002"
+      ],
+      "gold_rank": 3,
+      "retrieved_chunk_ids": [
+        "official_guide_1428__chunk_004",
+        "official_guide_1428__chunk_003",
+        "official_guide_1428__chunk_002",
+        "official_guide_1425__chunk_002",
+        "official_guide_1258__chunk_002",
+        "official_guide_1253__chunk_002",
+        "official_guide_1506__chunk_001",
+        "official_guide_1273__chunk_006",
+        "official_guide_1233__chunk_011",
+        "official_guide_1518__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1428",
+        "official_guide_1428",
+        "official_guide_1428",
+        "official_guide_1425",
+        "official_guide_1258",
+        "official_guide_1253",
+        "official_guide_1506",
+        "official_guide_1273",
+        "official_guide_1233",
+        "official_guide_1518"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0073",
+      "question": "내 캐릭터 이펙트 설정에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1428__chunk_003"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1428__chunk_003",
+        "official_guide_1289__chunk_001",
+        "official_guide_1289__chunk_005",
+        "official_guide_1289__chunk_003",
+        "official_guide_1289__chunk_004",
+        "official_guide_1289__chunk_006",
+        "official_guide_1289__chunk_002",
+        "official_guide_1289__chunk_007",
+        "official_guide_1289__chunk_008",
+        "official_guide_1428__chunk_004"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1428",
+        "official_guide_1289",
+        "official_guide_1289",
+        "official_guide_1289",
+        "official_guide_1289",
+        "official_guide_1289",
+        "official_guide_1289",
+        "official_guide_1289",
+        "official_guide_1289",
+        "official_guide_1428"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0074",
+      "question": "파티원 캐릭터 이펙트 설정에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1428__chunk_004"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1428__chunk_004",
+        "official_guide_1289__chunk_005",
+        "official_guide_1289__chunk_002",
+        "official_guide_1289__chunk_003",
+        "official_guide_1289__chunk_006",
+        "official_guide_1289__chunk_007",
+        "official_guide_1289__chunk_004",
+        "official_guide_1428__chunk_003",
+        "official_update_2926972__chunk_019",
+        "official_update_2927399__chunk_017"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1428",
+        "official_guide_1289",
+        "official_guide_1289",
+        "official_guide_1289",
+        "official_guide_1289",
+        "official_guide_1289",
+        "official_guide_1289",
+        "official_guide_1428",
+        "official_update_2926972",
+        "official_update_2927399"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0075",
+      "question": "깨어난 숲 사용 방법은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1433__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1433__chunk_001",
+        "official_guide_1433__chunk_009",
+        "official_guide_1258__chunk_002",
+        "official_guide_1433__chunk_002",
+        "official_guide_1433__chunk_012",
+        "official_guide_1433__chunk_007",
+        "official_guide_1420__chunk_003",
+        "official_update_2926972__chunk_010",
+        "official_update_2927399__chunk_011",
+        "official_guide_1391__chunk_007"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1433",
+        "official_guide_1433",
+        "official_guide_1258",
+        "official_guide_1433",
+        "official_guide_1433",
+        "official_guide_1433",
+        "official_guide_1420",
+        "official_update_2926972",
+        "official_update_2927399",
+        "official_guide_1391"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0076",
+      "question": "일반 난이도 조건이나 제한은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1433__chunk_003"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1488__chunk_002",
+        "official_guide_1433__chunk_003",
+        "official_guide_1433__chunk_004",
+        "official_guide_1488__chunk_006",
+        "official_guide_1420__chunk_005",
+        "official_guide_1420__chunk_036",
+        "official_guide_1420__chunk_002",
+        "official_guide_1420__chunk_035",
+        "official_guide_1534__chunk_012",
+        "official_guide_1512__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1488",
+        "official_guide_1433",
+        "official_guide_1433",
+        "official_guide_1488",
+        "official_guide_1420",
+        "official_guide_1420",
+        "official_guide_1420",
+        "official_guide_1420",
+        "official_guide_1534",
+        "official_guide_1512"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0077",
+      "question": "페이즈 전환에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1433__chunk_005"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_update_2927196__chunk_002",
+        "official_update_2926971__chunk_002",
+        "official_update_2927399__chunk_017",
+        "official_update_2926911__chunk_003",
+        "official_guide_1519__chunk_001",
+        "official_update_2926972__chunk_017",
+        "official_update_2927196__chunk_005",
+        "official_update_2927756__chunk_003",
+        "official_update_2926971__chunk_004",
+        "official_guide_1493__chunk_005"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2927196",
+        "official_update_2926971",
+        "official_update_2927399",
+        "official_update_2926911",
+        "official_guide_1519",
+        "official_update_2926972",
+        "official_update_2927196",
+        "official_update_2927756",
+        "official_update_2926971",
+        "official_guide_1493"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0078",
+      "question": "정화 포기에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1433__chunk_006"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1433__chunk_006",
+        "official_guide_1228__chunk_003",
+        "official_guide_1228__chunk_004",
+        "official_guide_1516__chunk_017",
+        "official_update_2927196__chunk_004",
+        "official_update_2926911__chunk_001",
+        "official_guide_1512__chunk_005",
+        "official_guide_1228__chunk_002",
+        "official_guide_1420__chunk_010",
+        "official_update_2926972__chunk_004"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1433",
+        "official_guide_1228",
+        "official_guide_1228",
+        "official_guide_1516",
+        "official_update_2927196",
+        "official_update_2926911",
+        "official_guide_1512",
+        "official_guide_1228",
+        "official_guide_1420",
+        "official_update_2926972"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0079",
+      "question": "콘텐츠 진행 (일반 난이도)에 대해 공식 문서가 설명한 건 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1433__chunk_008"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1488__chunk_002",
+        "official_guide_1516__chunk_004",
+        "official_guide_1520__chunk_004",
+        "official_guide_1520__chunk_002",
+        "official_guide_1420__chunk_004",
+        "official_guide_1534__chunk_012",
+        "official_guide_1534__chunk_002",
+        "official_guide_1516__chunk_007",
+        "official_guide_1420__chunk_001",
+        "official_guide_1534__chunk_011"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1488",
+        "official_guide_1516",
+        "official_guide_1520",
+        "official_guide_1520",
+        "official_guide_1420",
+        "official_guide_1534",
+        "official_guide_1534",
+        "official_guide_1516",
+        "official_guide_1420",
+        "official_guide_1534"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0080",
+      "question": "콘텐츠 진행 (극 난이도) 조건이나 제한은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1433__chunk_009"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1520__chunk_002",
+        "official_guide_1520__chunk_005",
+        "official_guide_1516__chunk_009",
+        "official_guide_1520__chunk_004",
+        "official_guide_1516__chunk_011",
+        "official_guide_1534__chunk_012",
+        "official_guide_1516__chunk_010",
+        "official_guide_1534__chunk_002",
+        "official_guide_1520__chunk_008",
+        "official_guide_1433__chunk_004"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1520",
+        "official_guide_1520",
+        "official_guide_1516",
+        "official_guide_1520",
+        "official_guide_1516",
+        "official_guide_1534",
+        "official_guide_1516",
+        "official_guide_1534",
+        "official_guide_1520",
+        "official_guide_1433"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0081",
+      "question": "공식 문서의 이벤트 기간 내용만 보고 내 상황에 가장 좋은 선택을 확정해줄 수 있어?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_004__chunk_001"
+      ],
+      "gold_rank": 5,
+      "retrieved_chunk_ids": [
+        "official_guide_1257__chunk_001",
+        "official_guide_1257__chunk_003",
+        "official_notice_2927728__chunk_001",
+        "official_guide_1257__chunk_002",
+        "official_event_event_card_004__chunk_001",
+        "official_update_2926911__chunk_002",
+        "official_event_event_card_009__chunk_001",
+        "official_event_event_card_007__chunk_001",
+        "official_event_event_card_008__chunk_001",
+        "official_event_event_card_013__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1257",
+        "official_guide_1257",
+        "official_notice_2927728",
+        "official_guide_1257",
+        "official_event_event_card_004",
+        "official_update_2926911",
+        "official_event_event_card_009",
+        "official_event_event_card_007",
+        "official_event_event_card_008",
+        "official_event_event_card_013"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0082",
+      "question": "공식 문서의 판매 기간 내용만 보고 내 상황에 가장 좋은 선택을 확정해줄 수 있어?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_005__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1237__chunk_004",
+        "official_notice_2927782__chunk_001",
+        "official_guide_1285__chunk_002",
+        "official_guide_1233__chunk_004",
+        "official_guide_1534__chunk_028",
+        "official_guide_1489__chunk_008",
+        "official_guide_1489__chunk_018",
+        "official_guide_1220__chunk_008",
+        "official_guide_1534__chunk_032",
+        "official_guide_1532__chunk_014"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1237",
+        "official_notice_2927782",
+        "official_guide_1285",
+        "official_guide_1233",
+        "official_guide_1534",
+        "official_guide_1489",
+        "official_guide_1489",
+        "official_guide_1220",
+        "official_guide_1534",
+        "official_guide_1532"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0083",
+      "question": "공식 문서의 적정 레벨 내용만 보고 내 상황에 가장 좋은 선택을 확정해줄 수 있어?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_009__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1243__chunk_002",
+        "official_guide_1532__chunk_014",
+        "official_event_event_card_008__chunk_001",
+        "official_guide_1375__chunk_003",
+        "official_guide_1532__chunk_006",
+        "official_guide_1256__chunk_008",
+        "official_guide_1488__chunk_002",
+        "official_guide_1495__chunk_005",
+        "official_guide_1433__chunk_003",
+        "official_guide_1519__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1243",
+        "official_guide_1532",
+        "official_event_event_card_008",
+        "official_guide_1375",
+        "official_guide_1532",
+        "official_guide_1256",
+        "official_guide_1488",
+        "official_guide_1495",
+        "official_guide_1433",
+        "official_guide_1519"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0084",
+      "question": "공식 문서의 던전 재입장 횟수 내용만 보고 내 상황에 가장 좋은 선택을 확정해줄 수 있어?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1202__chunk_003"
+      ],
+      "gold_rank": 10,
+      "retrieved_chunk_ids": [
+        "official_guide_1433__chunk_003",
+        "official_guide_1433__chunk_004",
+        "official_guide_1433__chunk_008",
+        "official_guide_1510__chunk_002",
+        "official_guide_1479__chunk_003",
+        "official_guide_1478__chunk_003",
+        "official_guide_1510__chunk_003",
+        "official_guide_1203__chunk_003",
+        "official_guide_1488__chunk_002",
+        "official_guide_1202__chunk_003"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1433",
+        "official_guide_1433",
+        "official_guide_1433",
+        "official_guide_1510",
+        "official_guide_1479",
+        "official_guide_1478",
+        "official_guide_1510",
+        "official_guide_1203",
+        "official_guide_1488",
+        "official_guide_1202"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0085",
+      "question": "공식 문서의 모험가 명성 조건 내용만 보고 내 상황에 가장 좋은 선택을 확정해줄 수 있어?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1206__chunk_003"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1255__chunk_001",
+        "official_guide_1255__chunk_010",
+        "official_guide_1255__chunk_002",
+        "official_guide_1255__chunk_003",
+        "official_guide_1255__chunk_004",
+        "official_guide_1255__chunk_005",
+        "official_guide_1255__chunk_006",
+        "official_guide_1255__chunk_008",
+        "official_guide_1255__chunk_007",
+        "official_guide_1255__chunk_009"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255",
+        "official_guide_1255"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0086",
+      "question": "공식 문서의 세라 화폐 내용만 보고 내 상황에 가장 좋은 선택을 확정해줄 수 있어?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1233__chunk_001"
+      ],
+      "gold_rank": 3,
+      "retrieved_chunk_ids": [
+        "official_notice_2927728__chunk_001",
+        "official_notice_2927763__chunk_004",
+        "official_guide_1233__chunk_001",
+        "official_notice_2927763__chunk_002",
+        "official_notice_2927763__chunk_003",
+        "official_notice_2927763__chunk_001",
+        "official_guide_1233__chunk_012",
+        "official_guide_1293__chunk_003",
+        "official_guide_1432__chunk_005",
+        "official_guide_1233__chunk_010"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2927728",
+        "official_notice_2927763",
+        "official_guide_1233",
+        "official_notice_2927763",
+        "official_notice_2927763",
+        "official_notice_2927763",
+        "official_guide_1233",
+        "official_guide_1293",
+        "official_guide_1432",
+        "official_guide_1233"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0087",
+      "question": "공식 문서의 칭호 데미지 내용만 보고 내 상황에 가장 좋은 선택을 확정해줄 수 있어?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1239__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1289__chunk_005",
+        "official_guide_1289__chunk_009",
+        "official_guide_1536__chunk_004",
+        "official_event_event_card_014__chunk_003",
+        "official_guide_1179__chunk_009",
+        "official_guide_1494__chunk_005",
+        "official_update_2926972__chunk_017",
+        "official_guide_1289__chunk_006",
+        "official_update_2926972__chunk_013",
+        "official_guide_1532__chunk_009"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1289",
+        "official_guide_1289",
+        "official_guide_1536",
+        "official_event_event_card_014",
+        "official_guide_1179",
+        "official_guide_1494",
+        "official_update_2926972",
+        "official_guide_1289",
+        "official_update_2926972",
+        "official_guide_1532"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0088",
+      "question": "공식 문서의 서약 / 결정 내용만 보고 내 상황에 가장 좋은 선택을 확정해줄 수 있어?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1255__chunk_007"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1532__chunk_014",
+        "official_guide_1532__chunk_001",
+        "official_guide_1532__chunk_015",
+        "official_guide_1532__chunk_005",
+        "official_guide_1532__chunk_018",
+        "official_guide_1532__chunk_004",
+        "official_guide_1532__chunk_007",
+        "official_guide_1532__chunk_006",
+        "official_guide_1532__chunk_012",
+        "official_guide_1532__chunk_011"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532",
+        "official_guide_1532"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "domain_eval_0089",
+      "question": "공식 문서의 전문직업 포기 비용 내용만 보고 내 상황에 가장 좋은 선택을 확정해줄 수 있어?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1272__chunk_003"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1273__chunk_003",
+        "official_guide_1272__chunk_003",
+        "official_guide_1271__chunk_003",
+        "official_guide_1270__chunk_003",
+        "official_guide_1272__chunk_007",
+        "official_guide_1273__chunk_006",
+        "official_guide_1271__chunk_002",
+        "official_guide_1273__chunk_002",
+        "official_guide_1272__chunk_002",
+        "official_guide_1290__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1273",
+        "official_guide_1272",
+        "official_guide_1271",
+        "official_guide_1270",
+        "official_guide_1272",
+        "official_guide_1273",
+        "official_guide_1271",
+        "official_guide_1273",
+        "official_guide_1272",
+        "official_guide_1290"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "domain_eval_0090",
+      "question": "공식 문서의 마법부여 상점 설치 내용만 보고 내 상황에 가장 좋은 선택을 확정해줄 수 있어?",
+      "answerability": "partial",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_guide_1273__chunk_010"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_guide_1273__chunk_010",
+        "official_guide_1482__chunk_003",
+        "official_guide_1482__chunk_005",
+        "official_guide_1482__chunk_010",
+        "official_guide_1482__chunk_007",
+        "official_guide_1220__chunk_002",
+        "official_guide_1220__chunk_003",
+        "official_update_2926972__chunk_011",
+        "official_guide_1220__chunk_005",
+        "official_guide_1220__chunk_008"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1273",
+        "official_guide_1482",
+        "official_guide_1482",
+        "official_guide_1482",
+        "official_guide_1482",
+        "official_guide_1220",
+        "official_guide_1220",
+        "official_update_2926972",
+        "official_guide_1220",
+        "official_guide_1220"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    }
+  ]
+}

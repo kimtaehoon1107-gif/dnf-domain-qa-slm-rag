@@ -1,0 +1,68 @@
+{
+  "status": "complete_rejected",
+  "experiment": "canonical_vs_deterministic_contextual_prefix_v1",
+  "configuration": {
+    "embedding_model": "BAAI/bge-m3",
+    "rank_mode": "hybrid",
+    "candidate_k": 100,
+    "top_k_single_retrieve": 10,
+    "cutoffs": [1, 3, 5, 10],
+    "latency_excludes_model_load": true
+  },
+  "artifacts": {
+    "canonical_chunks": "data/processed/domain_doc_chunks.jsonl",
+    "contextual_chunks": "data/processed/domain_doc_chunks_contextual_prefix_v1.jsonl",
+    "contextual_chunks_sha256": "2b0b74a15fa633c3cb4579b33574b70fd1e322daeaa3d71a529ea1e73638a15d",
+    "canonical_index": "outputs/chroma_domain_chunks",
+    "contextual_index": "outputs/chroma_domain_chunks_contextual_prefix_v1",
+    "rows_each": 1307,
+    "embedding_dimension": 1024,
+    "doc_ids_preserved": true
+  },
+  "prefix": {
+    "title_handling": "build_index.py prepends the existing title once for both arms",
+    "added_fields": ["document_type", "published_at", "effective_period", "section"],
+    "excluded_fields": ["collected_at", "source_url", "doc_number", "mutable_runtime_metadata"],
+    "version": "deterministic_context_v1"
+  },
+  "promotion_gate": {
+    "rule": "Improve retrieval while avoiding hit_rate@3 or hit_rate@10 regression on every development set.",
+    "passed": false,
+    "generation_ab_run": false,
+    "selective_llm_context_justified": false
+  },
+  "results": {
+    "domain": {
+      "answerable_rows": 90,
+      "canonical": {"hit_rate@1": 0.3, "hit_rate@3": 0.5222222222222223, "hit_rate@5": 0.5888888888888889, "hit_rate@10": 0.6555555555555556, "mrr@10": 0.4239197530864198, "avg_query_latency_sec": 0.06305647666619431},
+      "contextual": {"hit_rate@1": 0.26666666666666666, "hit_rate@3": 0.45555555555555555, "hit_rate@5": 0.5111111111111111, "hit_rate@10": 0.6222222222222222, "mrr@10": 0.37537918871252207, "avg_query_latency_sec": 0.06372386777778351},
+      "rank_changes": {"wins": 7, "losses": 18, "ties": 65, "missing_rescued": 1, "newly_missing": 4}
+    },
+    "official": {
+      "answerable_rows": 24,
+      "canonical": {"hit_rate@1": 0.20833333333333334, "hit_rate@3": 0.5, "hit_rate@5": 0.5, "hit_rate@10": 0.6666666666666666, "mrr@10": 0.36150793650793656, "avg_query_latency_sec": 0.06598112916678171},
+      "contextual": {"hit_rate@1": 0.25, "hit_rate@3": 0.4166666666666667, "hit_rate@5": 0.5, "hit_rate@10": 0.5833333333333334, "mrr@10": 0.36365740740740743, "avg_query_latency_sec": 0.06718687499990968},
+      "rank_changes": {"wins": 4, "losses": 7, "ties": 13, "missing_rescued": 0, "newly_missing": 2}
+    },
+    "fresh_dev": {
+      "answerable_rows": 22,
+      "canonical": {"hit_rate@1": 0.7727272727272727, "hit_rate@3": 0.9545454545454546, "hit_rate@5": 0.9545454545454546, "hit_rate@10": 1.0, "mrr@10": 0.8686868686868686, "avg_query_latency_sec": 0.06809284545372728},
+      "contextual": {"hit_rate@1": 0.7727272727272727, "hit_rate@3": 0.9545454545454546, "hit_rate@5": 0.9545454545454546, "hit_rate@10": 1.0, "mrr@10": 0.8686868686868686, "avg_query_latency_sec": 0.06682298181906597},
+      "rank_changes": {"wins": 1, "losses": 1, "ties": 20, "missing_rescued": 0, "newly_missing": 0}
+    },
+    "human_partial_dev": {
+      "answerable_rows": 20,
+      "canonical": {"hit_rate@1": 0.7, "hit_rate@3": 0.9, "hit_rate@5": 0.95, "hit_rate@10": 0.95, "mrr@10": 0.8016666666666665, "avg_query_latency_sec": 0.09010026999967521},
+      "contextual": {"hit_rate@1": 0.7, "hit_rate@3": 0.85, "hit_rate@5": 0.9, "hit_rate@10": 0.95, "mrr@10": 0.7930555555555555, "avg_query_latency_sec": 0.07293051500164438},
+      "rank_changes": {"wins": 0, "losses": 2, "ties": 18, "missing_rescued": 0, "newly_missing": 0}
+    }
+  },
+  "decision": {
+    "promote_contextual_prefix": false,
+    "change_canonical": false,
+    "change_gradio": false,
+    "run_selective_llm_context": false,
+    "frozen_blind_queried": false,
+    "next": "Keep canonical BGE-M3 hybrid chunk-only retrieval and diagnose a non-redundant clean SLM intervention before any final retrain."
+  }
+}

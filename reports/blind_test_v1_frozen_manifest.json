@@ -1,0 +1,77 @@
+{
+  "status": "frozen_unevaluated_requires_clean_retrain",
+  "evaluation_role": "final_blind_test_v1",
+  "model_evaluation_allowed": "one_shot_only",
+  "evaluated": false,
+  "historical_adapter_compatible": false,
+  "required_before_evaluation": [
+    "Regenerate RAFT with zero blind parent/chunk context overlap.",
+    "Train a new adapter from the base model, not from any historical adapter.",
+    "Do not include historical adapter scores in the final blind comparison."
+  ],
+  "historical_training_context_audit": [
+    {
+      "path": "data\\processed\\domain_raft_sample_expanded_gate_balanced.jsonl",
+      "unique_parent_overlap": 43,
+      "unique_exact_chunk_overlap": 35,
+      "context_occurrences": 464,
+      "gold_occurrences": 0,
+      "distractor_occurrences": 464
+    },
+    {
+      "path": "data\\processed\\domain_raft_measurement_fixed_gate_balanced.jsonl",
+      "unique_parent_overlap": 4,
+      "unique_exact_chunk_overlap": 3,
+      "context_occurrences": 83,
+      "gold_occurrences": 0,
+      "distractor_occurrences": 83
+    },
+    {
+      "path": "data\\processed\\domain_raft_instruction_only_gate_balanced.jsonl",
+      "unique_parent_overlap": 4,
+      "unique_exact_chunk_overlap": 3,
+      "context_occurrences": 83,
+      "gold_occurrences": 0,
+      "distractor_occurrences": 83
+    },
+    {
+      "path": "data\\processed\\domain_raft_hard_negative_only_gate_balanced.jsonl",
+      "unique_parent_overlap": 4,
+      "unique_exact_chunk_overlap": 3,
+      "context_occurrences": 50,
+      "gold_occurrences": 0,
+      "distractor_occurrences": 50
+    }
+  ],
+  "frozen_at_utc": "2026-07-11T19:21:07.408934+00:00",
+  "review_method": "30-row full human review, assistant pre-review of 70 rows, risk-stratified 25-row human confirmation, and full human review of 4 replacements",
+  "source_files": {
+    "data\\review\\blind_test_v1_candidate_reviewed_100.jsonl": "112df53b216bdfbc109457a9cd37f3ec762440a1f4a446a8d531586df21465ec",
+    "data\\review\\blind_test_v1_replacements_reviewed_4.jsonl": "0657a4868245df871bd978d8ee03c93c5239c9ade1ac143447ca20a3e106b54f",
+    "data\\processed\\domain_doc_chunks.jsonl": "40c4437034352331209430751a7568bc2da8620764587f65ae8a758a543ce3da",
+    "data\\processed\\domain_train_qa_measurement_fixed.jsonl": "b82e31465e2c48464cca672b2dddbdc517e0f6f5b071d8654fa3fb4af5f46a7b",
+    "data\\processed\\domain_eval_set_expanded.jsonl": "db9d85b5def0d96a2d76ffbbae11182290417678456df191e33dfe78af525e24",
+    "data\\processed\\official_eval_set.jsonl": "8bf9b7fc74a6c81aaf5c853328422d546b76f640ec89041d49f925f69efa32cd",
+    "data\\processed\\fresh_paraphrase_eval_set.jsonl": "25b46604f2327f3dc40d366cd83e1162c3767aaa36f1f52c753fba88f9749fe8",
+    "data\\processed\\domain_raft_sample_expanded_gate_balanced.jsonl": "0499aacbac0725b83ac797f97da86f9c78ff7a9a3b4634941612d7c3e365a2b3",
+    "data\\processed\\domain_raft_measurement_fixed_gate_balanced.jsonl": "47cb14facd132eca393468f0b43cab543420e7d6a953b31d987c3ddcca6e93e4",
+    "data\\processed\\domain_raft_instruction_only_gate_balanced.jsonl": "1efc1cfee09c858333dfb4053b9e57077383371f3201685404b3ff9c8247fd5b",
+    "data\\processed\\domain_raft_hard_negative_only_gate_balanced.jsonl": "552f46f82ec466bb0b24f9c8d85aa4430c2316f392e2dc97afbe2e198fb07c60"
+  },
+  "output": "data\\eval\\blind_test_v1.jsonl",
+  "output_sha256": "5ba916f8c9c1e78ceaaa160d3b6cf5557a697c12d847f50c63a89e7bb0e0793e",
+  "rows": 100,
+  "answerability_counts": {
+    "true": 60,
+    "partial": 20,
+    "false": 20
+  },
+  "unique_ids": 100,
+  "unique_questions": 100,
+  "missing_chunks": 0,
+  "evidence_span_mismatches": 0,
+  "false_with_evidence": 0,
+  "blocked_parent_overlap": 0,
+  "blocked_chunk_overlap": 0,
+  "blocked_question_overlap": 0
+}

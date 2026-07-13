@@ -1,0 +1,1038 @@
+{
+  "report_schema_version": 1,
+  "source_adapter": "outputs\\slm_lora_answer_filtered_blind_safe_v2_completed",
+  "source_eval_set": "data\\processed\\partial_dev_human_v1.jsonl",
+  "rows": 20,
+  "definitions": {
+    "grounded_slot_answered": "Every required fact group has at least one normalized phrase match.",
+    "unsupported_slot_abstained": "The answer mentions the unsupported request topic and contains an abstention expression.",
+    "grounded_slot_over_refused": "An abstention is present while the grounded slot is not answered.",
+    "unsupported_slot_over_answered": "The unsupported topic is mentioned without an abstention expression.",
+    "partial_requirement_joint_success": "Predicted partial + all grounded slots answered and cited + all unsupported slots explicitly abstained."
+  },
+  "summary": {
+    "grounded_slots": 31,
+    "grounded_slot_answer_rate": 0.16129032258064516,
+    "grounded_slot_answer_and_citation_rate": 0.12903225806451613,
+    "grounded_slot_over_refusal_rate": 0.8387096774193549,
+    "unsupported_slots": 21,
+    "unsupported_slot_abstention_rate": 0.47619047619047616,
+    "unsupported_slot_over_answer_rate": 0.0,
+    "unsupported_slot_omission_rate": 0.5238095238095238,
+    "partial_requirement_joint_success_rate": 0.1
+  },
+  "counts": {
+    "grounded_slots_answered": 5,
+    "grounded_slots_answered_and_cited": 4,
+    "grounded_slots_over_refused": 26,
+    "unsupported_slots_abstained": 10,
+    "unsupported_slots_over_answered": 0,
+    "unsupported_slots_omitted": 11,
+    "partial_requirement_joint_success": 2
+  },
+  "details": [
+    {
+      "eval_id": "partial_dev_human_0001",
+      "predicted_answerability": "partial",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [
+        "official_event_event_card_004__chunk_001"
+      ],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0001_g1",
+          "description": "트리니티 이벤트 기간",
+          "fact_group_matches": [
+            true,
+            true
+          ],
+          "answered": true,
+          "citation_hit": true,
+          "success": true,
+          "over_refused": false
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0001_u1",
+          "description": "계정 상황에 따른 참여 가치",
+          "topic_mentioned": true,
+          "abstained": true,
+          "over_answered": false,
+          "omitted": false,
+          "success": true
+        }
+      ],
+      "all_grounded_answered": true,
+      "grounded_citations_complete": true,
+      "all_unsupported_abstained": true,
+      "partial_requirement_joint_success": true,
+      "failure_types": []
+    },
+    {
+      "eval_id": "partial_dev_human_0002",
+      "predicted_answerability": "partial",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [
+        "official_event_event_card_020__chunk_001"
+      ],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0002_g1",
+          "description": "웨딩 아바타 콤보 상자 판매 기간",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        },
+        {
+          "requirement_id": "partial_dev_human_0002_g2",
+          "description": "웨딩 아바타 풀세트 상자 구성",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0002_u1",
+          "description": "캐릭터별 구매 가치",
+          "topic_mentioned": true,
+          "abstained": true,
+          "over_answered": false,
+          "omitted": false,
+          "success": true
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": true,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0003",
+      "predicted_answerability": "false",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0003_g1",
+          "description": "기초 데이터 획득 가능 던전",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        },
+        {
+          "requirement_id": "partial_dev_human_0003_g2",
+          "description": "기초 데이터 드랍 제외 던전",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0003_u1",
+          "description": "캐릭터별 파밍 던전 선택",
+          "topic_mentioned": false,
+          "abstained": false,
+          "over_answered": false,
+          "omitted": true,
+          "success": false
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": false,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "answerability_not_partial",
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal",
+        "unsupported_omitted"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0004",
+      "predicted_answerability": "false",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0004_g1",
+          "description": "이스핀즈 공략 실패 조건",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0004_u1",
+          "description": "캐릭터별 재도전 판단",
+          "topic_mentioned": false,
+          "abstained": false,
+          "over_answered": false,
+          "omitted": true,
+          "success": false
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": false,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "answerability_not_partial",
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal",
+        "unsupported_omitted"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0005",
+      "predicted_answerability": "partial",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [
+        "official_guide_1206__chunk_016"
+      ],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0005_g1",
+          "description": "시로코 입장 명성",
+          "fact_group_matches": [
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        },
+        {
+          "requirement_id": "partial_dev_human_0005_g2",
+          "description": "시로코 입장 재료",
+          "fact_group_matches": [
+            true
+          ],
+          "answered": true,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": false
+        },
+        {
+          "requirement_id": "partial_dev_human_0005_g3",
+          "description": "시로코 최대 참여 인원",
+          "fact_group_matches": [
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0005_u1",
+          "description": "캐릭터별 도전 적합성",
+          "topic_mentioned": true,
+          "abstained": true,
+          "over_answered": false,
+          "omitted": false,
+          "success": true
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": true,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0006",
+      "predicted_answerability": "false",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0006_g1",
+          "description": "세라 현금 환산",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        },
+        {
+          "requirement_id": "partial_dev_human_0006_g2",
+          "description": "세라샵 구매 가능 품목",
+          "fact_group_matches": [
+            false,
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0006_u1",
+          "description": "개인별 충전 판단",
+          "topic_mentioned": false,
+          "abstained": false,
+          "over_answered": false,
+          "omitted": true,
+          "success": false
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": false,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "answerability_not_partial",
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal",
+        "unsupported_omitted"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0007",
+      "predicted_answerability": "partial",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [
+        "official_guide_1239__chunk_001"
+      ],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0007_g1",
+          "description": "칭호 관리 영역의 관리 항목",
+          "fact_group_matches": [
+            false,
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": true,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0007_u1",
+          "description": "개인별 정리 우선순위",
+          "topic_mentioned": true,
+          "abstained": true,
+          "over_answered": false,
+          "omitted": false,
+          "success": true
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": true,
+      "all_unsupported_abstained": true,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "grounded_slot_missing",
+        "grounded_over_refusal"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0008",
+      "predicted_answerability": "false",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0008_g1",
+          "description": "서약과 결정 획득 콘텐츠",
+          "fact_group_matches": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0008_u1",
+          "description": "개인별 콘텐츠 우선순위",
+          "topic_mentioned": false,
+          "abstained": false,
+          "over_answered": false,
+          "omitted": true,
+          "success": false
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": false,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "answerability_not_partial",
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal",
+        "unsupported_omitted"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0009",
+      "predicted_answerability": "partial",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [
+        "official_guide_1272__chunk_003"
+      ],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0009_g1",
+          "description": "전문직업 포기 비용",
+          "fact_group_matches": [
+            true
+          ],
+          "answered": true,
+          "citation_hit": true,
+          "success": true,
+          "over_refused": false
+        },
+        {
+          "requirement_id": "partial_dev_human_0009_g2",
+          "description": "전문직업 반복 변경 비용",
+          "fact_group_matches": [
+            true,
+            true
+          ],
+          "answered": true,
+          "citation_hit": true,
+          "success": true,
+          "over_refused": false
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0009_u1",
+          "description": "현재 전문직업 변경 판단",
+          "topic_mentioned": true,
+          "abstained": true,
+          "over_answered": false,
+          "omitted": false,
+          "success": true
+        }
+      ],
+      "all_grounded_answered": true,
+      "grounded_citations_complete": true,
+      "all_unsupported_abstained": true,
+      "partial_requirement_joint_success": true,
+      "failure_types": []
+    },
+    {
+      "eval_id": "partial_dev_human_0010",
+      "predicted_answerability": "partial",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [
+        "official_guide_1273__chunk_010"
+      ],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0010_g1",
+          "description": "마법부여 상점 설치 절차",
+          "fact_group_matches": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": true,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0010_u1",
+          "description": "개인 상황에 맞춘 수수료",
+          "topic_mentioned": false,
+          "abstained": false,
+          "over_answered": false,
+          "omitted": true,
+          "success": false
+        },
+        {
+          "requirement_id": "partial_dev_human_0010_u2",
+          "description": "개인 상황에 맞춘 설치 위치",
+          "topic_mentioned": true,
+          "abstained": true,
+          "over_answered": false,
+          "omitted": false,
+          "success": true
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": true,
+      "all_unsupported_abstained": false,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "grounded_slot_missing",
+        "grounded_over_refusal",
+        "unsupported_omitted"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0011",
+      "predicted_answerability": "false",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0011_g1",
+          "description": "7월 2일 점검 시간",
+          "fact_group_matches": [
+            false,
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0011_u1",
+          "description": "개인 일정에 맞춘 접속 시점",
+          "topic_mentioned": false,
+          "abstained": false,
+          "over_answered": false,
+          "omitted": true,
+          "success": false
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": false,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "answerability_not_partial",
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal",
+        "unsupported_omitted"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0012",
+      "predicted_answerability": "partial",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [
+        "official_event_event_card_002__chunk_001"
+      ],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0012_g1",
+          "description": "보너스 창고 보급품 사용 가능 캐릭터",
+          "fact_group_matches": [
+            true,
+            true,
+            true
+          ],
+          "answered": true,
+          "citation_hit": true,
+          "success": true,
+          "over_refused": false
+        },
+        {
+          "requirement_id": "partial_dev_human_0012_g2",
+          "description": "보너스 보급품 사용 가능 캐릭터",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": true,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0012_u1",
+          "description": "브레이커 육성 판단",
+          "topic_mentioned": true,
+          "abstained": true,
+          "over_answered": false,
+          "omitted": false,
+          "success": true
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": true,
+      "all_unsupported_abstained": true,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "grounded_slot_missing",
+        "grounded_over_refusal"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0013",
+      "predicted_answerability": "false",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0013_g1",
+          "description": "웨딩 아바타 풀세트 구성",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0013_u1",
+          "description": "캐릭터별 외형 적합성",
+          "topic_mentioned": false,
+          "abstained": false,
+          "over_answered": false,
+          "omitted": true,
+          "success": false
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": false,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "answerability_not_partial",
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal",
+        "unsupported_omitted"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0014",
+      "predicted_answerability": "false",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0014_g1",
+          "description": "무력화 게이지 전부 차감 결과",
+          "fact_group_matches": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0014_u1",
+          "description": "개인별 세팅 변경 판단",
+          "topic_mentioned": false,
+          "abstained": false,
+          "over_answered": false,
+          "omitted": true,
+          "success": false
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": false,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "answerability_not_partial",
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal",
+        "unsupported_omitted"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0015",
+      "predicted_answerability": "partial",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [
+        "official_event_event_card_007__chunk_001"
+      ],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0015_g1",
+          "description": "썸머 부스트 업 캡슐 지정 대상",
+          "fact_group_matches": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": true,
+          "success": false,
+          "over_refused": true
+        },
+        {
+          "requirement_id": "partial_dev_human_0015_g2",
+          "description": "썸머 부스트 업 캡슐 지정 횟수",
+          "fact_group_matches": [
+            false
+          ],
+          "answered": false,
+          "citation_hit": true,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0015_u1",
+          "description": "계정별 캡슐 배분 판단",
+          "topic_mentioned": true,
+          "abstained": true,
+          "over_answered": false,
+          "omitted": false,
+          "success": true
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": true,
+      "all_unsupported_abstained": true,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "grounded_slot_missing",
+        "grounded_over_refusal"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0016",
+      "predicted_answerability": "false",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0016_g1",
+          "description": "일반 우편 보관 기간",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        },
+        {
+          "requirement_id": "partial_dev_human_0016_g2",
+          "description": "경매장 구매 우편 보관 기간",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        },
+        {
+          "requirement_id": "partial_dev_human_0016_g3",
+          "description": "우편 보관 기간 만료 결과",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0016_u1",
+          "description": "개인별 즉시 수령 판단",
+          "topic_mentioned": false,
+          "abstained": false,
+          "over_answered": false,
+          "omitted": true,
+          "success": false
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": false,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "answerability_not_partial",
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal",
+        "unsupported_omitted"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0017",
+      "predicted_answerability": "false",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0017_g1",
+          "description": "외부 결제 요구 진위 확인 방법",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        },
+        {
+          "requirement_id": "partial_dev_human_0017_g2",
+          "description": "외부 결제 요구 신고 방법",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0017_u1",
+          "description": "개별 연락의 진위 판단",
+          "topic_mentioned": false,
+          "abstained": false,
+          "over_answered": false,
+          "omitted": true,
+          "success": false
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": false,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "answerability_not_partial",
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal",
+        "unsupported_omitted"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0018",
+      "predicted_answerability": "partial",
+      "retrieval_expected_hit": true,
+      "refusal_detected": true,
+      "predicted_citations": [
+        "official_event_event_card_012__chunk_001"
+      ],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0018_g1",
+          "description": "레미디아 여프료시카 이벤트 기간",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0018_u1",
+          "description": "계정별 이벤트 참여 가치",
+          "topic_mentioned": true,
+          "abstained": true,
+          "over_answered": false,
+          "omitted": false,
+          "success": true
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": true,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0019",
+      "predicted_answerability": "false",
+      "retrieval_expected_hit": false,
+      "refusal_detected": true,
+      "predicted_citations": [],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0019_g1",
+          "description": "레기온 보상 획득 시 통합 횟수 변화",
+          "fact_group_matches": [
+            false,
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0019_u1",
+          "description": "캐릭터별 레기온 우선순위",
+          "topic_mentioned": false,
+          "abstained": false,
+          "over_answered": false,
+          "omitted": true,
+          "success": false
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": false,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "retrieval_miss",
+        "answerability_not_partial",
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal",
+        "unsupported_omitted"
+      ]
+    },
+    {
+      "eval_id": "partial_dev_human_0020",
+      "predicted_answerability": "partial",
+      "retrieval_expected_hit": false,
+      "refusal_detected": true,
+      "predicted_citations": [
+        "official_guide_1493__chunk_001"
+      ],
+      "grounded_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0020_g1",
+          "description": "장비 인벤토리 옆 무기고 아이콘 동작",
+          "fact_group_matches": [
+            false,
+            false
+          ],
+          "answered": false,
+          "citation_hit": false,
+          "success": false,
+          "over_refused": true
+        }
+      ],
+      "unsupported_requirements": [
+        {
+          "requirement_id": "partial_dev_human_0020_u1",
+          "description": "개인별 무기고 정리 우선순위",
+          "topic_mentioned": true,
+          "abstained": true,
+          "over_answered": false,
+          "omitted": false,
+          "success": true
+        }
+      ],
+      "all_grounded_answered": false,
+      "grounded_citations_complete": false,
+      "all_unsupported_abstained": true,
+      "partial_requirement_joint_success": false,
+      "failure_types": [
+        "retrieval_miss",
+        "grounded_slot_missing",
+        "citation_missing",
+        "grounded_over_refusal"
+      ]
+    }
+  ],
+  "source_report": "reports\\clean_answer_filtered_completed_partial_dev.json",
+  "source_annotations": "data\\processed\\partial_dev_human_v1_requirements.jsonl"
+}

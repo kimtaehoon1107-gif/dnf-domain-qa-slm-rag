@@ -1,0 +1,84 @@
+{
+  "status": "evaluated_not_promoted",
+  "adapter": "outputs/slm_lora_answer_filtered_blind_safe_v2_parent_group/checkpoint-250",
+  "training_status": "interrupted_at_250_of_264_steps",
+  "evaluation_config": {
+    "embedding_model": "BAAI/bge-m3",
+    "rank_mode": "hybrid",
+    "top_k": 3,
+    "candidate_k": 100,
+    "max_doc_chars": 900,
+    "max_new_tokens": 256,
+    "seed": 42,
+    "deterministic": true,
+    "reranker": false
+  },
+  "results": {
+    "domain": {
+      "rows": 120,
+      "retrieval_expected_hit_rate": 0.5222222222222223,
+      "answerability_accuracy": 1.0,
+      "exact_citation_recall_macro": 0.36666666666666664,
+      "partial_joint_success_rate": 0.1,
+      "false_joint_correct_rate": 1.0,
+      "evidence_token_recall_in_answer_mean": 0.24177171072190218,
+      "unsafe_answer_rate_on_safety_false": 0.0
+    },
+    "official": {
+      "rows": 30,
+      "retrieval_expected_hit_rate": 0.625,
+      "answerability_accuracy": 1.0,
+      "exact_citation_recall_macro": 0.4166666666666667,
+      "partial_joint_success_rate": null,
+      "false_joint_correct_rate": 1.0,
+      "evidence_token_recall_in_answer_mean": 0.3312108418776776,
+      "unsafe_answer_rate_on_safety_false": 0.0
+    },
+    "fresh_dev": {
+      "rows": 30,
+      "retrieval_expected_hit_rate": 0.9545454545454546,
+      "answerability_accuracy": 0.7666666666666667,
+      "exact_citation_recall_macro": 0.5,
+      "partial_joint_success_rate": 0.0,
+      "false_joint_correct_rate": 0.875,
+      "evidence_token_recall_in_answer_mean": 0.30664007338472576,
+      "unsafe_answer_rate_on_safety_false": 0.0
+    },
+    "human_partial_dev": {
+      "rows": 20,
+      "retrieval_expected_hit_rate": 0.9,
+      "answerability_accuracy": 0.85,
+      "exact_citation_recall_macro": 0.5,
+      "partial_joint_success_rate": 0.3,
+      "false_joint_correct_rate": null,
+      "evidence_token_recall_in_answer_mean": 0.20580927294002738
+    }
+  },
+  "controlled_comparison": {
+    "domain_control": {
+      "exact_citation": 0.3556,
+      "partial_joint": 0.1,
+      "false_joint": 0.9
+    },
+    "fresh_dev_control": {
+      "exact_citation": 0.5909,
+      "partial_joint": 0.3333333333333333,
+      "false_joint": 0.625
+    },
+    "interpretation": "Answer-aware cleaning prevents the unfiltered hard-negative citation collapse and improves refusal, but does not improve partial generalization over the control. Fresh-dev citation and partial joint regress."
+  },
+  "diagnosis": {
+    "domain_gold_missing_from_top3": 43,
+    "domain_answerable_rows": 90,
+    "fresh_over_refusal_when_gold_retrieved": 0.23809523809523808,
+    "human_partial_wrong_citation_given_any_citation": 0.4117647058823529,
+    "conclusion": "Retrieval candidate recall and evidence selection remain the bottlenecks; another 14 training steps are not a credible fix."
+  },
+  "decision": {
+    "complete_264_step_run": false,
+    "promote_adapter": false,
+    "change_gradio_default": false,
+    "run_frozen_blind": false,
+    "next": "Proceed to Phase C parent-window context A/B, then deterministic contextual-prefix A/B if warranted."
+  }
+}

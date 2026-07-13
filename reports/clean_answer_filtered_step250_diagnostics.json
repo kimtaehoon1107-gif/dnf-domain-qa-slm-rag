@@ -1,0 +1,463 @@
+{
+  "reports": {
+    "domain": {
+      "source": "reports\\clean_answer_filtered_step250_domain.json",
+      "rows": 120,
+      "answerable_or_partial_rows": 90,
+      "false_rows": 30,
+      "answerability_accuracy": 1.0,
+      "exact_citation_on_answerable": 0.36666666666666664,
+      "answerability_and_exact_citation_on_answerable": 0.36666666666666664,
+      "citation_metric_rows": 90,
+      "citation_precision_macro": 0.36666666666666664,
+      "citation_recall_macro": 0.36666666666666664,
+      "citation_exact_set_match": 0.36666666666666664,
+      "wrong_citation_given_any_citation": 0.6333333333333333,
+      "false_no_citation_rate": 1.0,
+      "over_refusal_when_gold_retrieved": 0.0,
+      "retrieved_answerable_rows": 47,
+      "by_gold_rank": {
+        "rank_2": {
+          "total": 15,
+          "exact_citation": 7,
+          "answerability_correct": 15
+        },
+        "rank_1": {
+          "total": 27,
+          "exact_citation": 24,
+          "answerability_correct": 27
+        },
+        "missing": {
+          "total": 43,
+          "exact_citation": 0,
+          "answerability_correct": 43
+        },
+        "rank_3": {
+          "total": 5,
+          "exact_citation": 2,
+          "answerability_correct": 5
+        }
+      },
+      "predicted_citation_rank_counts": {
+        "rank_1": 58,
+        "rank_3": 16,
+        "rank_2": 16
+      },
+      "examples": {
+        "wrong_citation": [
+          {
+            "eval_id": "domain_eval_0001",
+            "question": "외부 결제 요구 주의사항은 뭐야?",
+            "expected_chunk_ids": [
+              "official_notice_2838879__chunk_002"
+            ],
+            "parsed_citations": [
+              "official_notice_2838879__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_notice_2838879__chunk_001",
+              "official_notice_2838879__chunk_002",
+              "official_notice_2927860__chunk_001"
+            ]
+          },
+          {
+            "eval_id": "domain_eval_0003",
+            "question": "이벤트 기간은 어떻게 안내돼?",
+            "expected_chunk_ids": [
+              "official_event_event_card_001__chunk_001"
+            ],
+            "parsed_citations": [
+              "official_guide_1257__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_guide_1257__chunk_001",
+              "official_guide_1257__chunk_003",
+              "official_guide_1257__chunk_002"
+            ]
+          },
+          {
+            "eval_id": "domain_eval_0005",
+            "question": "장비 관련 변경 내용은 뭐야?",
+            "expected_chunk_ids": [
+              "official_update_2926911__chunk_002"
+            ],
+            "parsed_citations": [
+              "official_guide_1494__chunk_004"
+            ],
+            "retrieved_chunk_ids": [
+              "official_guide_1494__chunk_004",
+              "official_guide_1494__chunk_003",
+              "official_guide_1494__chunk_005"
+            ]
+          },
+          {
+            "eval_id": "domain_eval_0006",
+            "question": "피싱 피해 신고/문의 주의사항은 뭐야?",
+            "expected_chunk_ids": [
+              "official_notice_2838879__chunk_002"
+            ],
+            "parsed_citations": [
+              "official_notice_2838879__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_notice_2838879__chunk_001",
+              "official_notice_2838879__chunk_002",
+              "official_notice_2927847__chunk_001"
+            ]
+          },
+          {
+            "eval_id": "domain_eval_0007",
+            "question": "비인가 프로그램 사용 주의사항은 뭐야?",
+            "expected_chunk_ids": [
+              "official_notice_2838879__chunk_001"
+            ],
+            "parsed_citations": [
+              "official_notice_2927769__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_notice_2927769__chunk_001",
+              "official_notice_2927889__chunk_001",
+              "official_notice_2927847__chunk_001"
+            ]
+          }
+        ],
+        "over_refused_retrieved": []
+      }
+    },
+    "fresh_dev": {
+      "source": "reports\\clean_answer_filtered_step250_fresh_dev.json",
+      "rows": 30,
+      "answerable_or_partial_rows": 22,
+      "false_rows": 8,
+      "answerability_accuracy": 0.7666666666666667,
+      "exact_citation_on_answerable": 0.5,
+      "answerability_and_exact_citation_on_answerable": 0.45454545454545453,
+      "citation_metric_rows": 22,
+      "citation_precision_macro": 0.5,
+      "citation_recall_macro": 0.5,
+      "citation_exact_set_match": 0.5,
+      "wrong_citation_given_any_citation": 0.35294117647058826,
+      "false_no_citation_rate": 0.875,
+      "over_refusal_when_gold_retrieved": 0.23809523809523808,
+      "retrieved_answerable_rows": 21,
+      "by_gold_rank": {
+        "rank_1": {
+          "total": 17,
+          "exact_citation": 11,
+          "answerability_correct": 12
+        },
+        "rank_2": {
+          "total": 4,
+          "exact_citation": 0,
+          "answerability_correct": 3
+        },
+        "missing": {
+          "total": 1,
+          "exact_citation": 0,
+          "answerability_correct": 1
+        }
+      },
+      "predicted_citation_rank_counts": {
+        "rank_3": 5,
+        "rank_1": 12
+      },
+      "examples": {
+        "wrong_citation": [
+          {
+            "eval_id": "fresh_para_0001",
+            "question": "2026년 7월 2일 정기점검은 몇 시부터 몇 시까지야?",
+            "expected_chunk_ids": [
+              "official_notice_2927876__chunk_001"
+            ],
+            "parsed_citations": [
+              "official_update_2927877__chunk_002"
+            ],
+            "retrieved_chunk_ids": [
+              "official_notice_2927876__chunk_001",
+              "official_update_2927877__chunk_003",
+              "official_update_2927877__chunk_002"
+            ]
+          },
+          {
+            "eval_id": "fresh_para_0004",
+            "question": "7/2 클라 패치에서 트리니티 화면 멈춤 문제 고쳤어?",
+            "expected_chunk_ids": [
+              "official_notice_2927891__chunk_001"
+            ],
+            "parsed_citations": [
+              "official_update_2927877__chunk_002"
+            ],
+            "retrieved_chunk_ids": [
+              "official_notice_2927891__chunk_001",
+              "official_update_2927877__chunk_001",
+              "official_update_2927877__chunk_002"
+            ]
+          },
+          {
+            "eval_id": "fresh_para_0009",
+            "question": "웨딩 아바타 콤보 상자는 판매기간이 언제까지야?",
+            "expected_chunk_ids": [
+              "official_event_event_card_005__chunk_001"
+            ],
+            "parsed_citations": [
+              "official_event_event_card_020__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_event_event_card_005__chunk_002",
+              "official_event_event_card_005__chunk_001",
+              "official_event_event_card_020__chunk_001"
+            ]
+          },
+          {
+            "eval_id": "fresh_para_0010",
+            "question": "웨딩 아바타 풀세트 상자 삭제 시간도 문서에 있어?",
+            "expected_chunk_ids": [
+              "official_event_event_card_005__chunk_001"
+            ],
+            "parsed_citations": [
+              "official_event_event_card_020__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_event_event_card_005__chunk_002",
+              "official_event_event_card_005__chunk_001",
+              "official_event_event_card_020__chunk_001"
+            ]
+          },
+          {
+            "eval_id": "fresh_para_0013",
+            "question": "트레이닝 시뮬레이션은 피로도 써?",
+            "expected_chunk_ids": [
+              "official_event_event_card_007__chunk_002"
+            ],
+            "parsed_citations": [
+              "official_guide_1294__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_guide_1294__chunk_002",
+              "official_guide_1294__chunk_003",
+              "official_guide_1294__chunk_001"
+            ]
+          }
+        ],
+        "over_refused_retrieved": [
+          {
+            "eval_id": "fresh_para_0002",
+            "question": "이번주 정기점검 몇시에 끝나? 2026년 7월 2일 공지 기준으로 알려줘.",
+            "expected_answerability": "true",
+            "expected_chunk_ids": [
+              "official_notice_2927876__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_notice_2927876__chunk_001",
+              "official_update_2927877__chunk_003",
+              "official_update_2927877__chunk_002"
+            ]
+          },
+          {
+            "eval_id": "fresh_para_0017",
+            "question": "7월 2일 점검 시간을 보고 내가 그날 접속해도 되는지 대신 결정해줘.",
+            "expected_answerability": "partial",
+            "expected_chunk_ids": [
+              "official_notice_2927876__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_notice_2927876__chunk_001",
+              "official_update_2927877__chunk_003",
+              "official_notice_2927889__chunk_001"
+            ]
+          },
+          {
+            "eval_id": "fresh_para_0018",
+            "question": "보급 작전 보상 보면 브레이커 키우는 게 내 계정에 제일 좋아?",
+            "expected_answerability": "partial",
+            "expected_chunk_ids": [
+              "official_event_event_card_002__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_event_event_card_002__chunk_001",
+              "official_event_event_card_007__chunk_001",
+              "official_update_2927399__chunk_002"
+            ]
+          },
+          {
+            "eval_id": "fresh_para_0019",
+            "question": "웨딩 아바타 문서만 보고 내 캐릭터한테 어울릴지 골라줘.",
+            "expected_answerability": "partial",
+            "expected_chunk_ids": [
+              "official_event_event_card_005__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_event_event_card_005__chunk_001",
+              "official_event_event_card_005__chunk_002",
+              "official_guide_1280__chunk_002"
+            ]
+          },
+          {
+            "eval_id": "fresh_para_0022",
+            "question": "우편 보관기간 보면 지금 받을지 말지 네가 대신 결정해줘.",
+            "expected_answerability": "partial",
+            "expected_chunk_ids": [
+              "official_guide_1293__chunk_005"
+            ],
+            "retrieved_chunk_ids": [
+              "official_guide_1326__chunk_005",
+              "official_guide_1293__chunk_005",
+              "official_event_event_card_008__chunk_002"
+            ]
+          }
+        ]
+      }
+    },
+    "partial_dev": {
+      "source": "reports\\clean_answer_filtered_step250_partial_dev.json",
+      "rows": 20,
+      "answerable_or_partial_rows": 20,
+      "false_rows": 0,
+      "answerability_accuracy": 0.85,
+      "exact_citation_on_answerable": 0.5,
+      "answerability_and_exact_citation_on_answerable": 0.5,
+      "citation_metric_rows": 20,
+      "citation_precision_macro": 0.5,
+      "citation_recall_macro": 0.5,
+      "citation_exact_set_match": 0.5,
+      "wrong_citation_given_any_citation": 0.4117647058823529,
+      "false_no_citation_rate": null,
+      "over_refusal_when_gold_retrieved": 0.1111111111111111,
+      "retrieved_answerable_rows": 18,
+      "by_gold_rank": {
+        "rank_1": {
+          "total": 14,
+          "exact_citation": 7,
+          "answerability_correct": 12
+        },
+        "rank_3": {
+          "total": 1,
+          "exact_citation": 1,
+          "answerability_correct": 1
+        },
+        "rank_2": {
+          "total": 3,
+          "exact_citation": 2,
+          "answerability_correct": 3
+        },
+        "missing": {
+          "total": 2,
+          "exact_citation": 0,
+          "answerability_correct": 1
+        }
+      },
+      "predicted_citation_rank_counts": {
+        "rank_1": 7,
+        "rank_3": 6,
+        "rank_2": 4
+      },
+      "examples": {
+        "wrong_citation": [
+          {
+            "eval_id": "partial_dev_human_0002",
+            "question": "웨딩 아바타 콤보 상자의 판매 기간과 풀세트 상자 구성을 알려주고, 내 캐릭터에 사는 게 좋을지도 정해줘?",
+            "expected_chunk_ids": [
+              "official_event_event_card_005__chunk_001"
+            ],
+            "parsed_citations": [
+              "official_event_event_card_020__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_event_event_card_005__chunk_001",
+              "official_event_event_card_005__chunk_002",
+              "official_event_event_card_020__chunk_001"
+            ]
+          },
+          {
+            "eval_id": "partial_dev_human_0003",
+            "question": "오라클 탐사 지원의 기초 데이터를 얻을 수 있는 던전을 설명해주면서, 내 캐릭터는 어디를 도는 게 좋을지도 골라줘?",
+            "expected_chunk_ids": [
+              "official_event_event_card_009__chunk_001"
+            ],
+            "parsed_citations": [
+              "official_event_event_card_009__chunk_002"
+            ],
+            "retrieved_chunk_ids": [
+              "official_event_event_card_009__chunk_001",
+              "official_event_event_card_009__chunk_002",
+              "official_event_event_card_008__chunk_001"
+            ]
+          },
+          {
+            "eval_id": "partial_dev_human_0005",
+            "question": "무형의 시로코 레이드의 입장 명성·재료·최대 인원을 정리해주고, 내 캐릭터가 갈 만한지도 판단해줘?",
+            "expected_chunk_ids": [
+              "official_guide_1206__chunk_003"
+            ],
+            "parsed_citations": [
+              "official_guide_1206__chunk_016"
+            ],
+            "retrieved_chunk_ids": [
+              "official_guide_1206__chunk_003",
+              "official_guide_1206__chunk_017",
+              "official_guide_1206__chunk_016"
+            ]
+          },
+          {
+            "eval_id": "partial_dev_human_0013",
+            "question": "웨딩 아바타 풀세트 상자에서 받는 구성을 알려주면서, 그 아바타가 내 캐릭터에 어울릴지도 골라줘?",
+            "expected_chunk_ids": [
+              "official_event_event_card_005__chunk_001"
+            ],
+            "parsed_citations": [
+              "official_event_event_card_020__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_event_event_card_005__chunk_001",
+              "official_event_event_card_005__chunk_002",
+              "official_event_event_card_020__chunk_001"
+            ]
+          },
+          {
+            "eval_id": "partial_dev_human_0017",
+            "question": "외부에서 결제 재화를 요구받았을 때의 확인·신고 방법을 알려주면서, 내가 받은 연락이 진짜인지도 판단해줘?",
+            "expected_chunk_ids": [
+              "official_notice_2838879__chunk_002"
+            ],
+            "parsed_citations": [
+              "official_guide_1432__chunk_005"
+            ],
+            "retrieved_chunk_ids": [
+              "official_notice_2838879__chunk_001",
+              "official_notice_2838879__chunk_002",
+              "official_guide_1432__chunk_005"
+            ]
+          }
+        ],
+        "over_refused_retrieved": [
+          {
+            "eval_id": "partial_dev_human_0011",
+            "question": "7월 2일 점검 시간을 알려주고, 내 일정에 맞춰 언제 접속할지도 정해줘?",
+            "expected_answerability": "partial",
+            "expected_chunk_ids": [
+              "official_notice_2927876__chunk_001"
+            ],
+            "retrieved_chunk_ids": [
+              "official_notice_2927876__chunk_001",
+              "official_update_2927877__chunk_003",
+              "official_update_2927877__chunk_001"
+            ]
+          },
+          {
+            "eval_id": "partial_dev_human_0014",
+            "question": "몬스터의 무력화 게이지가 모두 차감되면 어떻게 되는지 설명하고, 내 세팅을 바꿔야 할지도 정해줘?",
+            "expected_answerability": "partial",
+            "expected_chunk_ids": [
+              "official_guide_1179__chunk_002"
+            ],
+            "retrieved_chunk_ids": [
+              "official_guide_1179__chunk_002",
+              "official_guide_1179__chunk_003",
+              "official_update_2927335__chunk_009"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

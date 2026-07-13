@@ -1,0 +1,31 @@
+{
+  "status": "ready_for_hard_negative_mining",
+  "may_be_used_for_raft_build": true,
+  "may_be_used_for_training": false,
+  "base_train_qa": "data\\processed\\domain_train_qa_measurement_fixed_blind_safe_v2.jsonl",
+  "base_train_qa_sha256": "1cba55061b338a34c691e953a9216f6ecdbccbd8112c10b8fa726c2dddbd484a",
+  "reviewed_decomposition": "data\\processed\\domain_partial_decomposition_train_reviewed.jsonl",
+  "reviewed_decomposition_sha256": "05805d18101b92099f0abff4ce10be5eea9076a27e43b49d8ba14d79749dd60d",
+  "blocked_eval_sets": [
+    "data\\processed\\domain_eval_set_expanded.jsonl",
+    "data\\processed\\official_eval_set.jsonl",
+    "data\\processed\\fresh_paraphrase_eval_set.jsonl",
+    "data\\processed\\partial_dev_human_v1.jsonl",
+    "data\\eval\\blind_test_v1.jsonl"
+  ],
+  "output": "data\\processed\\domain_train_qa_partial_decomposition_arm.jsonl",
+  "output_sha256": "6ed702cd401447721eb446ca2e4a177558dae6f3a6b924af1467c85c48c256f4",
+  "base_rows": 408,
+  "reviewed_decomposition_rows": 23,
+  "rows": 431,
+  "unique_ids": 431,
+  "unique_questions": 431,
+  "answerability_counts": {
+    "true": 277,
+    "partial": 67,
+    "false": 87
+  },
+  "reviewed_blocked_parent_overlap": 0,
+  "reviewed_blocked_chunk_overlap": 0,
+  "reviewed_blocked_question_overlap": 0
+}

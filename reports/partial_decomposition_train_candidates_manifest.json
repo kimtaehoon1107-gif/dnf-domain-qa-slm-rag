@@ -1,0 +1,32 @@
+{
+  "status": "pending_human_review",
+  "may_be_used_for_training": false,
+  "source_train_qa": "data\\processed\\domain_train_qa_measurement_fixed_blind_safe_v2.jsonl",
+  "chunks": "data\\processed\\domain_doc_chunks.jsonl",
+  "blocked_eval_sets": [
+    "data\\processed\\domain_eval_set_expanded.jsonl",
+    "data\\processed\\official_eval_set.jsonl",
+    "data\\processed\\fresh_paraphrase_eval_set.jsonl",
+    "data\\processed\\partial_dev_human_v1.jsonl",
+    "data\\eval\\blind_test_v1.jsonl"
+  ],
+  "output": "data\\processed\\domain_partial_decomposition_train_candidates.jsonl",
+  "output_sha256": "8fd3495cacec62a8c3b128cd63e8a50e0d579f7197e1423a626cb60b00bff5b5",
+  "rows": 24,
+  "unique_questions": 24,
+  "unique_parents": 9,
+  "source_intent_counts": {
+    "event_fact": 16,
+    "guide_fact": 8
+  },
+  "review_output": "data\\review\\partial_decomposition_train_review_24.csv",
+  "review_sha256": "9c5b56e9e1418345a338101e076571d0b288b5e319dd799528da32ff008c67fa",
+  "review_rows": 24,
+  "all_candidates_in_review": true,
+  "generic_refusal_rows": 0,
+  "blocked_parent_overlap": 0,
+  "blocked_chunk_overlap": 0,
+  "blocked_question_overlap": 0,
+  "missing_chunks": 0,
+  "span_mismatches": 0
+}

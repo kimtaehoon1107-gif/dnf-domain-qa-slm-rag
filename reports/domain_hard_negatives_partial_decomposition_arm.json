@@ -1,0 +1,36 @@
+{
+  "status": "ok",
+  "qa": "data\\processed\\domain_train_qa_partial_decomposition_arm.jsonl",
+  "output": "data\\processed\\domain_hard_negatives_partial_decomposition_arm.jsonl",
+  "rows": 431,
+  "rows_with_full_negative_count": 431,
+  "insufficient_rows": [],
+  "excluded_eval_sets": [
+    "data\\processed\\domain_eval_set_expanded.jsonl",
+    "data\\processed\\official_eval_set.jsonl",
+    "data\\processed\\fresh_paraphrase_eval_set.jsonl",
+    "data\\processed\\partial_dev_human_v1.jsonl",
+    "data\\eval\\blind_test_v1.jsonl"
+  ],
+  "excluded_heldout_chunks": 147,
+  "excluded_heldout_parents": 93,
+  "human_review": "data\\review\\hard_negative_blind_safe_review_30.csv",
+  "human_blocked_qa_rows": 10,
+  "human_blocked_pairs": 23,
+  "reuse_existing": "data\\processed\\domain_hard_negatives_answer_filtered_blind_safe_v2.jsonl",
+  "reused_rows": 408,
+  "mined_rows": 23,
+  "config": {
+    "persist_dir": "outputs\\chroma_domain_chunks",
+    "embedding_model": "BAAI/bge-m3",
+    "rank_mode": "hybrid",
+    "candidate_k": 100,
+    "reranker_model": "BAAI/bge-reranker-v2-m3",
+    "rerank_candidates": 20,
+    "reranker_max_length": 512,
+    "reranker_batch_size": 4,
+    "negatives_per_row": 3,
+    "max_evidence_token_recall": 0.5,
+    "fallback": "hybrid ranks after the reranked head; never random"
+  }
+}

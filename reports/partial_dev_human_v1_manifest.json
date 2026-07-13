@@ -1,0 +1,16 @@
+{
+  "status": "frozen_dev_only",
+  "evaluation_role": "human_authored_partial_development",
+  "may_guide_model_changes": true,
+  "may_be_used_for_training": false,
+  "review": "data\\review\\partial_dev_human_review_20.csv",
+  "review_sha256": "50c122cbf12ef6c770554e8d8dd8dd67b4e4fbb558f04a5e05deba18a8ad947d",
+  "output": "data\\processed\\partial_dev_human_v1.jsonl",
+  "output_sha256": "785e21ee2fcd2d636fc24735ffe0f50f942602f37611f5ededf653ebb8f99aba",
+  "rows": 20,
+  "answerability_counts": {
+    "partial": 20
+  },
+  "unique_questions": 20,
+  "train_raft_question_overlap": 0
+}

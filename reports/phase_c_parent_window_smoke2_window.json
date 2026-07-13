@@ -1,0 +1,144 @@
+{
+  "report_schema_version": 2,
+  "model_name": "Qwen/Qwen2.5-0.5B-Instruct",
+  "adapter_dir": "outputs\\slm_lora_answer_filtered_blind_safe_v2_parent_group\\checkpoint-250",
+  "eval_set": "data\\processed\\partial_dev_human_v1.jsonl",
+  "persist_dir": "outputs\\chroma_domain_chunks",
+  "embedding_model_name": "BAAI/bge-m3",
+  "rank_mode": "hybrid",
+  "top_k": 3,
+  "candidate_k": 100,
+  "max_doc_chars": 900,
+  "max_new_tokens": 256,
+  "instruction_mode": "legacy",
+  "context_mode": "sibling_window",
+  "chunks": "data\\processed\\domain_doc_chunks.jsonl",
+  "generation_max_doc_chars": 3212,
+  "device": "cuda",
+  "seed": 42,
+  "deterministic": true,
+  "reranker_model": null,
+  "rerank_candidates": 20,
+  "reranker_max_length": 512,
+  "reranker_batch_size": 4,
+  "rows": 2,
+  "total_runtime_sec": 30.355,
+  "summary": {
+    "answerable_rows": 2,
+    "retrieval_expected_hit_rate": 1.0,
+    "usable_gold_hit_rate": 1.0,
+    "generation_context_expected_hit_rate": 1.0,
+    "generation_usable_gold_hit_rate": 1.0,
+    "generation_evidence_visibility_when_context_hit": 1.0,
+    "evidence_visibility_when_retrieved": 1.0,
+    "answerability_field_rate": 1.0,
+    "answerability_accuracy": 1.0,
+    "answerability_by_label": {
+      "partial": {
+        "correct": 2,
+        "total": 2,
+        "accuracy": 1.0
+      }
+    },
+    "citations_field_rate": 1.0,
+    "answer_field_rate": 1.0,
+    "parsed_chunk_citation_rate": 1.0,
+    "citation_hit_when_retrieval_hit": 0.5,
+    "citation_in_retrieved_rate": 1.0,
+    "avg_answer_chars": 110.0,
+    "avg_generation_latency_sec": 7.248
+  },
+  "details": [
+    {
+      "eval_id": "partial_dev_human_0001",
+      "question": "트리니티 이벤트는 언제까지 진행되고, 내 계정 상황에서 참여하는 게 이득인지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_004"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_004__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_004",
+        "official_event_event_card_001",
+        "official_notice_2927771"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_004__chunk_001",
+        "official_event_event_card_001__chunk_001",
+        "official_notice_2927771__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_004__chunk_001",
+        "official_event_event_card_001__chunk_001",
+        "official_notice_2927771__chunk_001"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_event_event_card_004__chunk_001\nanswer: 트리니티 이벤트는 2026년 6月18日(목)부터 2026년 7月30日(목)까지 진행됩니다. 다만 계정 상황에서 참여하는 것이 이득인지는 공식 문서만으로 확정할 수 없습니다.",
+      "latency_sec": 6.982,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_event_event_card_004__chunk_001"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "트리니티 이벤트는 2026년 6月18日(목)부터 2026년 7月30日(목)까지 진행됩니다. 다만 계정 상황에서 참여하는 것이 이득인지는 공식 문서만으로 확정할 수 없습니다.",
+      "parsed_answer_chars": 96,
+      "parsed_citation_hit": true,
+      "parsed_citation_in_retrieved": true
+    },
+    {
+      "eval_id": "partial_dev_human_0002",
+      "question": "웨딩 아바타 콤보 상자의 판매 기간과 풀세트 상자 구성을 알려주고, 내 캐릭터에 사는 게 좋을지도 정해줘?",
+      "expected_answerability": "partial",
+      "expected_evidence_doc_ids": [
+        "official_event_event_card_005"
+      ],
+      "expected_chunk_ids": [
+        "official_event_event_card_005__chunk_001"
+      ],
+      "retrieved_parent_doc_ids": [
+        "official_event_event_card_005",
+        "official_event_event_card_005",
+        "official_event_event_card_020"
+      ],
+      "retrieved_chunk_ids": [
+        "official_event_event_card_005__chunk_001",
+        "official_event_event_card_005__chunk_002",
+        "official_event_event_card_020__chunk_001"
+      ],
+      "retrieval_expected_hit": true,
+      "gold_evidence_visible": true,
+      "usable_gold_hit": true,
+      "generation_context_chunk_ids": [
+        "official_event_event_card_005__chunk_001",
+        "official_event_event_card_005__chunk_002",
+        "official_event_event_card_020__chunk_001",
+        "official_event_event_card_020__chunk_002"
+      ],
+      "generation_context_expected_hit": true,
+      "generation_gold_evidence_visible": true,
+      "generation_usable_gold_hit": true,
+      "generated_answer": "answerability: partial\ncitations: official_event_event_card_020__chunk_001\nanswer: 공식 문서에서 확인되는 범위는 다음과 같습니다: 판매 기간은 2026년 5월 28일(목) 점검 후 ~ 8월 20일(목) 점검 전입니다. 다만 구매가 개인 캐릭터에게 가장 좋은지는 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "latency_sec": 7.515,
+      "parsed_answerability": "partial",
+      "has_answerability_field": true,
+      "has_citations_field": true,
+      "parsed_citations": [
+        "official_event_event_card_020__chunk_001"
+      ],
+      "has_answer_field": true,
+      "parsed_answer": "공식 문서에서 확인되는 범위는 다음과 같습니다: 판매 기간은 2026년 5월 28일(목) 점검 후 ~ 8월 20일(목) 점검 전입니다. 다만 구매가 개인 캐릭터에게 가장 좋은지는 수집된 공식 문서만으로 확정할 수 없습니다.",
+      "parsed_answer_chars": 124,
+      "parsed_citation_hit": false,
+      "parsed_citation_in_retrieved": true
+    }
+  ]
+}

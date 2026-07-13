@@ -204,20 +204,25 @@ Phase 11까지의 진단("문제는 모델이 아니라 데이터·평가 설계
 
 ---
 
-## 4. 현재 상태 스냅샷 (2026-07-10 기준)
+## 4. 현재 상태 스냅샷 (2026-07-13 기준)
 
-- **서빙 중 어댑터**: `outputs/slm_lora_qwen_domain_v3_3` — fresh 0.80 (true 14/16, partial 2/6, false 8/8), domain 0.9917, official 1.0, fresh exact citation 0.59.
-- **남은 약점 2개**: ① partial 2/6 — 남은 오류 4행은 전부 "결정 요구가 문장을 주도"하는 문형이고 거절 쪽 오류(지어내기 아님)라 안전 방향. ② domain exact citation 0.36 — rank-1 편향은 소멸했으나 내용 기반 선택에 아직 여지.
-- **모든 수치는 `--deterministic --seed 42`로 재현 가능**, 매 버전 git 커밋으로 추적됨.
+- **서빙 중 어댑터**: `outputs/slm_lora_qwen_domain_v3_3`. 이후 통제 arm은 모두 비승격이며 Gradio 기본값을 바꾸지 않았다.
+- **현재 비교 기준**: clean checkpoint-250. 사람 작성 Partial dev 20행과 요구사항 52개(grounded 31 / unsupported 21)를 기준으로 slot 단위 실패를 측정한다.
+- **최근 통제 실험**: 검수된 Partial decomposition 23행만 추가한 arm은 grounded slot과 fresh partial을 개선했지만, domain false joint `30/30→21/30`, fresh false joint `7/8→5/8`, 안전 위반 `0→2`, unsupported explicit abstention `14/21→9/21`로 회귀해 비승격했다.
+- **clean baseline 선택**: 중단됐던 checkpoint-250을 동일 상태에서 `264/264`까지 완료했지만 fresh citation `11/22→9/22`, human Partial citation `10/20→6/20`, human Partial joint `6/20→4/20`으로 악화됐다. 따라서 checkpoint-250을 dev-gated early-stopped clean baseline으로 유지하고 step-264는 비승격했다.
+- **frozen blind**: `data/eval/blind_test_v1.jsonl` 100행은 아직 검색/생성 평가에 사용하지 않았다. 개발 게이트를 모두 통과한 clean adapter의 최종 1회 평가용이다.
+- **현재 병목**: 검색 자체보다 mixed-evidence Partial과 wholly-unsupported 질문의 구분. 무관한 검색 문장을 supported half로 오인해 `partial`과 citation을 내는 과일반화가 확인됐다.
+- **모든 비교 수치는 `--deterministic --seed 42`로 재현하며**, answerability 단독이 아니라 exact citation, requirement joint, false joint, safety를 함께 판정한다.
 
 ---
 
 ## 5. 다음 계획
 
-1. **결정 요구 선행 partial 문형** ~10행 (마지막 남은 answerability 축) — 감수 게이트 필수
-2. **citation 개선 라운드**: hard negative mining 또는 reranker A/B — 판정은 "gold 적중"으로
-3. fresh eval 150행+ 확장(사람 작성), adversarial 안전성 테스트, candidate_k 표준화 — 장기 과제
-4. 3-way 비교(RAG-only vs LLM-RAG vs Tuned-SLM) 최종 정리 — `faithfulness_when_citation_hit`(조건부)만 사용
+1. false/unsafe 회귀와 unsupported omission을 분리해 행별 진단한다.
+2. mixed-evidence Partial마다 wholly-unsupported 대조 질문을 붙인 소형 train-only 후보를 만들고 사람 검수한다.
+3. 대조 데이터가 false/safety를 보존하면서 grounded slot을 개선할 수 있다는 근거가 생길 때만 같은 베이스 모델로 한 번 재학습한다.
+4. 네 dev 게이트를 모두 통과한 뒤에만 frozen blind를 최종 1회 실행한다.
+5. 최종 3-way 비교(RAG-only / base SLM+RAG / tuned SLM+RAG)와 포트폴리오 README를 갱신한다.
 
 ---
 

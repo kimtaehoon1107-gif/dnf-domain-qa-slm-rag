@@ -6,6 +6,12 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["app/gradio_app.py"],
       "port": 7860
+    },
+    {
+      "name": "v2-portfolio-static",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5501"],
+      "port": 5501
     }
   ]
 }

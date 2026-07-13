@@ -1,0 +1,21 @@
+{
+  "status": "validated_dev_annotation_v1",
+  "evaluation_role": "requirement_level_partial_development",
+  "may_be_used_for_training": false,
+  "source_eval": "data/processed/partial_dev_human_v1.jsonl",
+  "source_eval_sha256": "785e21ee2fcd2d636fc24735ffe0f50f942602f37611f5ededf653ebb8f99aba",
+  "annotations": "data/processed/partial_dev_human_v1_requirements.jsonl",
+  "annotations_sha256": "a8db415f2edf3468e0ed6dd836c795a3e278b74808d5f6c552b9f4a2d17ef62e",
+  "rows": 20,
+  "requirements": 52,
+  "grounded_slots": 31,
+  "unsupported_slots": 21,
+  "annotation_basis": "Derived from the approved human questions, gold answers, evidence spans, and review notes; the frozen source eval artifact was not modified.",
+  "gold_answer_oracle": {
+    "grounded_slot_answer_rate": 1.0,
+    "grounded_slot_answer_and_citation_rate": 1.0,
+    "unsupported_slot_abstention_rate": 1.0,
+    "partial_requirement_joint_success_rate": 1.0,
+    "joint_success_rows": 20
+  }
+}

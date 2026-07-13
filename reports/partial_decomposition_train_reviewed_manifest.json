@@ -1,0 +1,27 @@
+{
+  "status": "frozen_reviewed_training_only",
+  "may_be_used_for_training": true,
+  "source_candidate_manifest": "reports\\partial_decomposition_train_candidates_manifest.json",
+  "candidate_sha256": "8fd3495cacec62a8c3b128cd63e8a50e0d579f7197e1423a626cb60b00bff5b5",
+  "review": "data\\review\\partial_decomposition_train_review_24.csv",
+  "review_template_sha256": "9c5b56e9e1418345a338101e076571d0b288b5e319dd799528da32ff008c67fa",
+  "review_sha256": "fd4a96fd12d53b1b24088c6d2123b962cf0bd6928012801d96b3a9da882a23d8",
+  "output": "data\\processed\\domain_partial_decomposition_train_reviewed.jsonl",
+  "output_sha256": "05805d18101b92099f0abff4ce10be5eea9076a27e43b49d8ba14d79749dd60d",
+  "candidate_rows": 24,
+  "review_rows": 24,
+  "decision_counts": {
+    "approve": 5,
+    "rewrite": 18,
+    "reject": 1
+  },
+  "accepted_rows": 23,
+  "unique_accepted_questions": 23,
+  "train_question_overlap": 0,
+  "blocked_parent_overlap": 0,
+  "blocked_chunk_overlap": 0,
+  "blocked_question_overlap": 0,
+  "missing_chunks": 0,
+  "span_mismatches": 0,
+  "generic_refusal_rows": 0
+}

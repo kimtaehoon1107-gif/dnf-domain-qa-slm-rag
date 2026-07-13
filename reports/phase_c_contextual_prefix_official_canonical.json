@@ -1,0 +1,942 @@
+{
+  "eval_set": "data\\processed\\official_eval_set.jsonl",
+  "persist_dir": "outputs\\chroma_domain_chunks",
+  "model_name": "BAAI/bge-m3",
+  "summary": {
+    "answerable_rows": 24,
+    "rank_mode": "hybrid",
+    "top_k_single_retrieve": 10,
+    "candidate_k": 100,
+    "mrr@10": 0.36150793650793656,
+    "avg_query_latency_sec": 0.06598112916678171,
+    "p95_query_latency_sec": 0.07142789999488741,
+    "latency_excludes_model_load": true,
+    "gold_rank_distribution": {
+      "missing": 8,
+      "rank_1": 5,
+      "rank_10": 2,
+      "rank_2": 5,
+      "rank_3": 2,
+      "rank_6": 1,
+      "rank_7": 1
+    },
+    "hit_rate@1": 0.20833333333333334,
+    "hit_rate@3": 0.5,
+    "hit_rate@5": 0.5,
+    "hit_rate@10": 0.6666666666666666
+  },
+  "details": [
+    {
+      "eval_id": "official_eval_0001",
+      "question": "공식 문서에서 잔여, 오류 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2926911__chunk_001"
+      ],
+      "gold_rank": 3,
+      "retrieved_chunk_ids": [
+        "official_notice_2927848__chunk_001",
+        "official_notice_2927771__chunk_001",
+        "official_update_2926911__chunk_001",
+        "official_update_2926911__chunk_008",
+        "official_guide_1532__chunk_014",
+        "official_update_2927196__chunk_005",
+        "official_update_2927335__chunk_012",
+        "official_update_2927810__chunk_002",
+        "official_update_2927522__chunk_002",
+        "official_update_2927399__chunk_016"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2927848",
+        "official_notice_2927771",
+        "official_update_2926911",
+        "official_update_2926911",
+        "official_guide_1532",
+        "official_update_2927196",
+        "official_update_2927335",
+        "official_update_2927810",
+        "official_update_2927522",
+        "official_update_2927399"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0002",
+      "question": "공식 문서에서 버전, 5시 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2926947__chunk_001"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_notice_2927887__chunk_001",
+        "official_update_2926947__chunk_001",
+        "official_update_2926972__chunk_017",
+        "official_guide_1519__chunk_001",
+        "official_guide_1522__chunk_005",
+        "official_update_2927233__chunk_001",
+        "official_update_2927233__chunk_007",
+        "official_update_2927522__chunk_002",
+        "official_update_2927208__chunk_001",
+        "official_update_2927399__chunk_017"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2927887",
+        "official_update_2926947",
+        "official_update_2926972",
+        "official_guide_1519",
+        "official_guide_1522",
+        "official_update_2927233",
+        "official_update_2927233",
+        "official_update_2927522",
+        "official_update_2927208",
+        "official_update_2927399"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0003",
+      "question": "공식 문서에서 115레벨, 달성 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2926971__chunk_001"
+      ],
+      "gold_rank": 10,
+      "retrieved_chunk_ids": [
+        "official_guide_1375__chunk_001",
+        "official_guide_1529__chunk_014",
+        "official_notice_2927887__chunk_001",
+        "official_update_2926971__chunk_004",
+        "official_guide_1493__chunk_001",
+        "official_event_event_card_007__chunk_002",
+        "official_guide_1519__chunk_002",
+        "official_guide_1510__chunk_014",
+        "official_update_2927233__chunk_006",
+        "official_update_2926971__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1375",
+        "official_guide_1529",
+        "official_notice_2927887",
+        "official_update_2926971",
+        "official_guide_1493",
+        "official_event_event_card_007",
+        "official_guide_1519",
+        "official_guide_1510",
+        "official_update_2927233",
+        "official_update_2926971"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0004",
+      "question": "공식 문서에서 던전, 작전별 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2926972__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1488__chunk_002",
+        "official_notice_2927887__chunk_001",
+        "official_guide_1510__chunk_014",
+        "official_guide_1510__chunk_003",
+        "official_guide_1433__chunk_003",
+        "official_guide_1510__chunk_015",
+        "official_guide_1516__chunk_005",
+        "official_guide_1433__chunk_008",
+        "official_guide_1510__chunk_013",
+        "official_guide_1510__chunk_006"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1488",
+        "official_notice_2927887",
+        "official_guide_1510",
+        "official_guide_1510",
+        "official_guide_1433",
+        "official_guide_1510",
+        "official_guide_1516",
+        "official_guide_1433",
+        "official_guide_1510",
+        "official_guide_1510"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "official_eval_0005",
+      "question": "공식 문서에서 이용하실, 있습니다 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2926990__chunk_001"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_notice_2927887__chunk_001",
+        "official_update_2926990__chunk_001",
+        "official_guide_1432__chunk_003",
+        "official_guide_1519__chunk_001",
+        "official_guide_1432__chunk_001",
+        "official_guide_1243__chunk_004",
+        "official_guide_1432__chunk_005",
+        "official_guide_1243__chunk_001",
+        "official_guide_1296__chunk_003",
+        "official_guide_1432__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2927887",
+        "official_update_2926990",
+        "official_guide_1432",
+        "official_guide_1519",
+        "official_guide_1432",
+        "official_guide_1243",
+        "official_guide_1432",
+        "official_guide_1243",
+        "official_guide_1296",
+        "official_guide_1432"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0006",
+      "question": "공식 문서에서 해방된, 흉몽 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927196__chunk_001"
+      ],
+      "gold_rank": 7,
+      "retrieved_chunk_ids": [
+        "official_guide_1515__chunk_001",
+        "official_guide_1515__chunk_002",
+        "official_update_2927263__chunk_001",
+        "official_guide_1515__chunk_008",
+        "official_update_2926911__chunk_003",
+        "official_guide_1529__chunk_014",
+        "official_update_2927196__chunk_001",
+        "official_guide_1515__chunk_009",
+        "official_guide_1515__chunk_003",
+        "official_event_event_card_011__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1515",
+        "official_guide_1515",
+        "official_update_2927263",
+        "official_guide_1515",
+        "official_update_2926911",
+        "official_guide_1529",
+        "official_update_2927196",
+        "official_guide_1515",
+        "official_guide_1515",
+        "official_event_event_card_011"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0007",
+      "question": "공식 문서에서 버전, 9시 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927208__chunk_001"
+      ],
+      "gold_rank": 10,
+      "retrieved_chunk_ids": [
+        "official_notice_2927887__chunk_001",
+        "official_update_2926947__chunk_001",
+        "official_update_2926911__chunk_008",
+        "official_guide_1519__chunk_001",
+        "official_update_2926972__chunk_017",
+        "official_update_2926911__chunk_002",
+        "official_update_2927522__chunk_002",
+        "official_update_2927392__chunk_005",
+        "official_update_2927877__chunk_002",
+        "official_update_2927208__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2927887",
+        "official_update_2926947",
+        "official_update_2926911",
+        "official_guide_1519",
+        "official_update_2926972",
+        "official_update_2926911",
+        "official_update_2927522",
+        "official_update_2927392",
+        "official_update_2927877",
+        "official_update_2927208"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0008",
+      "question": "공식 문서에서 콘텐츠, 정보 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927233__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1537__chunk_001",
+        "official_guide_1420__chunk_004",
+        "official_guide_1516__chunk_004",
+        "official_guide_1437__chunk_004",
+        "official_guide_1534__chunk_002",
+        "official_guide_1420__chunk_035",
+        "official_guide_1516__chunk_007",
+        "official_guide_1520__chunk_002",
+        "official_guide_1437__chunk_005",
+        "official_guide_1437__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1537",
+        "official_guide_1420",
+        "official_guide_1516",
+        "official_guide_1437",
+        "official_guide_1534",
+        "official_guide_1420",
+        "official_guide_1516",
+        "official_guide_1520",
+        "official_guide_1437",
+        "official_guide_1437"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "official_eval_0009",
+      "question": "공식 문서에서 해방된, 흉몽 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927263__chunk_001"
+      ],
+      "gold_rank": 3,
+      "retrieved_chunk_ids": [
+        "official_guide_1515__chunk_001",
+        "official_guide_1515__chunk_002",
+        "official_update_2927263__chunk_001",
+        "official_guide_1515__chunk_008",
+        "official_update_2926911__chunk_003",
+        "official_guide_1529__chunk_014",
+        "official_update_2927196__chunk_001",
+        "official_guide_1515__chunk_009",
+        "official_guide_1515__chunk_003",
+        "official_event_event_card_011__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1515",
+        "official_guide_1515",
+        "official_update_2927263",
+        "official_guide_1515",
+        "official_update_2926911",
+        "official_guide_1529",
+        "official_update_2927196",
+        "official_guide_1515",
+        "official_guide_1515",
+        "official_event_event_card_011"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0010",
+      "question": "공식 문서에서 몬스터, HP 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927335__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_update_2927335__chunk_001",
+        "official_guide_1178__chunk_004",
+        "official_guide_1178__chunk_002",
+        "official_guide_1178__chunk_003",
+        "official_update_2926971__chunk_007",
+        "official_guide_1178__chunk_001",
+        "official_notice_2927887__chunk_001",
+        "official_guide_1289__chunk_002",
+        "official_update_2927233__chunk_007",
+        "official_guide_1512__chunk_019"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2927335",
+        "official_guide_1178",
+        "official_guide_1178",
+        "official_guide_1178",
+        "official_update_2926971",
+        "official_guide_1178",
+        "official_notice_2927887",
+        "official_guide_1289",
+        "official_update_2927233",
+        "official_guide_1512"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0011",
+      "question": "공식 문서에서 아이템, 획득 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927392__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1484__chunk_003",
+        "official_guide_1283__chunk_015",
+        "official_guide_1530__chunk_009",
+        "official_update_2927233__chunk_004",
+        "official_update_2926972__chunk_005",
+        "official_update_2927399__chunk_012",
+        "official_update_2926972__chunk_010",
+        "official_guide_1236__chunk_002",
+        "official_guide_1510__chunk_013",
+        "official_update_2927691__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1484",
+        "official_guide_1283",
+        "official_guide_1530",
+        "official_update_2927233",
+        "official_update_2926972",
+        "official_update_2927399",
+        "official_update_2926972",
+        "official_guide_1236",
+        "official_guide_1510",
+        "official_update_2927691"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "official_eval_0012",
+      "question": "공식 문서에서 1레벨, 방어구 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927399__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_update_2927399__chunk_001",
+        "official_update_2927233__chunk_004",
+        "official_update_2927399__chunk_004",
+        "official_guide_1236__chunk_004",
+        "official_update_2926971__chunk_004",
+        "official_update_2927399__chunk_012",
+        "official_update_2926972__chunk_005",
+        "official_guide_1495__chunk_004",
+        "official_update_2927399__chunk_009",
+        "official_update_2926972__chunk_014"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2927399",
+        "official_update_2927233",
+        "official_update_2927399",
+        "official_guide_1236",
+        "official_update_2926971",
+        "official_update_2927399",
+        "official_update_2926972",
+        "official_guide_1495",
+        "official_update_2927399",
+        "official_update_2926972"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0013",
+      "question": "공식 문서에서 계정귀속, 광휘 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927522__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_update_2927522__chunk_001",
+        "official_update_2927399__chunk_015",
+        "official_update_2927335__chunk_012",
+        "official_guide_1516__chunk_018",
+        "official_update_2926972__chunk_010",
+        "official_guide_1538__chunk_003",
+        "official_update_2927392__chunk_001",
+        "official_update_2927399__chunk_016",
+        "official_guide_1489__chunk_015",
+        "official_update_2927233__chunk_005"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2927522",
+        "official_update_2927399",
+        "official_update_2927335",
+        "official_guide_1516",
+        "official_update_2926972",
+        "official_guide_1538",
+        "official_update_2927392",
+        "official_update_2927399",
+        "official_guide_1489",
+        "official_update_2927233"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0014",
+      "question": "공식 문서에서 로즈베리론, 청면수라 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927691__chunk_001"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_update_2926971__chunk_007",
+        "official_update_2927691__chunk_001",
+        "official_update_2926971__chunk_004",
+        "official_update_2927392__chunk_003",
+        "official_update_2927263__chunk_002",
+        "official_update_2926972__chunk_020",
+        "official_update_2926971__chunk_003",
+        "official_update_2926971__chunk_008",
+        "official_update_2927522__chunk_002",
+        "official_update_2927335__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2926971",
+        "official_update_2927691",
+        "official_update_2926971",
+        "official_update_2927392",
+        "official_update_2927263",
+        "official_update_2926972",
+        "official_update_2926971",
+        "official_update_2926971",
+        "official_update_2927522",
+        "official_update_2927335"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0015",
+      "question": "공식 문서에서 변경, 타이드 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927756__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_update_2927756__chunk_001",
+        "official_update_2927691__chunk_001",
+        "official_notice_2927887__chunk_001",
+        "official_update_2926971__chunk_007",
+        "official_update_2927691__chunk_002",
+        "official_update_2927399__chunk_019",
+        "official_update_2926972__chunk_017",
+        "official_update_2927756__chunk_002",
+        "official_update_2926911__chunk_008",
+        "official_update_2926971__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2927756",
+        "official_update_2927691",
+        "official_notice_2927887",
+        "official_update_2926971",
+        "official_update_2927691",
+        "official_update_2927399",
+        "official_update_2926972",
+        "official_update_2927756",
+        "official_update_2926911",
+        "official_update_2926971"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0016",
+      "question": "공식 문서에서 아이템, 설명 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927810__chunk_001"
+      ],
+      "gold_rank": 6,
+      "retrieved_chunk_ids": [
+        "official_update_2927233__chunk_004",
+        "official_guide_1236__chunk_002",
+        "official_guide_1289__chunk_005",
+        "official_guide_1234__chunk_002",
+        "official_guide_1235__chunk_003",
+        "official_update_2927810__chunk_001",
+        "official_guide_1233__chunk_007",
+        "official_guide_1236__chunk_006",
+        "official_guide_1239__chunk_001",
+        "official_update_2927263__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2927233",
+        "official_guide_1236",
+        "official_guide_1289",
+        "official_guide_1234",
+        "official_guide_1235",
+        "official_update_2927810",
+        "official_guide_1233",
+        "official_guide_1236",
+        "official_guide_1239",
+        "official_update_2927263"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0017",
+      "question": "공식 문서에서 버전, 9시 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927822__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_notice_2927887__chunk_001",
+        "official_update_2926947__chunk_001",
+        "official_update_2926911__chunk_008",
+        "official_guide_1519__chunk_001",
+        "official_update_2926972__chunk_017",
+        "official_update_2926911__chunk_002",
+        "official_update_2927522__chunk_002",
+        "official_update_2927392__chunk_005",
+        "official_update_2927877__chunk_002",
+        "official_update_2927208__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2927887",
+        "official_update_2926947",
+        "official_update_2926911",
+        "official_guide_1519",
+        "official_update_2926972",
+        "official_update_2926911",
+        "official_update_2927522",
+        "official_update_2927392",
+        "official_update_2927877",
+        "official_update_2927208"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "official_eval_0018",
+      "question": "공식 문서에서 아포칼립스, 안티엔바이 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_update_2927877__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_update_2927122__chunk_001",
+        "official_update_2927196__chunk_001",
+        "official_guide_1534__chunk_001",
+        "official_update_2927522__chunk_001",
+        "official_update_2927522__chunk_002",
+        "official_update_2926972__chunk_014",
+        "official_update_2926972__chunk_001",
+        "official_update_2926972__chunk_003",
+        "official_guide_1534__chunk_020",
+        "official_update_2927399__chunk_011"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2927122",
+        "official_update_2927196",
+        "official_guide_1534",
+        "official_update_2927522",
+        "official_update_2927522",
+        "official_update_2926972",
+        "official_update_2926972",
+        "official_update_2926972",
+        "official_guide_1534",
+        "official_update_2927399"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "official_eval_0019",
+      "question": "공식 문서에서 사용, 가능한 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_2927568__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_guide_1519__chunk_001",
+        "official_update_2927522__chunk_002",
+        "official_notice_2927887__chunk_001",
+        "official_guide_1519__chunk_003",
+        "official_guide_1427__chunk_003",
+        "official_guide_1258__chunk_003",
+        "official_update_2926972__chunk_017",
+        "official_update_2926911__chunk_008",
+        "official_guide_1296__chunk_003",
+        "official_guide_1292__chunk_001"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1519",
+        "official_update_2927522",
+        "official_notice_2927887",
+        "official_guide_1519",
+        "official_guide_1427",
+        "official_guide_1258",
+        "official_update_2926972",
+        "official_update_2926911",
+        "official_guide_1296",
+        "official_guide_1292"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "official_eval_0020",
+      "question": "공식 문서에서 쿠폰, 코드 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_2927808__chunk_001"
+      ],
+      "gold_rank": 1,
+      "retrieved_chunk_ids": [
+        "official_event_2927808__chunk_001",
+        "official_event_event_card_013__chunk_003",
+        "official_event_event_card_013__chunk_002",
+        "official_event_event_card_013__chunk_001",
+        "official_update_2927399__chunk_017",
+        "official_guide_1519__chunk_001",
+        "official_guide_1233__chunk_007",
+        "official_update_2926971__chunk_007",
+        "official_event_event_card_011__chunk_001",
+        "official_update_2926911__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_event_2927808",
+        "official_event_event_card_013",
+        "official_event_event_card_013",
+        "official_event_event_card_013",
+        "official_update_2927399",
+        "official_guide_1519",
+        "official_guide_1233",
+        "official_update_2926971",
+        "official_event_event_card_011",
+        "official_update_2926911"
+      ],
+      "hit@1": true,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0021",
+      "question": "공식 문서에서 누적, 참여 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_001__chunk_001"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_guide_1432__chunk_005",
+        "official_event_event_card_001__chunk_001",
+        "official_event_event_card_013__chunk_002",
+        "official_guide_1494__chunk_005",
+        "official_guide_1209__chunk_019",
+        "official_guide_1532__chunk_014",
+        "official_guide_1285__chunk_004",
+        "official_guide_1520__chunk_002",
+        "official_update_2927335__chunk_012",
+        "official_update_2927810__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_guide_1432",
+        "official_event_event_card_001",
+        "official_event_event_card_013",
+        "official_guide_1494",
+        "official_guide_1209",
+        "official_guide_1532",
+        "official_guide_1285",
+        "official_guide_1520",
+        "official_update_2927335",
+        "official_update_2927810"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0022",
+      "question": "공식 문서에서 기간, 2026년 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_002__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_notice_2927887__chunk_001",
+        "official_event_2927568__chunk_001",
+        "official_notice_2927816__chunk_001",
+        "official_notice_2927876__chunk_001",
+        "official_event_event_card_013__chunk_002",
+        "official_event_event_card_013__chunk_003",
+        "official_event_event_card_017__chunk_001",
+        "official_notice_2927758__chunk_001",
+        "official_event_event_card_005__chunk_001",
+        "official_event_event_card_016__chunk_002"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2927887",
+        "official_event_2927568",
+        "official_notice_2927816",
+        "official_notice_2927876",
+        "official_event_event_card_013",
+        "official_event_event_card_013",
+        "official_event_event_card_017",
+        "official_notice_2927758",
+        "official_event_event_card_005",
+        "official_event_event_card_016"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    },
+    {
+      "eval_id": "official_eval_0023",
+      "question": "공식 문서에서 달성자, 전직별 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_004__chunk_001"
+      ],
+      "gold_rank": 2,
+      "retrieved_chunk_ids": [
+        "official_update_2927399__chunk_009",
+        "official_event_event_card_004__chunk_001",
+        "official_update_2927877__chunk_002",
+        "official_guide_1519__chunk_001",
+        "official_update_2927233__chunk_007",
+        "official_guide_1491__chunk_001",
+        "official_guide_1290__chunk_004",
+        "official_update_2927335__chunk_006",
+        "official_update_2926972__chunk_017",
+        "official_update_2927399__chunk_008"
+      ],
+      "retrieved_parent_ids": [
+        "official_update_2927399",
+        "official_event_event_card_004",
+        "official_update_2927877",
+        "official_guide_1519",
+        "official_update_2927233",
+        "official_guide_1491",
+        "official_guide_1290",
+        "official_update_2927335",
+        "official_update_2926972",
+        "official_update_2927399"
+      ],
+      "hit@1": false,
+      "hit@3": true,
+      "hit@5": true,
+      "hit@10": true
+    },
+    {
+      "eval_id": "official_eval_0024",
+      "question": "공식 문서에서 닫기, 이전 관련 핵심 내용은 뭐야?",
+      "answerability": "true",
+      "match_scope": "chunk",
+      "expected_ids": [
+        "official_event_event_card_005__chunk_001"
+      ],
+      "gold_rank": null,
+      "retrieved_chunk_ids": [
+        "official_notice_2927887__chunk_001",
+        "official_guide_1519__chunk_001",
+        "official_update_2926971__chunk_002",
+        "official_guide_1296__chunk_003",
+        "official_update_2926971__chunk_003",
+        "official_update_2926972__chunk_003",
+        "official_update_2927399__chunk_011",
+        "official_update_2927233__chunk_001",
+        "official_update_2927196__chunk_002",
+        "official_update_2926911__chunk_008"
+      ],
+      "retrieved_parent_ids": [
+        "official_notice_2927887",
+        "official_guide_1519",
+        "official_update_2926971",
+        "official_guide_1296",
+        "official_update_2926971",
+        "official_update_2926972",
+        "official_update_2927399",
+        "official_update_2927233",
+        "official_update_2927196",
+        "official_update_2926911"
+      ],
+      "hit@1": false,
+      "hit@3": false,
+      "hit@5": false,
+      "hit@10": false
+    }
+  ]
+}
