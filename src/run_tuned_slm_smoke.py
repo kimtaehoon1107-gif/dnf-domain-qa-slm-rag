@@ -10,7 +10,13 @@ from pathlib import Path
 from typing import Any
 
 from io_utils import read_jsonl
-from prompt_format import RAG_INSTRUCTIONS, evidence_span_visible, format_prompt, instruction_for_mode
+from prompt_format import (
+    RAG_INSTRUCTIONS,
+    evidence_span_visible,
+    format_prompt,
+    instruction_for_mode,
+    select_query_window,
+)
 from retrieve import retrieve
 from retrieval_config import (
     DEFAULT_CANDIDATE_K,
@@ -24,6 +30,7 @@ from retrieval_config import (
 
 
 CHUNK_ID_PATTERN = re.compile(r"[A-Za-z0-9_]+__chunk_\d+")
+CONTEXT_MODES = ("chunk", "sibling_window")
 
 
 def parent_doc_id(hit: dict[str, Any]) -> str:
@@ -61,6 +68,90 @@ def contexts_to_documents(contexts: list[dict[str, Any]]) -> list[dict[str, str]
     ]
 
 
+def chunk_parent_id(row: dict[str, Any]) -> str:
+    return str(row.get("parent_doc_id") or row.get("doc_id") or "")
+
+
+def chunk_index(row: dict[str, Any]) -> int | None:
+    value = row.get("chunk_index")
+    try:
+        return int(value) if value is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def build_sibling_lookup(
+    chunks: list[dict[str, Any]],
+) -> tuple[dict[str, dict[str, Any]], dict[tuple[str, int], dict[str, Any]]]:
+    by_id = {str(row["doc_id"]): row for row in chunks}
+    by_parent_index = {
+        (chunk_parent_id(row), index): row
+        for row in chunks
+        if (index := chunk_index(row)) is not None
+    }
+    return by_id, by_parent_index
+
+
+def expand_sibling_contexts(
+    contexts: list[dict[str, Any]],
+    chunks_by_id: dict[str, dict[str, Any]],
+    siblings_by_parent_index: dict[tuple[str, int], dict[str, Any]],
+    question: str,
+    max_doc_chars: int,
+) -> list[dict[str, Any]]:
+    expanded: list[dict[str, Any]] = []
+    retrieved_anchor_ids = {str(hit.get("doc_id") or "") for hit in contexts}
+    for hit in contexts:
+        anchor_id = str(hit.get("doc_id") or "")
+        anchor = chunks_by_id.get(anchor_id)
+        anchor_index = chunk_index(anchor or {})
+        parent_id = chunk_parent_id(anchor or {})
+        if anchor is None or anchor_index is None or not parent_id:
+            copied = dict(hit)
+            copied["context_chunk_ids"] = [anchor_id]
+            expanded.append(copied)
+            continue
+
+        context_chunks = []
+        for index in range(anchor_index - 1, anchor_index + 2):
+            sibling = siblings_by_parent_index.get((parent_id, index))
+            if sibling is None:
+                continue
+            sibling_id = str(sibling.get("doc_id") or "")
+            if sibling_id != anchor_id and sibling_id in retrieved_anchor_ids:
+                continue
+            context_chunks.append(sibling)
+        blocks = []
+        for sibling in context_chunks:
+            sibling_index = chunk_index(sibling)
+            title = str(sibling.get("title") or "")
+            text = select_query_window(
+                sibling.get("text", ""),
+                question=question,
+                max_chars=max_doc_chars,
+                title=title,
+            )
+            if sibling_index == anchor_index:
+                blocks.append(text)
+            else:
+                label = "previous sibling" if sibling_index < anchor_index else "next sibling"
+                blocks.append(f"[{label} context | {title}]\n{text}")
+
+        copied = dict(hit)
+        copied["text"] = "\n\n".join(blocks)
+        copied["context_chunk_ids"] = [str(row["doc_id"]) for row in context_chunks]
+        expanded.append(copied)
+    return expanded
+
+
+def generation_context_ids(contexts: list[dict[str, Any]]) -> list[str]:
+    ids = []
+    for hit in contexts:
+        values = hit.get("context_chunk_ids") or [hit.get("doc_id")]
+        ids.extend(str(value) for value in values if value)
+    return list(dict.fromkeys(ids))
+
+
 def resolve_device(torch_module, requested_device: str) -> str:
     if requested_device != "auto":
         return requested_device
@@ -92,7 +183,10 @@ def load_tuned_model(model_name: str, adapter_dir: Path, device: str, fp16: bool
             "Tuned-SLM smoke dependencies are missing. Install them with: pip install -r requirements-train.txt"
         ) from exc
 
-    tokenizer = AutoTokenizer.from_pretrained(adapter_dir, trust_remote_code=True)
+    tokenizer_source: str | Path = (
+        adapter_dir if (adapter_dir / "tokenizer_config.json").exists() else model_name
+    )
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_source, trust_remote_code=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
@@ -139,6 +233,10 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
     device = resolve_device(torch, args.device)
     setup_determinism(torch, seed=args.seed, deterministic=args.deterministic)
     torch_module, tokenizer, model = load_tuned_model(args.model_name, args.adapter_dir, device, args.fp16)
+    chunks_by_id: dict[str, dict[str, Any]] = {}
+    siblings_by_parent_index: dict[tuple[str, int], dict[str, Any]] = {}
+    if args.context_mode == "sibling_window":
+        chunks_by_id, siblings_by_parent_index = build_sibling_lookup(read_jsonl(args.chunks))
 
     details = []
     start = time.perf_counter()
@@ -155,10 +253,26 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
             reranker_max_length=args.reranker_max_length,
             reranker_batch_size=args.reranker_batch_size,
         )
+        generation_contexts = (
+            expand_sibling_contexts(
+                contexts,
+                chunks_by_id=chunks_by_id,
+                siblings_by_parent_index=siblings_by_parent_index,
+                question=row["question"],
+                max_doc_chars=args.max_doc_chars,
+            )
+            if args.context_mode == "sibling_window"
+            else contexts
+        )
+        generation_max_doc_chars = (
+            args.max_doc_chars * 3 + 512
+            if args.context_mode == "sibling_window"
+            else args.max_doc_chars
+        )
         prompt = format_prompt(
             question=row["question"],
-            documents=contexts_to_documents(contexts),
-            max_doc_chars=args.max_doc_chars,
+            documents=contexts_to_documents(generation_contexts),
+            max_doc_chars=generation_max_doc_chars,
             instruction=instruction_for_mode(args.instruction_mode),
         )
         row_start = time.perf_counter()
@@ -197,6 +311,29 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
             if has_evidence_span
             else None
         )
+        context_ids = generation_context_ids(generation_contexts)
+        generation_context_expected_hit = (
+            any(doc_id in context_ids for doc_id in expected_chunk_ids)
+            if expected_chunk_ids
+            else any(doc_id in [parent_doc_id(hit) for hit in contexts] for doc_id in expected_parent_ids)
+        )
+        generation_gold_contexts = [
+            hit
+            for hit in generation_contexts
+            if set(hit.get("context_chunk_ids") or [hit.get("doc_id")]) & set(expected_chunk_ids)
+        ]
+        generation_gold_evidence_visible = (
+            evidence_span_visible(
+                question=row["question"],
+                documents=generation_gold_contexts,
+                evidence_span=row.get("evidence_span", ""),
+                max_doc_chars=generation_max_doc_chars,
+            )
+            if has_evidence_span and generation_gold_contexts
+            else False
+            if has_evidence_span
+            else None
+        )
         detail = {
             "eval_id": row.get("eval_id"),
             "question": row["question"],
@@ -208,6 +345,12 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
             "retrieval_expected_hit": retrieval_expected_hit,
             "gold_evidence_visible": gold_evidence_visible,
             "usable_gold_hit": bool(retrieval_expected_hit and gold_evidence_visible),
+            "generation_context_chunk_ids": context_ids,
+            "generation_context_expected_hit": generation_context_expected_hit,
+            "generation_gold_evidence_visible": generation_gold_evidence_visible,
+            "generation_usable_gold_hit": bool(
+                generation_context_expected_hit and generation_gold_evidence_visible
+            ),
             "generated_answer": answer,
             "latency_sec": round(time.perf_counter() - row_start, 3),
         }
@@ -234,6 +377,18 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
         if row["retrieval_expected_hit"]
     ]
     usable_gold_hits = [bool(row["usable_gold_hit"]) for row in visibility_rows]
+    generation_context_hits = [bool(row["generation_context_expected_hit"]) for row in answerable_details]
+    generation_visibility_rows = [
+        row for row in answerable_details if row["generation_gold_evidence_visible"] is not None
+    ]
+    generation_visible_when_context_hit = [
+        bool(row["generation_gold_evidence_visible"])
+        for row in generation_visibility_rows
+        if row["generation_context_expected_hit"]
+    ]
+    generation_usable_gold_hits = [
+        bool(row["generation_usable_gold_hit"]) for row in generation_visibility_rows
+    ]
     answerability_format_hits = [bool(row["has_answerability_field"]) for row in details]
     answerability_correct = [
         str(row.get("parsed_answerability") or "").lower()
@@ -283,6 +438,13 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
         "max_doc_chars": args.max_doc_chars,
         "max_new_tokens": args.max_new_tokens,
         "instruction_mode": args.instruction_mode,
+        "context_mode": args.context_mode,
+        "chunks": str(args.chunks) if args.context_mode == "sibling_window" else "",
+        "generation_max_doc_chars": (
+            args.max_doc_chars * 3 + 512
+            if args.context_mode == "sibling_window"
+            else args.max_doc_chars
+        ),
         "device": device,
         "seed": args.seed,
         "deterministic": args.deterministic,
@@ -302,6 +464,21 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
             "usable_gold_hit_rate": (
                 sum(usable_gold_hits) / len(usable_gold_hits)
                 if usable_gold_hits
+                else None
+            ),
+            "generation_context_expected_hit_rate": (
+                sum(generation_context_hits) / len(generation_context_hits)
+                if generation_context_hits
+                else None
+            ),
+            "generation_usable_gold_hit_rate": (
+                sum(generation_usable_gold_hits) / len(generation_usable_gold_hits)
+                if generation_usable_gold_hits
+                else None
+            ),
+            "generation_evidence_visibility_when_context_hit": (
+                sum(generation_visible_when_context_hit) / len(generation_visible_when_context_hit)
+                if generation_visible_when_context_hit
                 else None
             ),
             "evidence_visibility_when_retrieved": (
@@ -371,6 +548,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-doc-chars", type=int, default=300)
     parser.add_argument("--max-new-tokens", type=int, default=64)
     parser.add_argument("--instruction-mode", choices=tuple(RAG_INSTRUCTIONS), default="legacy")
+    parser.add_argument("--context-mode", choices=CONTEXT_MODES, default="chunk")
+    parser.add_argument("--chunks", type=Path, default=Path("data/processed/domain_doc_chunks.jsonl"))
     parser.add_argument("--device", default="auto")
     parser.add_argument("--fp16", action="store_true")
     parser.add_argument("--seed", type=int, default=42)

@@ -169,6 +169,41 @@ Answer evaluation:
 - faithfulness-style atomic fact support
 - unsupported fact rows
 
+### Partial Requirement Annotation
+
+Partial development rows may have a separate requirement annotation artifact. The frozen eval row is not modified.
+
+```json
+{
+  "eval_id": "partial_dev_human_0011",
+  "requirements": [
+    {
+      "requirement_id": "partial_dev_human_0011_g1",
+      "type": "grounded",
+      "description": "점검 시간",
+      "required_fact_groups": [["05시 30분", "05:30"], ["10시", "10:00"]],
+      "expected_chunk_ids": ["official_notice_2927876__chunk_001"]
+    },
+    {
+      "requirement_id": "partial_dev_human_0011_u1",
+      "type": "unsupported",
+      "description": "개인 일정에 맞춘 접속 시점",
+      "target_phrases": ["언제 접속", "접속 시점", "일정"]
+    }
+  ]
+}
+```
+
+Every Partial row must contain at least one `grounded` and one `unsupported` requirement. All fact groups in a grounded slot are required; alternatives inside one group are equivalent normalized expressions. Unsupported success requires both an explicit topic mention and an abstention expression, so a generic whole-answer refusal does not pass.
+
+Requirement-level metrics:
+
+- grounded-slot answer rate;
+- grounded-slot answer-and-citation rate;
+- grounded-slot over-refusal rate;
+- unsupported-slot abstention, over-answer, and omission rates;
+- Partial requirement joint success: predicted `partial`, every grounded slot answered and cited, and every unsupported slot explicitly abstained.
+
 ## Label Studio Export
 
 Label Studio import/export helpers:

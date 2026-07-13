@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import re
 import sys
@@ -23,6 +24,24 @@ from retrieve import apply_reranker, retrieve
 
 TOKEN_PATTERN = re.compile(r"[0-9A-Za-z가-힣]+")
 DEFAULT_MAX_EVIDENCE_TOKEN_RECALL = 0.5
+
+
+def load_human_blocklist(path: Path | None) -> dict[str, set[str]]:
+    if path is None:
+        return {}
+    blocked: dict[str, set[str]] = {}
+    with path.open("r", encoding="utf-8-sig", newline="") as handle:
+        for row in csv.DictReader(handle):
+            source_qa_id = str(row.get("source_qa_id") or "").strip()
+            if not source_qa_id:
+                continue
+            for index in range(1, 4):
+                if str(row.get(f"negative_{index}_valid_non_answer") or "").strip().lower() != "no":
+                    continue
+                doc_id = str(row.get(f"negative_{index}_doc_id") or "").strip()
+                if doc_id:
+                    blocked.setdefault(source_qa_id, set()).add(doc_id)
+    return blocked
 
 
 def normalize_space(text: Any) -> str:
@@ -78,6 +97,39 @@ def heldout_ids(rows: list[dict[str, Any]]) -> tuple[set[str], set[str]]:
     return chunks, parents
 
 
+def reusable_negative_row(
+    existing: dict[str, Any] | None,
+    qa_row: dict[str, Any],
+    gold_chunks: set[str],
+    gold_parents: set[str],
+    heldout_chunks: set[str],
+    heldout_parents: set[str],
+    blocked_doc_ids: set[str],
+    negatives_per_row: int,
+) -> bool:
+    if not existing:
+        return False
+    if str(existing.get("question") or "") != str(qa_row.get("question") or ""):
+        return False
+    if str(existing.get("answerability") or "") != str(qa_row.get("answerability") or ""):
+        return False
+    if set(existing.get("gold_chunk_ids") or []) != gold_chunks:
+        return False
+    if set(existing.get("gold_parent_ids") or []) != gold_parents:
+        return False
+    negatives = list(existing.get("hard_negatives") or [])
+    if len(negatives) < negatives_per_row:
+        return False
+    for negative in negatives[:negatives_per_row]:
+        doc_id = str(negative.get("doc_id") or "")
+        doc_parent = str(negative.get("parent_doc_id") or "")
+        if not doc_id or doc_id in blocked_doc_ids:
+            return False
+        if doc_id in heldout_chunks or doc_parent in heldout_parents:
+            return False
+    return True
+
+
 def filter_hard_negatives(
     hits: list[dict[str, Any]],
     gold_chunk_ids: set[str],
@@ -87,13 +139,17 @@ def filter_hard_negatives(
     limit: int,
     evidence_span: str = "",
     max_evidence_token_recall: float = DEFAULT_MAX_EVIDENCE_TOKEN_RECALL,
+    blocked_doc_ids: set[str] | None = None,
 ) -> list[dict[str, Any]]:
     selected = []
     seen = set()
+    blocked_doc_ids = blocked_doc_ids or set()
     for hit in hits:
         doc_id = str(hit.get("doc_id") or "")
         doc_parent = parent_id(hit)
         if not doc_id or doc_id in seen:
+            continue
+        if doc_id in blocked_doc_ids:
             continue
         if doc_id in gold_chunk_ids or doc_parent in gold_parent_ids:
             continue
@@ -124,13 +180,35 @@ def mine(args: argparse.Namespace) -> tuple[list[dict[str, Any]], dict[str, Any]
     qa_rows = read_jsonl(args.qa)
     heldout_rows = [row for path in args.exclude_eval_set for row in read_jsonl(path)]
     heldout_chunks, heldout_parents = heldout_ids(heldout_rows)
+    human_blocklist = load_human_blocklist(args.human_review)
+    reusable_rows = (
+        {str(row.get("source_qa_id") or ""): row for row in read_jsonl(args.reuse_existing)}
+        if args.reuse_existing
+        else {}
+    )
     output_rows = []
     insufficient = []
+    reused_count = 0
 
     for index, row in enumerate(qa_rows, start=1):
         source_qa_id = str(row.get("qa_id") or row.get("eval_id") or f"row_{index:04d}")
         gold_chunks = expected_chunk_ids(row)
         gold_parents = expected_parent_ids(row)
+        blocked_doc_ids = human_blocklist.get(source_qa_id, set())
+        existing = reusable_rows.get(source_qa_id)
+        if reusable_negative_row(
+            existing,
+            row,
+            gold_chunks,
+            gold_parents,
+            heldout_chunks,
+            heldout_parents,
+            blocked_doc_ids,
+            args.negatives_per_row,
+        ):
+            output_rows.append(existing)
+            reused_count += 1
+            continue
         base_hits = retrieve(
             str(row["question"]),
             persist_dir=args.persist_dir,
@@ -159,6 +237,7 @@ def mine(args: argparse.Namespace) -> tuple[list[dict[str, Any]], dict[str, Any]
             limit=args.negatives_per_row,
             evidence_span=str(row.get("evidence_span") or ""),
             max_evidence_token_recall=args.max_evidence_token_recall,
+            blocked_doc_ids=blocked_doc_ids,
         )
         if len(negatives) < args.negatives_per_row:
             insufficient.append(source_qa_id)
@@ -183,6 +262,12 @@ def mine(args: argparse.Namespace) -> tuple[list[dict[str, Any]], dict[str, Any]
         "excluded_eval_sets": [str(path) for path in args.exclude_eval_set],
         "excluded_heldout_chunks": len(heldout_chunks),
         "excluded_heldout_parents": len(heldout_parents),
+        "human_review": str(args.human_review) if args.human_review else "",
+        "human_blocked_qa_rows": len(human_blocklist),
+        "human_blocked_pairs": sum(len(doc_ids) for doc_ids in human_blocklist.values()),
+        "reuse_existing": str(args.reuse_existing) if args.reuse_existing else "",
+        "reused_rows": reused_count,
+        "mined_rows": len(output_rows) - reused_count,
         "config": {
             "persist_dir": str(args.persist_dir),
             "embedding_model": args.model_name,
@@ -213,10 +298,21 @@ def parse_args() -> argparse.Namespace:
             Path("data/processed/official_eval_set.jsonl"),
             Path("data/processed/fresh_paraphrase_eval_set.jsonl"),
             Path("data/review/blind_test_v1_candidate.jsonl"),
+            Path("data/eval/blind_test_v1.jsonl"),
         ],
     )
     parser.add_argument("--output", type=Path, default=Path("data/processed/domain_hard_negatives.jsonl"))
     parser.add_argument("--report", type=Path, default=Path("reports/domain_hard_negatives.json"))
+    parser.add_argument(
+        "--human-review",
+        type=Path,
+        help="Optional review CSV; candidates marked valid_non_answer=no are blocked per QA row.",
+    )
+    parser.add_argument(
+        "--reuse-existing",
+        type=Path,
+        help="Reuse rows whose question, labels, gold IDs, held-out status, and human blocks are unchanged.",
+    )
     parser.add_argument("--model-name", default=DEFAULT_EMBEDDING_MODEL)
     parser.add_argument("--rank-mode", choices=RANK_MODES, default=DEFAULT_RANK_MODE)
     parser.add_argument("--candidate-k", type=int, default=DEFAULT_CANDIDATE_K)

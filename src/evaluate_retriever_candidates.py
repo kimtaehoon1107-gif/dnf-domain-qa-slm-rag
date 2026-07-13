@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
+import time
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -58,8 +60,20 @@ def evaluate_candidates(args: argparse.Namespace) -> dict[str, Any]:
     rank_counter: Counter[str] = Counter()
     hit_totals = {cutoff: 0 for cutoff in cutoffs}
     mrr_at_10_total = 0.0
+    query_latencies = []
+
+    if not args.skip_warmup:
+        retrieve(
+            answerable_rows[0]["question"],
+            persist_dir=args.persist_dir,
+            top_k=top_k,
+            model_name=args.model_name,
+            candidate_k=args.candidate_k,
+            rank_mode=args.rank_mode,
+        )
 
     for row in answerable_rows:
+        started_at = time.perf_counter()
         hits = retrieve(
             row["question"],
             persist_dir=args.persist_dir,
@@ -68,6 +82,7 @@ def evaluate_candidates(args: argparse.Namespace) -> dict[str, Any]:
             candidate_k=args.candidate_k,
             rank_mode=args.rank_mode,
         )
+        query_latencies.append(time.perf_counter() - started_at)
         expected_ids, match_scope = expected_match_ids(row)
         retrieved_chunk_ids = [str(hit["doc_id"]) for hit in hits]
         retrieved_parent_ids = [parent_doc_id(hit) for hit in hits]
@@ -98,16 +113,21 @@ def evaluate_candidates(args: argparse.Namespace) -> dict[str, Any]:
         )
 
     total = len(answerable_rows)
+    sorted_latencies = sorted(query_latencies)
+    p95_index = max(0, math.ceil(len(sorted_latencies) * 0.95) - 1)
     summary = {
         "answerable_rows": total,
         "rank_mode": args.rank_mode,
         "top_k_single_retrieve": top_k,
         "candidate_k": args.candidate_k,
         "mrr@10": mrr_at_10_total / total,
+        "avg_query_latency_sec": sum(query_latencies) / total,
+        "p95_query_latency_sec": sorted_latencies[p95_index],
+        "latency_excludes_model_load": not args.skip_warmup,
         "gold_rank_distribution": dict(sorted(rank_counter.items())),
     }
     for cutoff in cutoffs:
-        summary[f"recall@{cutoff}"] = hit_totals[cutoff] / total
+        summary[f"hit_rate@{cutoff}"] = hit_totals[cutoff] / total
 
     return {
         "eval_set": str(args.eval_set),
@@ -130,6 +150,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--rank-mode", choices=RANK_MODES, default=DEFAULT_RANK_MODE)
     parser.add_argument("--candidate-k", type=int, default=None)
     parser.add_argument("--cutoffs", type=parse_cutoffs, default=DEFAULT_CUTOFFS)
+    parser.add_argument("--skip-warmup", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     return parser.parse_args()
 

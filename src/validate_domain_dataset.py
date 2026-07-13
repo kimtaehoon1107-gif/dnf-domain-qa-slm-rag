@@ -176,6 +176,34 @@ def validate_raft(
     }
 
 
+def gold_position_balance(raft_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    counts: Counter[int] = Counter()
+    rows_with_gold_position = 0
+    rows_without_gold_position = 0
+    for row in raft_rows:
+        if str(row.get("answerability", "true")).lower() == "false":
+            continue
+        document_ids = [
+            str(doc.get("doc_id")) for doc in row.get("documents", []) or [] if doc.get("doc_id")
+        ]
+        citations = [str(item) for item in row.get("citations", []) or [] if item]
+        positions = [document_ids.index(citation) + 1 for citation in citations if citation in document_ids]
+        if positions:
+            rows_with_gold_position += 1
+            counts.update(positions)
+        else:
+            rows_without_gold_position += 1
+    total = sum(counts.values())
+    max_share = max(counts.values(), default=0) / total if total else None
+    return {
+        "rows_with_gold_position": rows_with_gold_position,
+        "rows_without_gold_position": rows_without_gold_position,
+        "total_gold_positions": total,
+        "position_counts": {str(position): count for position, count in sorted(counts.items())},
+        "max_position_share": max_share,
+    }
+
+
 def duplicate_values(rows: list[dict[str, Any]], key: str) -> dict[str, int]:
     counter = Counter(normalize_space(row.get(key, "")).lower() for row in rows if row.get(key))
     return {value: count for value, count in counter.items() if count > 1}
@@ -217,6 +245,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--title-overlap-cap", type=float, default=0.35)
     parser.add_argument("--max-doc-chars", type=int, default=900)
     parser.add_argument(
+        "--max-gold-position-share",
+        type=float,
+        default=0.5,
+        help="Fail when one context position contains more than this share of RAFT gold citations.",
+    )
+    parser.add_argument(
         "--legacy-eval-set",
         type=Path,
         nargs="*",
@@ -224,6 +258,7 @@ def parse_args() -> argparse.Namespace:
             Path("data/processed/official_eval_set.jsonl"),
             Path("data/processed/fresh_paraphrase_eval_set.jsonl"),
             Path("data/review/blind_test_v1_candidate.jsonl"),
+            Path("data/eval/blind_test_v1.jsonl"),
         ],
         help="Additional held-out eval set(s) that domain train/RAFT must not overlap with.",
     )
@@ -282,6 +317,7 @@ def main() -> None:
         )
 
     raft_visibility = {"rows": 0, "visible_rows": 0, "visible_rate": None, "max_doc_chars": args.max_doc_chars}
+    raft_gold_positions = gold_position_balance(raft_rows)
     if raft_rows:
         raft_errors, raft_warnings, raft_visibility = validate_raft(
             raft_rows,
@@ -292,6 +328,12 @@ def main() -> None:
         )
         errors.extend(raft_errors)
         warnings.extend(raft_warnings)
+        max_gold_share = raft_gold_positions["max_position_share"]
+        if max_gold_share is not None and max_gold_share > args.max_gold_position_share:
+            errors.append(
+                "RAFT gold position imbalance: "
+                f"max share {max_gold_share:.4f} > {args.max_gold_position_share:.4f}"
+            )
 
     raft_document_ids = {
         str(doc.get("doc_id"))
@@ -334,6 +376,7 @@ def main() -> None:
         "train_answerability_counts": dict(Counter(str(row.get("answerability", "")) for row in train_rows)),
         "raft_answerability_counts": dict(Counter(str(row.get("answerability", "")) for row in raft_rows)),
         "raft_gold_evidence_visibility": raft_visibility,
+        "raft_gold_position_balance": raft_gold_positions,
         "eval_expected_chunks": len(eval_chunks),
         "train_expected_chunks": len(train_chunks),
         "train_eval_parent_overlap": len(parent_overlap),

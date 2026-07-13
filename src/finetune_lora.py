@@ -323,7 +323,11 @@ def train(rows: list[dict[str, Any]], args: argparse.Namespace) -> None:
         eval_dataset=dev_dataset,
         data_collator=collator,
     )
-    trainer.train()
+    trainer.train(
+        resume_from_checkpoint=str(args.resume_from_checkpoint)
+        if args.resume_from_checkpoint
+        else None
+    )
     model.save_pretrained(args.output_dir)
     tokenizer.save_pretrained(args.output_dir)
     final_dev_loss = None
@@ -379,6 +383,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-name", default="Qwen/Qwen2.5-0.5B-Instruct")
     parser.add_argument("--train-file", type=Path, default=Path("data/processed/official_raft_sample.jsonl"))
     parser.add_argument("--output-dir", type=Path, default=Path("outputs/slm_lora"))
+    parser.add_argument(
+        "--resume-from-checkpoint",
+        type=Path,
+        help="Resume an interrupted Trainer run from a checkpoint directory.",
+    )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--max-doc-chars", type=int, default=1200)

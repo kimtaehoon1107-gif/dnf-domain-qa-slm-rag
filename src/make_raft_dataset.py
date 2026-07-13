@@ -301,7 +301,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--docs", type=Path, default=Path("data/raw/docs.jsonl"))
     parser.add_argument("--qa", type=Path, default=Path("data/processed/qa_dataset.jsonl"))
     parser.add_argument("--output", type=Path, default=Path("data/processed/raft_train_sample.jsonl"))
-    parser.add_argument("--exclude-eval-set", type=Path, nargs="+", default=[])
+    parser.add_argument(
+        "--exclude-eval-set",
+        type=Path,
+        nargs="+",
+        default=[Path("data/eval/blind_test_v1.jsonl")],
+    )
     parser.add_argument("--max-rows", type=int, default=50)
     parser.add_argument("--distractors", type=int, default=2)
     parser.add_argument("--gold-text", choices=("span", "chunk"), default="span")

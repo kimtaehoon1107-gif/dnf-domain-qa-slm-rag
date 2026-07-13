@@ -7,8 +7,9 @@
 | `domain_eval_set_expanded.jsonl` | template-rich development benchmark | Yes | No |
 | `official_eval_set.jsonl` | legacy compatibility benchmark | Yes | No |
 | `fresh_paraphrase_eval_set.jsonl` | adaptive conversational development set (`fresh_dev`) | Yes | No |
+| `partial_dev_human_v1.jsonl` | human-authored partial development slice | Yes | No |
 | `data/review/blind_test_v1_candidate.jsonl` | pending human-review candidate | No | No |
-| approved and frozen blind-test release | one-shot final test | No | Yes, once |
+| `data/eval/blind_test_v1.jsonl` | approved and frozen one-shot final test | No | Yes, once |
 
 `fresh_paraphrase_eval_set.jsonl` was initially held out, but its individual failures have repeatedly guided data and prompt changes. It is therefore an adaptive development set, not an untouched final test. The filename remains unchanged for compatibility; reports must call it `fresh_dev`.
 
@@ -22,6 +23,12 @@
 6. Run it once for the final report. Subsequent changes informed by its failures require a new blind-test version.
 
 The pending candidate is proactively included in train/RAFT leakage checks, but **must not be queried by a model** before approval and freeze.
+
+The frozen v1 release has SHA-256 `5ba916f8c9c1e78ceaaa160d3b6cf5557a697c12d847f50c63a89e7bb0e0793e`. Its manifest is `reports/blind_test_v1_frozen_manifest.json`; `evaluated=false` must remain unchanged until the single final run is intentionally started.
+
+The human partial-development slice has 20 approved rows and SHA-256 `785e21ee2fcd2d636fc24735ffe0f50f942602f37611f5ededf653ebb8f99aba`. It is development-only and must never be appended to QA train data or RAFT.
+
+Historical adapters are not compatible with this blind release. The v3.3 training RAFT exposed 43/45 answerable blind parent documents as distractor context. Before the one-shot evaluation, regenerate RAFT with zero blind parent/chunk overlap across **all** gold and distractor documents, then train a new adapter from the base model. Historical adapter results must not be included in the final blind comparison.
 
 ## Required reporting
 

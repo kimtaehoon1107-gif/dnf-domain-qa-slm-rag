@@ -18,6 +18,8 @@
 6. **RAFT 학습 데이터에서 gold 문서 위치가 항상 1번이면 모델이 "1등만 베끼는" 습관을 학습함.** 실측: `domain_raft_sample_expanded_gate_balanced.jsonl`의 citations 보유 279행 전부 gold가 documents[0]. 새 RAFT를 만들 때는 gold 위치를 반드시 랜덤화하고 gold 앞에도 distractor를 배치할 것.
 7. **`fresh_paraphrase_eval_set.jsonl`은 adaptive dev이며 학습에는 계속 금지.** 개별 실패가 반복적으로 모델/데이터 변경을 이끌었으므로 최종 blind 성능으로 부르지 말 것. `data/review/blind_test_v1_candidate.jsonl`은 사람 검수·freeze 전에는 검색/생성 평가도 금지하며 모든 학습 컨텍스트에서 제외할 것.
 8. **Hard negative는 answer-aware 필터가 필수.** gold/same-parent 제외만으로는 부족하다. 다른 부모 문서가 같은 사실을 반복해 valid evidence가 distractor로 들어갈 수 있으므로 exact `evidence_span` 및 높은 evidence-token overlap을 제거해야 한다. 미필터 arm은 실측상 거절은 좋아졌지만 exact citation을 크게 망쳤다.
+9. **blind 문서 누수는 gold/train QA만이 아니라 RAFT의 모든 context에서 검사.** 정답 문서가 distractor로 한 번이라도 학습에 들어가면 parent-document held-out가 깨진다. frozen blind를 평가할 모델은 base에서 새로 시작하고, gold+distractor 전체 기준 blind parent/chunk overlap `0`인 RAFT만 사용해야 한다.
+10. **계획한 마지막 step을 채웠다고 더 좋은 모델이 되는 것은 아니다.** clean step-264는 checkpoint-250보다 dev loss가 낮았지만 fresh/human Partial citation과 joint가 악화됐다. 완료 여부가 아니라 고정된 end-task dev gate로 checkpoint를 선택할 것.
 
 ## Repo Map (src/)
 

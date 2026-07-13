@@ -7,7 +7,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from mine_hard_negatives import filter_hard_negatives  # noqa: E402
+from mine_hard_negatives import (  # noqa: E402
+    filter_hard_negatives,
+    load_human_blocklist,
+    reusable_negative_row,
+)
 
 
 class HardNegativeFilterTests(unittest.TestCase):
@@ -66,6 +70,67 @@ class HardNegativeFilterTests(unittest.TestCase):
             max_evidence_token_recall=0.5,
         )
         self.assertEqual([row["doc_id"] for row in selected], ["safe"])
+
+    def test_excludes_human_rejected_pair(self) -> None:
+        hits = [
+            {"doc_id": "human_rejected", "rank": 1, "metadata": {"parent_doc_id": "p1"}},
+            {"doc_id": "safe", "rank": 2, "metadata": {"parent_doc_id": "p2"}},
+        ]
+        selected = filter_hard_negatives(
+            hits, set(), set(), set(), set(), limit=1, blocked_doc_ids={"human_rejected"}
+        )
+        self.assertEqual([row["doc_id"] for row in selected], ["safe"])
+
+    def test_loads_no_votes_from_review_csv(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "review.csv"
+            path.write_text(
+                "source_qa_id,negative_1_doc_id,negative_1_valid_non_answer,"
+                "negative_2_doc_id,negative_2_valid_non_answer,negative_3_doc_id,negative_3_valid_non_answer\n"
+                "qa_1,bad,no,good,yes,,\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(load_human_blocklist(path), {"qa_1": {"bad"}})
+
+    def test_reuse_requires_unchanged_question_and_unblocked_negatives(self) -> None:
+        existing = {
+            "question": "same",
+            "answerability": "true",
+            "gold_chunk_ids": ["gold"],
+            "gold_parent_ids": ["parent"],
+            "hard_negatives": [{"doc_id": "negative", "parent_doc_id": "negative_parent"}],
+        }
+        common = dict(
+            existing=existing,
+            gold_chunks={"gold"},
+            gold_parents={"parent"},
+            heldout_chunks=set(),
+            heldout_parents=set(),
+            negatives_per_row=1,
+        )
+        self.assertTrue(
+            reusable_negative_row(
+                qa_row={"question": "same", "answerability": "true"},
+                blocked_doc_ids=set(),
+                **common,
+            )
+        )
+        self.assertFalse(
+            reusable_negative_row(
+                qa_row={"question": "changed", "answerability": "true"},
+                blocked_doc_ids=set(),
+                **common,
+            )
+        )
+        self.assertFalse(
+            reusable_negative_row(
+                qa_row={"question": "same", "answerability": "true"},
+                blocked_doc_ids={"negative"},
+                **common,
+            )
+        )
 
 
 if __name__ == "__main__":
