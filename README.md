@@ -4,6 +4,8 @@ DNF Domain QA SLM/RAG v2 is a portfolio project for document-grounded Dungeon & 
 
 The goal is not to present a generic chatbot. The goal is to show a reproducible QA/RAG/SLM pipeline where unsupported questions can be refused and evidence quality can be measured.
 
+For a concise Korean portfolio narrative, architecture, final comparison, and honest release verdict, see [`PORTFOLIO_REPORT.md`](PORTFOLIO_REPORT.md).
+
 ## Latest Verified Status (2026-07-13)
 
 - Canonical retrieval is frozen at BGE-M3 + hybrid, `top_k=3`, `candidate_k=100`, chunk-only 900-character context, without reranker, parent window, or contextual prefix.
