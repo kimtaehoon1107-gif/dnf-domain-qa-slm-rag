@@ -5,6 +5,7 @@ __pycache__/
 outputs/chroma/
 outputs/chroma*/
 outputs/slm_lora*/
+outputs/resume_checkpoints*/
 outputs/*.json
 outputs/*.jsonl
 outputs/*.csv
