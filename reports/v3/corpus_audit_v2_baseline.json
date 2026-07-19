@@ -1,0 +1,256 @@
+{
+  "audit_version": "dnf_corpus_audit_v3.0",
+  "scope": "local_v2_artifacts_read_only",
+  "documents": {
+    "total": 188,
+    "guide_rows": 125,
+    "official_rows": 63,
+    "source_kind_counts": {
+      "account_policy": 5,
+      "event": 23,
+      "game_guide": 125,
+      "known_issue": 2,
+      "notice": 13,
+      "patch_note": 20
+    },
+    "legacy_doc_type_counts": {
+      "account_payment": 5,
+      "bug_known_issue": 2,
+      "event": 23,
+      "game_guide": 125,
+      "notice": 13,
+      "patch_note": 20
+    },
+    "official_section_counts": {
+      "event": 22,
+      "notice": 21,
+      "update": 20
+    },
+    "unique_document_ids": 188,
+    "missing_title": 0,
+    "missing_published_at": 44,
+    "missing_category": 111,
+    "guide_missing_category": 111,
+    "guide_missing_updated_at": 44,
+    "with_any_validity_range": 22,
+    "duplicate_text_group_count": 0,
+    "duplicate_text_row_count": 0,
+    "duplicate_text_groups": [],
+    "v3_direct_field_presence": {
+      "authority": 0,
+      "canonical_url": 0,
+      "category_path": 0,
+      "content_hash": 0,
+      "document_id": 0,
+      "fetched_at": 0,
+      "parser_version": 0,
+      "published_at": 144,
+      "raw_source_path": 0,
+      "revision_id": 0,
+      "source_kind": 0,
+      "source_snapshot_id": 0,
+      "status": 0,
+      "supersedes_document_id": 0,
+      "title": 188,
+      "valid_from": 0,
+      "valid_to": 0
+    }
+  },
+  "chunks": {
+    "total": 1307,
+    "unique_chunk_ids": 1307,
+    "parents_represented": 188,
+    "characters": {
+      "min": 17,
+      "median": 262.0,
+      "max": 1200
+    },
+    "under_100_characters": 192,
+    "under_200_characters": 504,
+    "empty_text": 0,
+    "chunks_per_parent": {
+      "min": 1,
+      "median": 4.0,
+      "max": 55
+    },
+    "missing_parent_doc_id": 0,
+    "missing_parent_doc_id_examples": [],
+    "orphan_chunk_count": 0,
+    "orphan_chunk_examples": [],
+    "with_valid_offsets": 0,
+    "duplicate_text_group_count": 11,
+    "duplicate_text_row_count": 31,
+    "duplicate_text_groups": [
+      {
+        "normalized_value_sha256": "076a61945bbba97e2de3c8c8ac1c338ff83a0f693a6c4209a083151708ce3e6b",
+        "row_count": 6,
+        "row_ids": [
+          "official_guide_1475__chunk_012",
+          "official_guide_1478__chunk_010",
+          "official_guide_1479__chunk_013",
+          "official_guide_1515__chunk_010",
+          "official_guide_1527__chunk_016",
+          "official_guide_1528__chunk_012"
+        ]
+      },
+      {
+        "normalized_value_sha256": "729ad73ea5cd2e03491b65d5dc6e5022c9b26174e0511d4a5a1d7478086b4291",
+        "row_count": 4,
+        "row_ids": [
+          "official_guide_1270__chunk_003",
+          "official_guide_1271__chunk_003",
+          "official_guide_1272__chunk_003",
+          "official_guide_1273__chunk_003"
+        ]
+      },
+      {
+        "normalized_value_sha256": "23243e05980afeba6ac8787cf0bb1889e699db4ed727666bf6343104621e406d",
+        "row_count": 4,
+        "row_ids": [
+          "official_guide_1475__chunk_005",
+          "official_guide_1478__chunk_005",
+          "official_guide_1479__chunk_005",
+          "official_guide_1527__chunk_004"
+        ]
+      },
+      {
+        "normalized_value_sha256": "b52e09de06b14ddbb507d8a4f3f72a3c54c0afa033ea4c8461e47804ea0580ba",
+        "row_count": 3,
+        "row_ids": [
+          "official_guide_1270__chunk_002",
+          "official_guide_1271__chunk_002",
+          "official_guide_1272__chunk_002"
+        ]
+      },
+      {
+        "normalized_value_sha256": "75606d537a04ddeb640e8f3669892835127bd14497de6bbf0ae638a0b141df74",
+        "row_count": 2,
+        "row_ids": [
+          "official_guide_1202__chunk_003",
+          "official_guide_1203__chunk_003"
+        ]
+      },
+      {
+        "normalized_value_sha256": "6adc363bb417c71716e19a93095ef8a263309e398b3a84893f942eb70dfd75d2",
+        "row_count": 2,
+        "row_ids": [
+          "official_guide_1478__chunk_004",
+          "official_guide_1479__chunk_004"
+        ]
+      },
+      {
+        "normalized_value_sha256": "cd0a5541494bca1955522f465fcd0052a18a1434da79da9e06a0f4ef428f004e",
+        "row_count": 2,
+        "row_ids": [
+          "official_guide_1489__chunk_008",
+          "official_guide_1489__chunk_018"
+        ]
+      },
+      {
+        "normalized_value_sha256": "2c29042a08b3e8e8ffd20dc2f592702fc77cda405445d123fddbaa32ebbff58c",
+        "row_count": 2,
+        "row_ids": [
+          "official_guide_1508__chunk_004",
+          "official_guide_1534__chunk_006"
+        ]
+      },
+      {
+        "normalized_value_sha256": "8ee20046110783f16834d97fc742f464f9f71ed9f957f6208910928318c43bac",
+        "row_count": 2,
+        "row_ids": [
+          "official_guide_1527__chunk_003",
+          "official_guide_1537__chunk_004"
+        ]
+      },
+      {
+        "normalized_value_sha256": "836825d46f022e6c16b6751df9932739037d7c076b5b66c182bc63028c1d4f21",
+        "row_count": 2,
+        "row_ids": [
+          "official_guide_1528__chunk_004",
+          "official_guide_1537__chunk_005"
+        ]
+      },
+      {
+        "normalized_value_sha256": "e264ec3bc639dfe15e116893594d8e3eebec079f2f9f60c5745cd9e22ec7792b",
+        "row_count": 2,
+        "row_ids": [
+          "official_guide_1534__chunk_026",
+          "official_guide_1534__chunk_047"
+        ]
+      }
+    ],
+    "v3_direct_field_presence": {
+      "chunk_id": 0,
+      "chunk_type": 0,
+      "chunker_version": 0,
+      "display_text": 0,
+      "end_offset": 0,
+      "entities": 0,
+      "heading_path": 0,
+      "parent_document_id": 0,
+      "retrieval_text": 0,
+      "start_offset": 0,
+      "token_count": 0,
+      "valid_from": 0,
+      "valid_to": 0
+    }
+  },
+  "issues": [
+    {
+      "severity": "not_measured",
+      "check": "source_discovery_coverage",
+      "count": null,
+      "detail": "수집 시점의 공식 사이트 URL 발견 목록이 없어 사이트 전체 대비 수집률을 계산할 수 없음"
+    },
+    {
+      "severity": "warning",
+      "check": "missing_document_category",
+      "count": 111,
+      "detail": "문서 유형별 category_path 보강 필요"
+    },
+    {
+      "severity": "warning",
+      "check": "missing_guide_updated_at",
+      "count": 44,
+      "detail": "가이드 revision 판정에 필요한 갱신일 누락"
+    },
+    {
+      "severity": "warning",
+      "check": "missing_validity",
+      "count": 166,
+      "detail": "valid_from/valid_to/status를 문서 유형별로 판정해야 함"
+    },
+    {
+      "severity": "warning",
+      "check": "duplicate_chunk_text",
+      "count": 31,
+      "detail": "동일 normalized text 청크가 여러 ID로 존재함"
+    },
+    {
+      "severity": "warning",
+      "check": "short_chunks_under_200",
+      "count": 504,
+      "detail": "고립 여부와 형제 병합 가능성 검토 필요"
+    },
+    {
+      "severity": "error",
+      "check": "missing_chunk_offsets",
+      "count": 1307,
+      "detail": "원문 위치 역추적 불가"
+    }
+  ],
+  "input_artifacts": [
+    {
+      "path": "data/raw/guide_docs.jsonl",
+      "sha256": "c1049eb0d8c1910d99abe6ad345af21b7820e5f3a483a6836342ad332daeb613"
+    },
+    {
+      "path": "data/raw/official_docs.jsonl",
+      "sha256": "4a9ad194cd3c285c2ffd4d61b29e9ca1422117b28a1759f7d354075f5869f307"
+    },
+    {
+      "path": "data/processed/domain_doc_chunks.jsonl",
+      "sha256": "40c4437034352331209430751a7568bc2da8620764587f65ae8a758a543ce3da"
+    }
+  ]
+}

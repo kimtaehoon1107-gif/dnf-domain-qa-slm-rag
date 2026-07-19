@@ -1,0 +1,198 @@
+{
+  "diagnostic_schema_version": "same-parent-cross-parent-diagnostic-v3.1",
+  "diagnostic_version": "same-parent-cross-parent-free-gate-v3.1.0",
+  "purpose": "round_4_pre_routing_free_label_diagnostic",
+  "evaluation_role": "adaptive_validation_diagnostic_only",
+  "inputs": {
+    "downgraded_canary": {
+      "path": "data/v3/evaluation/early_generalization_authored_canary_28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d.jsonl",
+      "sha256": "28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d"
+    },
+    "adaptive_dev": {
+      "path": "data/v3/evaluation/retrieval_dev_v3.1_b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978.jsonl",
+      "sha256": "b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978"
+    },
+    "stage_attribution": {
+      "path": "data/v3/evaluation/canary_stage_attribution_a132069a231a64225bfe78b86fbfa3e81dbc9cf9fc538df8469d5e33ef4dce35.jsonl",
+      "sha256": "a132069a231a64225bfe78b86fbfa3e81dbc9cf9fc538df8469d5e33ef4dce35"
+    },
+    "stage_attribution_manifest": {
+      "path": "data/v3/evaluation/canary_stage_attribution_manifest_9e25fe54e91bfd133febc44de355b5df7beab370153769196cc9cc905bb3251c.json",
+      "sha256": "9e25fe54e91bfd133febc44de355b5df7beab370153769196cc9cc905bb3251c"
+    },
+    "stage_attribution_contract": {
+      "path": "docs/v3/canary_stage_attribution.md",
+      "sha256": "4ac7c8b7c35f2a9f413eae1666ae518a5d74311bfe8796465b50a677039ec3c4"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    }
+  },
+  "precommitted_contract": {
+    "complex_question": "required_evidence_group_count >= 2",
+    "single_document_coverable": "the intersection of parent_document_id sets for all evidence groups is non-empty",
+    "cross_document": "the intersection of parent_document_id sets for all evidence groups is empty",
+    "primary_decision_population": "failed complex questions in ROUTING with expected decompose plus complex questions in CLAIM_COVERAGE",
+    "secondary_decision_population": "all complex questions in downgraded canary 32 plus adaptive dev 63",
+    "conflict_resolution": "if primary and secondary occupy different threshold bands, choose mixed",
+    "thresholds": {
+      "decomposition_track_stop_and_claim_coverage": "single_document_coverable_rate >= 0.80",
+      "keep_llm_decomposition": "single_document_coverable_rate <= 0.50",
+      "mixed": "0.50 < single_document_coverable_rate < 0.80"
+    }
+  },
+  "mapping_validation": {
+    "chunk_row_count": 3599,
+    "unique_chunk_id_count": 3599,
+    "missing_acceptable_chunk_id_count": 0,
+    "not_measured_complex_question_count": 0
+  },
+  "datasets": {
+    "downgraded_canary_32": {
+      "total_question_count": 32,
+      "complex_question_count": 17,
+      "single_document_coverable": {
+        "count": 15,
+        "rate": 0.88235294
+      },
+      "cross_document": {
+        "count": 2,
+        "rate": 0.11764706,
+        "same_source": 2,
+        "cross_source": 0
+      },
+      "source_involvement": [
+        {"source_id": "dnf_account_policy", "complex": 3, "same_parent": 2, "cross_parent": 1},
+        {"source_id": "dnf_event", "complex": 3, "same_parent": 3, "cross_parent": 0},
+        {"source_id": "dnf_faq", "complex": 2, "same_parent": 1, "cross_parent": 1},
+        {"source_id": "dnf_game_guide", "complex": 1, "same_parent": 1, "cross_parent": 0},
+        {"source_id": "dnf_monthly_item", "complex": 2, "same_parent": 2, "cross_parent": 0},
+        {"source_id": "dnf_notice", "complex": 1, "same_parent": 1, "cross_parent": 0},
+        {"source_id": "dnf_seria_shop", "complex": 3, "same_parent": 3, "cross_parent": 0},
+        {"source_id": "dnf_update", "complex": 2, "same_parent": 2, "cross_parent": 0}
+      ]
+    },
+    "adaptive_dev_63": {
+      "total_question_count": 63,
+      "complex_question_count": 4,
+      "single_document_coverable": {
+        "count": 0,
+        "rate": 0.0
+      },
+      "cross_document": {
+        "count": 4,
+        "rate": 1.0,
+        "same_source": 2,
+        "cross_source": 2
+      },
+      "source_involvement": [
+        {"source_id": "dnf_account_policy", "complex": 2, "same_parent": 0, "cross_parent": 2},
+        {"source_id": "dnf_faq", "complex": 2, "same_parent": 0, "cross_parent": 2},
+        {"source_id": "dnf_monthly_item", "complex": 1, "same_parent": 0, "cross_parent": 1},
+        {"source_id": "dnf_seria_shop", "complex": 1, "same_parent": 0, "cross_parent": 1}
+      ],
+      "source_involvement_note": "counts are not mutually exclusive for cross-source questions"
+    }
+  },
+  "failed_complex_cross_analysis": {
+    "routing_expected_decompose": {
+      "attribution_question_count": 9,
+      "complex_question_count": 9,
+      "single_document_coverable": {
+        "count": 7,
+        "rate": 0.77777778
+      },
+      "cross_document": {
+        "count": 2,
+        "rate": 0.22222222,
+        "same_source": 2,
+        "cross_source": 0
+      }
+    },
+    "claim_coverage": {
+      "attribution_question_count": 6,
+      "complex_question_count": 4,
+      "non_complex_question_count": 2,
+      "single_document_coverable": {
+        "count": 4,
+        "rate": 1.0
+      },
+      "cross_document": {
+        "count": 0,
+        "rate": 0.0,
+        "same_source": 0,
+        "cross_source": 0
+      },
+      "label_note": "two CLAIM_COVERAGE questions have one required evidence group and are excluded by the precommitted complex-question definition"
+    },
+    "combined_complex_only": {
+      "complex_question_count": 13,
+      "single_document_coverable": {
+        "count": 11,
+        "rate": 0.84615385
+      },
+      "cross_document": {
+        "count": 2,
+        "rate": 0.15384615,
+        "same_source": 2,
+        "cross_source": 0
+      },
+      "threshold_band": "decomposition_track_stop_and_claim_coverage"
+    },
+    "source_involvement": [
+      {"source_id": "dnf_account_policy", "complex": 2, "same_parent": 1, "cross_parent": 1},
+      {"source_id": "dnf_event", "complex": 2, "same_parent": 2, "cross_parent": 0},
+      {"source_id": "dnf_faq", "complex": 2, "same_parent": 1, "cross_parent": 1},
+      {"source_id": "dnf_game_guide", "complex": 1, "same_parent": 1, "cross_parent": 0},
+      {"source_id": "dnf_monthly_item", "complex": 2, "same_parent": 2, "cross_parent": 0},
+      {"source_id": "dnf_notice", "complex": 1, "same_parent": 1, "cross_parent": 0},
+      {"source_id": "dnf_seria_shop", "complex": 2, "same_parent": 2, "cross_parent": 0},
+      {"source_id": "dnf_update", "complex": 1, "same_parent": 1, "cross_parent": 0}
+    ]
+  },
+  "combined_all_complex": {
+    "complex_question_count": 21,
+    "single_document_coverable": {
+      "count": 15,
+      "rate": 0.71428571
+    },
+    "cross_document": {
+      "count": 6,
+      "rate": 0.28571429,
+      "same_source": 4,
+      "cross_source": 2
+    },
+    "threshold_band": "mixed"
+  },
+  "decision": {
+    "primary_failed_complex_band": "decomposition_track_stop_and_claim_coverage",
+    "secondary_all_complex_band": "mixed",
+    "final_pre_round_4_decision": "mixed",
+    "reason": "the precommitted conflict rule selects mixed because failed complex questions are 84.62 percent same-parent while all complex questions are 71.43 percent same-parent",
+    "round_4_direction": "use requirement-slot claim coverage for same-parent questions and reserve decomposition for cross-parent questions only",
+    "global_llm_decomposition": "NO-GO",
+    "claim_coverage_track": "GO_TO_DESIGN",
+    "cross_parent_only_decomposition_track": "CONDITIONAL_GO_TO_DESIGN"
+  },
+  "scope_confirmation": {
+    "router_code_changed": false,
+    "decomposition_code_changed": false,
+    "retrieval_code_changed": false,
+    "claim_code_changed": false,
+    "questions_or_gold_changed": false,
+    "new_canary_executed": false,
+    "model_or_embedding_or_search_executed": false,
+    "frozen_blind_accessed": false,
+    "raw_question_or_gold_text_in_report": false
+  },
+  "input_hash_verification": {
+    "checked_input_count": 6,
+    "mismatch_count": 0
+  },
+  "sample_limitations": [
+    "the adaptive dev set contains only four complex questions",
+    "the failed-complex primary population contains thirteen questions because two CLAIM_COVERAGE failures are non-complex under the required-evidence-group definition",
+    "source involvement counts can exceed question counts when a question names more than one source"
+  ]
+}

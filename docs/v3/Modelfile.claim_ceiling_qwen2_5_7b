@@ -1,0 +1,3 @@
+FROM qwen2.5:7b-instruct
+PARAMETER num_ctx 32768
+PARAMETER temperature 0

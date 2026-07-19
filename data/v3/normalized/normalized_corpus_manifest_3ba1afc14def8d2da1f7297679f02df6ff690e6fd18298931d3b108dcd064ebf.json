@@ -1,0 +1,92 @@
+{
+  "builder_version": "dnf_normalized_corpus_builder_v3.1",
+  "built_at": "2026-07-17T23:50:00+09:00",
+  "candidate_document_count": 979,
+  "contents": {
+    "path": "data/v3/normalized/document_contents_dnf_official_detail_v3.1_5fe50f7fcbd7adbf415bbb1f1ebb8ef3684f7b2c61ac2b2ace9d0e4365b3080e.jsonl",
+    "row_count": 980,
+    "sha256": "5fe50f7fcbd7adbf415bbb1f1ebb8ef3684f7b2c61ac2b2ace9d0e4365b3080e"
+  },
+  "corpus_name": "dnf_official_detail",
+  "documents": {
+    "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+    "row_count": 980,
+    "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+  },
+  "excluded_documents": [
+    {
+      "canonical_url": "https://df.nexon.com/df/pg/13th",
+      "effective_default_exposure": false,
+      "effective_status": "unavailable_redirect",
+      "reason": "canonical_detail_redirected_off_path",
+      "source_id": "dnf_event"
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/arcana",
+      "effective_default_exposure": false,
+      "effective_status": "unavailable_redirect",
+      "reason": "canonical_detail_redirected_off_path",
+      "source_id": "dnf_event"
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/crystalball",
+      "effective_default_exposure": false,
+      "effective_status": "unavailable_redirect",
+      "reason": "canonical_detail_redirected_off_path",
+      "source_id": "dnf_event"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "data/v3/normalized/documents_dnf_official_v3.0_c77299d729a6.jsonl",
+      "role": "baseline_document_v3",
+      "row_count": 188,
+      "sha256": "a202b31bbccf8433f7eb260ce14d449868c8e8815b42b19696468977b529daf3"
+    },
+    {
+      "path": "data/v3/visual_evidence/discovery_correction_overlay_0841fdad1f8c80dcda51036162b524ed4c7cf3cd31fb2bdb26a915cf77ddf61b.jsonl",
+      "role": "correction_overlay",
+      "row_count": 3,
+      "sha256": "0841fdad1f8c80dcda51036162b524ed4c7cf3cd31fb2bdb26a915cf77ddf61b"
+    },
+    {
+      "path": "data/v3/collections/detail_full_collection_ledger_0165b356041a60ca920949b9d8c4436cb7509bdf7787fe97fee90fb9856ce12b.jsonl",
+      "role": "detail_collection_ledger",
+      "row_count": 982,
+      "sha256": "0165b356041a60ca920949b9d8c4436cb7509bdf7787fe97fee90fb9856ce12b"
+    },
+    {
+      "path": "data/v3/collections/detail_hardened_extraction_preview_ac49a188c07ec22cc3265ebfa656f4849bfad3f5070779f538925e920fc4c4c8.jsonl",
+      "role": "hardened_preview",
+      "row_count": 982,
+      "sha256": "ac49a188c07ec22cc3265ebfa656f4849bfad3f5070779f538925e920fc4c4c8"
+    },
+    {
+      "path": "data/v3/raw_snapshots/raw_snapshot_guide_docs_v2_c1049eb0d8c1.jsonl",
+      "role": "preserved_baseline_raw_snapshot",
+      "row_count": 125,
+      "sha256": "c1049eb0d8c1910d99abe6ad345af21b7820e5f3a483a6836342ad332daeb613"
+    },
+    {
+      "path": "data/v3/discovery/source_registry_04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a.jsonl",
+      "role": "source_registry",
+      "row_count": 13214,
+      "sha256": "04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a"
+    },
+    {
+      "path": "data/v3/visual_evidence/visual_document_evidence_c7362de31d59ee1f0877477caa8c5d4848fdbdf40719b5c64cdb861c29469d38.jsonl",
+      "role": "visual_document_evidence",
+      "row_count": 18,
+      "sha256": "c7362de31d59ee1f0877477caa8c5d4848fdbdf40719b5c64cdb861c29469d38"
+    },
+    {
+      "path": "data/v3/visual_evidence/visual_evidence_manifest_ff585eb897627edd9bceae3f643fe5ac23904a07fcbed7b5fbe51cb59e64050b.json",
+      "role": "visual_evidence_manifest",
+      "row_count": null,
+      "sha256": "ff585eb897627edd9bceae3f643fe5ac23904a07fcbed7b5fbe51cb59e64050b"
+    }
+  ],
+  "manifest_id": "manifest_sha256_044726f26193b950904abdbca7c2fb36cfb04dd757765686725c576dc7fbd7f0",
+  "manifest_schema_version": "dnf_normalized_corpus_manifest_v3.1",
+  "preserved_baseline_revision_count": 1
+}
