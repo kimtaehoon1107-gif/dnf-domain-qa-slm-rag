@@ -480,3 +480,13 @@ RAFT/LoRA는 4번이 주요 병목으로 확인될 때만 진행한다.
 성공 기준은 “새 모델이 실행됨”이 아니라 다음이다.
 
 > 현재 코퍼스의 수집 범위와 품질 문제가 재현 가능한 보고서로 측정되고, v3 스키마 및 첫 A/B 실험의 변경 범위가 명확해진 상태.
+
+## 17. v3 재현성 기준선
+
+- v3 baseline commit: `f2508334691d38fe29ea58b6666a024fa4457ab3`
+- branch: `codex/rag-v3-corpus-foundation`
+- frozen on: `2026-07-20`
+- 범위: v3 코드·계약·테스트·보고서·canonical corpus·평가셋·사람 검수 기록
+- 제외: raw snapshot·visual asset·재생성 가능 index/collection·`.f32`·discovery JSONL
+- 제외된 원본과 재생성물은 삭제하지 않고 로컬 워킹트리와 사용자 별도 백업에 보존한다.
+- 향후 manifest의 source commit은 위 baseline commit을 기준으로 기록한다.
