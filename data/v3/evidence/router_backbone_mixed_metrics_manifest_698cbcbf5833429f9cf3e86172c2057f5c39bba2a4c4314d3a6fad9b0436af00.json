@@ -1,0 +1,64 @@
+{
+  "artifacts": {
+    "cases": {
+      "path": "data/v3/evidence/router_backbone_mixed_metrics_cases_72fdfde24b8001ea7ab9864b431d606eb40217f581a37bcaba1274b57e15170a.jsonl",
+      "row_count": 95,
+      "sha256": "72fdfde24b8001ea7ab9864b431d606eb40217f581a37bcaba1274b57e15170a"
+    },
+    "report": {
+      "path": "reports/v3/router_backbone_mixed_metrics_ab_b1cec58a5a0147f652dbf252d3e416360948a08109a65429324b2ea800945e4a.json",
+      "sha256": "b1cec58a5a0147f652dbf252d3e416360948a08109a65429324b2ea800945e4a"
+    },
+    "report_markdown": {
+      "path": "reports/v3/router_backbone_mixed_metrics_ab_bc8dda09b3cace406e5a17f874d1224730cf9281245310420905b4a845dcf884.md",
+      "sha256": "bc8dda09b3cace406e5a17f874d1224730cf9281245310420905b4a845dcf884"
+    }
+  },
+  "evaluator_version": "router-backbone-mixed-metrics-v3.2.0",
+  "input_hashes_unchanged": true,
+  "inputs": {
+    "adaptive_dev": {
+      "path": "data/v3/evaluation/retrieval_dev_v3.1_b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978.jsonl",
+      "sha256": "b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978"
+    },
+    "answerability_ground_truth": {
+      "path": "data/v3/evaluation/semantic_answerability_ground_truth_53cd8ae72ad4ee2f7c9b1d4370991ad74b5044d154e3657fd2008f45f71fe609.jsonl",
+      "sha256": "53cd8ae72ad4ee2f7c9b1d4370991ad74b5044d154e3657fd2008f45f71fe609"
+    },
+    "assembler_cases": {
+      "path": "data/v3/evidence/extractive_assembler_v3_chunk_diverse_cases_06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c.jsonl",
+      "sha256": "06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c"
+    },
+    "backbone_cases": {
+      "path": "data/v3/router/router_backbone_answer_source_ab_cases_41e3e5dd351fc3a6ad01113490a835ef380d00d047df71ee39e44603d5fbed39.jsonl",
+      "sha256": "41e3e5dd351fc3a6ad01113490a835ef380d00d047df71ee39e44603d5fbed39"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "contract": {
+      "path": "docs/v3/router_backbone_mixed_metrics.md",
+      "sha256": "e8657177477552ce8324651775155f339c7d52c98631e9430183e0061feb9d5b"
+    },
+    "downgraded_canary": {
+      "path": "data/v3/evaluation/early_generalization_authored_canary_28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d.jsonl",
+      "sha256": "28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d"
+    },
+    "enumeration": {
+      "path": "data/v3/evaluation/semantic_requirement_enumeration_495caba182115c2dbec6e846dca7c0809c4cb8a4de552ee1268440d254d2ba9c.jsonl",
+      "sha256": "495caba182115c2dbec6e846dca7c0809c4cb8a4de552ee1268440d254d2ba9c"
+    },
+    "evaluator_source": {
+      "path": "src/v3/evaluate_router_backbone_mixed_metrics.py",
+      "sha256": "53e8f83df6bd399ecdddb68f60a554533e20ba31c1d0d58f90e8f1a046456193"
+    },
+    "value_shape_source": {
+      "path": "src/v3/requirement_value_shape.py",
+      "sha256": "ea3969a349fe8b8dbe3b5e9f099a846890bf1fcd413addd6cd8ce95b580a09c9"
+    }
+  },
+  "manifest_schema_version": "router-backbone-mixed-metrics-manifest-v3.2",
+  "runtime_or_canonical_promoted": false,
+  "source_commit": "aad26a81fa241900f94b12e7a79c50207a38b7a8"
+}
