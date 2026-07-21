@@ -1,0 +1,295 @@
+{
+  "artifact_role": "v3_current_state_single_source",
+  "as_of": "2026-07-21",
+  "authority": {
+    "preserves_handoff_frozen_baseline_provenance": true,
+    "preserves_handoff_frozen_contract": true,
+    "preserves_long_term_goal": true,
+    "supersedes": "stale Cycle 1-7 status and ordering only",
+    "supersedes_entire_handoff": false
+  },
+  "capstone_schema_version": "v3_honest_ceiling_capstone_v1",
+  "current_verdict": {
+    "component_progress": "GO components exist",
+    "runtime": "NO_GO",
+    "summary": "Planner enumeration and the chunk-diverse exact assembler passed their development component gates, but false-full 9/82 docs cases and cross-parent trigger 0/2 keep the end-to-end runtime blocked."
+  },
+  "frozen_evidence": [
+    {
+      "id": "planner_enumeration_answerability_ab",
+      "manifest_path": "data/v3/evaluation/semantic_answerability_ab_manifest_d3e356a92c4c55e4e180b9b36c8aef50d84df085e439b14a6c8235869e51a59e.json",
+      "manifest_sha256": "d3e356a92c4c55e4e180b9b36c8aef50d84df085e439b14a6c8235869e51a59e",
+      "report_path": "reports/v3/planner_enumeration_answerability_ab_3e708a8d9f2352d58ed4a962b790d1269d65fad2249a835f8f04cf2e7a5ce006.json",
+      "report_sha256": "3e708a8d9f2352d58ed4a962b790d1269d65fad2249a835f8f04cf2e7a5ce006"
+    },
+    {
+      "id": "requirement_reranker_pilot",
+      "manifest_path": "data/v3/evidence/requirement_reranker_manifest_9d55090789cee5baebc026fc735658896807db73ef2076bcb3bbce61f67a70e4.json",
+      "manifest_sha256": "9d55090789cee5baebc026fc735658896807db73ef2076bcb3bbce61f67a70e4",
+      "report_path": "reports/v3/requirement_reranker_pilot_fb5241a1d4b07fc78606216598c470cb12ca09cc7376f399567bdb698bce3048.json",
+      "report_sha256": "fb5241a1d4b07fc78606216598c470cb12ca09cc7376f399567bdb698bce3048"
+    },
+    {
+      "id": "extractive_assembler_v3_chunk_diverse",
+      "manifest_path": "data/v3/evidence/extractive_assembler_v3_chunk_diverse_manifest_9db367b14a981bd05ba37d6029fc79a9e0e8606efc06221dd6eee117a38bc2b8.json",
+      "manifest_sha256": "9db367b14a981bd05ba37d6029fc79a9e0e8606efc06221dd6eee117a38bc2b8",
+      "report_path": "reports/v3/extractive_assembler_v3_chunk_diverse_aa202881ab98531442e80c5d75cf0c49ff06330f9c79cd6c4ee30125dcdf4f60.json",
+      "report_sha256": "aa202881ab98531442e80c5d75cf0c49ff06330f9c79cd6c4ee30125dcdf4f60"
+    },
+    {
+      "id": "answerability_execution_diagnostic",
+      "manifest_path": "data/v3/router/answerability_execution_manifest_67607bb1dd175b3b135ad3837293dcd8ed12bddb4d6f12ec114c4ca65514c98a.json",
+      "manifest_sha256": "67607bb1dd175b3b135ad3837293dcd8ed12bddb4d6f12ec114c4ca65514c98a",
+      "report_path": "reports/v3/answerability_execution_diagnostic_dd505e79c031f8f70f8b14f307323dfd8a344bc2905341562dc9b54e9e9ce637.json",
+      "report_sha256": "dd505e79c031f8f70f8b14f307323dfd8a344bc2905341562dc9b54e9e9ce637"
+    },
+    {
+      "id": "temporal_router",
+      "manifest_path": "data/v3/temporal/temporal_router_manifest_ea3d5d0df9021a0a9c2b623b5150244cc20383351daf958b526d83703b6c2be8.json",
+      "manifest_sha256": "ea3d5d0df9021a0a9c2b623b5150244cc20383351daf958b526d83703b6c2be8",
+      "report_path": "reports/v3/temporal_router_b9e9d595877bccbafb5cdc1666a2b15eae606ecdeba1d2b2f41f073e38902e26.json",
+      "report_sha256": "b9e9d595877bccbafb5cdc1666a2b15eae606ecdeba1d2b2f41f073e38902e26"
+    },
+    {
+      "id": "router_backbone_answer_source_ab",
+      "manifest_path": "data/v3/router/router_backbone_answer_source_ab_manifest_1dc7f770f17b5426ef434b8a10ecd7395b6705cb0cf9a4626bc4ca8527d81e29.json",
+      "manifest_sha256": "1dc7f770f17b5426ef434b8a10ecd7395b6705cb0cf9a4626bc4ca8527d81e29",
+      "report_path": "reports/v3/router_backbone_answer_source_ab_941c5b6295deda53664bdfa7cd3f5822cade6d5ef9136b6238acd00492e2d81b.json",
+      "report_sha256": "941c5b6295deda53664bdfa7cd3f5822cade6d5ef9136b6238acd00492e2d81b"
+    },
+    {
+      "id": "semantic_support_verifier_ab",
+      "manifest_path": "data/v3/evidence/semantic_support_verifier_manifest_d7fcbb9a3d488fde261ee76a790beb8676f73500ea1f6121889d411ee98d4001.json",
+      "manifest_sha256": "d7fcbb9a3d488fde261ee76a790beb8676f73500ea1f6121889d411ee98d4001",
+      "report_path": "reports/v3/semantic_support_verifier_ab_f76a137b79cec2ae1004a6b12ff8ad8b0c7b16d7d59b74faa2fb451723988358.json",
+      "report_sha256": "f76a137b79cec2ae1004a6b12ff8ad8b0c7b16d7d59b74faa2fb451723988358"
+    },
+    {
+      "id": "false_full_case_audit",
+      "manifest_path": "data/v3/evidence/false_full_audit_manifest_1830d97afd819836df95bdc0ddce2db9a09cbeab7ad7d8fbb8b77ebc4a4efab1.json",
+      "manifest_sha256": "1830d97afd819836df95bdc0ddce2db9a09cbeab7ad7d8fbb8b77ebc4a4efab1",
+      "report_path": "reports/v3/false_full_audit_8eb66f2bcc094a8b9f947d8cf242e14b4aa95d5f1bc2f6bbf8624289b842771e.json",
+      "report_sha256": "8eb66f2bcc094a8b9f947d8cf242e14b4aa95d5f1bc2f6bbf8624289b842771e"
+    }
+  ],
+  "human_report": {
+    "path": "reports/v3/v3_honest_ceiling_capstone_2444ff5d3949fd4075f5f657a99b8c24d7a635cf404a1a19321693bac59112a7.md",
+    "sha256": "2444ff5d3949fd4075f5f657a99b8c24d7a635cf404a1a19321693bac59112a7"
+  },
+  "investigated_architecture": [
+    "hybrid retrieval",
+    "semantic planner requirement enumeration",
+    "per-requirement candidate selection and reranking",
+    "chunk-diverse exact assembler",
+    "groundedness-based routing, partial answer, and abstain"
+  ],
+  "component_decisions": {
+    "answer_source_classifier": {
+      "decision": "NO_GO",
+      "evidence": {
+        "fixed_model_docs_false_negative_questions": 15,
+        "fixed_model_docs_false_negative_requirements": 24,
+        "fixed_model_docs_false_positive_questions": 1,
+        "fixed_model_docs_false_positive_requirements": 2,
+        "prompt_fix_consecutive_no_go_count": 3
+      },
+      "replacement_behavior": "high-precision mechanical reject plus honest unsupported abstain",
+      "runtime_promoted": false
+    },
+    "chunk_diverse_exact_assembler": {
+      "decision": "COMPONENT_GO",
+      "evidence": {
+        "combined_all_groups_baseline": "59/73",
+        "combined_all_groups_candidate": "73/73",
+        "combined_human_gold_baseline": "78/109",
+        "combined_human_gold_candidate": "93/109",
+        "evidence_group_regressions": 0,
+        "exact_slice_validity": "397/397",
+        "llm_calls": 0,
+        "malformed_outputs": 0,
+        "question_regressions": 0
+      },
+      "meaning": "eligible for a new sealed canary only",
+      "runtime_promoted": false
+    },
+    "groundedness_router_backbone": {
+      "decision": "DEVELOPMENT_GO_RUNTIME_NO_GO",
+      "evidence": {
+        "cross_parent_trigger": "0/2",
+        "docs_false_full": "9/82",
+        "docs_grounded_full": "73/82",
+        "docs_overreject": "0/82",
+        "realtime_safe_abstain": "2/2",
+        "reject_correct": "11/11"
+      },
+      "runtime_promoted": false
+    },
+    "planner_enumeration": {
+      "decision": "GO",
+      "directional_recall": {
+        "adaptive_dev_63": "approximately 98%",
+        "downgraded_canary_32": "approximately 90%"
+      },
+      "enumeration_prompt_sha256": "01ddcf34498276b4896f5c628f53fa874047e8a989b3a5df3e405bd43c87d948",
+      "enumeration_sha256": "495caba182115c2dbec6e846dca7c0809c4cb8a4de552ee1268440d254d2ba9c",
+      "excludes_answerable_from_docs_gate": true
+    },
+    "requirement_aware_selection": {
+      "decision": "NOT_A_STANDALONE_GO_BUT_NOT_THE_DOMINANT_BOTTLENECK",
+      "evidence": {
+        "all_groups_baseline": "73/75",
+        "all_groups_requirement_arm": "73/75",
+        "question_improvements": 2,
+        "question_regressions": 2,
+        "retrieval_bound_questions": 7
+      },
+      "integrated_path_status": "completed through the chunk-diverse exact assembler"
+    },
+    "semantic_support_verifier": {
+      "decision": "NO_GO",
+      "reason": "No threshold materially reduced false-full while preserving all 73 grounded answers.",
+      "runtime_promoted": false
+    },
+    "temporal_revision": {
+      "decision": "PARTIAL",
+      "evidence": {
+        "actual_current_cases": 6,
+        "authored_regression_cases": 11,
+        "authored_regression_errors": 0,
+        "non_current_leaks": 0
+      },
+      "limitations": [
+        "broad temporal router remains NO-GO",
+        "final temporal benchmark remains NO-GO",
+        "semantic citation support verifier remains NO-GO"
+      ]
+    }
+  },
+  "answerability_boundary": {
+    "candidate_count_less_than_2": {
+      "answerable_false_reject": "2/82",
+      "reject_recall": "9/11"
+    },
+    "candidate_count_zero": {
+      "answerable_false_reject": "0/82",
+      "reject_recall": "8/11"
+    },
+    "current_safe_behavior": "answer only requirements with exact supporting evidence; mark unsupported requirements as unavailable in official documents",
+    "realtime_at_zero_answerable_false_positive": "0/2 recovered",
+    "realtime_personal_classifier_status": "unresolved_and_not_promoted"
+  },
+  "false_full_attribution": {
+    "actual_errors": 9,
+    "forms": {
+      "unsupported_requirement_marked_full": 7,
+      "wrong_value_presented": 2
+    },
+    "measurement_artifacts": 0,
+    "severity": {
+      "catchable": 6,
+      "subtle": 3
+    },
+    "stages": {
+      "cross_parent_miss": 1,
+      "retrieval_miss": 6,
+      "wrong_attribute": 2
+    },
+    "true_post_retrieval_hardcore": 2
+  },
+  "principle": {
+    "statement": "Trust bounded enumeration and mechanical execution; do not trust semantic classification or free generation without a passed gate.",
+    "trusted": [
+      "atomic requirement enumeration",
+      "content-addressed inputs",
+      "deterministic reranking over existing candidates",
+      "verbatim offset slicing",
+      "per-requirement unsupported and partial marking"
+    ],
+    "untrusted_without_new_gate": [
+      "answer-source classification",
+      "small-model span copying or selection",
+      "single global semantic-support threshold",
+      "uncited free-form generation"
+    ]
+  },
+  "remaining_levers_not_executed": [
+    {
+      "case_count": 7,
+      "name": "requirement-targeted retrieval and parent coverage",
+      "source": "retrieval miss 6 plus cross-parent miss 1"
+    },
+    {
+      "case_count": 2,
+      "name": "sibling-attribute discrimination",
+      "source": "wrong-attribute cases"
+    },
+    {
+      "case_count": 2,
+      "name": "cross-parent route conclusion",
+      "status": "deferred because n=2"
+    }
+  ],
+  "roadmap": [
+    {
+      "cycle": "Long-term target",
+      "corrected_status": "VALID_UNCHANGED"
+    },
+    {
+      "cycle": "Cycle 1 Planner answerability FP=0",
+      "corrected_status": "ENUMERATION_GO_CLASSIFIER_NO_GO",
+      "note": "Replaced operationally by high-precision zero-candidate reject plus honest abstain; runtime remains NO-GO."
+    },
+    {
+      "cycle": "Cycle 2 Requirement-aware reranker",
+      "corrected_status": "COMPLETED_AS_INTEGRATED_SELECTION_AND_EXACT_ASSEMBLY_PATH",
+      "note": "Standalone reranker was not a GO; the chunk-diverse exact assembler passed with zero strict regression."
+    },
+    {
+      "cycle": "Cycle 3 Temporal and revision verifier",
+      "corrected_status": "PARTIAL",
+      "note": "Policy temporal router development GO; broad temporal route and final benchmark unfinished; semantic support verifier NO-GO."
+    },
+    {
+      "cycle": "Cycle 4 New sealed canary",
+      "corrected_status": "INCOMPLETE",
+      "note": "Frozen blind preserved and untouched; inspected canary is adaptive validation and cannot be reused as sealed."
+    },
+    {
+      "cycle": "Cycle 5 Extractive generator",
+      "corrected_status": "COMPONENT_LEVEL_EFFECTIVELY_COMPLETE",
+      "note": "Exact citation assembler with no free generation; end-to-end runtime still blocked by false-full."
+    },
+    {
+      "cycle": "Cycle 6 Productization",
+      "corrected_status": "INCOMPLETE"
+    },
+    {
+      "cycle": "Cycle 7 Final evaluation and optional training",
+      "corrected_status": "INCOMPLETE"
+    }
+  ],
+  "scope": {
+    "canonical_or_runtime_promotion": false,
+    "code_changes": false,
+    "frozen_blind_accessed": false,
+    "gold_label_question_changes": false,
+    "learning": false,
+    "new_measurement_or_model_execution": false
+  },
+  "source_commit": "734516899e7f12acd52329fc14a7678a002f535d",
+  "superseded_answerability_prompt_fix_lineage": [
+    {
+      "manifest_sha256": "b6dafd6f7f69b97bcc5835cfb2f6db1edf2668ba1210a217abd10b0cc42c50c1",
+      "report_sha256": "0b9bf330b17a3dd60be15b7c8f410cbdf14bee4a4dcaa45115b79307971d0692"
+    },
+    {
+      "manifest_sha256": "5f087ae1a6dd27589b71d5c3390ed2b9aa88ec4fe43cf414e39114fa247c818b",
+      "report_sha256": "69b761be44ddd2022ac40fdfa7c9529805b89c0350d448ac0f30bf7757d89608"
+    },
+    {
+      "manifest_sha256": "01a1374c6cceccafab72682766536136ca968d1c17c7d87bce59849c416831d9",
+      "report_sha256": "451f3777de8245a5c424cf8396ebbc5b39e423c85c330f36ebef93367b63d5ce"
+    }
+  ],
+  "title": "DNF official-document QA/RAG v3 honest ceiling capstone"
+}

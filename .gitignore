@@ -28,3 +28,6 @@ data/v3/discovery/*.jsonl
 
 # 잘못 배치된 로컬 Chroma 산출물 — 삭제·이동 없이 커밋에서 제외
 /src/outputs/
+
+# Reproducible v3 federated per-segment score dump (>20 MiB); keep locally.
+data/v3/evidence/federated_retrieval_ab_segment_scores_*.jsonl
