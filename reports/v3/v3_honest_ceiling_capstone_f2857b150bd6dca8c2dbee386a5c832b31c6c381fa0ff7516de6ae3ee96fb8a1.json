@@ -1,0 +1,370 @@
+{
+  "artifact_role": "v3_current_state_single_source",
+  "as_of": "2026-07-21",
+  "capstone_schema_version": "v3_honest_ceiling_capstone_v2",
+  "title": "DNF 공식 문서 QA/RAG v3 정직한 천장 캡스톤 갱신",
+  "source_commit": "f18717a326ca59078c50e5ea4e36ca0f019354f3",
+  "supersedes": {
+    "scope": "current status and roadmap only",
+    "prior_json_path": "reports/v3/v3_honest_ceiling_capstone_b3655a2478626c068aa8138ba65b7829b5fd8560dbf0214a12694828b940971e.json",
+    "prior_json_sha256": "b3655a2478626c068aa8138ba65b7829b5fd8560dbf0214a12694828b940971e",
+    "prior_md_path": "reports/v3/v3_honest_ceiling_capstone_2444ff5d3949fd4075f5f657a99b8c24d7a635cf404a1a19321693bac59112a7.md",
+    "prior_md_sha256": "2444ff5d3949fd4075f5f657a99b8c24d7a635cf404a1a19321693bac59112a7",
+    "prior_artifacts_preserved": true
+  },
+  "authority": {
+    "status": "FINAL_DOCUMENTATION_ONLY",
+    "new_measurement": false,
+    "new_execution": false,
+    "new_training": false,
+    "canonical_or_runtime_promotion": false,
+    "gold_label_question_changes": false,
+    "frozen_blind_accessed": false,
+    "interpretation": "프로즌 개발 결과를 통합한 현재 상태의 단일 출처이며 이론적 상한이나 최종 blind 성능이 아니다."
+  },
+  "current_verdict": {
+    "component_status": "planner enumeration and chunk-diverse exact assembler are GO",
+    "backbone_status": "development GO",
+    "runtime_status": "NO_GO",
+    "canonical_promotion": false,
+    "blocking_reason": "82개 답가능 개발 문항에서 false-full 9건이 남고 cross-parent 2건을 회수하지 못했다.",
+    "measured_ceiling": "approximately 9/82 false-full under the frozen small-model plus extractive-citation architecture"
+  },
+  "inherited_component_decisions": [
+    {
+      "component": "planner_enumeration",
+      "decision": "GO",
+      "evidence": "strong rematching directional recall 85-98%"
+    },
+    {
+      "component": "requirement_reranking_and_chunk_diverse_assembler",
+      "decision": "GO",
+      "evidence": "strict regression 0 and exact-slice validity 100%"
+    },
+    {
+      "component": "answer_source_classifier",
+      "decision": "NO_GO",
+      "evidence": "three failed approaches, including 24 answerable false negatives and FP/FN see-saw"
+    },
+    {
+      "component": "semantic_support_verifier",
+      "decision": "NO_GO",
+      "evidence": "no operating point reduced false-full while preserving all 73 grounded answers"
+    },
+    {
+      "component": "grounded_router_backbone",
+      "decision": "DEV_GO_RUNTIME_NO_GO",
+      "evidence": "grounded 73/82, false-full 9/82, reject 11/11, realtime safe-abstain 2/2, cross-parent 0/2"
+    }
+  ],
+  "post_capstone_updates": {
+    "requirement_query_retrieval": {
+      "decision": "NO_GO",
+      "baseline": {
+        "grounded": "73/82",
+        "false_full": "9/82"
+      },
+      "requirement_only": {
+        "retrieval_bound_recovered": "0/7",
+        "grounded": "63/82",
+        "false_full": "19/82"
+      },
+      "question_union_requirement": {
+        "retrieval_bound_recovered": "0/7",
+        "grounded": "64/82",
+        "false_full": "18/82"
+      },
+      "diagnosis": "6/7 had the gold source excluded by the frozen hard route; 1/7 was route-aligned but absent from top-10."
+    },
+    "federated_retrieval": {
+      "decision": "NO_GO",
+      "baseline": {
+        "grounded": "73/82",
+        "false_full": "9/82"
+      },
+      "quota_arm": {
+        "retrieval_bound_candidate_recovered": "5/7",
+        "grounded": "63/82",
+        "false_full": "19/82",
+        "reject": "11/11",
+        "realtime_safe_abstain": "2/2",
+        "temporal_revision_preview_expired_leaks": 0
+      },
+      "global_arm": {
+        "grounded": "63/82"
+      },
+      "conclusion": "hard source routing removal improved local recall but caused a net loss in strict grounded answers."
+    },
+    "federated_quota_regression_adjudication": {
+      "status": "PROVISIONAL_HUMAN_CONFIRMATION_PENDING",
+      "gross_cases": 17,
+      "classification_counts": {
+        "EQUIVALENT_OFFICIAL": 9,
+        "NAVIGATION_CONTAMINATION": 3,
+        "PERSONAL_SUBJECTIVE_LABEL": 1,
+        "PARTIAL_SUPPORT": 1,
+        "REAL_WRONG": 3
+      },
+      "strict": {
+        "grounded": "63/82",
+        "false_full": "19/82",
+        "original_acceptable_set_loss": 10
+      },
+      "provisional_if_all_equivalent_official_are_confirmed": {
+        "grounded": "72/82",
+        "false_full": "10/82"
+      },
+      "acceptable_siblings_applied": 0,
+      "gold_changes": 0,
+      "conclusion": "the gross 17 regressions were mostly strict-annotation effects, but the original acceptable-set loss of 10 remains under strict scoring."
+    },
+    "corpus_hygiene": {
+      "decision": "NO_GO",
+      "clean_corpus_sha256": "61d858ef5b7df3a3c157e65dba9dd6991f1daa74bbd2067f17b2438e1c01b5b8",
+      "chunks_total": 3599,
+      "retrieval_text_changed_chunks": 560,
+      "retrieval_text_characters_removed": 97081,
+      "integrity": {
+        "display_text_preserved": true,
+        "chunk_ids_preserved": true,
+        "citation_offsets_preserved": true,
+        "gold_mapping_preserved": true,
+        "gold_evidence_spans_exact": "396/396"
+      },
+      "before": {
+        "grounded": "73/82",
+        "false_full": "9/82",
+        "combined_evidence_group_candidate_recall": "96/109"
+      },
+      "after": {
+        "grounded": "72/82",
+        "false_full": "10/82",
+        "combined_evidence_group_candidate_recall": "95/109"
+      },
+      "navigation_cases": {
+        "targeted": 3,
+        "resolved": 1,
+        "remaining": 2,
+        "reason": "assembler citations still slice the preserved dirty display_text"
+      },
+      "candidate_depth_boundary_regression": "one gold candidate moved from rank 10 to rank 20 after global score-distribution changes",
+      "conclusion": "retrieval-text cleanup did not reduce the false-full ceiling without regression and is not a promotion lever."
+    }
+  },
+  "final_ceiling": {
+    "classification": "MEASURED_DEVELOPMENT_CEILING_NOT_THEORETICAL_UPPER_BOUND",
+    "frozen_baseline": {
+      "answerable_questions": 82,
+      "grounded": "73/82",
+      "false_full": "9/82",
+      "cross_parent_recovered": "0/2"
+    },
+    "orthogonal_no_go_levers": [
+      {
+        "lever": "semantic_support_verifier",
+        "reason": "false-full reduction conflicted with preserving grounded 73"
+      },
+      {
+        "lever": "requirement_query_retrieval",
+        "reason": "0/7 retrieval-bound recovery and substantial grounded regression"
+      },
+      {
+        "lever": "federated_retrieval",
+        "reason": "5/7 local recovery but grounded 73 to 63"
+      },
+      {
+        "lever": "corpus_retrieval_text_hygiene",
+        "reason": "grounded 73 to 72 and false-full 9 to 10"
+      }
+    ],
+    "residual_error_attribution": {
+      "retrieval_or_cross_parent_bound": 7,
+      "wrong_sibling_attribute": 2,
+      "measurement_artifact": 0,
+      "catchable_with_visible_citation": 6,
+      "subtle": 3
+    },
+    "architectural_principle": "Trust deterministic enumeration and execution; distrust weak-model classification and generation unless independently gated."
+  },
+  "future_work_v3_2": {
+    "execution_status": "NOT_EXECUTED",
+    "promotion_status": "NOT_PROMOTED",
+    "root_cause_hypothesis": "the citation source display_text remains contaminated, and flattened tables lose row-level attribute ownership",
+    "directions": [
+      "offset-preserving clean display/evidence view or citation-safe segment mask",
+      "row-level atomic table facts with explicit subject-attribute-value binding",
+      "all-source temporal and revision validity contract",
+      "duplicate-family modeling for equivalent official evidence",
+      "long-policy structure-aware rechunking",
+      "fresh pre-registered promotion gates before any runtime or canonical change"
+    ],
+    "design_comparisons_only": [
+      "TableRAG",
+      "VersionRAG",
+      "Contextual Retrieval",
+      "Databricks document-processing patterns",
+      "Azure document-intelligence patterns",
+      "Docling document-structure patterns"
+    ],
+    "disclaimer": "These are future design directions only; this capstone records no implementation, experiment, adoption, or promotion."
+  },
+  "roadmap_reconciliation": [
+    {
+      "legacy_cycle": "Cycle 1 Planner answerability FP=0",
+      "actual_status": "planner enumeration GO; answer-source classifier NO-GO; replaced by mechanical reject plus honest abstain"
+    },
+    {
+      "legacy_cycle": "Cycle 2 Requirement-aware reranker",
+      "actual_status": "complete; chunk-diverse exact assembler GO"
+    },
+    {
+      "legacy_cycle": "Cycle 3 Temporal/Revision verifier",
+      "actual_status": "partial; temporal router dev-GO, semantic citation-support verifier NO-GO"
+    },
+    {
+      "legacy_cycle": "Cycle 4 New sealed canary",
+      "actual_status": "incomplete; frozen blind preserved"
+    },
+    {
+      "legacy_cycle": "Cycle 5 Extractive Generator",
+      "actual_status": "functionally complete as exact extractive citation assembly; no free-form generation"
+    },
+    {
+      "legacy_cycle": "Cycle 6 Productization",
+      "actual_status": "incomplete"
+    },
+    {
+      "legacy_cycle": "Cycle 7 Final evaluation and optional training",
+      "actual_status": "incomplete"
+    }
+  ],
+  "frozen_evidence": [
+    {
+      "id": "planner_enumeration_answerability_ab",
+      "report_path": "reports/v3/planner_enumeration_answerability_ab_3e708a8d9f2352d58ed4a962b790d1269d65fad2249a835f8f04cf2e7a5ce006.json",
+      "report_sha256": "3e708a8d9f2352d58ed4a962b790d1269d65fad2249a835f8f04cf2e7a5ce006",
+      "manifest_path": "data/v3/evaluation/semantic_answerability_ab_manifest_d3e356a92c4c55e4e180b9b36c8aef50d84df085e439b14a6c8235869e51a59e.json",
+      "manifest_sha256": "d3e356a92c4c55e4e180b9b36c8aef50d84df085e439b14a6c8235869e51a59e"
+    },
+    {
+      "id": "requirement_reranker_pilot",
+      "report_path": "reports/v3/requirement_reranker_pilot_fb5241a1d4b07fc78606216598c470cb12ca09cc7376f399567bdb698bce3048.json",
+      "report_sha256": "fb5241a1d4b07fc78606216598c470cb12ca09cc7376f399567bdb698bce3048",
+      "manifest_path": "data/v3/evidence/requirement_reranker_manifest_9d55090789cee5baebc026fc735658896807db73ef2076bcb3bbce61f67a70e4.json",
+      "manifest_sha256": "9d55090789cee5baebc026fc735658896807db73ef2076bcb3bbce61f67a70e4"
+    },
+    {
+      "id": "extractive_assembler_v3_chunk_diverse",
+      "report_path": "reports/v3/extractive_assembler_v3_chunk_diverse_aa202881ab98531442e80c5d75cf0c49ff06330f9c79cd6c4ee30125dcdf4f60.json",
+      "report_sha256": "aa202881ab98531442e80c5d75cf0c49ff06330f9c79cd6c4ee30125dcdf4f60",
+      "manifest_path": "data/v3/evidence/extractive_assembler_v3_chunk_diverse_manifest_9db367b14a981bd05ba37d6029fc79a9e0e8606efc06221dd6eee117a38bc2b8.json",
+      "manifest_sha256": "9db367b14a981bd05ba37d6029fc79a9e0e8606efc06221dd6eee117a38bc2b8"
+    },
+    {
+      "id": "answerability_execution_diagnostic",
+      "report_path": "reports/v3/answerability_execution_diagnostic_dd505e79c031f8f70f8b14f307323dfd8a344bc2905341562dc9b54e9e9ce637.json",
+      "report_sha256": "dd505e79c031f8f70f8b14f307323dfd8a344bc2905341562dc9b54e9e9ce637",
+      "manifest_path": "data/v3/router/answerability_execution_manifest_67607bb1dd175b3b135ad3837293dcd8ed12bddb4d6f12ec114c4ca65514c98a.json",
+      "manifest_sha256": "67607bb1dd175b3b135ad3837293dcd8ed12bddb4d6f12ec114c4ca65514c98a"
+    },
+    {
+      "id": "temporal_router",
+      "report_path": "reports/v3/temporal_router_b9e9d595877bccbafb5cdc1666a2b15eae606ecdeba1d2b2f41f073e38902e26.json",
+      "report_sha256": "b9e9d595877bccbafb5cdc1666a2b15eae606ecdeba1d2b2f41f073e38902e26",
+      "manifest_path": "data/v3/temporal/temporal_router_manifest_ea3d5d0df9021a0a9c2b623b5150244cc20383351daf958b526d83703b6c2be8.json",
+      "manifest_sha256": "ea3d5d0df9021a0a9c2b623b5150244cc20383351daf958b526d83703b6c2be8"
+    },
+    {
+      "id": "router_backbone_answer_source_ab",
+      "report_path": "reports/v3/router_backbone_answer_source_ab_941c5b6295deda53664bdfa7cd3f5822cade6d5ef9136b6238acd00492e2d81b.json",
+      "report_sha256": "941c5b6295deda53664bdfa7cd3f5822cade6d5ef9136b6238acd00492e2d81b",
+      "manifest_path": "data/v3/router/router_backbone_answer_source_ab_manifest_1dc7f770f17b5426ef434b8a10ecd7395b6705cb0cf9a4626bc4ca8527d81e29.json",
+      "manifest_sha256": "1dc7f770f17b5426ef434b8a10ecd7395b6705cb0cf9a4626bc4ca8527d81e29"
+    },
+    {
+      "id": "semantic_support_verifier_ab",
+      "report_path": "reports/v3/semantic_support_verifier_ab_f76a137b79cec2ae1004a6b12ff8ad8b0c7b16d7d59b74faa2fb451723988358.json",
+      "report_sha256": "f76a137b79cec2ae1004a6b12ff8ad8b0c7b16d7d59b74faa2fb451723988358",
+      "manifest_path": "data/v3/evidence/semantic_support_verifier_manifest_d7fcbb9a3d488fde261ee76a790beb8676f73500ea1f6121889d411ee98d4001.json",
+      "manifest_sha256": "d7fcbb9a3d488fde261ee76a790beb8676f73500ea1f6121889d411ee98d4001"
+    },
+    {
+      "id": "false_full_case_audit",
+      "report_path": "reports/v3/false_full_audit_8eb66f2bcc094a8b9f947d8cf242e14b4aa95d5f1bc2f6bbf8624289b842771e.json",
+      "report_sha256": "8eb66f2bcc094a8b9f947d8cf242e14b4aa95d5f1bc2f6bbf8624289b842771e",
+      "manifest_path": "data/v3/evidence/false_full_audit_manifest_1830d97afd819836df95bdc0ddce2db9a09cbeab7ad7d8fbb8b77ebc4a4efab1.json",
+      "manifest_sha256": "1830d97afd819836df95bdc0ddce2db9a09cbeab7ad7d8fbb8b77ebc4a4efab1"
+    },
+    {
+      "id": "requirement_retrieval_ab",
+      "report_path": "reports/v3/requirement_retrieval_ab_ff945c4b87b691b248ced8a3541ba53cd025f41183dd03de5dddf00ae8b45cd9.json",
+      "report_sha256": "ff945c4b87b691b248ced8a3541ba53cd025f41183dd03de5dddf00ae8b45cd9",
+      "manifest_path": "data/v3/retrieval/requirement_retrieval_ab_manifest_40fc2122cb462f97ac930f201e817e7784c4c17a5be07485e2b244d926597788.json",
+      "manifest_sha256": "40fc2122cb462f97ac930f201e817e7784c4c17a5be07485e2b244d926597788"
+    },
+    {
+      "id": "federated_retrieval_ab",
+      "report_path": "reports/v3/federated_retrieval_ab_0e48bfbc2d69d6b524b98b83c79d0ff296540ba05374e72cd1ec6f0616a5172c.json",
+      "report_sha256": "0e48bfbc2d69d6b524b98b83c79d0ff296540ba05374e72cd1ec6f0616a5172c",
+      "manifest_path": "data/v3/retrieval/federated_retrieval_ab_manifest_34b38c3cdbc58be3def5828c157833e4a7726a5ee2ccfca32512f0a1326cc856.json",
+      "manifest_sha256": "34b38c3cdbc58be3def5828c157833e4a7726a5ee2ccfca32512f0a1326cc856"
+    },
+    {
+      "id": "federated_quota_regression_adjudication",
+      "report_path": "reports/v3/federated_quota_regression_adjudication_a679323c737c45ca15dbe42b8e9584d936869833638689432ebfdfb291c45919.json",
+      "report_sha256": "a679323c737c45ca15dbe42b8e9584d936869833638689432ebfdfb291c45919",
+      "manifest_path": "data/v3/evaluation/federated_quota_regression_adjudication_manifest_a60c98e15d0a5b6290accdab67f1b8f5d57e49c5c0c54a844639a3309798547a.json",
+      "manifest_sha256": "a60c98e15d0a5b6290accdab67f1b8f5d57e49c5c0c54a844639a3309798547a"
+    },
+    {
+      "id": "corpus_hygiene_remeasurement",
+      "report_path": "reports/v3/corpus_hygiene_remeasurement_7cd274672459e64f083f90bae819729a6f43515e17ed476e3d25e473012708c4.json",
+      "report_sha256": "7cd274672459e64f083f90bae819729a6f43515e17ed476e3d25e473012708c4",
+      "manifest_path": "data/v3/chunks/corpus_hygiene_remeasurement_manifest_3278ffeb6897bf3d4ffa2f0f27457787ce8f095a26f09552f7e0e27246edeab4.json",
+      "manifest_sha256": "3278ffeb6897bf3d4ffa2f0f27457787ce8f095a26f09552f7e0e27246edeab4"
+    },
+    {
+      "id": "corpus_hygiene_no_go_diagnostic",
+      "report_path": "reports/v3/corpus_hygiene_no_go_diagnostic_92ba266fbe2d4682f7559d3a321be2c3888828413005688d69787b1fdcebf37d.json",
+      "report_sha256": "92ba266fbe2d4682f7559d3a321be2c3888828413005688d69787b1fdcebf37d",
+      "manifest_path": "data/v3/chunks/corpus_hygiene_no_go_manifest_4f261e6f1af8964c24239054cb03f03655affa42aa186be5ca49978dc4c0a54b.json",
+      "manifest_sha256": "4f261e6f1af8964c24239054cb03f03655affa42aa186be5ca49978dc4c0a54b"
+    },
+    {
+      "id": "corpus_retrieval_hygiene_contract",
+      "report_path": "docs/v3/corpus_retrieval_hygiene.md",
+      "report_sha256": "878252d03ac5b78a83a7dfa884278e8948dd4c490554d917d404271b2efd52f6",
+      "manifest_path": null,
+      "manifest_sha256": null
+    }
+  ],
+  "human_report": {
+    "path": "reports/v3/v3_honest_ceiling_capstone_628a9abf5fb8c3177766274e5c134ad24c8605f1bd293911553e057f48d9f32f.md",
+    "sha256": "628a9abf5fb8c3177766274e5c134ad24c8605f1bd293911553e057f48d9f32f"
+  },
+  "lineage_inputs": [
+    {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    {
+      "path": "data/v3/evaluation/retrieval_dev_v3.1_b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978.jsonl",
+      "sha256": "b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978"
+    },
+    {
+      "path": "data/v3/evaluation/early_generalization_authored_canary_28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d.jsonl",
+      "sha256": "28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d"
+    }
+  ],
+  "preservation": {
+    "prior_capstones_deleted": false,
+    "dirty_canonical_deleted": false,
+    "clean_derived_corpus_deleted": false,
+    "failed_and_no_go_artifacts_deleted": false,
+    "future_work_execution_performed": false
+  }
+}

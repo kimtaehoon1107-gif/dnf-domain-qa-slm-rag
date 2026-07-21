@@ -949,6 +949,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--root", type=Path, default=root)
     parser.add_argument("--canary", type=Path, default=DEFAULT_CANARY)
     parser.add_argument("--canary-manifest", type=Path, default=DEFAULT_CANARY_MANIFEST)
+    parser.add_argument("--documents", type=Path, default=DEFAULT_DOCUMENTS)
+    parser.add_argument("--chunks", type=Path, default=DEFAULT_CHUNKS)
+    parser.add_argument("--bm25-manifest", type=Path, default=DEFAULT_BM25_MANIFEST)
+    parser.add_argument("--dense-manifest", type=Path, default=DEFAULT_DENSE_MANIFEST)
     parser.add_argument("--device", choices=("cpu", "cuda"))
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--full-query-embeddings", type=Path)
@@ -965,6 +969,10 @@ def main() -> None:
         root=args.root,
         canary_path=args.canary,
         canary_manifest_path=args.canary_manifest,
+        documents_path=args.documents,
+        chunks_path=args.chunks,
+        bm25_manifest_path=args.bm25_manifest,
+        dense_manifest_path=args.dense_manifest,
         device=args.device,
         batch_size=args.batch_size,
         full_query_embeddings_path=args.full_query_embeddings,
