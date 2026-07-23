@@ -62,6 +62,39 @@ def test_duration_and_cost_resource_quantity_are_supported_shapes() -> None:
     assert "quantity" in shapes
 
 
+def test_dated_range_counts_as_a_duration() -> None:
+    assert "duration" in detect_value_shapes("판매기간: 06.25 ~ 07.30")
+    assert "duration" in detect_value_shapes("2026.06.25 ~ 2026.07.30")
+    requirement = {
+        "requirement_id": "requirement_1",
+        "subject": "7월 이달의 아이템",
+        "relation": "판매 기간",
+        "value_type": "duration",
+    }
+    _, audit = apply_value_shape_veto(
+        requirement, _decision("판매기간: 06.25 ~ 07.30")
+    )
+    assert not audit["vetoed"]
+
+
+def test_unbounded_term_counts_as_a_duration() -> None:
+    requirement = {
+        "requirement_id": "requirement_1",
+        "subject": "타인_결제수단_도용",
+        "relation": "첫_이용제한",
+        "value_type": "duration",
+    }
+    _, audit = apply_value_shape_veto(
+        requirement,
+        _decision("| 결제도용 가해 (타인의 결제 수단 무단도용) | 영구 게임 이용제한 |"),
+    )
+    assert not audit["vetoed"]
+
+
+def test_a_single_date_is_still_not_a_duration() -> None:
+    assert "duration" not in detect_value_shapes("2026년 7월 30일 06시에 삭제됩니다")
+
+
 def test_ambiguous_text_or_amount_has_no_veto_contract() -> None:
     text_requirement = {"relation": "주의사항", "value_type": "text"}
     amount_requirement = {"relation": "unknown_amount", "value_type": "amount"}

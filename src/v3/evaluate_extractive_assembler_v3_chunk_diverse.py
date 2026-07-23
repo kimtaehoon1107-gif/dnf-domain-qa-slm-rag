@@ -33,6 +33,10 @@ from src.v3.evaluate_extractive_assembler import (
 )
 from src.v3.evaluate_extractive_assembler_v2 import aggregate_v2, score_cases_v2
 from src.v3.evaluate_extractive_assembler_v3 import THRESHOLDS
+from src.v3.requirement_value_shape import (
+    detect_value_shapes,
+    normalize_expected_value_shape,
+)
 
 
 EVALUATOR_VERSION = "mechanical-chunk-diverse-assembler-v3.5"
@@ -71,17 +75,38 @@ DEFAULT_CONTRACT = Path(
 )
 
 
-def _ranked(requirement: dict[str, Any]) -> list[dict[str, Any]]:
-    return sorted(
-        requirement["candidates"],
-        key=lambda row: (
+def _ranked(
+    score: dict[str, Any], *, expected_kind: str | None = None
+) -> list[dict[str, Any]]:
+    """Rank candidates by reranker score, optionally floating value-bearing spans first.
+
+    ``expected_kind`` of None reproduces the score-only order exactly. When set, a
+    candidate whose text carries the requirement's value shape outranks one that does
+    not, so the shape contract selects evidence instead of only rejecting it later.
+
+    Ranking additionally by subject alignment was measured and reverted: the surface
+    matcher does not strip Korean particles, so "마일리지샵을" misses "마일리지샵" while a
+    bare "2026.04.30 06:00" matches on "2026". It scored real prose evidence below
+    stray timestamps and destroyed 3 correct answers for no gain.
+    """
+
+    def sort_key(row: dict[str, Any]) -> tuple[Any, ...]:
+        missing_value = (
+            0
+            if expected_kind is None
+            or expected_kind in detect_value_shapes(str(row.get("text") or ""))
+            else 1
+        )
+        return (
+            missing_value,
             -float(row["reranker_score"]),
             row["chunk_id"],
             int(row["start_char"]),
             int(row["end_char"]),
             row["span_id"],
-        ),
-    )
+        )
+
+    return sorted(score["candidates"], key=sort_key)
 
 
 def assemble_chunk_diverse_configuration(
@@ -90,6 +115,7 @@ def assemble_chunk_diverse_configuration(
     *,
     threshold: float,
     k: int,
+    value_first: bool = False,
 ) -> list[dict[str, Any]]:
     scores_by_id = {row["case_id"]: row for row in score_rows}
     output = []
@@ -101,9 +127,18 @@ def assemble_chunk_diverse_configuration(
         decisions = []
         for index, requirement in enumerate(case["requirements"], 1):
             score = requirement_scores.get(index)
+            expected_kind = (
+                normalize_expected_value_shape(requirement)["expected_kind"]
+                if value_first
+                else None
+            )
             selected = []
             seen_chunks: set[str] = set()
-            for candidate in _ranked(score) if score is not None else []:
+            for candidate in (
+                _ranked(score, expected_kind=expected_kind)
+                if score is not None
+                else []
+            ):
                 if float(candidate["reranker_score"]) < threshold:
                     continue
                 if candidate["chunk_id"] in seen_chunks:
@@ -157,7 +192,9 @@ def assemble_chunk_diverse_configuration(
                 "dataset": case["dataset"],
                 "threshold": threshold,
                 "k": k,
-                "selection_strategy": "top_k_distinct_chunks_per_requirement",
+                "selection_strategy": "value_first_top_k_distinct_chunks_per_requirement"
+                if value_first
+                else "top_k_distinct_chunks_per_requirement",
                 "decisions": decisions,
             }
         )

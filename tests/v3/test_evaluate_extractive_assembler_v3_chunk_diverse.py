@@ -114,6 +114,42 @@ class ChunkDiverseAssemblerTest(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual(len(first[0]), len(THRESHOLDS) * len(K_VALUES))
 
+    def test_value_first_prefers_the_span_carrying_the_required_shape(self) -> None:
+        # s1 outranks s3 on reranker score but carries no price; the 가격 requirement
+        # expects cost_value, so value-first must reach past the higher-scoring header.
+        default = assemble_chunk_diverse_configuration(
+            [_case()], _scores(), threshold=0.001, k=1
+        )
+        value_first = assemble_chunk_diverse_configuration(
+            [_case()], _scores(), threshold=0.001, k=1, value_first=True
+        )
+        self.assertEqual(
+            [row["span_id"] for row in default[0]["decisions"][0]["spans"]], ["s1"]
+        )
+        self.assertEqual(
+            [row["span_id"] for row in value_first[0]["decisions"][0]["spans"]], ["s3"]
+        )
+
+    def test_value_first_off_leaves_selection_untouched(self) -> None:
+        explicit_off = assemble_chunk_diverse_configuration(
+            [_case()], _scores(), threshold=0.001, k=2, value_first=False
+        )
+        default = assemble_chunk_diverse_configuration(
+            [_case()], _scores(), threshold=0.001, k=2
+        )
+        self.assertEqual(explicit_off, default)
+
+    def test_value_first_never_selects_below_threshold_candidates(self) -> None:
+        scores = _scores()
+        scores[0]["requirements"][0]["candidates"][2]["reranker_score"] = 0.0
+        assembled = assemble_chunk_diverse_configuration(
+            [_case()], scores, threshold=0.001, k=1, value_first=True
+        )
+        # s3 carries the price but no longer clears the threshold, so it stays out.
+        self.assertEqual(
+            [row["span_id"] for row in assembled[0]["decisions"][0]["spans"]], ["s1"]
+        )
+
     def test_gold_fields_do_not_influence_selection(self) -> None:
         original = _case()
         changed = _case()

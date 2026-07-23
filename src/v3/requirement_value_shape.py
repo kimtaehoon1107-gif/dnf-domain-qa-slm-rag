@@ -5,7 +5,7 @@ import re
 from typing import Any
 
 
-VALUE_SHAPE_VERSION = "requirement-value-shape-v3.2.0"
+VALUE_SHAPE_VERSION = "requirement-value-shape-v3.3.0"
 
 # These markers are applied only to the planner's normalized relation label. They
 # are not question-intent routing rules and never turn evidence into support.
@@ -58,6 +58,14 @@ _CLOCK_RE = re.compile(
 _DURATION_RE = re.compile(
     rf"(?<![\d.]){_NUMBER}\s*(?:년|개월|달|주|일|시간|분|초)(?!\s*[월일:])"
 )
+# A period can also be written without a number+unit pair: as a dated range
+# ("06.25 ~ 07.30") or as an unbounded term ("영구"). Both are checked on the raw
+# text because _mask_calendar_and_clock would erase the range endpoints.
+_DATE_TOKEN = r"(?:\d{4}\s*[년./-]\s*)?\d{1,2}\s*[월./-]\s*\d{1,2}\s*일?"
+_DATE_RANGE_RE = re.compile(
+    rf"{_DATE_TOKEN}[^~\n]{{0,25}}~[^~\n]{{0,25}}{_DATE_TOKEN}"
+)
+_UNBOUNDED_DURATION_RE = re.compile(r"영구")
 _CURRENCY_RE = re.compile(
     rf"(?<![\d.]){_NUMBER}\s*(?:만|억)?\s*(?:골드|세라|원|마일리지|코인)"
 )
@@ -138,6 +146,8 @@ def detect_value_shapes(text: str) -> set[str]:
         shapes.add("calendar_date")
     if _CLOCK_RE.search(text):
         shapes.add("clock_or_datetime")
+    if _DATE_RANGE_RE.search(text) or _UNBOUNDED_DURATION_RE.search(text):
+        shapes.add("duration")
 
     non_timestamp = _mask_calendar_and_clock(text)
     if _DURATION_RE.search(non_timestamp):

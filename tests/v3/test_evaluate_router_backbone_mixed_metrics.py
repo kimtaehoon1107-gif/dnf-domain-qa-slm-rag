@@ -15,6 +15,7 @@ from src.v3.evaluate_router_backbone_mixed_metrics import (
     docs_requirement_split,
     legacy_proxy,
     score_mixed_case,
+    summarize_generation_ab,
     summarize_two_axis,
 )
 
@@ -137,10 +138,56 @@ def test_integration_reproduces_frozen_two_axis() -> None:
         == 73
     )
     # Span-value strict is the honest docs-only grounding: strictly below the chunk count.
-    assert docs["docs_only_grounded_span_strict"]["successes"] == 45
+    # Was 45 under requirement-value-shape-v3.2.0, which recognised a duration only as a
+    # number+unit pair and so wrongly vetoed "06.25 ~ 07.30" and "영구". v3.3.0 reads both,
+    # recovering exactly those two requirements. No other axis moves.
+    assert docs["docs_only_grounded_span_strict"]["successes"] == 47
     assert docs["docs_only_grounded_span_strict"]["successes"] < docs["docs_only_grounded"]["successes"]
     # Legacy false_full 9 splits into docs-only 8 and one mixed missing-evidence.
     assert docs["docs_only_false_full"]["successes"] == 8
     assert mixed["mixed_missing_evidence"]["successes"] == 1
     assert two["reject_correct"]["successes"] == 11
     assert two["realtime_safe_abstain"]["successes"] == 2
+
+
+def test_generation_summary_separates_verified_text_from_grounding() -> None:
+    score = {
+        "grounded_answer": True,
+        "false_full_answer": False,
+        "false_partial": False,
+        "honest_partial": False,
+        "answerable_overreject": False,
+        "reject_correct": False,
+        "realtime_safe_abstain": False,
+    }
+    rows = [
+        {
+            "case_id": "case_table",
+            "answerability_profile": "docs_only",
+            "answerability_target": "answerable_docs",
+            "off": {
+                "arm": {"response_mode": "full_answer"},
+                "score": score,
+                "docs_value_complete": True,
+                "mixed_metrics": {},
+                "cost_relation_veto_count": 0,
+            },
+            "on": {
+                "generation": {
+                    "mode": "generated",
+                    "used_generated_text": True,
+                },
+                "axes_unchanged_from_off": True,
+                "gold_value_scoreable": True,
+                "gold_value_complete": True,
+                "selected_table_value_count": 4,
+            },
+        }
+    ]
+
+    summary = summarize_generation_ab(rows)
+
+    assert summary["generation_on"]["verified_generated"]["successes"] == 1
+    assert summary["generation_on"]["grounded_and_generated"]["successes"] == 1
+    assert summary["generation_on"]["false_full_and_generated"]["successes"] == 0
+    assert summary["generation_on"]["table"]["verified_generated"]["successes"] == 1
