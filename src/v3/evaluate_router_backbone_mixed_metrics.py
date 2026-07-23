@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
+import os
 import subprocess
 import sys
+import time
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -16,12 +19,17 @@ from src.io_utils import read_jsonl
 from src.v3.build_corpus import file_sha256
 from src.v3.collect_details import _canonical_json_bytes, _serialize_jsonl, write_immutable
 from src.v3.evaluate_router_backbone_ab import _score_arm, simulate_arm
+from src.v3.grounded_answer_generator import (
+    apply_table_value_shape_gate,
+    extract_factual_tokens,
+)
 from src.v3.requirement_value_shape import VALUE_SHAPE_VERSION, apply_value_shape_veto
 
 EVALUATOR_VERSION = "router-backbone-mixed-metrics-v3.2.0"
 CASE_SCHEMA_VERSION = "router-backbone-mixed-metrics-case-v3.2"
 REPORT_SCHEMA_VERSION = "router-backbone-mixed-metrics-report-v3.2"
 MANIFEST_SCHEMA_VERSION = "router-backbone-mixed-metrics-manifest-v3.2"
+GENERATION_AB_VERSION = "router-backbone-generation-ab-v1"
 
 DEFAULT_GROUND_TRUTH = Path(
     "data/v3/evaluation/semantic_answerability_ground_truth_"
@@ -285,6 +293,326 @@ def build_case_rows(
     return output
 
 
+def _compact(value: Any) -> str:
+    return "".join(str(value or "").split())
+
+
+def build_fixed_backbone_generation_rows(
+    *,
+    ground_truth_rows: list[dict[str, Any]],
+    enumeration_rows: list[dict[str, Any]],
+    assembler_rows: list[dict[str, Any]],
+    backbone_rows: list[dict[str, Any]],
+    evaluation_rows: list[dict[str, Any]],
+    chunks: list[dict[str, Any]],
+    table_view_provider: Any,
+    generation_runner: Any,
+) -> list[dict[str, Any]]:
+    """Run generation OFF/ON on one frozen backbone result per case.
+
+    Search, planner requirements, assembler decisions and citation slices are fixed.
+    The ON arm receives a deep copy of the OFF public result and may only compose text.
+    """
+
+    ground_truth = {row["case_id"]: row for row in ground_truth_rows}
+    enumerations = {row["case_id"]: row for row in enumeration_rows}
+    assemblers = {row["case_id"]: row for row in assembler_rows}
+    backbones = {row["case_id"]: row for row in backbone_rows}
+    evaluations = {row["dev_id"]: row for row in evaluation_rows}
+    chunks_by_id = {row["chunk_id"]: row for row in chunks}
+    chunk_to_parent = {
+        chunk_id: row["parent_document_id"] for chunk_id, row in chunks_by_id.items()
+    }
+
+    if not (
+        set(ground_truth)
+        == set(enumerations)
+        == set(assemblers)
+        == set(backbones)
+        == set(evaluations)
+    ):
+        raise RuntimeError("Frozen 95-case generation joins do not have identical case IDs")
+
+    output = []
+    for case_id in sorted(backbones):
+        gt = ground_truth[case_id]
+        enumeration = enumerations[case_id]
+        assembler = assemblers[case_id]
+        backbone = backbones[case_id]
+        evaluation = evaluations[case_id]
+        requirements = enumeration["requirements"]
+        decisions = assembler["decisions"]
+        if len(requirements) != len(decisions):
+            raise RuntimeError(f"Planner/assembler count mismatch: {case_id}")
+
+        gated_decisions = []
+        public_requirements = []
+        table_view_count = 0
+        table_row_count = 0
+        value_shape_veto_count = 0
+        cost_relation_veto_count = 0
+        for requirement, decision in zip(requirements, decisions, strict=True):
+            citations = [dict(span) for span in decision.get("spans", [])]
+            cited_chunks = [
+                chunks_by_id[span["chunk_id"]]
+                for span in citations
+                if span.get("chunk_id") in chunks_by_id
+            ]
+            parent_ids = tuple(
+                sorted({row["parent_document_id"] for row in cited_chunks})
+            )
+            source_ids = tuple(sorted({row["source_id"] for row in cited_chunks}))
+            table_views = (
+                table_view_provider(
+                    requirement,
+                    source_ids=source_ids,
+                    allowed_parent_document_ids=parent_ids,
+                    time_scope=str(evaluation.get("time_scope") or "current"),
+                )
+                if decision.get("status") == "supported_exact"
+                else []
+            )
+            checked, value_shape_audit = apply_table_value_shape_gate(
+                requirement,
+                decision,
+                table_views,
+            )
+            value_shape_veto_count += bool(value_shape_audit.get("vetoed"))
+            cost_relation_veto_count += bool(
+                value_shape_audit.get("cost_relation_vetoed")
+            )
+            supported = checked.get("status") == "supported_exact"
+            gated_decisions.append(checked)
+            visible_table_views = table_views if supported else []
+            table_view_count += len(visible_table_views)
+            table_row_count += sum(
+                int(view.get("row_count") or len(view.get("rows", [])))
+                for view in visible_table_views
+            )
+            public_requirements.append(
+                {
+                    "requirement": dict(requirement),
+                    "status": "supported" if supported else "unsupported",
+                    "message": None if supported else "not_confirmable_from_documents",
+                    "citations": citations if supported else [],
+                    "table_views": visible_table_views,
+                    "value_shape_audit": value_shape_audit,
+                }
+            )
+
+        baseline_supported = {
+            index
+            for index, decision in enumerate(decisions, start=1)
+            if decision["status"] == "supported_exact"
+        }
+        off_arm = simulate_arm(
+            placement="arm0",
+            question=evaluation["question"],
+            assembler_decisions=gated_decisions,
+            classifier_predictions=[],
+            chunk_to_parent=chunk_to_parent,
+        )
+        off_score = _score_arm(
+            off_arm,
+            target=backbone["answerability_target"],
+            evidence_groups=evaluation["evidence_groups"],
+            expected_docs_flags=[True] * len(requirements),
+            baseline_supported_indices=baseline_supported,
+        )
+        supported = set(off_arm["supported_requirement_indices"])
+        profile = gt["answerability_profile"]
+        docs_required, non_docs_required = docs_requirement_split(
+            gt,
+            len(requirements),
+        )
+        docs_value_complete = _docs_value_complete(
+            docs_required,
+            supported,
+            requirements,
+            gated_decisions,
+        )
+        mixed = score_mixed_case(
+            profile=profile,
+            docs_required=docs_required,
+            non_docs_required=non_docs_required,
+            supported=supported,
+            response_mode=off_arm["response_mode"],
+            all_groups_cited=off_score["all_groups_cited"],
+            docs_value_complete=docs_value_complete,
+        )
+        public_result = {
+            "question": evaluation["question"],
+            "response_mode": off_arm["response_mode"],
+            "requirements": public_requirements,
+        }
+        generation = generation_runner(copy.deepcopy(public_result))
+        answer_text = str(generation.get("answer_text") or "")
+        gold_tokens = []
+        seen_gold_tokens = set()
+        for group in evaluation["evidence_groups"]:
+            for token in extract_factual_tokens(str(group.get("evidence_span") or "")):
+                key = _compact(token)
+                if key and key not in seen_gold_tokens:
+                    seen_gold_tokens.add(key)
+                    gold_tokens.append(token)
+        gold_value_complete = bool(gold_tokens) and all(
+            _compact(token) in _compact(answer_text) for token in gold_tokens
+        )
+        selected_table_value_count = sum(
+            int(entry.get("table_value_span_count") or 0)
+            for entry in generation.get("generatable", [])
+        )
+        output.append(
+            {
+                "generation_ab_version": GENERATION_AB_VERSION,
+                "case_id": case_id,
+                "dataset": backbone["dataset"],
+                "answerability_profile": profile,
+                "answerability_target": backbone["answerability_target"],
+                "off": {
+                    "arm": off_arm,
+                    "score": off_score,
+                    "docs_value_complete": docs_value_complete,
+                    "mixed_metrics": mixed,
+                    "table_view_count": table_view_count,
+                    "table_row_count": table_row_count,
+                    "value_shape_veto_count": value_shape_veto_count,
+                    "cost_relation_veto_count": cost_relation_veto_count,
+                },
+                "on": {
+                    "generation": generation,
+                    "axes_unchanged_from_off": True,
+                    "gold_factual_tokens": gold_tokens,
+                    "gold_value_scoreable": bool(gold_tokens),
+                    "gold_value_complete": gold_value_complete,
+                    "selected_table_value_count": selected_table_value_count,
+                },
+                "fixed_inputs": {
+                    "search_changed": False,
+                    "planner_changed": False,
+                    "assembler_decisions_changed": False,
+                    "public_backbone_result_shared": True,
+                },
+            }
+        )
+    return output
+
+
+def _generation_rows_for_two_axis(
+    rows: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "answerability_profile": row["answerability_profile"],
+            "answerability_target": row["answerability_target"],
+            "arm0": row["off"]["arm"],
+            "arm0_score": row["off"]["score"],
+            "docs_value_complete": row["off"]["docs_value_complete"],
+            "mixed_metrics": row["off"]["mixed_metrics"],
+        }
+        for row in rows
+    ]
+
+
+def summarize_generation_ab(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    two_axis = summarize_two_axis(_generation_rows_for_two_axis(rows))
+    model_called = [
+        row
+        for row in rows
+        if row["on"]["generation"].get("mode")
+        in {"generated", "extractive_fallback", "generation_error"}
+    ]
+    generated = [
+        row for row in rows if row["on"]["generation"].get("used_generated_text")
+    ]
+    fallback = [
+        row
+        for row in rows
+        if row["on"]["generation"].get("mode") == "extractive_fallback"
+    ]
+    errors = [
+        row
+        for row in rows
+        if row["on"]["generation"].get("mode") == "generation_error"
+    ]
+    abstained = [
+        row for row in rows if row["on"]["generation"].get("mode") == "abstain"
+    ]
+    table_rows = [
+        row for row in rows if row["on"]["selected_table_value_count"] > 0
+    ]
+    scoreable = [row for row in generated if row["on"]["gold_value_scoreable"]]
+    grounded_generated = [
+        row for row in generated if row["off"]["score"]["grounded_answer"]
+    ]
+    false_full_generated = [
+        row for row in generated if row["off"]["score"]["false_full_answer"]
+    ]
+    cost_relation_veto_rows = [
+        row for row in rows if row["off"]["cost_relation_veto_count"]
+    ]
+    return {
+        "question_count": len(rows),
+        "generation_off": two_axis,
+        "generation_on": {
+            "two_axis": two_axis,
+            "axes_identical_to_off_by_construction": all(
+                row["on"]["axes_unchanged_from_off"] for row in rows
+            ),
+            "model_called": _ratio(len(model_called), len(rows)),
+            "verified_generated": _ratio(len(generated), len(rows)),
+            "extractive_fallback": _ratio(len(fallback), len(rows)),
+            "generation_error": _ratio(len(errors), len(rows)),
+            "mechanical_abstain_without_model": _ratio(len(abstained), len(rows)),
+            "grounded_and_generated": _ratio(len(grounded_generated), len(rows)),
+            "false_full_and_generated": _ratio(
+                len(false_full_generated),
+                len(rows),
+            ),
+            "cost_relation_vetoed_requirements": sum(
+                row["off"]["cost_relation_veto_count"] for row in rows
+            ),
+            "cost_relation_vetoed_case_ids": [
+                row["case_id"] for row in cost_relation_veto_rows
+            ],
+            "gold_value_complete_when_scoreable": _ratio(
+                sum(row["on"]["gold_value_complete"] for row in scoreable),
+                len(scoreable),
+            ),
+            "table": {
+                "question_count": len(table_rows),
+                "verified_generated": _ratio(
+                    sum(
+                        bool(row["on"]["generation"].get("used_generated_text"))
+                        for row in table_rows
+                    ),
+                    len(table_rows),
+                ),
+                "gold_value_complete_when_scoreable": _ratio(
+                    sum(
+                        row["on"]["gold_value_complete"]
+                        for row in table_rows
+                        if row["on"]["gold_value_scoreable"]
+                    ),
+                    sum(
+                        row["on"]["gold_value_scoreable"] for row in table_rows
+                    ),
+                ),
+            },
+            "generated_case_ids": [row["case_id"] for row in generated],
+            "fallback_case_ids": [row["case_id"] for row in fallback],
+            "generation_error_case_ids": [row["case_id"] for row in errors],
+            "false_full_generated_case_ids": [
+                row["case_id"] for row in false_full_generated
+            ],
+        },
+        "interpretation_limit": (
+            "Verification proves selected numeric/date/table tokens are grounded. "
+            "It does not semantically judge unrestricted text paraphrases."
+        ),
+    }
+
+
 def summarize_two_axis(case_rows: list[dict[str, Any]]) -> dict[str, Any]:
     docs = [r for r in case_rows if r["answerability_profile"] == DOCS_PROFILE]
     mixed = [r for r in case_rows if r["answerability_profile"] == MIXED_PROFILE]
@@ -495,11 +823,220 @@ def evaluate_and_freeze(root: Path) -> dict[str, Any]:
     }
 
 
+def evaluate_generation_ab(
+    root: Path,
+    *,
+    generator_model: str = "qwen3:8b",
+    device: str | None = None,
+    timeout: float = 180.0,
+    assembler_cases: Path | None = None,
+    generation_evidence_scope: str = "chunk",
+) -> dict[str, Any]:
+    """Measure only the answer-composition delta on the frozen 95-case backbone.
+
+    ``assembler_cases`` swaps in a different span-selection run. The reference two-axis
+    numbers always come from the frozen assembler, so the reported delta stays anchored
+    to the same baseline no matter which selection is under test.
+    """
+
+    from src.v3.gradio_backbone_demo import DemoBackbone
+
+    root = root.resolve()
+    inputs = {
+        "answerability_ground_truth": root / DEFAULT_GROUND_TRUTH,
+        "enumeration": root / DEFAULT_ENUMERATION,
+        "assembler_cases": (root / assembler_cases) if assembler_cases else (root / DEFAULT_ASSEMBLER),
+        "reference_assembler_cases": root / DEFAULT_ASSEMBLER,
+        "backbone_cases": root / DEFAULT_BACKBONE,
+        "adaptive_dev": root / DEFAULT_DEV,
+        "downgraded_canary": root / DEFAULT_CANARY,
+        "chunks": root / DEFAULT_CHUNKS,
+        "generator_source": root / "src/v3/grounded_answer_generator.py",
+        "demo_source": root / "src/v3/gradio_backbone_demo.py",
+        "evaluator_source": Path(__file__).resolve(),
+    }
+    before = {name: file_sha256(path) for name, path in inputs.items()}
+    ground_truth_rows = read_jsonl(inputs["answerability_ground_truth"])
+    enumeration_rows = read_jsonl(inputs["enumeration"])
+    assembler_rows = read_jsonl(inputs["assembler_cases"])
+    reference_assembler_rows = read_jsonl(inputs["reference_assembler_cases"])
+    backbone_rows = read_jsonl(inputs["backbone_cases"])
+    evaluation_rows = read_jsonl(inputs["adaptive_dev"]) + read_jsonl(
+        inputs["downgraded_canary"]
+    )
+    chunks = read_jsonl(inputs["chunks"])
+
+    os.environ.setdefault("OPENAI_BASE_URL", "http://localhost:11434/v1")
+    os.environ.setdefault("OPENAI_API_KEY", "ollama")
+    runtime = DemoBackbone(
+        root=root,
+        planner_model="qwen3:8b",
+        device=device,
+        timeout=timeout,
+        enable_v3_2_candidates=True,
+        enable_generation=True,
+        generator_model=generator_model,
+        generation_evidence_scope=generation_evidence_scope,
+    )
+    runtime._initialize()
+    table_parent_ids = {
+        str(row["parent_document_id"]) for row in runtime._table_facts
+    }
+
+    def table_view_provider(
+        requirement: dict[str, Any],
+        *,
+        source_ids: tuple[str, ...],
+        allowed_parent_document_ids: tuple[str, ...],
+        time_scope: str,
+    ) -> list[dict[str, Any]]:
+        if not (
+            set(allowed_parent_document_ids) & table_parent_ids
+        ):
+            return []
+        return runtime._table_views(
+            requirement,
+            source_ids=source_ids,
+            allowed_parent_document_ids=allowed_parent_document_ids,
+            time_scope=time_scope,
+        )
+
+    def generation_runner(public_result: dict[str, Any]) -> dict[str, Any]:
+        finalized = runtime._finalize_result(
+            public_result,
+            started=time.perf_counter(),
+        )
+        return finalized["generation"]
+
+    rows = build_fixed_backbone_generation_rows(
+        ground_truth_rows=ground_truth_rows,
+        enumeration_rows=enumeration_rows,
+        assembler_rows=assembler_rows,
+        backbone_rows=backbone_rows,
+        evaluation_rows=evaluation_rows,
+        chunks=chunks,
+        table_view_provider=table_view_provider,
+        generation_runner=generation_runner,
+    )
+    reference_rows = build_case_rows(
+        ground_truth_rows=ground_truth_rows,
+        enumeration_rows=enumeration_rows,
+        assembler_rows=reference_assembler_rows,
+        backbone_rows=backbone_rows,
+        evaluation_rows=evaluation_rows,
+        chunks=chunks,
+    )
+    summary = summarize_generation_ab(rows)
+    reference_two_axis = summarize_two_axis(reference_rows)
+
+    def delta(path: tuple[str, ...]) -> int:
+        reference: Any = reference_two_axis
+        current: Any = summary["generation_off"]
+        for key in path:
+            reference = reference[key]
+            current = current[key]
+        return int(current["successes"]) - int(reference["successes"])
+
+    report = {
+        "report_schema_version": "router-backbone-generation-ab-report-v1",
+        "evaluator_version": GENERATION_AB_VERSION,
+        "evaluation_role": "development_only_fixed_backbone_generation_ab",
+        "generator_model": generator_model,
+        "reference_frozen_two_axis": reference_two_axis,
+        "generation_ab": summary,
+        "gate_and_table_wiring_delta_vs_frozen_reference": {
+            "docs_only_grounded": delta(
+                ("docs_only", "docs_only_grounded")
+            ),
+            "docs_only_grounded_span_strict": delta(
+                ("docs_only", "docs_only_grounded_span_strict")
+            ),
+            "docs_only_false_full": delta(
+                ("docs_only", "docs_only_false_full")
+            ),
+            "mixed_overclaim": delta(("mixed", "mixed_overclaim")),
+        },
+        "constraints": {
+            "search_changed": False,
+            "planner_changed": False,
+            "assembler_decisions_changed": assembler_cases is not None,
+            "same_public_backbone_result_for_off_and_on": True,
+            "generation_path": (
+                "DemoBackbone._finalize_result -> compose_backbone_answer"
+            ),
+            "table_scope": "already_cited_parent_documents_only",
+            "generation_evidence_scope": generation_evidence_scope,
+            "model_inference_calls": summary["generation_on"]["model_called"][
+                "successes"
+            ],
+            "runtime_or_canonical_promoted": False,
+        },
+        "inputs": {
+            name: {
+                "path": path.resolve().relative_to(root).as_posix(),
+                "sha256": before[name],
+            }
+            for name, path in inputs.items()
+        },
+    }
+
+    cases_bytes = _serialize_jsonl(rows, sort_key=lambda row: row["case_id"])
+    cases_sha = hashlib.sha256(cases_bytes).hexdigest()
+    cases_path = (
+        root
+        / "outputs/v3"
+        / f"router_backbone_generation_ab_cases_{cases_sha}.jsonl"
+    )
+    write_immutable(cases_path, cases_bytes)
+    report_bytes = _canonical_json_bytes(report, indent=2)
+    report_sha = hashlib.sha256(report_bytes).hexdigest()
+    report_path = (
+        root / "reports/v3" / f"router_backbone_generation_ab_{report_sha}.json"
+    )
+    write_immutable(report_path, report_bytes)
+
+    after = {name: file_sha256(path) for name, path in inputs.items()}
+    if before != after:
+        raise RuntimeError("A fixed generation A/B input changed during evaluation")
+    return {
+        "cases": cases_path.relative_to(root).as_posix(),
+        "report": report_path.relative_to(root).as_posix(),
+        **report,
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Two-axis mixed-answerability re-scoring (development only)")
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
+    parser.add_argument("--generation-ab", action="store_true")
+    parser.add_argument("--generator-model", default="qwen3:8b")
+    parser.add_argument("--device", choices=("cpu", "cuda"))
+    parser.add_argument("--timeout", type=float, default=180.0)
+    parser.add_argument(
+        "--assembler-cases",
+        type=Path,
+        help="Repo-relative assembler decisions to test instead of the frozen ones",
+    )
+    parser.add_argument(
+        "--generation-evidence-scope",
+        choices=("span", "chunk"),
+        default="chunk",
+        help="What the generator sees: the selected spans, or their whole parent chunks",
+    )
     args = parser.parse_args()
-    print(json.dumps(evaluate_and_freeze(args.root), ensure_ascii=False, indent=2))
+    result = (
+        evaluate_generation_ab(
+            args.root,
+            generator_model=args.generator_model,
+            device=args.device,
+            assembler_cases=args.assembler_cases,
+            generation_evidence_scope=args.generation_evidence_scope,
+            timeout=args.timeout,
+        )
+        if args.generation_ab
+        else evaluate_and_freeze(args.root)
+    )
+    print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

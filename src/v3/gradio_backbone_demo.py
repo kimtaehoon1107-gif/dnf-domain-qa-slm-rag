@@ -22,6 +22,7 @@ import gradio as gr
 
 from src.io_utils import read_jsonl
 from src.v3.assemble_table_group_answers import assemble_table_group_answers
+from src.v3.build_bm25 import SearchPolicy
 from src.v3.build_corpus import file_sha256
 from src.v3.evaluate_extractive_assembler_v3 import segment_chunk_nonoverlap
 from src.v3.evaluate_extractive_assembler_v3_chunk_diverse import (
@@ -36,9 +37,16 @@ from src.v3.evaluate_table_atomic_facts_arm1 import (
 )
 from src.v3.evaluate_semantic_requirement_planner import (
     PLANNER_SYSTEM_PROMPT,
+    _configured_base_url,
     _fixed_prompt_hash,
+    _json_request,
+    _ollama_api_url,
     run_planner,
     runtime_metadata,
+)
+from src.v3.grounded_answer_generator import (
+    apply_table_value_shape_gate,
+    compose_backbone_answer,
 )
 from src.v3.question_router import (
     DEFAULT_AS_OF,
@@ -48,7 +56,8 @@ from src.v3.question_router import (
     route_question,
 )
 from src.v3.rerank_evidence import select_reranked_evidence
-from src.v3.retrieve_v3 import load_runtime_artifacts
+from src.v3.requirement_value_shape import apply_value_shape_veto
+from src.v3.retrieve_v3 import load_runtime_artifacts, retrieve_with_embedding
 from src.v3.score_evidence_reranker import (
     BATCH_SIZE,
     MAX_LENGTH,
@@ -61,8 +70,10 @@ from src.v3.select_evidence import classify_answerability
 DEMO_VERSION = "dnf-v3-backbone-gradio-demo-v1.2-v3.2-promoted-default"
 RUNTIME_PROMOTION_STATUS = "v3.2_development_canonical_promoted_by_user_authorization"
 DEFAULT_PLANNER_MODEL = "qwen3:8b"
+DEFAULT_GENERATOR_MODEL = "qwen3:8b"
 DEFAULT_PORT = 7862
 TOP_K = 10
+BOUNDED_SOURCE_EXPANSION_LIMIT = 2
 ASSEMBLER_MANIFEST = Path(
     "data/v3/evidence/extractive_assembler_v3_chunk_diverse_manifest_"
     "9db367b14a981bd05ba37d6029fc79a9e0e8606efc06221dd6eee117a38bc2b8.json"
@@ -242,6 +253,31 @@ def summarize_grounded_decisions(
     }
 
 
+def bounded_candidate_sources(route: dict[str, Any]) -> tuple[str, ...]:
+    output = list(route["source_ids"])
+    candidates = route.get("routing_signals", {}).get("candidate_sources", [])
+    for source_id in candidates[:BOUNDED_SOURCE_EXPANSION_LIMIT]:
+        if source_id not in output:
+            output.append(source_id)
+    return tuple(output)
+
+
+def shape_audit(
+    requirements: list[dict[str, Any]], decisions: list[dict[str, Any]]
+) -> dict[str, Any]:
+    audits = []
+    supported_after_veto = 0
+    for requirement, decision in zip(requirements, decisions, strict=True):
+        checked, audit = apply_value_shape_veto(requirement, decision)
+        supported_after_veto += checked["status"] == "supported_exact"
+        audits.append(audit)
+    return {
+        "supported_after_veto": supported_after_veto,
+        "veto_count": sum(row["vetoed"] for row in audits),
+        "requirements": audits,
+    }
+
+
 def _route_only_result(
     *,
     question: str,
@@ -293,12 +329,22 @@ class DemoBackbone:
         device: str | None = None,
         timeout: float = 180.0,
         enable_v3_2_candidates: bool = True,
+        enable_bounded_fallback: bool = False,
+        enable_generation: bool = False,
+        generator_model: str = DEFAULT_GENERATOR_MODEL,
+        generation_evidence_scope: str = "chunk",
+        answer_generator: Any | None = None,
     ) -> None:
         self.root = root.resolve()
         self.planner_model = planner_model
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.timeout = timeout
         self.enable_v3_2_candidates = enable_v3_2_candidates
+        self.enable_bounded_fallback = enable_bounded_fallback
+        self.enable_generation = enable_generation
+        self.generator_model = generator_model
+        self.generation_evidence_scope = generation_evidence_scope
+        self._answer_generator = answer_generator
         self._lock = threading.Lock()
         self._artifacts: Any | None = None
         self._overlay_rows: list[dict[str, Any]] | None = None
@@ -314,6 +360,123 @@ class DemoBackbone:
         self._table_embeddings: np.ndarray | None = None
         self._canonical_runtime_manifest_ref: dict[str, Any] | None = None
         self._table_facts_path: str | None = None
+
+    def _generate_answer_text(self, request: dict[str, Any]) -> str:
+        if self._answer_generator is not None:
+            return str(self._answer_generator(request) or "")
+        if not os.environ.get("OPENAI_API_KEY"):
+            raise RuntimeError("OPENAI_API_KEY is required (use the Ollama dummy key)")
+        if self.generator_model.startswith("qwen3"):
+            response = _json_request(
+                _ollama_api_url(_configured_base_url(), "/api/chat"),
+                {
+                    "model": self.generator_model,
+                    "messages": [
+                        {"role": "system", "content": request["system"]},
+                        {"role": "user", "content": request["user"]},
+                    ],
+                    "stream": False,
+                    "think": False,
+                    "options": {"temperature": 0, "num_predict": 600},
+                },
+                self.timeout,
+            )
+            content = response.get("message", {}).get("content")
+            if not content:
+                raise RuntimeError("Ollama native generator returned no answer text")
+            return str(content)
+        from openai import OpenAI
+
+        response = OpenAI(max_retries=1, timeout=self.timeout).chat.completions.create(
+            model=self.generator_model,
+            messages=[
+                {"role": "system", "content": request["system"]},
+                {"role": "user", "content": request["user"]},
+            ],
+            temperature=0,
+            max_tokens=600,
+        )
+        content = response.choices[0].message.content
+        if not content:
+            raise RuntimeError("Generator returned no answer text")
+        return content
+
+    def _generation_chunk_texts(
+        self, result: dict[str, Any]
+    ) -> dict[str, str] | None:
+        """Parent-chunk text for the cited chunks, when the model may see whole passages.
+
+        On by default. Measured on the frozen 95 against the same backbone: handing the
+        model the parent chunk instead of the selected spans took correct gold values
+        from 16 to 26 and wrong answers from 22 to 12, with generation errors staying at
+        zero. Set the scope to "span" to restore span-only evidence.
+        """
+
+        if not getattr(self, "generation_evidence_scope", "span") == "chunk":
+            return None
+        if self._artifacts is None:
+            return None
+        texts: dict[str, str] = {}
+        for item in result.get("requirements", []):
+            for citation in item.get("citations", []):
+                chunk_id = citation.get("chunk_id")
+                chunk = self._artifacts.chunks_by_id.get(chunk_id)
+                if chunk_id and chunk:
+                    texts[chunk_id] = str(
+                        chunk.get("display_text") or chunk.get("text") or ""
+                    )
+        return texts or None
+
+    def _finalize_result(
+        self,
+        result: dict[str, Any],
+        *,
+        started: float,
+    ) -> dict[str, Any]:
+        generation_enabled = bool(getattr(self, "enable_generation", False))
+        generator_model = str(
+            getattr(self, "generator_model", DEFAULT_GENERATOR_MODEL)
+        )
+        if not generation_enabled:
+            result["generation"] = {
+                "enabled": False,
+                "model": generator_model,
+                "mode": "disabled",
+                "used_generated_text": False,
+            }
+        else:
+            generation_started = time.perf_counter()
+            try:
+                composed = compose_backbone_answer(
+                    result,
+                    generate=self._generate_answer_text,
+                    chunk_text_by_id=self._generation_chunk_texts(result),
+                )
+                result["generation"] = {
+                    "enabled": True,
+                    "model": generator_model,
+                    **composed,
+                    "latency_ms": round(
+                        (time.perf_counter() - generation_started) * 1000,
+                        3,
+                    ),
+                }
+            except Exception as exc:
+                result["generation"] = {
+                    "enabled": True,
+                    "model": generator_model,
+                    "mode": "generation_error",
+                    "answer_text": "",
+                    "used_generated_text": False,
+                    "verification": None,
+                    "error": str(exc),
+                    "latency_ms": round(
+                        (time.perf_counter() - generation_started) * 1000,
+                        3,
+                    ),
+                }
+        result["latency_ms"] = round((time.perf_counter() - started) * 1000, 3)
+        return result
 
     def _initialize(self) -> None:
         if self._artifacts is not None:
@@ -518,6 +681,74 @@ class DemoBackbone:
             k=int(self._assembler_config["k"]),
         )[0]["decisions"]
 
+    def _bounded_fallback(
+        self,
+        *,
+        requirements: list[dict[str, Any]],
+        route: dict[str, Any],
+        baseline_selected: list[dict[str, Any]],
+        baseline_decisions: list[dict[str, Any]],
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
+        before = shape_audit(requirements, baseline_decisions)
+        detail = {
+            "enabled": self.enable_bounded_fallback,
+            "triggered": False,
+            "committed": False,
+            "bounded_source_ids": list(route["source_ids"]),
+            "baseline_shape_audit": before,
+            "fallback_shape_audit": before,
+        }
+        if (
+            not self.enable_bounded_fallback
+            or route["route_action"] != "retrieve"
+            or before["veto_count"] == 0
+        ):
+            return baseline_selected, baseline_decisions, detail
+
+        assert self._artifacts is not None
+        allowed_sources = bounded_candidate_sources(route)
+        detail["triggered"] = True
+        detail["bounded_source_ids"] = list(allowed_sources)
+        selected_by_id = {row["chunk_id"]: row for row in baseline_selected}
+        for requirement in requirements:
+            query = requirement_text(requirement)
+            policy = SearchPolicy(
+                default_exposure_only=route["default_exposure_only"],
+                allowed_statuses=tuple(route["allowed_statuses"]),
+                include_review_required=False,
+                as_of=(
+                    DEFAULT_AS_OF
+                    if route["time_scope"] == "current"
+                    else route["temporal_as_of"]
+                ),
+                source_ids=allowed_sources,
+            )
+            hits = retrieve_with_embedding(
+                query,
+                self._encode(query),
+                self._artifacts,
+                top_k=TOP_K,
+                policy=policy,
+            )
+            if self.enable_v3_2_candidates:
+                hits, _ = filter_hits_by_global_temporal(
+                    hits,
+                    time_scope=route["time_scope"],
+                    temporal_by_document=self._global_temporal_by_document,
+                )
+            for row in self._rerank_chunks(query, hits):
+                selected_by_id.setdefault(row["chunk_id"], row)
+
+        fallback_selected = list(selected_by_id.values())
+        fallback_decisions = self._assemble(requirements, fallback_selected)
+        after = shape_audit(requirements, fallback_decisions)
+        detail["fallback_shape_audit"] = after
+        committed = after["supported_after_veto"] > before["supported_after_veto"]
+        detail["committed"] = committed
+        if committed:
+            return fallback_selected, fallback_decisions, detail
+        return baseline_selected, baseline_decisions, detail
+
     def _table_views(
         self,
         requirement: dict[str, Any],
@@ -591,15 +822,18 @@ class DemoBackbone:
                     source_entity_index=self._source_entity_index,
                     overlay_rows=self._overlay_rows,
                 )
-                return _route_only_result(
-                    question=question,
-                    requirements=[],
-                    route=route,
-                    planner_log={
-                        "skipped": True,
-                        "reason": "answerability_gate",
-                    },
-                    planner_runtime=self._planner_runtime,
+                return self._finalize_result(
+                    _route_only_result(
+                        question=question,
+                        requirements=[],
+                        route=route,
+                        planner_log={
+                            "skipped": True,
+                            "reason": "answerability_gate",
+                        },
+                        planner_runtime=self._planner_runtime,
+                    ),
+                    started=started,
                 )
 
             requirements, planner_log = self._plan(question)
@@ -615,12 +849,15 @@ class DemoBackbone:
             )
             route = routed["route"]
             if route["route_action"] != "retrieve":
-                return _route_only_result(
-                    question=question,
-                    requirements=requirements,
-                    route=route,
-                    planner_log=planner_log,
-                    planner_runtime=self._planner_runtime,
+                return self._finalize_result(
+                    _route_only_result(
+                        question=question,
+                        requirements=requirements,
+                        route=route,
+                        planner_log=planner_log,
+                        planner_runtime=self._planner_runtime,
+                    ),
+                    started=started,
                 )
 
             routed_hits = routed["hits"]
@@ -633,13 +870,23 @@ class DemoBackbone:
                 )
             selected = self._rerank_chunks(question, routed_hits)
             decisions = self._assemble(requirements, selected)
+            selected, decisions, fallback = self._bounded_fallback(
+                requirements=requirements,
+                route=route,
+                baseline_selected=selected,
+                baseline_decisions=decisions,
+            )
             chunk_to_parent = {
                 chunk_id: row["parent_document_id"]
                 for chunk_id, row in self._artifacts.chunks_by_id.items()
             }
-            backbone = summarize_grounded_decisions(decisions, chunk_to_parent)
             requirement_results = []
-            route_sources = tuple(route["source_ids"])
+            gated_decisions = []
+            route_sources = tuple(
+                fallback["bounded_source_ids"]
+                if fallback["committed"]
+                else route["source_ids"]
+            )
             for requirement, decision in zip(requirements, decisions, strict=True):
                 citations = []
                 for span in decision["spans"]:
@@ -662,7 +909,7 @@ class DemoBackbone:
                             family_by_document=self._family_by_document,
                         )
                     citations.append(metadata)
-                supported = decision["status"] == "supported_exact"
+                assembler_supported = decision["status"] == "supported_exact"
                 cited_parent_ids = tuple(
                     sorted({row["parent_document_id"] for row in citations})
                 )
@@ -673,18 +920,30 @@ class DemoBackbone:
                         allowed_parent_document_ids=cited_parent_ids,
                         time_scope=route["time_scope"],
                     )
-                    if supported
+                    if assembler_supported
                     else []
                 )
+                checked_decision, value_shape_audit = apply_table_value_shape_gate(
+                    requirement,
+                    decision,
+                    table_views,
+                )
+                supported = checked_decision["status"] == "supported_exact"
+                gated_decisions.append(checked_decision)
                 requirement_results.append(
                     {
                         "requirement": requirement,
                         "status": "supported" if supported else "unsupported",
                         "message": None if supported else "문서에서 확인 불가",
-                        "citations": citations,
-                        "table_views": table_views,
+                        "citations": citations if supported else [],
+                        "table_views": table_views if supported else [],
+                        "value_shape_audit": value_shape_audit,
                     }
                 )
+            backbone = summarize_grounded_decisions(
+                gated_decisions,
+                chunk_to_parent,
+            )
             if backbone["response_mode"] == "abstain":
                 message = "선택된 공식 문서에서 요구사항을 지지하는 근거를 확인하지 못했습니다."
             elif backbone["response_mode"] == "partial_answer":
@@ -694,7 +953,7 @@ class DemoBackbone:
                     "아래 인용은 dirty canonical 원문의 exact slice입니다. "
                     "exact는 원문 복사를 뜻하며, 요구를 의미적으로 올바르게 지지한다는 검증은 아닙니다."
                 )
-            return {
+            result = {
                 "demo_version": DEMO_VERSION,
                 "question": question,
                 "route": {**route, "backbone_action": backbone["route_action"]},
@@ -706,6 +965,7 @@ class DemoBackbone:
                     "hit_count": len(routed_hits),
                     "temporal_denied_hit_count": len(temporal_denied_hits),
                     "selected_chunk_ids": [row["chunk_id"] for row in selected],
+                    "bounded_fallback": fallback,
                 },
                 "latency_ms": round((time.perf_counter() - started) * 1000, 3),
                 "provenance": {
@@ -716,6 +976,7 @@ class DemoBackbone:
                     "reranker_revision": MODEL_REVISION,
                     "as_of": DEFAULT_AS_OF,
                     "v3_2_candidates_enabled": self.enable_v3_2_candidates,
+                    "bounded_fallback_enabled": self.enable_bounded_fallback,
                     "runtime_promotion_status": RUNTIME_PROMOTION_STATUS,
                     "canonical_runtime_pointer": CANONICAL_RUNTIME_POINTER.as_posix(),
                     "canonical_runtime_manifest": self._canonical_runtime_manifest_ref,
@@ -736,6 +997,7 @@ class DemoBackbone:
                     ),
                 },
             }
+            return self._finalize_result(result, started=started)
 
 
 def render_result(
@@ -747,6 +1009,28 @@ def render_result(
         f"### 라우팅: `{route_action}` · 응답: `{result['response_mode']}`\n\n"
         f"{result['message']}"
     )
+    generation = result.get("generation") or {}
+    if generation.get("enabled"):
+        if generation.get("used_generated_text"):
+            status += (
+                "\n\n### \uc0dd\uc131 \ub2f5\ubcc0\n\n"
+                + str(generation.get("answer_text") or "")
+            )
+        elif generation.get("mode") == "abstain":
+            status += (
+                "\n\n### \uc0dd\uc131 \ub2f5\ubcc0\n\n"
+                + str(generation.get("answer_text") or "")
+            )
+        elif generation.get("mode") == "generation_error":
+            status += (
+                "\n\n> \uc0dd\uc131 \uc2e4\ud328: "
+                "extractive \uadfc\uac70\ub9cc \ud45c\uc2dc\ud569\ub2c8\ub2e4."
+            )
+        else:
+            status += (
+                "\n\n> \uc0dd\uc131 \uac80\uc99d \uc2e4\ud328: "
+                "extractive \uadfc\uac70\ub9cc \ud45c\uc2dc\ud569\ub2c8\ub2e4."
+            )
     rows = []
     citation_sections = []
     for index, item in enumerate(result["requirements"], 1):
@@ -810,12 +1094,13 @@ def render_result(
         "response_mode": result["response_mode"],
         "provenance": result["provenance"],
         "latency_ms": result.get("latency_ms"),
+        "generation": generation,
     }
     return status, rows, citations, technical
 
 
 _RUNTIME: DemoBackbone | None = None
-_RUNTIME_KEY: tuple[str, str, str | None, bool] | None = None
+_RUNTIME_KEY: tuple[str, str, str | None, bool, bool, str] | None = None
 
 
 def get_runtime(
@@ -824,15 +1109,26 @@ def get_runtime(
     planner_model: str,
     device: str | None,
     enable_v3_2_candidates: bool = True,
+    enable_generation: bool = False,
+    generator_model: str = DEFAULT_GENERATOR_MODEL,
 ) -> DemoBackbone:
     global _RUNTIME, _RUNTIME_KEY
-    key = (str(root.resolve()), planner_model, device, enable_v3_2_candidates)
+    key = (
+        str(root.resolve()),
+        planner_model,
+        device,
+        enable_v3_2_candidates,
+        enable_generation,
+        generator_model,
+    )
     if _RUNTIME is None or _RUNTIME_KEY != key:
         _RUNTIME = DemoBackbone(
             root=root,
             planner_model=planner_model,
             device=device,
             enable_v3_2_candidates=enable_v3_2_candidates,
+            enable_generation=enable_generation,
+            generator_model=generator_model,
         )
         _RUNTIME_KEY = key
     return _RUNTIME
@@ -845,6 +1141,8 @@ def run_demo(
     planner_model: str,
     device: str | None,
     enable_v3_2_candidates: bool = True,
+    enable_generation: bool = False,
+    generator_model: str = DEFAULT_GENERATOR_MODEL,
 ) -> tuple[str, list[list[str]], str, dict[str, Any]]:
     try:
         result = get_runtime(
@@ -852,6 +1150,8 @@ def run_demo(
             planner_model=planner_model,
             device=device,
             enable_v3_2_candidates=enable_v3_2_candidates,
+            enable_generation=enable_generation,
+            generator_model=generator_model,
         ).answer(question)
         return render_result(result)
     except Exception as exc:
@@ -870,6 +1170,8 @@ def create_demo(
     planner_model: str = DEFAULT_PLANNER_MODEL,
     device: str | None = None,
     enable_v3_2_candidates: bool = True,
+    enable_generation: bool = False,
+    generator_model: str = DEFAULT_GENERATOR_MODEL,
 ) -> gr.Blocks:
     def submit(question: str) -> tuple[str, list[list[str]], str, dict[str, Any]]:
         return run_demo(
@@ -878,6 +1180,8 @@ def create_demo(
             planner_model=planner_model,
             device=device,
             enable_v3_2_candidates=enable_v3_2_candidates,
+            enable_generation=enable_generation,
+            generator_model=generator_model,
         )
 
     css = """
@@ -928,6 +1232,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--planner-model", default=DEFAULT_PLANNER_MODEL)
+    parser.add_argument("--generator-model", default=DEFAULT_GENERATOR_MODEL)
+    parser.add_argument(
+        "--enable-generation",
+        action="store_true",
+        help="Compose a verified answer with the configured generator model.",
+    )
     parser.add_argument("--device", choices=("cpu", "cuda"))
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
@@ -949,6 +1259,8 @@ def main() -> None:
         planner_model=args.planner_model,
         device=args.device,
         enable_v3_2_candidates=not args.disable_v3_2_candidates,
+        enable_generation=args.enable_generation,
+        generator_model=args.generator_model,
     ).queue(default_concurrency_limit=1).launch(
         server_name=args.host,
         server_port=args.port,

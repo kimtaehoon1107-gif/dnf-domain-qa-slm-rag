@@ -14,15 +14,51 @@ from src.v3.gradio_backbone_demo import (
     TABLE_INDEX_MANIFEST,
     _route_only_result,
     build_duplicate_family_member_index,
+    bounded_candidate_sources,
     enrich_citation_metadata,
     filter_hits_by_global_temporal,
     render_result,
     summarize_grounded_decisions,
+    shape_audit,
     validate_exact_citation,
 )
 
 
 class GradioBackboneDemoTest(unittest.TestCase):
+    def test_bounded_sources_use_only_first_two_route_candidates(self) -> None:
+        route = {
+            "source_ids": ["dnf_game_guide"],
+            "routing_signals": {
+                "candidate_sources": ["dnf_faq", "dnf_notice", "dnf_event"]
+            },
+        }
+        self.assertEqual(
+            bounded_candidate_sources(route),
+            ("dnf_game_guide", "dnf_faq", "dnf_notice"),
+        )
+
+    def test_shape_audit_is_a_trigger_not_positive_entailment(self) -> None:
+        requirements = [
+            {
+                "requirement_id": "requirement_1",
+                "subject": "상품",
+                "relation": "price",
+                "value_type": "amount",
+            }
+        ]
+        missing = shape_audit(
+            requirements,
+            [{"status": "supported_exact", "spans": [{"text": "상품 가격 안내"}]}],
+        )
+        present = shape_audit(
+            requirements,
+            [{"status": "supported_exact", "spans": [{"text": "9,800 세라"}]}],
+        )
+        self.assertEqual(missing["veto_count"], 1)
+        self.assertEqual(missing["supported_after_veto"], 0)
+        self.assertEqual(present["veto_count"], 0)
+        self.assertEqual(present["supported_after_veto"], 1)
+
     def test_reject_question_skips_planner(self) -> None:
         demo = DemoBackbone.__new__(DemoBackbone)
         demo._lock = threading.Lock()
@@ -187,6 +223,77 @@ class GradioBackboneDemoTest(unittest.TestCase):
             technical["provenance"]["dirty_canonical_chunks_sha256"],
             EXPECTED_DIRTY_CHUNKS_SHA256,
         )
+
+    def test_finalize_result_runs_generator_only_when_enabled(self) -> None:
+        requests = []
+        demo = DemoBackbone.__new__(DemoBackbone)
+        demo.enable_generation = True
+        demo.generator_model = "qwen3:8b"
+        demo._answer_generator = lambda request: requests.append(request) or (
+            "\uac00\uaca9\uc740 100,000\uace8\ub4dc\uc785\ub2c8\ub2e4."
+        )
+        demo.timeout = 10.0
+        result = {
+            "question": "\uac00\uaca9\uc740?",
+            "requirements": [
+                {
+                    "requirement": {
+                        "requirement_id": "requirement_1",
+                        "subject": "\uc544\uc774\ud15c",
+                        "relation": "price",
+                        "value_type": "amount",
+                    },
+                    "status": "supported",
+                    "citations": [
+                        {
+                            "text": (
+                                "\uc544\uc774\ud15c \uac00\uaca9: "
+                                "100,000\uace8\ub4dc"
+                            )
+                        }
+                    ],
+                    "table_views": [],
+                }
+            ],
+        }
+
+        finalized = demo._finalize_result(result, started=0.0)
+
+        self.assertEqual(len(requests), 1)
+        self.assertEqual(finalized["generation"]["mode"], "generated")
+        self.assertTrue(finalized["generation"]["used_generated_text"])
+
+        disabled = DemoBackbone.__new__(DemoBackbone)
+        disabled.enable_generation = False
+        disabled.generator_model = "qwen3:8b"
+        disabled_result = disabled._finalize_result(
+            {"question": "\uac00\uaca9\uc740?", "requirements": []},
+            started=0.0,
+        )
+        self.assertEqual(disabled_result["generation"]["mode"], "disabled")
+
+    def test_render_result_exposes_verified_generated_answer(self) -> None:
+        result = {
+            "demo_version": "test",
+            "route": {"route_action": "retrieve", "backbone_action": "retrieve"},
+            "response_mode": "full_answer",
+            "message": "extractive",
+            "requirements": [],
+            "provenance": {},
+            "generation": {
+                "enabled": True,
+                "model": "qwen3:8b",
+                "mode": "generated",
+                "answer_text": "\uac00\uaca9\uc740 100,000\uace8\ub4dc\uc785\ub2c8\ub2e4.",
+                "used_generated_text": True,
+                "verification": {"verified": True},
+            },
+        }
+
+        status, _, _, technical = render_result(result)
+
+        self.assertIn("\uac00\uaca9\uc740 100,000\uace8\ub4dc\uc785\ub2c8\ub2e4.", status)
+        self.assertEqual(technical["generation"]["mode"], "generated")
 
     def test_global_temporal_filter_blocks_only_current_denials(self) -> None:
         hits = [
