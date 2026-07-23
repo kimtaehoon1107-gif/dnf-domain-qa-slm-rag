@@ -84,10 +84,13 @@ def _ranked(
     candidate whose text carries the requirement's value shape outranks one that does
     not, so the shape contract selects evidence instead of only rejecting it later.
 
-    Ranking additionally by subject alignment was measured and reverted: the surface
-    matcher does not strip Korean particles, so "마일리지샵을" misses "마일리지샵" while a
-    bare "2026.04.30 06:00" matches on "2026". It scored real prose evidence below
-    stray timestamps and destroyed 3 correct answers for no gain.
+    Adding a subject-similarity tie-break was measured twice and reverted both times
+    (regex matcher 50.0% -> 44.2%, Kiwi particle-stripped 50.0% -> 42.9% gold-value
+    accuracy). The cause is structural, not matcher quality: the correct span often
+    never names the subject at all -- "| 상점판매가격 | 4,000만 골드 |" carries the value
+    while the product name sits in another cell -- so ranking by subject presence
+    systematically demotes correct evidence. Binding by table structure, not by text
+    similarity, is the open path.
     """
 
     def sort_key(row: dict[str, Any]) -> tuple[Any, ...]:
