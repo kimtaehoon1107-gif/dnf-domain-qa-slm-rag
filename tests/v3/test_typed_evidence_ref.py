@@ -4,10 +4,12 @@ import unittest
 
 from src.v3.evaluate_grounded_llm_replay import run_fixed_requirement_replay
 from src.v3.typed_evidence_ref import (
+    _value_supported,
     build_evidence_units,
     build_typed_evidence_prompt,
     verify_typed_requirement_selection,
 )
+from src.v3.value_normalization import boolean_evidence, currency_values
 
 
 def _artifacts(
@@ -189,6 +191,251 @@ class TypedEvidenceRefTest(unittest.TestCase):
                 "subject": "던파ON",
                 "relation": "2.0.19 버전 적용일",
                 "surface": "적용 시점",
+                "value_type": "date",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "supported_exact")
+        self.assertEqual(audit["failure_reasons"], [])
+
+    def test_canonical_effective_at_uses_role_labeled_evidence(self) -> None:
+        text = (
+            "### 업데이트\n"
+            "시즌 11 Act 2. 제국의 파도 ＆ 폭권\n"
+            "2026.06.02 15:00\n"
+            "6/4(목) 점검 중 업데이트 되는 내용 안내 드립니다."
+        )
+        chunks, units, documents, temporal = _units(
+            text,
+            title="시즌 11 Act 2. 제국의 파도 ＆ 폭권",
+            published_at="2026-06-02",
+        )
+        published_ref = _ref_containing(units, "2026.06.02 15:00")
+        effective_ref = _ref_containing(
+            units,
+            "6/4(목) 점검 중 업데이트 되는 내용 안내 드립니다.",
+        )
+        requirement = {
+            "requirement_id": "effective_date",
+            "subject": "시즌 11 Act 2. 제국의 파도 ＆ 폭권",
+            "relation": "effective_at",
+            "value_type": "date",
+        }
+
+        wrong, wrong_audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "effective_date",
+                "status": "supported",
+                "value_type": "date",
+                "value": "2026-06-02",
+                "evidence_refs": [published_ref],
+            },
+            requirement=requirement,
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+        right, right_audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "effective_date",
+                "status": "supported",
+                "value_type": "date",
+                "value": "2026-06-04",
+                "evidence_refs": [effective_ref],
+            },
+            requirement=requirement,
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+        prompt, _ = build_typed_evidence_prompt(
+            question="업데이트는 언제 적용됐어?",
+            requirements=[requirement],
+            question_time_scope="current",
+            as_of="2026-07-22",
+            candidate_chunk_ids=["c1"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+
+        self.assertEqual(wrong["status"], "unsupported")
+        self.assertIn(
+            "temporal_role_mismatch",
+            wrong_audit["failure_reasons"],
+        )
+        self.assertEqual(right["status"], "supported_exact")
+        self.assertEqual(right["answer"], "2026년 6월 4일")
+        self.assertEqual(right_audit["failure_reasons"], [])
+        self.assertIn(
+            f"{published_ref}\ttemporal_roles=published_at\t",
+            prompt,
+        )
+        self.assertIn(
+            f"{effective_ref}\ttemporal_roles="
+            "effective_at,maintenance_time\t",
+            prompt,
+        )
+
+    def test_event_end_rejects_start_date_from_same_period(self) -> None:
+        text = (
+            "이벤트 기간: 2026년 7월 2일(목) 점검 후 "
+            "~ 2026년 7월 23일(목) 점검 전"
+        )
+        chunks, units, _, _ = _units(text, title="보급 작전 이벤트")
+        evidence_ref = _ref_containing(units, text)
+        requirement = {
+            "requirement_id": "event_end",
+            "subject": "보급 작전 이벤트",
+            "relation": "event_end",
+            "value_type": "date",
+        }
+
+        wrong, wrong_audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "event_end",
+                "status": "supported",
+                "value_type": "date",
+                "value": "2026-07-02",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement=requirement,
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+        right, right_audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "event_end",
+                "status": "supported",
+                "value_type": "date",
+                "value": "2026-07-23",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement=requirement,
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(wrong["status"], "unsupported")
+        self.assertIn(
+            "temporal_role_mismatch",
+            wrong_audit["failure_reasons"],
+        )
+        self.assertEqual(right["status"], "supported_exact")
+        self.assertEqual(right["answer"], "2026년 7월 23일")
+        self.assertEqual(right_audit["failure_reasons"], [])
+
+    def test_effective_at_uses_adjacent_apply_heading_context(self) -> None:
+        text = "▒ 적용 일자\n- 2026년 5월 28일(목)"
+        chunks, units, _, _ = _units(
+            text,
+            title="세라 이용약관 개정 안내",
+            published_at="2026-05-20",
+        )
+        evidence_ref = _ref_containing(units, "- 2026년 5월 28일(목)")
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "effective_date",
+                "status": "supported",
+                "value_type": "date",
+                "value": "2026-05-28",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "effective_date",
+                "subject": "세라 이용약관 개정",
+                "relation": "effective_at",
+                "value_type": "date",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "supported_exact")
+        self.assertEqual(audit["failure_reasons"], [])
+
+    def test_policy_valid_from_supports_canonical_effective_at(self) -> None:
+        text = "### 운영정책\n2026년 03월 15일"
+        chunks, documents, temporal = _artifacts(
+            text,
+            title="던전앤파이터 운영정책",
+            published_at="2026-03-15",
+        )
+        documents["d1"]["source_id"] = "dnf_account_policy"
+        temporal["d1"].update(
+            {
+                "source_kind": "account_policy",
+                "valid_from": "2026-03-15",
+            }
+        )
+        unit_rows = build_evidence_units(
+            ["c1"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+        units = {unit["evidence_ref"]: unit for unit in unit_rows}
+        evidence_ref = _ref_containing(units, "2026년 03월 15일")
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "effective_date",
+                "status": "supported",
+                "value_type": "date",
+                "value": "2026-03-15",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "effective_date",
+                "subject": "던전앤파이터 운영정책",
+                "relation": "effective_at",
+                "value_type": "date",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "supported_exact")
+        self.assertEqual(audit["failure_reasons"], [])
+
+    def test_revision_cutoff_accepts_labeled_update_baseline(self) -> None:
+        text = (
+            "- 2026년 5월 28일 기준 라이브 서버 업데이트가 "
+            "완료된 직업의 아바타만 포함되어 있습니다."
+        )
+        chunks, units, _, _ = _units(
+            text,
+            title="2026 나비 무도회 패키지",
+        )
+        evidence_ref = _ref_containing(units, text)
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "class_cutoff",
+                "status": "supported",
+                "value_type": "date",
+                "value": "2026-05-28",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "class_cutoff",
+                "subject": "2026 나비 무도회 패키지",
+                "relation": "revision_cutoff",
                 "value_type": "date",
             },
             question_time_scope="current",
@@ -413,6 +660,331 @@ class TypedEvidenceRefTest(unittest.TestCase):
                 "subject": "장비 점수",
                 "relation": "캐릭터별 스킬 정보 반영",
                 "surface": "캐릭터 스킬 반영 여부",
+                "value_type": "boolean",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "unsupported")
+        self.assertIn(
+            "typed_value_not_supported_by_evidence",
+            audit["failure_reasons"],
+        )
+
+    def test_currency_amount_only_and_extended_units_are_supported(self) -> None:
+        self.assertEqual(currency_values("10 골드 코인"), {(10, "골드 코인")})
+        self.assertEqual(currency_values("1500 마일리지"), {(1500, "마일리지")})
+        self.assertEqual(currency_values("12,900 세라"), {(12900, "세라")})
+        self.assertEqual(
+            currency_values("광휘의 잔영 120개"),
+            {(120, "광휘의 잔영")},
+        )
+        self.assertTrue(
+            _value_supported(
+                "currency",
+                "12900",
+                "가격은 12,900 세라입니다.",
+                as_of="2026-07-22",
+            )
+        )
+        self.assertTrue(
+            _value_supported(
+                "currency",
+                22600,
+                "가격은 22,600 세라입니다.",
+                as_of="2026-07-22",
+            )
+        )
+        self.assertTrue(
+            _value_supported(
+                "currency",
+                "10",
+                "가격은 10 골드 코인입니다.",
+                as_of="2026-07-22",
+            )
+        )
+        self.assertFalse(
+            _value_supported(
+                "currency",
+                "12900",
+                "가격은 99,999 골드입니다.",
+                as_of="2026-07-22",
+            )
+        )
+        self.assertFalse(
+            _value_supported(
+                "currency",
+                "10",
+                "가격은 10 세라 또는 10 골드입니다.",
+                as_of="2026-07-22",
+            )
+        )
+
+    def test_currency_amount_only_passes_public_verifier(self) -> None:
+        text = "트로피컬 바캉스 패키지의 가격은 12,900 세라입니다."
+        chunks, units, _, _ = _units(
+            text,
+            title="트로피컬 바캉스 패키지",
+        )
+        evidence_ref = _ref_containing(units, text)
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "r1",
+                "status": "supported",
+                "value_type": "currency",
+                "value": 12900,
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "r1",
+                "subject": "트로피컬 바캉스 패키지",
+                "relation": "가격",
+                "surface": "가격",
+                "value_type": "currency",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "supported_exact")
+        self.assertEqual(decision["answer"], "12,900 세라")
+        self.assertEqual(audit["failure_reasons"], [])
+
+    def test_boolean_state_noun_passes_public_verifier(self) -> None:
+        text = (
+            "다른 계정으로 이동하면 해당 아이템은 교환불가 타입으로 변경됩니다."
+        )
+        chunks, units, _, _ = _units(text, title="아이템 거래 타입")
+        evidence_ref = _ref_containing(units, text)
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "r1",
+                "status": "supported",
+                "value_type": "boolean",
+                "value": True,
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "r1",
+                "subject": "해당 아이템",
+                "relation": "교환불가 타입으로 변경",
+                "surface": "교환불가 타입으로 변경",
+                "value_type": "boolean",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "supported_exact")
+        self.assertEqual(decision["answer"], "예")
+        self.assertEqual(audit["failure_reasons"], [])
+
+    def test_boolean_opposite_direction_is_blocked_by_public_verifier(self) -> None:
+        text = (
+            "다른 계정으로 이동해도 해당 아이템은 "
+            "교환불가 상태로 변경되지 않습니다."
+        )
+        chunks, units, _, _ = _units(text, title="아이템 거래 타입")
+        evidence_ref = _ref_containing(units, text)
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "r1",
+                "status": "supported",
+                "value_type": "boolean",
+                "value": True,
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "r1",
+                "subject": "해당 아이템",
+                "relation": "교환불가 상태로 변경",
+                "surface": "교환불가 상태로 변경",
+                "value_type": "boolean",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "unsupported")
+        self.assertIn(
+            "typed_value_not_supported_by_evidence",
+            audit["failure_reasons"],
+        )
+
+    def test_boolean_evidence_is_directional_and_protects_state_nouns(self) -> None:
+        cases = {
+            "해당 현상이 수정됩니다.": {True},
+            "거래타입 교환가능": {True},
+            "다른 계정으로 이동하면 교환불가 타입으로 변경": {True},
+            "교환불가 상태로 변경되지 않습니다": {False},
+            "연출이 출력되지 않는 현상": {False},
+            "결투장에서는 적용되지 않습니다": {False},
+            "정지된 이후에도 OTP 이용이 가능합니다": {True},
+        }
+        for evidence, expected in cases.items():
+            with self.subTest(evidence=evidence):
+                self.assertEqual(boolean_evidence(evidence), expected)
+
+    def test_boolean_ignores_negative_evidence_for_another_subject_relation(
+        self,
+    ) -> None:
+        positive = "기존 이용 중이신 경우 비밀번호 변경, 재발급이 가능합니다."
+        negative = "폐기 시 추가 발급이 가능하지 않은 점 참고 부탁드립니다."
+        chunks = {
+            "c1": {
+                "chunk_id": "c1",
+                "parent_document_id": "d1",
+                "display_text": positive,
+                "default_exposure": True,
+                "status": "current",
+            },
+            "c2": {
+                "chunk_id": "c2",
+                "parent_document_id": "d2",
+                "display_text": negative,
+                "default_exposure": True,
+                "status": "current",
+            },
+        }
+        documents = {
+            "d1": {
+                "document_id": "d1",
+                "source_id": "dnf_test",
+                "title": "[고블린패드] 신규 가입",
+                "published_at": "2026-07-01",
+                "revision_id": "r1",
+                "status": "current",
+                "default_exposure": True,
+            },
+            "d2": {
+                "document_id": "d2",
+                "source_id": "dnf_test",
+                "title": "[고블린패드] 폐기",
+                "published_at": "2026-07-01",
+                "revision_id": "r2",
+                "status": "current",
+                "default_exposure": True,
+            },
+        }
+        temporal = {
+            document_id: {
+                "document_id": document_id,
+                "revision_id": document["revision_id"],
+                "validity_state": "current",
+                "retrieval_action_current": "allow",
+            }
+            for document_id, document in documents.items()
+        }
+        unit_rows = build_evidence_units(
+            ["c1", "c2"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+        units = {unit["evidence_ref"]: unit for unit in unit_rows}
+        positive_ref = _ref_containing(units, positive)
+        negative_ref = _ref_containing(units, negative)
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "r1",
+                "status": "supported",
+                "value_type": "boolean",
+                "value": True,
+                "evidence_refs": [positive_ref, negative_ref],
+            },
+            requirement={
+                "requirement_id": "r1",
+                "subject": "고블린패드 기존 이용자",
+                "relation": "can_reissue",
+                "value_type": "boolean",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "supported_exact")
+        self.assertEqual(decision["answer"], "예")
+        self.assertEqual(
+            [citation["evidence_ref"] for citation in decision["citations"]],
+            [positive_ref],
+        )
+        self.assertEqual(audit["failure_reasons"], [])
+
+    def test_boolean_blocks_relation_compatible_conflicting_evidence(self) -> None:
+        positive = "기존 이용자는 재발급이 가능합니다."
+        negative = "기존 이용자는 재발급이 가능하지 않습니다."
+        chunks = {
+            "c1": {
+                "chunk_id": "c1",
+                "parent_document_id": "d1",
+                "display_text": positive,
+                "default_exposure": True,
+                "status": "current",
+            },
+            "c2": {
+                "chunk_id": "c2",
+                "parent_document_id": "d2",
+                "display_text": negative,
+                "default_exposure": True,
+                "status": "current",
+            },
+        }
+        documents = {
+            document_id: {
+                "document_id": document_id,
+                "source_id": "dnf_test",
+                "title": "[고블린패드] 기존 이용자",
+                "published_at": "2026-07-01",
+                "revision_id": f"r{index}",
+                "status": "current",
+                "default_exposure": True,
+            }
+            for index, document_id in enumerate(("d1", "d2"), 1)
+        }
+        temporal = {
+            document_id: {
+                "document_id": document_id,
+                "revision_id": document["revision_id"],
+                "validity_state": "current",
+                "retrieval_action_current": "allow",
+            }
+            for document_id, document in documents.items()
+        }
+        unit_rows = build_evidence_units(
+            ["c1", "c2"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+        units = {unit["evidence_ref"]: unit for unit in unit_rows}
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "r1",
+                "status": "supported",
+                "value_type": "boolean",
+                "value": True,
+                "evidence_refs": list(units),
+            },
+            requirement={
+                "requirement_id": "r1",
+                "subject": "고블린패드 기존 이용자",
+                "relation": "can_reissue",
                 "value_type": "boolean",
             },
             question_time_scope="current",

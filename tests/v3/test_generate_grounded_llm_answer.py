@@ -125,6 +125,72 @@ class GroundedLlmAnswerTest(unittest.TestCase):
         self.assertNotIn("acceptable_evidence_group_ids", prompt)
         self.assertNotIn("gold", prompt)
 
+    def test_table_row_key_value_can_bind_the_requirement_subject(self) -> None:
+        rows = {
+            "c1": [
+                {
+                    "row_id": "target",
+                    "row_text": (
+                        "| [프리미엄 코인샵]트로피컬 바캉스 무기 아바타 상자 "
+                        "| 2개 | 계정당 5회 | 2026년 8월 27일 06시 |"
+                    ),
+                    "facts": [
+                        {
+                            "subject": "삭제일자가 존재하는 판매 물품",
+                            "attribute": "판매 목록",
+                            "value": (
+                                "[프리미엄 코인샵]"
+                                "트로피컬 바캉스 무기 아바타 상자"
+                            ),
+                        },
+                        {
+                            "subject": "삭제일자가 존재하는 판매 물품",
+                            "attribute": "삭제일자",
+                            "value": "2026년 8월 27일 06시",
+                        },
+                    ],
+                },
+                {
+                    "row_id": "sibling",
+                    "row_text": (
+                        "| [프리미엄 코인샵]트로피컬 바캉스 스페셜 모자 "
+                        "아바타 상자 | 2개 | 계정당 5회 "
+                        "| 2026년 8월 27일 06시 |"
+                    ),
+                    "facts": [
+                        {
+                            "subject": "삭제일자가 존재하는 판매 물품",
+                            "attribute": "판매 목록",
+                            "value": (
+                                "[프리미엄 코인샵]"
+                                "트로피컬 바캉스 스페셜 모자 아바타 상자"
+                            ),
+                        },
+                        {
+                            "subject": "삭제일자가 존재하는 판매 물품",
+                            "attribute": "삭제일자",
+                            "value": "2026년 8월 27일 06시",
+                        },
+                    ],
+                },
+            ]
+        }
+        requirement = {
+            "requirement_id": "deletion_at",
+            "subject": (
+                "[프리미엄 코인샵]트로피컬 바캉스 무기 아바타 상자"
+            ),
+            "relation": "deletion_at",
+            "value_type": "datetime",
+        }
+
+        selected = select_table_rows_for_requirement(rows, requirement)
+
+        self.assertEqual(
+            [row["row_id"] for row in selected["c1"]],
+            ["target"],
+        )
+
     def test_batched_table_prompt_keeps_requirement_local_row_refs(self) -> None:
         chunks, documents, temporal = _fixtures()
         rows = {
@@ -181,6 +247,10 @@ class GroundedLlmAnswerTest(unittest.TestCase):
         self.assertNotIn('"table_row_ref": "2"', prompt)
         self.assertIn("상품 A의 가격은 100 세라", prompt)
         self.assertIn("상품 A의 거래 타입은 계정귀속", prompt)
+        self.assertNotIn(
+            "상품 A의 가격은 100 세라이며 거래 타입은 계정귀속입니다.",
+            prompt,
+        )
         self.assertNotIn('"row_id":', prompt)
 
     def test_boolean_prompt_requires_an_exact_evidence_phrase_not_false(self) -> None:
@@ -413,6 +483,70 @@ class GroundedLlmAnswerTest(unittest.TestCase):
         self.assertEqual(decision["status"], "supported_exact")
         self.assertEqual(decision["citations"][0]["text"], "상품 A의 가격은 100 세라")
         self.assertEqual(audit["matching_table_row_ids"], ["target"])
+
+    def test_table_verifier_normalizes_datetime_to_exact_row_value(self) -> None:
+        chunks, documents, temporal = _fixtures()
+        row_text = (
+            "| [프리미엄 코인샵]트로피컬 바캉스 무기 아바타 상자 "
+            "| 2개 | 계정당 5회 | 2026년 8월 27일 06시 |"
+        )
+        chunks["c1"]["display_text"] = row_text
+        rows = {
+            "c1": [
+                {
+                    "row_id": "target",
+                    "row_text": row_text,
+                    "facts": [
+                        {
+                            "subject": "삭제일자가 존재하는 판매 물품",
+                            "attribute": "판매 목록",
+                            "value": (
+                                "[프리미엄 코인샵]"
+                                "트로피컬 바캉스 무기 아바타 상자"
+                            ),
+                        },
+                        {
+                            "subject": "삭제일자가 존재하는 판매 물품",
+                            "attribute": "삭제일자",
+                            "value": "2026년 8월 27일 06시",
+                        },
+                    ],
+                }
+            ]
+        }
+
+        decision, audit = verify_requirement_selection(
+            {
+                "status": "supported",
+                "answer": "2026-08-27T06:00:00",
+                "evidence": [
+                    {"candidate_ref": "1", "quote": "", "table_row_ref": "1"}
+                ],
+            },
+            requirement={
+                "requirement_id": "deletion_at",
+                "subject": (
+                    "[프리미엄 코인샵]"
+                    "트로피컬 바캉스 무기 아바타 상자"
+                ),
+                "relation": "deletion_at",
+                "value_type": "datetime",
+            },
+            question_time_scope="current",
+            candidate_chunk_ids=["c1"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+            table_rows_by_chunk=rows,
+        )
+
+        self.assertEqual(decision["status"], "supported_exact")
+        self.assertEqual(decision["answer"], "2026년 8월 27일 06시")
+        self.assertEqual(audit["failure_reasons"], [])
+        self.assertEqual(
+            audit["answer_value_source"],
+            "selected_table_fact",
+        )
 
     def test_non_table_schema_forbids_table_row_ref(self) -> None:
         with self.assertRaises(ValidationError):

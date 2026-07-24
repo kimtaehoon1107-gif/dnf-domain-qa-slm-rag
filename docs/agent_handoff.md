@@ -1,5 +1,47 @@
 # Agent Handoff - DNF Domain QA SLM/RAG
 
+## 2026-07-25 Latest pipeline full-64 adaptive diagnostic
+
+The current temporal-role prompt, relation-group/currency verifier, table
+row-subject binding, and table-only prompt compression were run with 64 new
+Qwen3 8B calls over the stored candidate pools.
+
+- Official sealed one-shot remains `37/64`.
+- Verifier-only replay of the original outputs remains `43/64`.
+- Latest new-generation adaptive diagnostic is `45/64`.
+- Approved direct evidence is `35/64`, verifier overreject `5`, generation
+  errors `3`, mean/p95 latency `15.76s / 37.20s`.
+- Against verifier-only v2: wins `9,10,39,53,55,61`; regressions
+  `12,41,43,63`.
+- Automatic false-full flags are `31,47,63`. Slots 31 and 47 remain frozen-gold
+  omission candidates; slot 63 is a source-reviewed real semantic false-full.
+- Slot 9 is correct in this full run but varied to `unsupported` in targeted
+  retries. Slot 49 remains correct with exact row citation and 2,578 input
+  tokens.
+- Overall promotion verdict: **NO-GO**. Do not tune further on these 64 cases.
+
+See:
+`reports/v3/typed_evidence_ref_latest_pipeline_qwen3_8b_full64_20260725.md`.
+
+## 2026-07-25 Typed evidence-ref verifier addendum
+
+최신 v3 일반화-64 작업은 아래 인계 문서를 먼저 확인한다.
+
+- `reports/v3/typed_evidence_ref_relation_group_currency_handoff_20260725.md`
+
+핵심 상태:
+
+- 공식 봉인 one-shot은 계속 `37/64`이며 수정하지 않았다.
+- 동일한 저장 출력에 relation-group boolean 및 currency-unit verifier를
+  사후 적용하면 `43/64`, 직접 근거 `37/64`, overreject `8`, 회귀 `0`이다.
+- 새 LLM 호출과 검색 재실행은 없으므로 `43/64`는 공식 새 기준선이 아니라
+  verifier-only post-hoc diagnostic이다.
+- 자동 false-full flag는 split `2`, Typed `1`이었으나 공식 출처 재검수상
+  split 31번과 Typed 47번은 gold 허용 근거 누락 후보이며, 확인된 실제
+  relation/column false-full은 split 55번 1건이다.
+- 따라서 향후 보고에서는 `자동 frozen-gold false-full flag`와
+  `공식 출처 재검수상 실제 false-full`을 분리한다.
+
 ## Current Goal
 
 The final portfolio cycle is closed. Canonical retrieval is BGE-M3 hybrid

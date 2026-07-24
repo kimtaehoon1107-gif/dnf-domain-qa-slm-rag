@@ -1,5 +1,14 @@
 # 64문항 paired 비교: 이전 split-schema vs Typed evidence-ref
 
+> **2026-07-25 정정:** 이 문서의 `실제 false-full` 수치는 사람의 공식
+> 출처 재검수 전 자동 frozen-gold flag다. 출처 재검수 결과 split 31번과
+> Typed 47번은 gold 허용 근거 누락 후보이며, 확인된 실제 relation/column
+> false-full은 split 55번이다. 또한 최신 verifier-only 사후 진단은 Typed
+> `43/64`, 직접 근거 `37/64`, overreject `8`, 회귀 `0`이다. 공식 봉인
+> one-shot은 계속 `37/64`다. 자세한 내용은
+> `reports/v3/typed_evidence_ref_relation_group_currency_handoff_20260725.md`를
+> 따른다.
+
 ## 평가 범위
 
 두 Arm은 동일한 human-reviewed sealed 64문항, 동일한

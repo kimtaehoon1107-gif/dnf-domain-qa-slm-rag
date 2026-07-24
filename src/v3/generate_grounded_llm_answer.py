@@ -180,6 +180,53 @@ def _compact_text(value: Any) -> str:
     return re.sub(r"[^0-9a-z가-힣]+", "", str(value).lower())
 
 
+_YMD_VALUE = re.compile(
+    r"(?P<year>20\d{2})\s*(?:년|[./-])\s*"
+    r"(?P<month>\d{1,2})\s*(?:월|[./-])\s*"
+    r"(?P<day>\d{1,2})\s*일?"
+)
+
+
+def _date_values(value: Any) -> set[str]:
+    return {
+        (
+            f"{int(match.group('year')):04d}-"
+            f"{int(match.group('month')):02d}-"
+            f"{int(match.group('day')):02d}"
+        )
+        for match in _YMD_VALUE.finditer(str(value or ""))
+    }
+
+
+def _datetime_values(value: Any) -> set[str]:
+    text = str(value or "")
+    values = set()
+    for match in _YMD_VALUE.finditer(text):
+        tail = text[match.end() : match.end() + 30]
+        time_match = re.search(
+            r".{0,10}?(?P<ampm>오전|오후)?\s*(?P<hour>\d{1,2})"
+            r"(?:\s*시|:)(?P<minute>\d{1,2})?\s*분?",
+            tail,
+        )
+        if time_match is None:
+            continue
+        hour = int(time_match.group("hour"))
+        minute = int(time_match.group("minute") or 0)
+        if time_match.group("ampm") == "오후" and hour < 12:
+            hour += 12
+        if time_match.group("ampm") == "오전" and hour == 12:
+            hour = 0
+        if hour > 23 or minute > 59:
+            continue
+        date_value = (
+            f"{int(match.group('year')):04d}-"
+            f"{int(match.group('month')):02d}-"
+            f"{int(match.group('day')):02d}"
+        )
+        values.add(f"{date_value}T{hour:02d}:{minute:02d}")
+    return values
+
+
 VALUE_TYPE_ATTRIBUTE_HINTS = {
     "activation": ("적용", "기간제한"),
     "date": ("날짜", "일자", "적용일"),
@@ -191,21 +238,53 @@ VALUE_TYPE_ATTRIBUTE_HINTS = {
     "trade_type": ("거래타입", "거래유형"),
 }
 
+ROW_SUBJECT_ATTRIBUTES = {
+    "판매목록",
+    "판매물품",
+    "아이템명",
+    "상품명",
+}
+
+
+def _attribute_matches_requirement(
+    attribute: Any,
+    requirement: dict[str, Any],
+) -> bool:
+    compact_attribute = _compact_text(attribute)
+    relation_text = _compact_text(
+        " ".join(
+            str(requirement.get(key, ""))
+            for key in ("relation", "surface", "value_type")
+        )
+    )
+    hints = tuple(
+        _compact_text(value)
+        for value in VALUE_TYPE_ATTRIBUTE_HINTS.get(
+            requirement.get("value_type"),
+            (),
+        )
+    )
+    return bool(
+        compact_attribute
+        and (
+            compact_attribute in relation_text
+            or any(
+                hint
+                and (
+                    hint in compact_attribute
+                    or compact_attribute in hint
+                )
+                for hint in hints
+            )
+        )
+    )
+
 
 def select_table_rows_for_requirement(
     table_rows_by_chunk: dict[str, list[dict[str, Any]]],
     requirement: dict[str, Any],
 ) -> dict[str, list[dict[str, Any]]]:
     subject = _compact_text(requirement.get("subject", ""))
-    relation_text = _compact_text(
-        " ".join(
-            str(requirement.get(key, "")) for key in ("relation", "surface", "value_type")
-        )
-    )
-    hints = tuple(
-        _compact_text(value)
-        for value in VALUE_TYPE_ATTRIBUTE_HINTS.get(requirement.get("value_type"), ())
-    )
     selected: dict[str, list[dict[str, Any]]] = {}
     for chunk_id, rows in table_rows_by_chunk.items():
         matched = []
@@ -214,18 +293,25 @@ def select_table_rows_for_requirement(
             subjects = {
                 _compact_text(fact.get("subject", "")) for fact in facts if fact.get("subject")
             }
+            subjects.update(
+                _compact_text(fact.get("value", ""))
+                for fact in facts
+                if (
+                    _compact_text(fact.get("attribute", ""))
+                    in ROW_SUBJECT_ATTRIBUTES
+                    and fact.get("value")
+                )
+            )
             subject_match = bool(
                 subject
                 and any(subject in candidate or candidate in subject for candidate in subjects)
             )
-            attributes = [_compact_text(fact.get("attribute", "")) for fact in facts]
             attribute_match = any(
-                attribute
-                and (
-                    attribute in relation_text
-                    or any(hint and (hint in attribute or attribute in hint) for hint in hints)
+                _attribute_matches_requirement(
+                    fact.get("attribute", ""),
+                    requirement,
                 )
-                for attribute in attributes
+                for fact in facts
             )
             if subject_match and attribute_match:
                 matched.append(row)
@@ -242,6 +328,7 @@ def _candidate_payload(
     temporal_by_document: dict[str, dict[str, Any]],
     table_rows_by_chunk: dict[str, list[dict[str, Any]]] | None = None,
     short_table_row_refs: bool = False,
+    include_text: bool = True,
 ) -> list[dict[str, Any]]:
     output = []
     seen = set()
@@ -266,23 +353,23 @@ def _candidate_payload(
                 }
                 for row_index, row in enumerate(table_rows, 1)
             ]
-        output.append(
-            {
-                "candidate_ref": str(candidate_index),
-                "source_id": document["source_id"],
-                "title": document["title"],
-                "published_at": document.get("published_at"),
-                "revision_id": document.get("revision_id"),
-                "status": document.get("status"),
-                "default_exposure": document.get("default_exposure"),
-                "valid_from": document.get("valid_from"),
-                "valid_to": document.get("valid_to"),
-                "validity_state": temporal.get("validity_state"),
-                "retrieval_action_current": temporal.get("retrieval_action_current"),
-                "table_atomic_rows": table_rows,
-                "text": chunk["display_text"],
-            }
-        )
+        candidate = {
+            "candidate_ref": str(candidate_index),
+            "source_id": document["source_id"],
+            "title": document["title"],
+            "published_at": document.get("published_at"),
+            "revision_id": document.get("revision_id"),
+            "status": document.get("status"),
+            "default_exposure": document.get("default_exposure"),
+            "valid_from": document.get("valid_from"),
+            "valid_to": document.get("valid_to"),
+            "validity_state": temporal.get("validity_state"),
+            "retrieval_action_current": temporal.get("retrieval_action_current"),
+            "table_atomic_rows": table_rows,
+        }
+        if include_text:
+            candidate["text"] = chunk["display_text"]
+        output.append(candidate)
     return output
 
 
@@ -374,6 +461,7 @@ def build_batched_requirement_prompt(
         chunks_by_id=chunks_by_id,
         documents_by_id=documents_by_id,
         temporal_by_document=temporal_by_document,
+        include_text=not include_table_rows,
     )
     table_candidates_by_requirement = []
     if include_table_rows:
@@ -643,6 +731,23 @@ def _answer_supported_by_text(answer: str, text: str) -> bool:
     )
 
 
+def _answer_supported_for_requirement(
+    answer: str,
+    text: str,
+    requirement: dict[str, Any],
+) -> bool:
+    if _answer_supported_by_text(answer, text):
+        return True
+    value_type = requirement.get("value_type")
+    if value_type == "datetime":
+        answer_values = _datetime_values(answer)
+        return bool(answer_values) and answer_values <= _datetime_values(text)
+    if value_type in {"date", "date_range"}:
+        answer_values = _date_values(answer)
+        return bool(answer_values) and answer_values <= _date_values(text)
+    return False
+
+
 def _verify_parsed_requirement_selection(
     parsed: RequirementSelectionOutput | NonTableRequirementSelectionOutput,
     *,
@@ -661,6 +766,8 @@ def _verify_parsed_requirement_selection(
     citations = []
     failures = []
     cited_table_rows = []
+    resolved_answer = parsed.answer
+    answer_value_source = "model_answer" if parsed.status == "supported" else None
     selected_rows = (
         select_table_rows_for_requirement(table_rows_by_chunk or {}, requirement)
         if allow_table_rows
@@ -710,7 +817,11 @@ def _verify_parsed_requirement_selection(
             elif citation is not None:
                 citations.append(citation)
         combined_quotes = " ".join(citation["text"] for citation in citations)
-        if citations and not _answer_supported_by_text(parsed.answer, combined_quotes):
+        if citations and not _answer_supported_for_requirement(
+            parsed.answer,
+            combined_quotes,
+            requirement,
+        ):
             failures.append("answer_tokens_not_contained_in_evidence")
         if not cited_table_rows:
             for citation in citations:
@@ -724,13 +835,33 @@ def _verify_parsed_requirement_selection(
             if not cited_table_rows:
                 failures.append("citation_not_in_requirement_matching_table_row")
             else:
-                table_values = " ".join(
+                matching_table_values = [
                     str(fact.get("value", ""))
                     for row in cited_table_rows
                     for fact in row.get("facts") or []
-                )
-                if not _answer_supported_by_text(parsed.answer, table_values):
+                    if _attribute_matches_requirement(
+                        fact.get("attribute", ""),
+                        requirement,
+                    )
+                ]
+                table_values = " ".join(matching_table_values)
+                if not _answer_supported_for_requirement(
+                    parsed.answer,
+                    table_values,
+                    requirement,
+                ):
                     failures.append("answer_not_supported_by_matching_table_value")
+                elif requirement.get("value_type") in {
+                    "date",
+                    "date_range",
+                    "datetime",
+                }:
+                    unique_table_values = list(
+                        dict.fromkeys(matching_table_values)
+                    )
+                    if len(unique_table_values) == 1:
+                        resolved_answer = unique_table_values[0]
+                        answer_value_source = "selected_table_fact"
     elif parsed.answer.strip() or parsed.evidence:
         failures.append("unsupported_payload_discarded")
     exposed = parsed.status == "supported" and bool(citations) and not failures
@@ -738,7 +869,7 @@ def _verify_parsed_requirement_selection(
         "requirement_id": requirement["requirement_id"],
         "question_part": requirement.get("surface") or requirement.get("relation"),
         "status": "supported_exact" if exposed else "unsupported",
-        "answer": parsed.answer if exposed else "",
+        "answer": resolved_answer if exposed else "",
         "citations": citations if exposed else [],
     }
     audit = {
@@ -747,6 +878,7 @@ def _verify_parsed_requirement_selection(
         "exposed_status": decision["status"],
         "failure_reasons": failures,
         "matching_table_row_ids": [row["row_id"] for row in cited_table_rows],
+        "answer_value_source": answer_value_source,
     }
     return decision, audit
 

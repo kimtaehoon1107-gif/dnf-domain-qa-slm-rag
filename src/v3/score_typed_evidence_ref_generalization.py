@@ -4,32 +4,28 @@ import re
 from collections import Counter
 from typing import Any
 
+from src.v3.value_normalization import (
+    CURRENCY_UNITS,
+    boolean_value,
+    currency_values,
+)
 
-SCORER_VERSION = "typed-evidence-ref-generalization-scorer-v1"
+
+SCORER_VERSION = "typed-evidence-ref-generalization-scorer-v2"
 NORMALIZATION_CONTRACT = {
-    "version": "typed-evidence-ref-generalization-normalization-v1",
+    "version": "typed-evidence-ref-generalization-normalization-v2",
     "rules": [
         "Whitespace, punctuation, and Korean zero-padded month/day variants are normalized.",
         "Korean and ISO dates are compared as YYYY-MM-DD; month/day-only forms use the frozen as_of year.",
         "06시, 6시, and 06:00 are compared as 06:00; 오전/오후 are converted to 24-hour time.",
-        "Currency commas and Korean 만/억 scales are normalized to integer amount plus unit.",
+        "Currency commas, Korean 만/억 scales, domain currency units, and unit-first count forms are normalized to integer amount plus unit.",
         "Percentages and plain numbers are compared numerically.",
-        "Boolean answers normalize explicit true/false and Korean positive/negative expressions.",
+        "Boolean answers normalize explicit true/false and Korean positive/negative actions while protecting 불가 state nouns.",
         "Table-row and prose citations are equivalent only when the normalized gold value is present and the citation comes from an approved evidence chunk.",
         "For text, enum, entity, and entity_list values, a directly cited pre-approved evidence unit is the canonical gold when required_values is a human-authored summary of that unit.",
         "No semantic paraphrase credit is added beyond the typed normalizations above.",
     ],
 }
-
-_CURRENCY_UNITS = {
-    "세라": "SERA",
-    "sera": "SERA",
-    "골드": "GOLD",
-    "gold": "GOLD",
-    "원": "KRW",
-    "krw": "KRW",
-}
-
 
 def _compact(value: Any) -> str:
     return re.sub(r"[^0-9a-z가-힣]+", "", str(value or "").casefold())
@@ -81,22 +77,6 @@ def _time_values(value: Any) -> set[str]:
     return values
 
 
-def _currency_values(value: Any) -> set[tuple[int, str]]:
-    text = str(value or "")
-    values = set()
-    pattern = re.compile(
-        r"(?P<amount>\d[\d,]*(?:\.\d+)?)\s*(?P<scale>만|억)?\s*"
-        r"(?P<unit>세라|골드|원|SERA|GOLD|KRW)",
-        re.IGNORECASE,
-    )
-    for match in pattern.finditer(text):
-        amount = float(match.group("amount").replace(",", ""))
-        scale = {"만": 10_000, "억": 100_000_000}.get(match.group("scale"), 1)
-        unit = _CURRENCY_UNITS[match.group("unit").casefold()]
-        values.add((int(amount * scale), unit))
-    return values
-
-
 def _number_values(value: Any) -> set[float]:
     text = str(value or "")
     values = set()
@@ -114,37 +94,20 @@ def _percentage_values(value: Any) -> set[float]:
     }
 
 
-def _boolean_value(value: Any) -> bool | None:
-    if isinstance(value, bool):
-        return value
-    compact = _compact(value)
-    if compact in {"true", "yes", "예", "적용", "포함", "가능"}:
-        return True
-    if compact in {"false", "no", "아니오", "미적용", "제외", "불가"}:
-        return False
-    negative = ("않", "미적용", "제외", "불가", "없", "아니")
-    positive = ("적용됩니다", "포함됩니다", "가능합니다", "수정됩니다")
-    if any(marker in compact for marker in negative):
-        return False
-    if any(marker in compact for marker in positive):
-        return True
-    return None
-
-
 def _expected_currency(value: Any) -> tuple[int, str] | None:
     if not isinstance(value, dict):
-        parsed = _currency_values(value)
+        parsed = currency_values(value)
         return next(iter(parsed)) if len(parsed) == 1 else None
     amount = value.get("amount")
     unit = str(value.get("unit") or "").casefold()
-    if not isinstance(amount, (int, float)) or unit not in _CURRENCY_UNITS:
+    if not isinstance(amount, (int, float)) or unit not in CURRENCY_UNITS:
         return None
-    return int(amount), _CURRENCY_UNITS[unit]
+    return int(amount), CURRENCY_UNITS[unit]
 
 
 def value_present(expected: Any, value_type: str, observed: Any, *, as_of: str) -> bool:
     if value_type == "boolean" or isinstance(expected, bool):
-        return _boolean_value(expected) is not None and _boolean_value(expected) == _boolean_value(
+        return boolean_value(expected) is not None and boolean_value(expected) == boolean_value(
             observed
         )
     if isinstance(expected, dict):
@@ -158,7 +121,7 @@ def value_present(expected: Any, value_type: str, observed: Any, *, as_of: str) 
         )
     if value_type in {"currency", "price"}:
         normalized = _expected_currency(expected)
-        return normalized is not None and normalized in _currency_values(observed)
+        return normalized is not None and normalized in currency_values(observed)
     if value_type == "percentage":
         expected_values = (
             {float(expected)}

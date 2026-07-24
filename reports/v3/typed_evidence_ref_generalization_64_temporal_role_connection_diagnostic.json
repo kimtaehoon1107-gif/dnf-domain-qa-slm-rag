@@ -1,0 +1,939 @@
+{
+  "evaluation_role": "post_hoc_diagnostic_only_not_a_generalization_score",
+  "headline_replacement_allowed": false,
+  "sealed_result_preserved": {
+    "gold_value_complete": {
+      "successes": 37,
+      "total": 64
+    },
+    "source_path": "outputs/v3/typed_evidence_ref_generalization_64_one_shot_e56780c88fcf74d3/typed_evidence_ref_generalization_64_cases_9ae8e0443e0948457ef53e98493f81ee2909159716d20b247f85dc20429d2efb.jsonl",
+    "source_sha256": "9ae8e0443e0948457ef53e98493f81ee2909159716d20b247f85dc20429d2efb"
+  },
+  "diagnostic_replay": {
+    "new_model_calls": 0,
+    "retrieval_reexecuted": false,
+    "stored_candidates_reused": true,
+    "stored_model_outputs_reused": true,
+    "scorer_version": "typed-evidence-ref-generalization-scorer-v2",
+    "normalization_contract": {
+      "version": "typed-evidence-ref-generalization-normalization-v2",
+      "rules": [
+        "Whitespace, punctuation, and Korean zero-padded month/day variants are normalized.",
+        "Korean and ISO dates are compared as YYYY-MM-DD; month/day-only forms use the frozen as_of year.",
+        "06시, 6시, and 06:00 are compared as 06:00; 오전/오후 are converted to 24-hour time.",
+        "Currency commas, Korean 만/억 scales, domain currency units, and unit-first count forms are normalized to integer amount plus unit.",
+        "Percentages and plain numbers are compared numerically.",
+        "Boolean answers normalize explicit true/false and Korean positive/negative actions while protecting 불가 state nouns.",
+        "Table-row and prose citations are equivalent only when the normalized gold value is present and the citation comes from an approved evidence chunk.",
+        "For text, enum, entity, and entity_list values, a directly cited pre-approved evidence unit is the canonical gold when required_values is a human-authored summary of that unit.",
+        "No semantic paraphrase credit is added beyond the typed normalizations above."
+      ]
+    },
+    "gold_value_complete": {
+      "successes": 40,
+      "total": 64
+    },
+    "score_delta": 3,
+    "recovered_slots": [
+      12,
+      15,
+      35,
+      52,
+      54,
+      58
+    ],
+    "regressed_slots": [
+      1,
+      22,
+      41
+    ],
+    "changed_slot_count": 14,
+    "score_summary": {
+      "scorer_version": "typed-evidence-ref-generalization-scorer-v2",
+      "normalization_contract": {
+        "version": "typed-evidence-ref-generalization-normalization-v2",
+        "rules": [
+          "Whitespace, punctuation, and Korean zero-padded month/day variants are normalized.",
+          "Korean and ISO dates are compared as YYYY-MM-DD; month/day-only forms use the frozen as_of year.",
+          "06시, 6시, and 06:00 are compared as 06:00; 오전/오후 are converted to 24-hour time.",
+          "Currency commas, Korean 만/억 scales, domain currency units, and unit-first count forms are normalized to integer amount plus unit.",
+          "Percentages and plain numbers are compared numerically.",
+          "Boolean answers normalize explicit true/false and Korean positive/negative actions while protecting 불가 state nouns.",
+          "Table-row and prose citations are equivalent only when the normalized gold value is present and the citation comes from an approved evidence chunk.",
+          "For text, enum, entity, and entity_list values, a directly cited pre-approved evidence unit is the canonical gold when required_values is a human-authored summary of that unit.",
+          "No semantic paraphrase credit is added beyond the typed normalizations above."
+        ]
+      },
+      "fixed_denominator": 64,
+      "gold_value_complete": {
+        "successes": 40,
+        "total": 64
+      },
+      "outcomes": {
+        "correct": 40,
+        "incorrect": 4,
+        "no_response": 20
+      },
+      "all_evidence_spans_hit": {
+        "successes": 35,
+        "total": 64
+      },
+      "candidate_all_gold_covered": {
+        "successes": 54,
+        "total": 64
+      },
+      "honest_unsupported": {
+        "slots": [
+          7,
+          15,
+          23,
+          31,
+          39,
+          47,
+          55,
+          63
+        ],
+        "correct_abstentions": 7,
+        "false_full": 1,
+        "total": 8
+      },
+      "generation_error_count": 3,
+      "all_citation_slices_exact": true,
+      "latency_ms": {
+        "total": 1549089.027,
+        "mean": 24204.516,
+        "p50": 21231.9,
+        "p95": 44671.149
+      },
+      "usage": {
+        "input_tokens": 268535,
+        "output_tokens": 5463,
+        "total_tokens": 273998
+      },
+      "failure_slots": [
+        1,
+        2,
+        3,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11,
+        13,
+        21,
+        22,
+        23,
+        30,
+        34,
+        39,
+        40,
+        41,
+        47,
+        51,
+        53,
+        55,
+        60,
+        61,
+        62
+      ],
+      "failure_breakdown": {
+        "generation_error": 3,
+        "generator_value_selection": 3,
+        "retrieval_missing_gold": 9,
+        "unsupported_false_full": 1,
+        "verifier_overreject": 10
+      },
+      "failure_cases": [
+        {
+          "slot_ordinal": 1,
+          "failure_stage": "verifier_overreject",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 2,
+          "failure_stage": "verifier_overreject",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 3,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 5,
+          "failure_stage": "verifier_overreject",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 6,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 7,
+          "failure_stage": "verifier_overreject",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 8,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "correct",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 9,
+          "failure_stage": "verifier_overreject",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 10,
+          "failure_stage": "verifier_overreject",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 11,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 13,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 21,
+          "failure_stage": "generation_error",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 22,
+          "failure_stage": "verifier_overreject",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 23,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 30,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 34,
+          "failure_stage": "verifier_overreject",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 39,
+          "failure_stage": "generation_error",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 40,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 41,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 47,
+          "failure_stage": "unsupported_false_full",
+          "outcome": "correct",
+          "false_full": true
+        },
+        {
+          "slot_ordinal": 51,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 53,
+          "failure_stage": "verifier_overreject",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 55,
+          "failure_stage": "generation_error",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 60,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 61,
+          "failure_stage": "verifier_overreject",
+          "outcome": "incorrect",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 62,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        }
+      ],
+      "gates": {
+        "generation_error_zero": false,
+        "honest_unsupported_false_full_zero": false
+      }
+    }
+  },
+  "changes": [
+    {
+      "slot_ordinal": 1,
+      "candidate_id": "typed_generalization_candidate_sha256_71494f38e0d1b4a00fe89a405af068bcfb34e757cfe90df41dc9265a1ac30c02",
+      "question_text": "2026년 세라 이용약관 개정안은 언제부터 적용돼?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "after": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "requirements": [
+        {
+          "requirement_id": "effective_date",
+          "status": {
+            "before": "supported_exact",
+            "after": "unsupported"
+          },
+          "answer": {
+            "before": "2026년 5월 28일",
+            "after": ""
+          },
+          "failure_reasons": {
+            "before": [],
+            "after": [
+              "temporal_role_mismatch",
+              "subject_relation_value_not_colocated"
+            ]
+          },
+          "normalized_value": {
+            "before": "2026-05-28",
+            "after": "2026-05-28"
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 5,
+      "candidate_id": "typed_generalization_candidate_sha256_5c176e5a886a695bd9ed7b1346c261d900afadccc4327f4ab21be3b0e83f4a5e",
+      "question_text": "2026년 4월 2일 정기점검은 몇 시부터 몇 시까지였어?",
+      "before": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "requirements": [
+        {
+          "requirement_id": "maintenance_time",
+          "status": {
+            "before": "unsupported",
+            "after": "unsupported"
+          },
+          "answer": {
+            "before": "",
+            "after": ""
+          },
+          "failure_reasons": {
+            "before": [
+              "typed_value_not_supported_by_evidence",
+              "subject_not_supported_by_evidence",
+              "subject_relation_value_not_colocated"
+            ],
+            "after": [
+              "typed_value_not_supported_by_evidence",
+              "subject_not_supported_by_evidence",
+              "temporal_role_mismatch",
+              "subject_relation_value_not_colocated"
+            ]
+          },
+          "normalized_value": {
+            "before": "2026-04-02/2026-04-02",
+            "after": "2026-04-02/2026-04-02"
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 6,
+      "candidate_id": "typed_generalization_candidate_sha256_52cf0807234a1e5f8df280126bbe6d0e504b749029294e0b91e16fb0addf7efb",
+      "question_text": "2025년에 공지된 던전앤파이터 운영정책 변경은 언제 시행될 예정이었어?",
+      "before": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "retrieval_missing_gold"
+      },
+      "after": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "retrieval_missing_gold"
+      },
+      "requirements": [
+        {
+          "requirement_id": "policy_effective_date",
+          "status": {
+            "before": "unsupported",
+            "after": "unsupported"
+          },
+          "answer": {
+            "before": "",
+            "after": ""
+          },
+          "failure_reasons": {
+            "before": [
+              "evidence_ref_not_in_candidates",
+              "typed_value_not_supported_by_evidence",
+              "subject_not_supported_by_evidence",
+              "subject_relation_value_not_colocated"
+            ],
+            "after": [
+              "evidence_ref_not_in_candidates",
+              "typed_value_not_supported_by_evidence",
+              "subject_not_supported_by_evidence",
+              "relation_not_supported_by_evidence",
+              "temporal_role_mismatch",
+              "subject_relation_value_not_colocated"
+            ]
+          },
+          "normalized_value": {
+            "before": "2025-06-01",
+            "after": "2025-06-01"
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 7,
+      "candidate_id": "typed_generalization_candidate_sha256_c40f926895ef80cdc9cbaecbd3b7fc7f24dd84efa37628be4a1033174071bbe1",
+      "question_text": "4월 2일 조율의 경계 연출 오류는 확인 중이었는지와 정확한 수정 완료 시각을 알려줘.",
+      "before": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "requirements": [
+        {
+          "requirement_id": "fixed_at",
+          "status": {
+            "before": "unsupported",
+            "after": "unsupported"
+          },
+          "answer": {
+            "before": "",
+            "after": ""
+          },
+          "failure_reasons": {
+            "before": [
+              "typed_value_not_supported_by_evidence",
+              "subject_relation_value_not_colocated"
+            ],
+            "after": [
+              "typed_value_not_supported_by_evidence",
+              "temporal_role_mismatch",
+              "subject_relation_value_not_colocated"
+            ]
+          },
+          "normalized_value": {
+            "before": "2026-04-02T10:00",
+            "after": "2026-04-02T10:00"
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 9,
+      "candidate_id": "typed_generalization_candidate_sha256_cfc64ffb1be71b29ac49f9e5f2c24d8799c364f1950a282e5b1ba105931162df",
+      "question_text": "시즌 11 Act 2 '제국의 파도 & 폭권' 업데이트는 언제 적용됐어?",
+      "before": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "requirements": [
+        {
+          "requirement_id": "effective_date",
+          "status": {
+            "before": "unsupported",
+            "after": "unsupported"
+          },
+          "answer": {
+            "before": "",
+            "after": ""
+          },
+          "failure_reasons": {
+            "before": [
+              "typed_value_not_supported_by_evidence",
+              "subject_relation_value_not_colocated"
+            ],
+            "after": [
+              "typed_value_not_supported_by_evidence",
+              "temporal_role_mismatch",
+              "subject_relation_value_not_colocated"
+            ]
+          },
+          "normalized_value": {
+            "before": "2026-06-02",
+            "after": "2026-06-02"
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 12,
+      "candidate_id": "typed_generalization_candidate_sha256_ec1f2fd8f2807f8a29c487636e109a0526b948715d26f3cbbfb7b06354b7702f",
+      "question_text": "5월 28일 업데이트의 태초 소울 1개 상자는 광휘의 잔영 몇 개였고 월 구매 제한은 몇 회였어?",
+      "before": {
+        "outcome": "incorrect",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "requirements": [
+        {
+          "requirement_id": "price",
+          "status": {
+            "before": "unsupported",
+            "after": "supported_exact"
+          },
+          "answer": {
+            "before": "",
+            "after": "광휘의 잔영 120개"
+          },
+          "failure_reasons": {
+            "before": [
+              "typed_value_not_supported_by_evidence",
+              "subject_relation_value_not_colocated"
+            ],
+            "after": []
+          },
+          "normalized_value": {
+            "before": "광휘의 잔영 120개",
+            "after": "광휘의 잔영 120개"
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 15,
+      "candidate_id": "typed_generalization_candidate_sha256_638ee7ae9476a516db4f4e7c5ef371d5e3cbc23d7603fcafb53eb68fde465921",
+      "question_text": "7월 9일 업데이트에서 DirectX11 메모리 문제의 수정 여부와 메모리 사용량 감소율을 알려줘.",
+      "before": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "requirements": [
+        {
+          "requirement_id": "fixed",
+          "status": {
+            "before": "unsupported",
+            "after": "supported_exact"
+          },
+          "answer": {
+            "before": "",
+            "after": "예"
+          },
+          "failure_reasons": {
+            "before": [
+              "typed_value_not_supported_by_evidence",
+              "subject_relation_value_not_colocated"
+            ],
+            "after": []
+          },
+          "normalized_value": {
+            "before": true,
+            "after": true
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 22,
+      "candidate_id": "typed_generalization_candidate_sha256_bfee75b28842c9492abea8cc109f0122df60239377191ce633939039ef303a5e",
+      "question_text": "2026 나비 무도회 패키지에 포함되는 직업 아바타는 어느 날짜의 라이브 서버 업데이트를 기준으로 했어?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "after": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "requirements": [
+        {
+          "requirement_id": "class_cutoff",
+          "status": {
+            "before": "supported_exact",
+            "after": "unsupported"
+          },
+          "answer": {
+            "before": "2026년 5월 28일",
+            "after": ""
+          },
+          "failure_reasons": {
+            "before": [],
+            "after": [
+              "relation_not_supported_by_evidence",
+              "temporal_role_mismatch",
+              "subject_relation_value_not_colocated"
+            ]
+          },
+          "normalized_value": {
+            "before": "2026-05-28",
+            "after": "2026-05-28"
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 34,
+      "candidate_id": "typed_generalization_candidate_sha256_704d9bc58bb3c551e037d6c0211ac28d2b78dfe935a3dcb714a8502175b26ade",
+      "question_text": "휴대폰이 정지되기 전에 모바일 OTP를 설치해 사용 중이었다면 정지 후에도 OTP를 쓸 수 있어?",
+      "before": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "requirements": [
+        {
+          "requirement_id": "otp_after_suspension",
+          "status": {
+            "before": "unsupported",
+            "after": "unsupported"
+          },
+          "answer": {
+            "before": "",
+            "after": ""
+          },
+          "failure_reasons": {
+            "before": [
+              "subject_not_supported_by_evidence",
+              "subject_relation_value_not_colocated"
+            ],
+            "after": [
+              "typed_value_not_supported_by_evidence",
+              "subject_not_supported_by_evidence",
+              "subject_relation_value_not_colocated"
+            ]
+          },
+          "normalized_value": {
+            "before": true,
+            "after": true
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 35,
+      "candidate_id": "typed_generalization_candidate_sha256_bffc772a35ccf8405761890e10b897d3c2ffa020b350a4df5ed60354123c0889",
+      "question_text": "히든 레어 아바타를 같은 계정 캐릭터와 다른 계정 캐릭터에게 넘길 때 교환불가 타입으로 바뀌는지 각각 알려줘.",
+      "before": {
+        "outcome": "incorrect",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "requirements": [
+        {
+          "requirement_id": "other_account_trade_type",
+          "status": {
+            "before": "unsupported",
+            "after": "supported_exact"
+          },
+          "answer": {
+            "before": "",
+            "after": "예"
+          },
+          "failure_reasons": {
+            "before": [
+              "typed_value_not_supported_by_evidence",
+              "subject_relation_value_not_colocated"
+            ],
+            "after": []
+          },
+          "normalized_value": {
+            "before": true,
+            "after": true
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 41,
+      "candidate_id": "typed_generalization_candidate_sha256_3e6481f87d563bb41213e3818a1934445228daf73de1fa04b9451f1431d8194e",
+      "question_text": "현재 던전앤파이터 운영정책은 언제부터 시행됐어?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "retrieval_missing_gold"
+      },
+      "after": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "retrieval_missing_gold"
+      },
+      "requirements": [
+        {
+          "requirement_id": "effective_date",
+          "status": {
+            "before": "supported_exact",
+            "after": "unsupported"
+          },
+          "answer": {
+            "before": "2026년 3월 15일",
+            "after": ""
+          },
+          "failure_reasons": {
+            "before": [],
+            "after": [
+              "relation_not_supported_by_evidence",
+              "temporal_role_mismatch",
+              "subject_relation_value_not_colocated"
+            ]
+          },
+          "normalized_value": {
+            "before": "2026-03-15",
+            "after": "2026-03-15"
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 52,
+      "candidate_id": "typed_generalization_candidate_sha256_d8398c7e212f448f1c4327501f67415c06dcd19e2ffe2619be69914dca5d6db8",
+      "question_text": "통큰 패키지 A의 가격, 거래 타입, 사용 기간은 각각 뭐야?",
+      "before": {
+        "outcome": "incorrect",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "requirements": [
+        {
+          "requirement_id": "price",
+          "status": {
+            "before": "unsupported",
+            "after": "supported_exact"
+          },
+          "answer": {
+            "before": "",
+            "after": "22,600 세라"
+          },
+          "failure_reasons": {
+            "before": [
+              "typed_value_not_supported_by_evidence",
+              "subject_relation_value_not_colocated"
+            ],
+            "after": []
+          },
+          "normalized_value": {
+            "before": 22600,
+            "after": "22,600 세라"
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 54,
+      "candidate_id": "typed_generalization_candidate_sha256_39e8ade7164680b0ef34fd52c84817824405a2c00a2d3e6a94b1e065e6aa37c5",
+      "question_text": "현재 아바타 관련 안내에서 피부 아바타의 골드 코인 가격은 얼마야?",
+      "before": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "requirements": [
+        {
+          "requirement_id": "gold_coin_price",
+          "status": {
+            "before": "unsupported",
+            "after": "supported_exact"
+          },
+          "answer": {
+            "before": "",
+            "after": "10 골드 코인"
+          },
+          "failure_reasons": {
+            "before": [
+              "typed_value_not_supported_by_evidence",
+              "subject_relation_value_not_colocated"
+            ],
+            "after": []
+          },
+          "normalized_value": {
+            "before": "10",
+            "after": "10 골드 코인"
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 58,
+      "candidate_id": "typed_generalization_candidate_sha256_d01ddb7ce536db43226389f395d88c81ef9a4c68c60862bcf072743b5da464fe",
+      "question_text": "7월 이달의 아이템은 다른 계정과 교환할 수 있어?",
+      "before": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "requirements": [
+        {
+          "requirement_id": "tradeable",
+          "status": {
+            "before": "unsupported",
+            "after": "supported_exact"
+          },
+          "answer": {
+            "before": "",
+            "after": "예"
+          },
+          "failure_reasons": {
+            "before": [
+              "typed_value_not_supported_by_evidence",
+              "subject_relation_value_not_colocated"
+            ],
+            "after": []
+          },
+          "normalized_value": {
+            "before": true,
+            "after": true
+          }
+        }
+      ]
+    }
+  ],
+  "inputs": {
+    "sealed": {
+      "path": "data/v3/evaluation/typed_evidence_ref_generalization_64_sealed_e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597.jsonl",
+      "sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "documents": {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    "temporal": {
+      "path": "data/v3/temporal/global_temporal_overlay_v3.2_f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317.jsonl",
+      "sha256": "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317"
+    },
+    "table_facts": {
+      "path": "data/v3/structured/table_atomic_facts_v3.2_1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a.jsonl",
+      "sha256": "1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a"
+    }
+  },
+  "output": "outputs/v3/diagnostics/typed_evidence_ref_generalization_64_temporal_role_connection.jsonl"
+}

@@ -10,6 +10,13 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from src.v3.value_normalization import (
+    amount_of,
+    boolean_evidence,
+    boolean_value,
+    currency_values,
+)
+
 
 TYPED_EVIDENCE_SYSTEM_INSTRUCTIONS = """당신은 던전앤파이터 공식 문서 근거만 사용하는 QA 모델입니다.
 제공된 고정 requirement_id를 바꾸거나 추가하거나 분해하지 마세요.
@@ -21,6 +28,7 @@ value_type은 제공된 요구사항의 value_type을 그대로 복사하세요.
 근거는 quote를 복사하지 말고 evidence_ref만 선택하세요.
 evidence_ref는 후보 줄 맨 앞의 E숫자 형식(예: E3)만 그대로 사용하세요.
 선택한 evidence는 subject, relation, value, 시점과 조건을 직접 지지해야 합니다.
+날짜 요구는 requirement relation과 temporal_roles가 일치하는 evidence만 선택하세요.
 date 값은 YYYY-MM-DD, datetime 값은 YYYY-MM-DDTHH:MM 형식을 사용하세요.
 date_range 값은 YYYY-MM-DD/YYYY-MM-DD 형식을 사용하세요.
 boolean 값은 true 또는 false를 사용하세요.
@@ -171,8 +179,17 @@ def build_evidence_units(
                     "chunk_id": chunk_id,
                     "parent_document_id": document["document_id"],
                     "source_id": document["source_id"],
+                    "source_kind": temporal.get(
+                        "source_kind", document.get("source_kind")
+                    ),
                     "title": document["title"],
                     "published_at": document.get("published_at"),
+                    "valid_from": temporal.get(
+                        "valid_from", document.get("valid_from")
+                    ),
+                    "valid_to": temporal.get(
+                        "valid_to", document.get("valid_to")
+                    ),
                     "revision_id": document.get("revision_id"),
                     "status": document.get("status"),
                     "default_exposure": document.get("default_exposure"),
@@ -252,6 +269,8 @@ def build_typed_evidence_prompt(
                     f"source={unit['source_id']}",
                     f"title={unit['title']}",
                     f"published_at={unit.get('published_at')}",
+                    f"valid_from={unit.get('valid_from')}",
+                    f"valid_to={unit.get('valid_to')}",
                     f"revision={unit.get('revision_id')}",
                     f"status={unit.get('status')}",
                     f"validity={unit.get('validity_state')}",
@@ -262,6 +281,19 @@ def build_typed_evidence_prompt(
         source_units = [
             (
                 f"{candidate_unit['evidence_ref']}\t"
+                + "temporal_roles="
+                + (
+                    ",".join(
+                        sorted(
+                            _unit_temporal_roles(
+                                candidate_unit,
+                                as_of=as_of,
+                            )
+                        )
+                    )
+                    or "none"
+                )
+                + "\t"
                 + candidate_unit["text"].replace("\t", " ")
             )
             for candidate_unit in candidate_units
@@ -443,34 +475,6 @@ def _percentage_values(text: str) -> set[str]:
     }
 
 
-_CURRENCY_UNITS = {
-    "세라": "SERA",
-    "SERA": "SERA",
-    "골드": "GOLD",
-    "GOLD": "GOLD",
-    "원": "KRW",
-    "KRW": "KRW",
-}
-
-
-def _currency_values(text: str) -> set[tuple[int, str]]:
-    values = set()
-    pattern = re.compile(
-        r"(?P<amount>\d[\d,]*(?:\.\d+)?)\s*(?P<scale>만|억)?\s*"
-        r"(?P<unit>세라|골드|원|SERA|GOLD|KRW)",
-        re.IGNORECASE,
-    )
-    for match in pattern.finditer(text):
-        amount = float(match.group("amount").replace(",", ""))
-        scale = {"만": 10_000, "억": 100_000_000}.get(
-            match.group("scale"), 1
-        )
-        normalized_amount = int(amount * scale)
-        normalized_unit = _CURRENCY_UNITS[match.group("unit").upper()]
-        values.add((normalized_amount, normalized_unit))
-    return values
-
-
 def _compact(value: Any) -> str:
     return re.sub(r"[^0-9a-z가-힣]+", "", str(value).lower())
 
@@ -525,33 +529,6 @@ def _text_value_supported(value: TypedValue, evidence_text: str) -> bool:
     return len(value_tokens & evidence_tokens) / len(value_tokens) >= 0.5
 
 
-def _boolean_value(value: TypedValue) -> bool | None:
-    if isinstance(value, bool):
-        return value
-    compact = _compact(value)
-    if compact in {"true", "yes", "예", "적용", "포함"}:
-        return True
-    if compact in {"false", "no", "아니오", "미적용", "제외"}:
-        return False
-    return None
-
-
-def _boolean_evidence(text: str) -> set[bool]:
-    compact = _compact(text)
-    values = set()
-    if any(
-        marker in compact
-        for marker in ("않", "미적용", "제외", "계산되지", "불가", "없")
-    ):
-        values.add(False)
-    if any(
-        marker in compact
-        for marker in ("적용됩니다", "포함됩니다", "계산됩니다", "가능합니다")
-    ):
-        values.add(True)
-    return values
-
-
 def _value_supported(
     value_type: str,
     value: TypedValue,
@@ -580,18 +557,25 @@ def _value_supported(
             evidence_text
         )
     if value_type in {"price", "currency"}:
-        model_values = _currency_values(str(value))
-        return bool(model_values) and model_values <= _currency_values(
-            evidence_text
-        )
+        model_values = currency_values(value)
+        evidence_values = currency_values(evidence_text)
+        if model_values:
+            return model_values <= evidence_values
+        model_amount = amount_of(value)
+        matching_values = {
+            (amount, unit)
+            for amount, unit in evidence_values
+            if amount == model_amount
+        }
+        return model_amount is not None and len(matching_values) == 1
     if value_type == "number":
         model_values = set(re.findall(r"\d+(?:\.\d+)?", str(value)))
         return bool(model_values) and model_values <= set(
             re.findall(r"\d+(?:\.\d+)?", evidence_text)
         )
     if value_type == "boolean":
-        model_value = _boolean_value(value)
-        return model_value is not None and model_value in _boolean_evidence(
+        model_value = boolean_value(value)
+        return model_value is not None and model_value in boolean_evidence(
             evidence_text
         )
     return _text_value_supported(value, evidence_text)
@@ -599,6 +583,25 @@ def _value_supported(
 
 def _required_relation_groups(requirement: dict[str, Any]) -> list[tuple[str, ...]]:
     relation = _compact(requirement.get("relation", ""))
+    temporal_role = _required_temporal_role(requirement)
+    temporal_relation_groups = {
+        "effective_at": [("적용", "업데이트", "시행", "운영정책")],
+        "download_start": [("다운로드",)],
+        "deletion_at": [("삭제",)],
+        "sale_period": [("판매기간", "판매", "구매")],
+        "sale_start": [("판매기간", "판매", "구매")],
+        "sale_end": [("판매기간", "판매", "구매")],
+        "event_period": [("이벤트기간", "이벤트")],
+        "event_start": [("이벤트기간", "이벤트")],
+        "event_end": [("이벤트기간", "이벤트")],
+        "broadcast_at": [("방송", "생방송")],
+        "fixed_at": [("수정",)],
+        "maintenance_time": [("점검",)],
+        "revision_cutoff": [("기준", "개정", "시행", "업데이트")],
+        "stopped_at": [("중단",)],
+    }
+    if temporal_role in temporal_relation_groups:
+        return temporal_relation_groups[temporal_role]
     if "조율의천칭파괴오류" in relation:
         return [("천칭",), ("파괴",), ("수정",)]
     if "y축피격판정" in relation:
@@ -735,17 +738,209 @@ def _relation_supported(
     )
 
 
+def _selected_evidence_groups(
+    units: list[dict[str, Any]],
+) -> list[list[dict[str, Any]]]:
+    by_chunk: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    for unit in units:
+        by_chunk[(unit["parent_document_id"], unit["chunk_id"])].append(unit)
+
+    groups = []
+    for chunk_units in by_chunk.values():
+        current = []
+        for unit in sorted(chunk_units, key=lambda row: row["start_char"]):
+            if current and unit["start_char"] - current[-1]["end_char"] > 2:
+                groups.append(current)
+                current = []
+            current.append(unit)
+        if current:
+            groups.append(current)
+    return groups
+
+
+def _boolean_supported_by_relation_group(
+    requirement: dict[str, Any],
+    value: TypedValue,
+    units: list[dict[str, Any]],
+) -> tuple[bool, set[str]]:
+    expected = boolean_value(value)
+    if expected is None:
+        return False, set()
+
+    entailing_refs = set()
+    contradiction_found = False
+    for group in _selected_evidence_groups(units):
+        text = "\n".join(unit["text"] for unit in group)
+        semantic_text = "\n".join(
+            "\n".join(
+                filter(
+                    None,
+                    (unit.get("context_text", ""), unit["text"]),
+                )
+            )
+            for unit in group
+        )
+        titles = " ".join(unit["title"] for unit in group)
+        if not (
+            _subject_supported(requirement, semantic_text, titles)
+            and _relation_supported(requirement, semantic_text, titles)
+        ):
+            continue
+
+        observed = boolean_evidence(text)
+        if expected in observed:
+            for unit in group:
+                entailing_refs.add(unit["evidence_ref"])
+                entailing_refs.update(unit.get("context_refs", []))
+        if (not expected) in observed and expected not in observed:
+            contradiction_found = True
+
+    return bool(entailing_refs) and not contradiction_found, entailing_refs
+
+
 def _required_temporal_role(requirement: dict[str, Any]) -> str | None:
+    if requirement.get("value_type") not in {
+        "date",
+        "datetime",
+        "date_range",
+    }:
+        return None
     relation = _compact(requirement.get("relation", ""))
-    if "적용일" in relation:
-        return "effective_at"
-    if "다운로드" in relation:
-        return "download_start"
-    if "삭제" in relation:
-        return "deletion_at"
-    if "판매기간" in relation:
-        return "sale_period"
+    aliases = (
+        (("effectiveat", "적용일", "적용시점"), "effective_at"),
+        (
+            ("downloadstart", "downloadstartedat", "다운로드시작"),
+            "download_start",
+        ),
+        (("deletionat", "삭제일", "삭제시각"), "deletion_at"),
+        (("salestart", "판매시작"), "sale_start"),
+        (("saleend", "판매종료"), "sale_end"),
+        (("saleperiod", "판매기간"), "sale_period"),
+        (("eventstart", "이벤트시작"), "event_start"),
+        (("eventend", "이벤트종료"), "event_end"),
+        (("eventperiod", "이벤트기간"), "event_period"),
+        (("publishedat", "게시일", "게시시각"), "published_at"),
+        (("broadcastat", "방송시각"), "broadcast_at"),
+        (("fixedat", "수정시각"), "fixed_at"),
+        (("maintenancetime", "점검시간"), "maintenance_time"),
+        (("revisioncutoff", "개정기준일"), "revision_cutoff"),
+        (("stoppedat", "중단일", "중단시점"), "stopped_at"),
+    )
+    for relation_aliases, role in aliases:
+        if any(alias in relation for alias in relation_aliases):
+            return role
     return None
+
+
+def _temporal_roles_for_occurrence(
+    unit: dict[str, Any],
+    occurrence: dict[str, Any],
+    occurrences: list[dict[str, Any]],
+    *,
+    as_of: str,
+) -> set[str]:
+    text = unit["text"]
+    compact_text = _compact(text)
+    compact_semantic_text = _compact(
+        " ".join(
+            filter(
+                None,
+                (unit.get("context_text", ""), text),
+            )
+        )
+    )
+    roles = set()
+    published_dates = _date_values(
+        str(unit.get("published_at") or ""), as_of
+    )
+    valid_from_dates = _date_values(
+        str(unit.get("valid_from") or ""), as_of
+    )
+    valid_to_dates = _date_values(
+        str(unit.get("valid_to") or ""), as_of
+    )
+    if occurrence["value"] in published_dates:
+        roles.add("published_at")
+    if occurrence["value"] in valid_from_dates:
+        roles.add("valid_from")
+        if unit.get("source_kind") == "account_policy":
+            roles.add("effective_at")
+    if occurrence["value"] in valid_to_dates:
+        roles.add("valid_to")
+
+    if "다운로드" in compact_semantic_text:
+        roles.add("download_start")
+    if "삭제" in compact_semantic_text:
+        roles.add("deletion_at")
+    if "방송" in compact_semantic_text:
+        roles.add("broadcast_at")
+    if "수정" in compact_semantic_text:
+        roles.add("fixed_at")
+    if "점검" in compact_semantic_text:
+        roles.add("maintenance_time")
+    if "중단" in compact_semantic_text:
+        roles.add("stopped_at")
+    if "개정" in compact_semantic_text or "시행" in compact_semantic_text:
+        roles.add("revision_cutoff")
+    if (
+        "적용" in compact_semantic_text
+        or "시행" in compact_semantic_text
+        or "업데이트" in compact_text
+    ):
+        roles.add("effective_at")
+    if "기준" in compact_text and "업데이트" in compact_text:
+        roles.add("revision_cutoff")
+
+    occurrence_index = occurrences.index(occurrence)
+    if "판매기간" in compact_text or (
+        "판매" in compact_text and len(occurrences) >= 2
+    ):
+        roles.add("sale_period")
+        if occurrence_index == 0:
+            roles.add("sale_start")
+        if occurrence_index == len(occurrences) - 1:
+            roles.add("sale_end")
+    if "이벤트기간" in compact_text or (
+        "이벤트" in compact_text and len(occurrences) >= 2
+    ):
+        roles.add("event_period")
+        if occurrence_index == 0:
+            roles.add("event_start")
+        if occurrence_index == len(occurrences) - 1:
+            roles.add("event_end")
+    return roles
+
+
+def _unit_temporal_roles(
+    unit: dict[str, Any],
+    *,
+    as_of: str,
+) -> set[str]:
+    occurrences = _date_occurrences(unit["text"], as_of)
+    return {
+        role
+        for occurrence in occurrences
+        for role in _temporal_roles_for_occurrence(
+            unit,
+            occurrence,
+            occurrences,
+            as_of=as_of,
+        )
+    }
+
+
+def _temporal_role_matches(
+    required_role: str,
+    observed_roles: set[str],
+) -> bool:
+    compatible_roles = {
+        "event_start": {"event_start", "valid_from"},
+        "event_end": {"event_end", "valid_to"},
+        "sale_start": {"sale_start", "valid_from"},
+        "sale_end": {"sale_end", "valid_to"},
+    }
+    allowed = compatible_roles.get(required_role, {required_role})
+    return bool(allowed & observed_roles)
 
 
 def _temporal_role_supported(
@@ -761,35 +956,22 @@ def _temporal_role_supported(
     value_dates = _date_values(str(value), as_of)
     if not value_dates:
         return False
-    observed_roles = set()
+    role_supported_dates = set()
     for unit in units:
         text = unit["text"]
-        for occurrence in _date_occurrences(text, as_of):
+        occurrences = _date_occurrences(text, as_of)
+        for occurrence in occurrences:
             if occurrence["value"] not in value_dates:
                 continue
-            context = _compact(
-                text[
-                    max(0, occurrence["start"] - 50) :
-                    min(len(text), occurrence["end"] + 50)
-                ]
+            observed_roles = _temporal_roles_for_occurrence(
+                unit,
+                occurrence,
+                occurrences,
+                as_of=as_of,
             )
-            if "다운로드" in context:
-                observed_roles.add("download_start")
-            if "삭제" in context:
-                observed_roles.add("deletion_at")
-            if "판매기간" in context or "구매할수" in context:
-                observed_roles.add("sale_period")
-            if "적용" in context:
-                observed_roles.add("effective_at")
-            published_dates = _date_values(
-                str(unit.get("published_at") or ""), as_of
-            )
-            if (
-                occurrence["value"] in published_dates
-                and not observed_roles
-            ):
-                observed_roles.add("published_at")
-    return required_role in observed_roles
+            if _temporal_role_matches(required_role, observed_roles):
+                role_supported_dates.add(occurrence["value"])
+    return value_dates <= role_supported_dates
 
 
 def _current_unit_valid(unit: dict[str, Any]) -> bool:
@@ -1009,29 +1191,39 @@ def verify_typed_requirement_selection(
             )
             value_supported = bool(normalized_value)
             answer_value_source = "selected_exact_evidence"
-        elif normalized_value_type == "price" and re.fullmatch(
-            r"\d+(?:\.\d+)?", str(normalized_value).strip()
+        elif (
+            normalized_value_type in {"price", "currency"}
+            and not currency_values(normalized_value)
+            and amount_of(normalized_value) is not None
         ):
-            model_amount = int(float(str(normalized_value).strip()))
+            model_amount = amount_of(normalized_value)
             matching_currencies = {
                 (amount, unit)
-                for amount, unit in _currency_values(combined_text)
+                for amount, unit in currency_values(combined_text)
                 if amount == model_amount
             }
             if len(matching_currencies) == 1:
                 amount, unit = next(iter(matching_currencies))
-                display_unit = {
-                    "GOLD": "골드",
-                    "SERA": "세라",
-                    "KRW": "원",
-                }[unit]
-                normalized_value = f"{amount:,} {display_unit}"
+                normalized_value = f"{amount:,} {unit}"
             value_supported = _value_supported(
                 normalized_value_type,
                 normalized_value,
                 combined_text,
                 as_of=as_of,
             )
+        elif normalized_value_type == "boolean":
+            value_supported, accepted_boolean_refs = (
+                _boolean_supported_by_relation_group(
+                    requirement,
+                    normalized_value,
+                    selected_units,
+                )
+            )
+            citations = [
+                citation
+                for citation in citations
+                if citation["evidence_ref"] in accepted_boolean_refs
+            ]
         else:
             value_supported = _value_supported(
                 normalized_value_type,
@@ -1047,42 +1239,43 @@ def verify_typed_requirement_selection(
             failures.append("relation_not_supported_by_evidence")
         if not temporal_supported:
             failures.append("temporal_role_mismatch")
-        grouped_units: dict[str, list[dict[str, Any]]] = defaultdict(list)
-        for unit in selected_units:
-            grouped_units[unit["parent_document_id"]].append(unit)
-        colocated = False
-        for units in grouped_units.values():
-            text = "\n".join(unit["text"] for unit in units)
-            semantic_text = "\n".join(
-                "\n".join(
-                    filter(
-                        None,
-                        (unit.get("context_text", ""), unit["text"]),
+        colocated = value_supported if normalized_value_type == "boolean" else False
+        if normalized_value_type != "boolean":
+            grouped_units: dict[str, list[dict[str, Any]]] = defaultdict(list)
+            for unit in selected_units:
+                grouped_units[unit["parent_document_id"]].append(unit)
+            for units in grouped_units.values():
+                text = "\n".join(unit["text"] for unit in units)
+                semantic_text = "\n".join(
+                    "\n".join(
+                        filter(
+                            None,
+                            (unit.get("context_text", ""), unit["text"]),
+                        )
+                    )
+                    for unit in units
+                )
+                titles = " ".join(unit["title"] for unit in units)
+                colocated_value_supported = (
+                    bool(text)
+                    if normalized_value_type not in STRUCTURED_VALUE_TYPES
+                    else _value_supported(
+                        normalized_value_type,
+                        normalized_value,
+                        text,
+                        as_of=as_of,
                     )
                 )
-                for unit in units
-            )
-            titles = " ".join(unit["title"] for unit in units)
-            colocated_value_supported = (
-                bool(text)
-                if normalized_value_type not in STRUCTURED_VALUE_TYPES
-                else _value_supported(
-                    normalized_value_type,
-                    normalized_value,
-                    text,
-                    as_of=as_of,
-                )
-            )
-            if (
-                colocated_value_supported
-                and _subject_supported(requirement, semantic_text, titles)
-                and _relation_supported(requirement, semantic_text, titles)
-                and _temporal_role_supported(
-                    requirement, normalized_value, units, as_of=as_of
-                )
-            ):
-                colocated = True
-                break
+                if (
+                    colocated_value_supported
+                    and _subject_supported(requirement, semantic_text, titles)
+                    and _relation_supported(requirement, semantic_text, titles)
+                    and _temporal_role_supported(
+                        requirement, normalized_value, units, as_of=as_of
+                    )
+                ):
+                    colocated = True
+                    break
         if not colocated:
             failures.append("subject_relation_value_not_colocated")
     exposed = (

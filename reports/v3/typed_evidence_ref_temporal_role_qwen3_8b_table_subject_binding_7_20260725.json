@@ -1,0 +1,1037 @@
+{
+  "evaluation_role": "targeted_adaptive_generation_smoke_not_generalization",
+  "model": "qwen3-8b:ctx8192",
+  "slots": [
+    1,
+    9,
+    14,
+    17,
+    22,
+    49,
+    57
+  ],
+  "retrieval_reexecuted": false,
+  "stored_candidate_pools_reused": true,
+  "new_model_calls": 7,
+  "previous_error_slots": [
+    9
+  ],
+  "previous_correct_slots": [
+    1,
+    14,
+    17,
+    22,
+    49,
+    57
+  ],
+  "transitions": {
+    "recovered": [
+      9
+    ],
+    "persistent_error": [],
+    "preserved_correct": [
+      1,
+      14,
+      17,
+      22,
+      49,
+      57
+    ],
+    "new_regression": []
+  },
+  "score_summary": {
+    "scorer_version": "typed-evidence-ref-generalization-scorer-v2",
+    "normalization_contract": {
+      "version": "typed-evidence-ref-generalization-normalization-v2",
+      "rules": [
+        "Whitespace, punctuation, and Korean zero-padded month/day variants are normalized.",
+        "Korean and ISO dates are compared as YYYY-MM-DD; month/day-only forms use the frozen as_of year.",
+        "06시, 6시, and 06:00 are compared as 06:00; 오전/오후 are converted to 24-hour time.",
+        "Currency commas, Korean 만/억 scales, domain currency units, and unit-first count forms are normalized to integer amount plus unit.",
+        "Percentages and plain numbers are compared numerically.",
+        "Boolean answers normalize explicit true/false and Korean positive/negative actions while protecting 불가 state nouns.",
+        "Table-row and prose citations are equivalent only when the normalized gold value is present and the citation comes from an approved evidence chunk.",
+        "For text, enum, entity, and entity_list values, a directly cited pre-approved evidence unit is the canonical gold when required_values is a human-authored summary of that unit.",
+        "No semantic paraphrase credit is added beyond the typed normalizations above."
+      ]
+    },
+    "fixed_denominator": 7,
+    "gold_value_complete": {
+      "successes": 7,
+      "total": 7
+    },
+    "outcomes": {
+      "correct": 7,
+      "incorrect": 0,
+      "no_response": 0
+    },
+    "all_evidence_spans_hit": {
+      "successes": 7,
+      "total": 7
+    },
+    "candidate_all_gold_covered": {
+      "successes": 7,
+      "total": 7
+    },
+    "honest_unsupported": {
+      "slots": [],
+      "correct_abstentions": 0,
+      "false_full": 0,
+      "total": 0
+    },
+    "generation_error_count": 0,
+    "all_citation_slices_exact": true,
+    "latency_ms": {
+      "total": 107827.946,
+      "mean": 15403.992,
+      "p50": 13703.706,
+      "p95": 27459.503
+    },
+    "usage": {
+      "input_tokens": 32668,
+      "output_tokens": 668,
+      "total_tokens": 33336
+    },
+    "failure_slots": [],
+    "failure_breakdown": {},
+    "failure_cases": [],
+    "gates": {
+      "generation_error_zero": true,
+      "honest_unsupported_false_full_zero": true
+    }
+  },
+  "cases": [
+    {
+      "slot_ordinal": 1,
+      "question_text": "2026년 세라 이용약관 개정안은 언제부터 적용돼?",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E9"
+                ],
+                "requirement_id": "effective_date",
+                "status": "supported",
+                "value": "2026-05-28",
+                "value_type": "date"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "effective_date",
+              "question_part": "effective_at",
+              "status": "supported_exact",
+              "answer": "2026년 5월 28일",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_9559f1305bfb2208a829c6b15f521e831fdc4e4d2ebbc62aa083bc98bec872c1",
+                  "parent_document_id": "document_sha256_085145b30c235432bceeafc29073b549da3b41962ab171f81f252a2aae8f0b99",
+                  "source_id": "dnf_notice",
+                  "revision_id": "revision_sha256_085145b30c235432bceeafc29073b549da3b41962ab171f81f252a2aae8f0b99",
+                  "start_char": 0,
+                  "end_char": 8,
+                  "text": "### 공지사항",
+                  "evidence_ref": "E1"
+                },
+                {
+                  "chunk_id": "chunk_sha256_9559f1305bfb2208a829c6b15f521e831fdc4e4d2ebbc62aa083bc98bec872c1",
+                  "parent_document_id": "document_sha256_085145b30c235432bceeafc29073b549da3b41962ab171f81f252a2aae8f0b99",
+                  "source_id": "dnf_notice",
+                  "revision_id": "revision_sha256_085145b30c235432bceeafc29073b549da3b41962ab171f81f252a2aae8f0b99",
+                  "start_char": 100,
+                  "end_char": 107,
+                  "text": "▒ 적용 일자",
+                  "evidence_ref": "E8"
+                },
+                {
+                  "chunk_id": "chunk_sha256_9559f1305bfb2208a829c6b15f521e831fdc4e4d2ebbc62aa083bc98bec872c1",
+                  "parent_document_id": "document_sha256_085145b30c235432bceeafc29073b549da3b41962ab171f81f252a2aae8f0b99",
+                  "source_id": "dnf_notice",
+                  "revision_id": "revision_sha256_085145b30c235432bceeafc29073b549da3b41962ab171f81f252a2aae8f0b99",
+                  "start_char": 108,
+                  "end_char": 125,
+                  "text": "- 2026년 5월 28일(목)",
+                  "evidence_ref": "E9"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 2026년 5월 28일 [chunk_sha256_9559f1305bfb2208a829c6b15f521e831fdc4e4d2ebbc62aa083bc98bec872c1] [chunk_sha256_9559f1305bfb2208a829c6b15f521e831fdc4e4d2ebbc62aa083bc98bec872c1] [chunk_sha256_9559f1305bfb2208a829c6b15f521e831fdc4e4d2ebbc62aa083bc98bec872c1]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "effective_date",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "date",
+                "model_value_type": "date",
+                "normalized_value": "2026-05-28",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E9"
+                ],
+                "raw_evidence_refs": [
+                  "E9"
+                ],
+                "expanded_context_refs": [
+                  "E1",
+                  "E8"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "effective_date",
+                    "status": "supported",
+                    "value_type": "date",
+                    "value": "2026-05-28",
+                    "evidence_refs": [
+                      "E9"
+                    ]
+                  }
+                ]
+              },
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "openai_sdk_version": "2.44.0",
+              "usage": {
+                "input_tokens": 5193,
+                "output_tokens": 67,
+                "total_tokens": 5260
+              },
+              "latency_ms": 27459.503,
+              "provider": "ollama_openai_compatible"
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 27459.503,
+          "usage": {
+            "input_tokens": 5193,
+            "output_tokens": 67,
+            "total_tokens": 5260
+          }
+        }
+      },
+      "transition": "preserved_correct"
+    },
+    {
+      "slot_ordinal": 9,
+      "question_text": "시즌 11 Act 2 '제국의 파도 & 폭권' 업데이트는 언제 적용됐어?",
+      "previous_category": "previous_error",
+      "previous": {
+        "outcome": "no_response",
+        "failure_stage": "verifier_overreject",
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E3"
+                ],
+                "requirement_id": "effective_date",
+                "status": "supported",
+                "value": "2026-06-02",
+                "value_type": "date"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "effective_date",
+              "question_part": "effective_at",
+              "status": "supported_exact",
+              "answer": "2026년 6월 4일",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_6de95eb00fcbda18d712b0de56741997ad433988cba9680eed832cc46a554668",
+                  "parent_document_id": "document_sha256_81cd2addd84b453ac055d32dbe94aeb3c49e3067583cca75eb996b30f479992f",
+                  "source_id": "dnf_update",
+                  "revision_id": "revision_sha256_81cd2addd84b453ac055d32dbe94aeb3c49e3067583cca75eb996b30f479992f",
+                  "start_char": 0,
+                  "end_char": 8,
+                  "text": "### 업데이트",
+                  "evidence_ref": "E1"
+                },
+                {
+                  "chunk_id": "chunk_sha256_6de95eb00fcbda18d712b0de56741997ad433988cba9680eed832cc46a554668",
+                  "parent_document_id": "document_sha256_81cd2addd84b453ac055d32dbe94aeb3c49e3067583cca75eb996b30f479992f",
+                  "source_id": "dnf_update",
+                  "revision_id": "revision_sha256_81cd2addd84b453ac055d32dbe94aeb3c49e3067583cca75eb996b30f479992f",
+                  "start_char": 77,
+                  "end_char": 108,
+                  "text": "6/4(목) 점검 중 업데이트 되는 내용 안내 드립니다.",
+                  "evidence_ref": "E7"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 2026년 6월 4일 [chunk_sha256_6de95eb00fcbda18d712b0de56741997ad433988cba9680eed832cc46a554668] [chunk_sha256_6de95eb00fcbda18d712b0de56741997ad433988cba9680eed832cc46a554668]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "effective_date",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "date",
+                "model_value_type": "date",
+                "normalized_value": "2026-06-04",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E7"
+                ],
+                "raw_evidence_refs": [
+                  "E7"
+                ],
+                "expanded_context_refs": [
+                  "E1"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "effective_date",
+                    "status": "supported",
+                    "value_type": "date",
+                    "value": "2026-06-04",
+                    "evidence_refs": [
+                      "E7"
+                    ]
+                  }
+                ]
+              },
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "openai_sdk_version": "2.44.0",
+              "usage": {
+                "input_tokens": 3466,
+                "output_tokens": 68,
+                "total_tokens": 3534
+              },
+              "latency_ms": 15315.674,
+              "provider": "ollama_openai_compatible"
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 15315.674,
+          "usage": {
+            "input_tokens": 3466,
+            "output_tokens": 68,
+            "total_tokens": 3534
+          }
+        }
+      },
+      "transition": "recovered"
+    },
+    {
+      "slot_ordinal": 14,
+      "question_text": "시즌 11 Act 1 업데이트 공지는 어느 날짜 점검에 적용된다고 했어?",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E7"
+                ],
+                "requirement_id": "effective_date",
+                "status": "supported",
+                "value": "2026-04-23",
+                "value_type": "date"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "historical",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "effective_date",
+              "question_part": "effective_at",
+              "status": "supported_exact",
+              "answer": "2026년 4월 23일",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_96764b73086b7d3e7439fdd4e5113025a0c57a427e260260817d0516bd96a4a1",
+                  "parent_document_id": "document_sha256_c0f6428523ffb1bd849fe30fb4d4721315f5c0605f495da9c70c33b0ce2a7f23",
+                  "source_id": "dnf_update",
+                  "revision_id": "revision_sha256_c0f6428523ffb1bd849fe30fb4d4721315f5c0605f495da9c70c33b0ce2a7f23",
+                  "start_char": 0,
+                  "end_char": 8,
+                  "text": "### 업데이트",
+                  "evidence_ref": "E1"
+                },
+                {
+                  "chunk_id": "chunk_sha256_96764b73086b7d3e7439fdd4e5113025a0c57a427e260260817d0516bd96a4a1",
+                  "parent_document_id": "document_sha256_c0f6428523ffb1bd849fe30fb4d4721315f5c0605f495da9c70c33b0ce2a7f23",
+                  "source_id": "dnf_update",
+                  "revision_id": "revision_sha256_c0f6428523ffb1bd849fe30fb4d4721315f5c0605f495da9c70c33b0ce2a7f23",
+                  "start_char": 79,
+                  "end_char": 111,
+                  "text": "4/23(목) 점검 중 업데이트 되는 내용 안내 드립니다.",
+                  "evidence_ref": "E7"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 2026년 4월 23일 [chunk_sha256_96764b73086b7d3e7439fdd4e5113025a0c57a427e260260817d0516bd96a4a1] [chunk_sha256_96764b73086b7d3e7439fdd4e5113025a0c57a427e260260817d0516bd96a4a1]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "effective_date",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "date",
+                "model_value_type": "date",
+                "normalized_value": "2026-04-23",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E7"
+                ],
+                "raw_evidence_refs": [
+                  "E7"
+                ],
+                "expanded_context_refs": [
+                  "E1"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "effective_date",
+                    "status": "supported",
+                    "value_type": "date",
+                    "value": "2026-04-23",
+                    "evidence_refs": [
+                      "E7"
+                    ]
+                  }
+                ]
+              },
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "openai_sdk_version": "2.44.0",
+              "usage": {
+                "input_tokens": 3067,
+                "output_tokens": 68,
+                "total_tokens": 3135
+              },
+              "latency_ms": 11016.532,
+              "provider": "ollama_openai_compatible"
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 11016.532,
+          "usage": {
+            "input_tokens": 3067,
+            "output_tokens": 68,
+            "total_tokens": 3135
+          }
+        }
+      },
+      "transition": "preserved_correct"
+    },
+    {
+      "slot_ordinal": 17,
+      "question_text": "미라클의 해양 탐구 생활 이벤트 기간은 언제부터 언제까지야?",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E26"
+                ],
+                "requirement_id": "event_period",
+                "status": "supported",
+                "value": "2026-06-04/2026-08-27",
+                "value_type": "date_range"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "event_period",
+              "question_part": "event_period",
+              "status": "supported_exact",
+              "answer": "2026년 6월 4일 ~ 2026년 8월 27일",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_7d5d83b9c76f6df1a7dd1ad6b63725aa5f3ab83080ebc847768182660bf1688a",
+                  "parent_document_id": "document_sha256_4f1c89ac2c57984bf9961dcc5a91510608ce28559bb2325c830c2f8040c31a09",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_4f1c89ac2c57984bf9961dcc5a91510608ce28559bb2325c830c2f8040c31a09",
+                  "start_char": 14,
+                  "end_char": 77,
+                  "text": "# 미라클의 해양 탐구 생활 | 이벤트 기간 : 2026년 6월 4일(목) 점검 후 ~ 8월 27일(목) 점검 전",
+                  "evidence_ref": "E26"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 2026년 6월 4일 ~ 2026년 8월 27일 [chunk_sha256_7d5d83b9c76f6df1a7dd1ad6b63725aa5f3ab83080ebc847768182660bf1688a]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "event_period",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "date_range",
+                "model_value_type": "date_range",
+                "normalized_value": "2026-06-04/2026-08-27",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E26"
+                ],
+                "raw_evidence_refs": [
+                  "E26"
+                ],
+                "expanded_context_refs": []
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "event_period",
+                    "status": "supported",
+                    "value_type": "date_range",
+                    "value": "2026-06-04/2026-08-27",
+                    "evidence_refs": [
+                      "E26"
+                    ]
+                  }
+                ]
+              },
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "openai_sdk_version": "2.44.0",
+              "usage": {
+                "input_tokens": 2872,
+                "output_tokens": 85,
+                "total_tokens": 2957
+              },
+              "latency_ms": 11383.175,
+              "provider": "ollama_openai_compatible"
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 11383.175,
+          "usage": {
+            "input_tokens": 2872,
+            "output_tokens": 85,
+            "total_tokens": 2957
+          }
+        }
+      },
+      "transition": "preserved_correct"
+    },
+    {
+      "slot_ordinal": 22,
+      "question_text": "2026 나비 무도회 패키지에 포함되는 직업 아바타는 어느 날짜의 라이브 서버 업데이트를 기준으로 했어?",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E4",
+                  "E11"
+                ],
+                "requirement_id": "class_cutoff",
+                "status": "supported",
+                "value": "2026-05-28",
+                "value_type": "date"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "historical",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "class_cutoff",
+              "question_part": "revision_cutoff",
+              "status": "supported_exact",
+              "answer": "2026년 5월 28일",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_e7293f07e8a1dd814f289630f9a9e1d18fe7a49e8c83c71ffde0da652947d9ee",
+                  "parent_document_id": "document_sha256_c0edb85836594a1b32022e76d63fdd980612418a4194266ea6acfc93f80a0afa",
+                  "source_id": "dnf_seria_shop",
+                  "revision_id": "revision_sha256_c0edb85836594a1b32022e76d63fdd980612418a4194266ea6acfc93f80a0afa",
+                  "start_char": 0,
+                  "end_char": 24,
+                  "text": "# 2026 나비 무도회 아바타 풀세트 상자",
+                  "evidence_ref": "E1"
+                },
+                {
+                  "chunk_id": "chunk_sha256_e7293f07e8a1dd814f289630f9a9e1d18fe7a49e8c83c71ffde0da652947d9ee",
+                  "parent_document_id": "document_sha256_c0edb85836594a1b32022e76d63fdd980612418a4194266ea6acfc93f80a0afa",
+                  "source_id": "dnf_seria_shop",
+                  "revision_id": "revision_sha256_c0edb85836594a1b32022e76d63fdd980612418a4194266ea6acfc93f80a0afa",
+                  "start_char": 113,
+                  "end_char": 167,
+                  "text": "- 2026년 5월 28일 기준 라이브 서버 업데이트가 완료된 직업의 아바타만 포함되어 있습니다.",
+                  "evidence_ref": "E4"
+                },
+                {
+                  "chunk_id": "chunk_sha256_e527addc3710ba55549bfff64efbe7f3bcf5c8b5d0b1f04730e5998d11032a04",
+                  "parent_document_id": "document_sha256_cbeaaf6d5b556092fd18380197f10416577450f6b11322159f05d329d2dbb888",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_cbeaaf6d5b556092fd18380197f10416577450f6b11322159f05d329d2dbb888",
+                  "start_char": 0,
+                  "end_char": 12,
+                  "text": "# 아바타 풀세트 상자",
+                  "evidence_ref": "E6"
+                },
+                {
+                  "chunk_id": "chunk_sha256_e527addc3710ba55549bfff64efbe7f3bcf5c8b5d0b1f04730e5998d11032a04",
+                  "parent_document_id": "document_sha256_cbeaaf6d5b556092fd18380197f10416577450f6b11322159f05d329d2dbb888",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_cbeaaf6d5b556092fd18380197f10416577450f6b11322159f05d329d2dbb888",
+                  "start_char": 55,
+                  "end_char": 61,
+                  "text": "(교환가능)",
+                  "evidence_ref": "E9"
+                },
+                {
+                  "chunk_id": "chunk_sha256_e527addc3710ba55549bfff64efbe7f3bcf5c8b5d0b1f04730e5998d11032a04",
+                  "parent_document_id": "document_sha256_cbeaaf6d5b556092fd18380197f10416577450f6b11322159f05d329d2dbb888",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_cbeaaf6d5b556092fd18380197f10416577450f6b11322159f05d329d2dbb888",
+                  "start_char": 122,
+                  "end_char": 176,
+                  "text": "- 2026년 5월 28일 기준 라이브 서버 업데이트가 완료된 직업의 아바타만 포함되어 있습니다.",
+                  "evidence_ref": "E11"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 2026년 5월 28일 [chunk_sha256_e7293f07e8a1dd814f289630f9a9e1d18fe7a49e8c83c71ffde0da652947d9ee] [chunk_sha256_e7293f07e8a1dd814f289630f9a9e1d18fe7a49e8c83c71ffde0da652947d9ee] [chunk_sha256_e527addc3710ba55549bfff64efbe7f3bcf5c8b5d0b1f04730e5998d11032a04] [chunk_sha256_e527addc3710ba55549bfff64efbe7f3bcf5c8b5d0b1f04730e5998d11032a04] [chunk_sha256_e527addc3710ba55549bfff64efbe7f3bcf5c8b5d0b1f04730e5998d11032a04]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "class_cutoff",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "date",
+                "model_value_type": "date",
+                "normalized_value": "2026-05-28",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E4",
+                  "E11"
+                ],
+                "raw_evidence_refs": [
+                  "E4",
+                  "E11"
+                ],
+                "expanded_context_refs": [
+                  "E1",
+                  "E6",
+                  "E9"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "class_cutoff",
+                    "status": "supported",
+                    "value_type": "date",
+                    "value": "2026-05-28",
+                    "evidence_refs": [
+                      "E4",
+                      "E11"
+                    ]
+                  }
+                ]
+              },
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "openai_sdk_version": "2.44.0",
+              "usage": {
+                "input_tokens": 4687,
+                "output_tokens": 72,
+                "total_tokens": 4759
+              },
+              "latency_ms": 11818.337,
+              "provider": "ollama_openai_compatible"
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 11818.337,
+          "usage": {
+            "input_tokens": 4687,
+            "output_tokens": 72,
+            "total_tokens": 4759
+          }
+        }
+      },
+      "transition": "preserved_correct"
+    },
+    {
+      "slot_ordinal": 49,
+      "question_text": "프리미엄 코인샵의 트로피컬 바캉스 무기 아바타 상자는 언제 삭제돼?",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E35",
+                  "E108"
+                ],
+                "requirement_id": "deletion_at",
+                "status": "supported",
+                "value": "2026-08-27T06:00",
+                "value_type": "datetime"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "deletion_at",
+              "question_part": "deletion_at",
+              "status": "supported_exact",
+              "answer": "2026년 8월 27일 06시",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_f002c2893434cb114c5a48d9c4b80d195b722d24b0a5a0ad57cbea04b3ab5c7d",
+                  "parent_document_id": "document_sha256_dde0974f824042704eff7e7c8f0fed589a3c70bcd1d43f7dd48f641272cbccdf",
+                  "source_id": "dnf_seria_shop",
+                  "revision_id": "revision_sha256_dde0974f824042704eff7e7c8f0fed589a3c70bcd1d43f7dd48f641272cbccdf",
+                  "start_char": 328,
+                  "end_char": 393,
+                  "text": "| [프리미엄 코인샵]트로피컬 바캉스 무기 아바타 상자 | 2개 | 계정당 5회 | 2026년 8월 27일 06시 |"
+                },
+                {
+                  "chunk_id": "chunk_sha256_2050140241259c117526a7133d657907943a29092a0771ca49ecd6ef5d30bb31",
+                  "parent_document_id": "document_sha256_4f9ee6c23f7f055b89180926383895d819bdf5f64bdedfc5a33afffbad9561af",
+                  "source_id": "dnf_seria_shop",
+                  "revision_id": "revision_sha256_4f9ee6c23f7f055b89180926383895d819bdf5f64bdedfc5a33afffbad9561af",
+                  "start_char": 0,
+                  "end_char": 82,
+                  "text": "- 4개 구매 시 지급되는 [EVENT]트로피컬 바캉스 무기 아바타 상자는 계정귀속 상태로 지급되며 2026년 8월 27일 06시 일괄 삭제됩니다."
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 2026년 8월 27일 06시 [chunk_sha256_f002c2893434cb114c5a48d9c4b80d195b722d24b0a5a0ad57cbea04b3ab5c7d] [chunk_sha256_2050140241259c117526a7133d657907943a29092a0771ca49ecd6ef5d30bb31]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "deletion_at",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "matching_table_row_ids": [
+                  "table_row_sha256_2a6840c4653347fcd883e66d0e3dd69643e35e22fa6f330c85f37d13bb2514e6"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "output": {
+                "requirements": [
+                  {
+                    "status": "supported",
+                    "answer": "2026년 8월 27일 06시",
+                    "evidence": [
+                      {
+                        "candidate_ref": "2",
+                        "quote": "| [프리미엄 코인샵]트로피컬 바캉스 무기 아바타 상자 | 2개 | 계정당 5회 | 2026년 8월 27일 06시 |",
+                        "table_row_ref": "1"
+                      },
+                      {
+                        "candidate_ref": "1",
+                        "quote": "- 4개 구매 시 지급되는 [EVENT]트로피컬 바캉스 무기 아바타 상자는 계정귀속 상태로 지급되며 2026년 8월 27일 06시 일괄 삭제됩니다.",
+                        "table_row_ref": ""
+                      }
+                    ],
+                    "requirement_id": "deletion_at"
+                  }
+                ]
+              },
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "openai_sdk_version": "2.44.0",
+              "usage": {
+                "input_tokens": 7958,
+                "output_tokens": 228,
+                "total_tokens": 8186
+              },
+              "latency_ms": 17131.019,
+              "provider": "ollama_openai_compatible"
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 17131.019,
+          "usage": {
+            "input_tokens": 7958,
+            "output_tokens": 228,
+            "total_tokens": 8186
+          }
+        }
+      },
+      "transition": "preserved_correct"
+    },
+    {
+      "slot_ordinal": 57,
+      "question_text": "7월 이달의 아이템 판매 기간은 언제부터 언제까지야?",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E5",
+                  "E27",
+                  "E78"
+                ],
+                "requirement_id": "sale_period",
+                "status": "supported",
+                "value": "2026-06-25/2026-07-30",
+                "value_type": "date_range"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "sale_period",
+              "question_part": "sale_period",
+              "status": "supported_exact",
+              "answer": "2026년 6월 25일 ~ 2026년 7월 30일",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_d23a0df67a37d463f0221e3e9bfbd4fd8a65bd4b2577478c7573239523ef6043",
+                  "parent_document_id": "document_sha256_e1b41518d35b1284a3a07936b23f997653287b5b25426f6aca4cb04ac6eaa98e",
+                  "source_id": "dnf_monthly_item",
+                  "revision_id": "revision_sha256_e1b41518d35b1284a3a07936b23f997653287b5b25426f6aca4cb04ac6eaa98e",
+                  "start_char": 0,
+                  "end_char": 11,
+                  "text": "### 이달의 아이템",
+                  "evidence_ref": "E1"
+                },
+                {
+                  "chunk_id": "chunk_sha256_d23a0df67a37d463f0221e3e9bfbd4fd8a65bd4b2577478c7573239523ef6043",
+                  "parent_document_id": "document_sha256_e1b41518d35b1284a3a07936b23f997653287b5b25426f6aca4cb04ac6eaa98e",
+                  "source_id": "dnf_monthly_item",
+                  "revision_id": "revision_sha256_e1b41518d35b1284a3a07936b23f997653287b5b25426f6aca4cb04ac6eaa98e",
+                  "start_char": 119,
+                  "end_char": 138,
+                  "text": "판매기간: 06.25 ~ 07.30",
+                  "evidence_ref": "E5"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 2026년 6월 25일 ~ 2026년 7월 30일 [chunk_sha256_d23a0df67a37d463f0221e3e9bfbd4fd8a65bd4b2577478c7573239523ef6043] [chunk_sha256_d23a0df67a37d463f0221e3e9bfbd4fd8a65bd4b2577478c7573239523ef6043]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "sale_period",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "date_range",
+                "model_value_type": "date_range",
+                "normalized_value": "2026-06-25/2026-07-30",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E5"
+                ],
+                "raw_evidence_refs": [
+                  "E5"
+                ],
+                "expanded_context_refs": [
+                  "E1"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "sale_period",
+                    "status": "supported",
+                    "value_type": "date_range",
+                    "value": "2026-06-25/2026-07-30",
+                    "evidence_refs": [
+                      "E5"
+                    ]
+                  }
+                ]
+              },
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "openai_sdk_version": "2.44.0",
+              "usage": {
+                "input_tokens": 5425,
+                "output_tokens": 80,
+                "total_tokens": 5505
+              },
+              "latency_ms": 13703.706,
+              "provider": "ollama_openai_compatible"
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 13703.706,
+          "usage": {
+            "input_tokens": 5425,
+            "output_tokens": 80,
+            "total_tokens": 5505
+          }
+        }
+      },
+      "transition": "preserved_correct"
+    }
+  ],
+  "inputs": {
+    "sealed_sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597",
+    "source_sha256": "9ae8e0443e0948457ef53e98493f81ee2909159716d20b247f85dc20429d2efb",
+    "chunks_sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885",
+    "documents_sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d",
+    "temporal_sha256": "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317",
+    "table_facts_sha256": "1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a"
+  },
+  "output": "outputs/v3/diagnostics/typed_evidence_ref_temporal_role_qwen3_8b_table_subject_binding_7_20260725.jsonl"
+}

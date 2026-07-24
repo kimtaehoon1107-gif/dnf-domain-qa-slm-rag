@@ -51,6 +51,32 @@ class TypedEvidenceRefGeneralizationScorerTest(unittest.TestCase):
             NORMALIZATION_CONTRACT["rules"],
         )
 
+    def test_shared_currency_and_boolean_normalization(self) -> None:
+        self.assertTrue(
+            value_present(
+                {"amount": 120, "unit": "광휘의 잔영"},
+                "currency",
+                "광휘의 잔영 120개",
+                as_of="2026-07-17",
+            )
+        )
+        self.assertTrue(
+            value_present(
+                True,
+                "boolean",
+                "다른 계정으로 이동하면 교환불가 타입으로 변경",
+                as_of="2026-07-17",
+            )
+        )
+        self.assertFalse(
+            value_present(
+                True,
+                "boolean",
+                "교환불가 상태로 변경되지 않습니다",
+                as_of="2026-07-17",
+            )
+        )
+
     def test_fixed_denominator_and_unsupported_false_full(self) -> None:
         chunk_id = "chunk_1"
         chunk_text = "가격은 4,000만 골드입니다."
