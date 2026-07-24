@@ -1,0 +1,172 @@
+{
+  "artifacts": {
+    "requirement_audit": {
+      "path": "data/v3/evidence/table_binding_zero_selection_audit_ff15cb794f1dab0203fa8d10364ae05e60e1d69328baa8013872e345ca908594.jsonl",
+      "row_count": 33,
+      "sha256": "ff15cb794f1dab0203fa8d10364ae05e60e1d69328baa8013872e345ca908594"
+    }
+  },
+  "constraints": {
+    "binding_logic_changed": false,
+    "frozen_artifact_regenerated": false,
+    "gold_fields_read": false,
+    "gold_in_output": false,
+    "gold_used_for_judgment": false,
+    "llm_inference_calls": 0,
+    "planner_changed": false,
+    "post_binding_gate_drift_used_for_stage_judgment": false,
+    "routing_changed": false,
+    "search_changed": false,
+    "table_sidecar_embedding_and_reranker_replay": true
+  },
+  "evaluation_role": "development_only_table_binding_root_cause_no_fix",
+  "hypotheses": {
+    "H1_subject_row_layer_mismatch": {
+      "case_count": 2,
+      "evidence_requirement_count": 3,
+      "of_which_failed_at_s4": 1,
+      "operational_definition": "subject-only cannot qualify any row while relation-only can",
+      "verdict": "supported"
+    },
+    "H2_overlong_subject": {
+      "case_count": 0,
+      "operational_definition": "row subject is a strict substring of planner subject; current containment score is then checked for an S2 failure",
+      "overlong_containment_requirement_count": 0,
+      "s2_failure_count": 0,
+      "verdict": "not_supported_as_direct_s2_cause"
+    },
+    "H3_korean_particles_or_morphology": {
+      "case_count": 7,
+      "kiwi_rescued_requirement_count": 10,
+      "operational_definition": "current S2 failure becomes qualifying after Kiwi removes J* particles",
+      "verdict": "supported"
+    },
+    "H4_attribute_name_mismatch": {
+      "case_count": 3,
+      "evidence_requirement_count": 4,
+      "operational_definition": "row survives S2/S3 but relation matches neither an attribute nor the existing marker/cost fallback",
+      "verdict": "supported"
+    }
+  },
+  "inputs": {
+    "adaptive_dev": {
+      "path": "data/v3/evaluation/retrieval_dev_v3.1_b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978.jsonl",
+      "sha256": "b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978"
+    },
+    "assembler_cases": {
+      "path": "data/v3/evidence/extractive_assembler_v3_chunk_diverse_cases_06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c.jsonl",
+      "sha256": "06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c"
+    },
+    "binding_source": {
+      "path": "src/v3/grounded_answer_generator.py",
+      "sha256": "387a79e4befb4cd4ed16b26b9a751e6461a1c1e857f2ee3617cb1e8ad11126d2"
+    },
+    "canonical_runtime_pointer": {
+      "path": "data/v3/runtime/canonical_runtime_v3_2.json",
+      "sha256": "e4644f9369303a942ff50ba86627c8bfe1cfd581ac1228261c4f77af0b05a458"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "demo_source": {
+      "path": "src/v3/gradio_backbone_demo.py",
+      "sha256": "bb9f92a4673c0b7906e524cc609c2c41355373c32ac15751a70370e7a95f9ebd"
+    },
+    "downgraded_canary": {
+      "path": "data/v3/evaluation/early_generalization_authored_canary_28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d.jsonl",
+      "sha256": "28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d"
+    },
+    "enumeration": {
+      "path": "data/v3/evaluation/semantic_requirement_enumeration_495caba182115c2dbec6e846dca7c0809c4cb8a4de552ee1268440d254d2ba9c.jsonl",
+      "sha256": "495caba182115c2dbec6e846dca7c0809c4cb8a4de552ee1268440d254d2ba9c"
+    },
+    "investigation_source": {
+      "path": "src/v3/investigate_table_binding_zero_selection.py",
+      "sha256": "84bf297be149d8d242cdd84e98cf7f6279bec917a43d8828b3cad11a00406015"
+    },
+    "observed_generation_ab_cases": {
+      "path": "outputs/v3/router_backbone_generation_ab_cases_deae90daddfb95167e29ea781104fd1991a964c90557b4588190e0a9366a2264.jsonl",
+      "sha256": "deae90daddfb95167e29ea781104fd1991a964c90557b4588190e0a9366a2264"
+    },
+    "table_index_manifest": {
+      "path": "data/v3/structured/table_atomic_facts_arm1_index_manifest_423dfd6ae35bbfa5db1cef0ea1caa61df547ed99c508c998fd134f44f1c4f79d.json",
+      "sha256": "423dfd6ae35bbfa5db1cef0ea1caa61df547ed99c508c998fd134f44f1c4f79d"
+    }
+  },
+  "investigation_version": "table-binding-zero-selection-investigation-v1",
+  "report_schema_version": "table-binding-zero-selection-report-v1",
+  "reproduction": {
+    "mismatch_count": 4,
+    "mismatches": [
+      {
+        "case_id": "authored_canary_sha256_1d3d1079fe9a48467f4a24243ba570e6360b397f9c69115f4ea2a23dacf594e3",
+        "observed": {
+          "table_row_count": 10,
+          "table_view_count": 1
+        },
+        "reconstructed": {
+          "table_row_count": 0,
+          "table_view_count": 0
+        }
+      },
+      {
+        "case_id": "authored_canary_sha256_9e2c7f69dd204fd5229a8e21b441b7d2c07b3e4ba5eb73ee5b40f5867f4bb875",
+        "observed": {
+          "table_row_count": 15,
+          "table_view_count": 1
+        },
+        "reconstructed": {
+          "table_row_count": 0,
+          "table_view_count": 0
+        }
+      },
+      {
+        "case_id": "retrieval_dev_sha256_8c5b2427c17a8558f6798e416e7e2c70d3c5e3209b577cdc18c9fe47d5948c5f",
+        "observed": {
+          "table_row_count": 26,
+          "table_view_count": 1
+        },
+        "reconstructed": {
+          "table_row_count": 0,
+          "table_view_count": 0
+        }
+      },
+      {
+        "case_id": "retrieval_dev_sha256_ccbf1e2b4f5a71ebf3eb7af42d1511f53e028497b4f6b97db3376682510fc0a6",
+        "observed": {
+          "table_row_count": 2,
+          "table_view_count": 1
+        },
+        "reconstructed": {
+          "table_row_count": 0,
+          "table_view_count": 0
+        }
+      }
+    ],
+    "raw_table_views_replayed_from_frozen_sidecar": true,
+    "visible_count_mismatch_scope": "post_binding_value_shape_gate_only",
+    "visible_counts_match_frozen_artifact_per_case": false
+  },
+  "runtime_control_flow_findings": {
+    "s1_surface_score_is_an_actual_veto": false,
+    "s2_difference_recorded_separately": true,
+    "s2_documented_left_surface": "subject",
+    "s2_runtime_left_surface": "subject + relation"
+  },
+  "stage_distribution": {
+    "S1": 4,
+    "S2": 25,
+    "S3": 0,
+    "S4": 4,
+    "passed_but_empty": 0,
+    "passed_with_values": 0
+  },
+  "target": {
+    "case_count": 17,
+    "observed_visible_table_row_count": 184,
+    "observed_visible_table_view_count": 29,
+    "requirement_count": 33,
+    "selection_rule": "off.table_view_count > 0 and on.selected_table_value_count == 0"
+  }
+}

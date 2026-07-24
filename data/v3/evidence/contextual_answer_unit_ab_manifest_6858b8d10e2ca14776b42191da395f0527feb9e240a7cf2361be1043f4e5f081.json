@@ -1,0 +1,89 @@
+{
+  "decision": "DEVELOPMENT_GO_NEW_REVIEWED_CANARY_REQUIRED",
+  "evaluator_version": "contextual-answer-unit-ab-v3.2.3",
+  "input_hashes_unchanged": true,
+  "inputs": {
+    "adaptive_dev": {
+      "path": "data/v3/evaluation/retrieval_dev_v3.1_b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978.jsonl",
+      "sha256": "b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978"
+    },
+    "assembler_cases": {
+      "path": "data/v3/evidence/extractive_assembler_v3_chunk_diverse_cases_06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c.jsonl",
+      "sha256": "06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c"
+    },
+    "authored_results": {
+      "path": "data/v3/evaluation/authored_validation_v3_2_results_7825374fd4fbf72d426d68dc3f401803de5036a3753f9d92f267f36c03062415.jsonl",
+      "sha256": "7825374fd4fbf72d426d68dc3f401803de5036a3753f9d92f267f36c03062415"
+    },
+    "authored_set": {
+      "path": "data/v3/evaluation/authored_validation_v3_2_52c1b84ef7ab0f9bee29931c46f9febf0970492216b6742e8f5337282af4181e.jsonl",
+      "sha256": "52c1b84ef7ab0f9bee29931c46f9febf0970492216b6742e8f5337282af4181e"
+    },
+    "canary_runtime": {
+      "path": "data/v3/evaluation/authored_canary_first_run_cases_a326d9fd96a4cfcaf9b2d38d74f27fffe26b62dfc1364063c8258891546beecd.jsonl",
+      "sha256": "a326d9fd96a4cfcaf9b2d38d74f27fffe26b62dfc1364063c8258891546beecd"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "contract": {
+      "path": "docs/v3/contextual_answer_unit_ab.md",
+      "sha256": "6e254d334f21a740611558a031258c88649387a25428b981eeb4337c2a4bc7bd"
+    },
+    "dev_runtime": {
+      "path": "data/v3/runtime/unified_runtime_cases_f28e2fbfb768c901dc4f1079f262252d645a74c7e4ee494180c2879e528f7789.jsonl",
+      "sha256": "f28e2fbfb768c901dc4f1079f262252d645a74c7e4ee494180c2879e528f7789"
+    },
+    "documents": {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    "downgraded_canary": {
+      "path": "data/v3/evaluation/early_generalization_authored_canary_28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d.jsonl",
+      "sha256": "28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d"
+    },
+    "enumeration": {
+      "path": "data/v3/evaluation/semantic_requirement_enumeration_495caba182115c2dbec6e846dca7c0809c4cb8a4de552ee1268440d254d2ba9c.jsonl",
+      "sha256": "495caba182115c2dbec6e846dca7c0809c4cb8a4de552ee1268440d254d2ba9c"
+    },
+    "evaluator_source": {
+      "path": "src/v3/evaluate_contextual_answer_unit_ab.py",
+      "sha256": "fcb67289528dce3a92946f22818f838d381e4e30e4b8debfacb2c71be3989f77"
+    },
+    "ground_truth": {
+      "path": "data/v3/evaluation/semantic_answerability_ground_truth_53cd8ae72ad4ee2f7c9b1d4370991ad74b5044d154e3657fd2008f45f71fe609.jsonl",
+      "sha256": "53cd8ae72ad4ee2f7c9b1d4370991ad74b5044d154e3657fd2008f45f71fe609"
+    },
+    "q3_cases": {
+      "path": "data/v3/evidence/question_partial_context_ab_cases_7ad2c3b70d7cba22d8e04ddc6ac0ea5f20bfa8072fc55dcde1d3d17c188a6c79.jsonl",
+      "sha256": "7ad2c3b70d7cba22d8e04ddc6ac0ea5f20bfa8072fc55dcde1d3d17c188a6c79"
+    },
+    "segment_scores": {
+      "path": "data/v3/evidence/federated_retrieval_ab_segment_scores_d06152692e3fafa04f72de4e3a87b4fffbc18b324154f4486a6c4db11f853f41.jsonl",
+      "sha256": "d06152692e3fafa04f72de4e3a87b4fffbc18b324154f4486a6c4db11f853f41"
+    },
+    "temporal": {
+      "path": "data/v3/temporal/global_temporal_overlay_v3.2_f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317.jsonl",
+      "sha256": "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317"
+    }
+  },
+  "manifest_schema_version": "contextual-answer-unit-ab-manifest-v3.2",
+  "outputs": {
+    "cases": {
+      "path": "data/v3/evidence/contextual_answer_unit_ab_cases_a551a43517b112bc0927ab176a5ad6564fedddb791c396bb9d4493b2fe344ad8.jsonl",
+      "row_count": 93,
+      "sha256": "a551a43517b112bc0927ab176a5ad6564fedddb791c396bb9d4493b2fe344ad8"
+    },
+    "report_json": {
+      "path": "reports/v3/contextual_answer_unit_ab_0f7cd39e2cdaf2aca590fd71c7d913ae17c2380e12d162934d10bcaa6b1af302.json",
+      "sha256": "0f7cd39e2cdaf2aca590fd71c7d913ae17c2380e12d162934d10bcaa6b1af302"
+    },
+    "report_md": {
+      "path": "reports/v3/contextual_answer_unit_ab_26f73d1719257ff342468083b141f0c93f993b484abf2d22802892d87a97f59a.md",
+      "sha256": "26f73d1719257ff342468083b141f0c93f993b484abf2d22802892d87a97f59a"
+    }
+  },
+  "runtime_or_canonical_promoted": false,
+  "source_commit": "5cdc150df4de68096445c4d97824d4d159a94250"
+}

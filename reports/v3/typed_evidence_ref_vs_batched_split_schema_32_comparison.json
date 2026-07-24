@@ -1,0 +1,129 @@
+{
+  "comparison_schema_version": "typed-vs-batched-split-schema-semantic-comparison-v1",
+  "evaluation_role": "adaptive_32_paired_comparison_not_generalization",
+  "question_count": 32,
+  "shared_conditions": {
+    "reviewed_questions": "outputs/v3/subject_arm_full_reviewed_32.jsonl",
+    "candidate_pools": "outputs/v3/subject_arm_full_requirement_pools_32.jsonl",
+    "candidate_pool_arm": "subject_arm_full",
+    "candidate_coverage": "31/32",
+    "model": "qwen3-8b:ctx8192",
+    "llm_calls": 32
+  },
+  "arm_a": {
+    "name": "batched_split_schema",
+    "output": "outputs/v3/batched_split_schema_requirement_generation_subject_arm_32.jsonl",
+    "semantic_full_with_direct_evidence": 22,
+    "semantic_partial_or_abstain": 9,
+    "actual_false_full": 1,
+    "actual_false_full_slots": [
+      7
+    ],
+    "response_modes": {
+      "full_answer": 23,
+      "partial_answer": 6,
+      "abstain": 3
+    },
+    "latency_ms": {
+      "mean": 19951.093,
+      "p50": 18743.545,
+      "p95": 42098.234,
+      "max": 48386.42
+    },
+    "tokens": {
+      "input": 157712,
+      "output": 8888,
+      "total": 166600
+    }
+  },
+  "arm_b": {
+    "name": "typed_evidence_ref",
+    "output": "outputs/v3/typed_evidence_ref_subject_arm_32_reverified_v2.jsonl",
+    "semantic_full_with_direct_evidence": 30,
+    "semantic_partial_or_abstain": 2,
+    "actual_false_full": 0,
+    "actual_false_full_slots": [],
+    "response_modes": {
+      "full_answer": 30,
+      "partial_answer": 2,
+      "abstain": 0
+    },
+    "latency_ms": {
+      "mean": 20328.381,
+      "p50": 18122.358,
+      "p95": 38582.971,
+      "max": 54152.999
+    },
+    "tokens": {
+      "input": 144980,
+      "output": 4957,
+      "total": 149937
+    }
+  },
+  "paired_movements": {
+    "same_semantic_full": {
+      "count": 21,
+      "slots": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        9,
+        10,
+        11,
+        15,
+        16,
+        18,
+        19,
+        21,
+        23,
+        25,
+        26,
+        27,
+        28,
+        30,
+        31,
+        32
+      ]
+    },
+    "arm_a_nonfull_to_arm_b_full": {
+      "count": 9,
+      "slots": [
+        7,
+        8,
+        12,
+        13,
+        17,
+        20,
+        22,
+        24,
+        29
+      ]
+    },
+    "arm_a_nonfull_to_arm_b_partial": {
+      "count": 1,
+      "slots": [
+        5
+      ]
+    },
+    "arm_a_full_to_arm_b_partial": {
+      "count": 1,
+      "slots": [
+        14
+      ]
+    }
+  },
+  "deltas": {
+    "semantic_full_count": 8,
+    "semantic_full_percentage_points": 25.0,
+    "actual_false_full_count": -1,
+    "mean_latency_ms": 377.287,
+    "p50_latency_ms": -621.187,
+    "p95_latency_ms": -3515.263,
+    "total_tokens": -16663,
+    "total_token_change_percent": -10.002
+  },
+  "decision": "ARM_B_WINS_ON_ADAPTIVE_32",
+  "generalization_claim_allowed": false
+}

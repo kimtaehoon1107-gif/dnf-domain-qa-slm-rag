@@ -1,0 +1,123 @@
+{
+  "validator_version": "typed-evidence-ref-generalization-candidate-validator-v1",
+  "status": "pass",
+  "candidate_path": "data/review/typed_evidence_ref_generalization_candidate_64.jsonl",
+  "candidate_sha256": "a715e1d5c271debe06ee01c2caa3b4a87f88a25229c55a4cbe8c005f30f5046a",
+  "row_count": 64,
+  "source_counts": {
+    "dnf_account_policy": 8,
+    "dnf_event": 8,
+    "dnf_faq": 8,
+    "dnf_game_guide": 8,
+    "dnf_monthly_item": 8,
+    "dnf_notice": 8,
+    "dnf_seria_shop": 8,
+    "dnf_update": 8
+  },
+  "dimension_counts": {
+    "boolean_direction": 8,
+    "direct_fact": 8,
+    "multi_requirement": 8,
+    "revision_selection": 8,
+    "sibling_relation": 8,
+    "table_attribute": 8,
+    "temporal_role": 8,
+    "unsupported_or_partial": 8
+  },
+  "evidence_unit_count": 89,
+  "unsupported_requirement_count": 8,
+  "pending_review_count": 64,
+  "execution_allowed_rows": 0,
+  "training_allowed_rows": 0,
+  "duplicate_question_count": 0,
+  "prior_question_count_scanned": 165,
+  "prior_parent_count_scanned": 89,
+  "prior_exact_question_overlap_slots": [],
+  "parent_overlap_count": 16,
+  "parent_overlaps": [
+    {
+      "slot_ordinal": 41,
+      "document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 42,
+      "document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 43,
+      "document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 44,
+      "document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 45,
+      "document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 46,
+      "document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 47,
+      "document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 48,
+      "document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 57,
+      "document_id": "document_sha256_e1b41518d35b1284a3a07936b23f997653287b5b25426f6aca4cb04ac6eaa98e",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 58,
+      "document_id": "document_sha256_e1b41518d35b1284a3a07936b23f997653287b5b25426f6aca4cb04ac6eaa98e",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 59,
+      "document_id": "document_sha256_e1b41518d35b1284a3a07936b23f997653287b5b25426f6aca4cb04ac6eaa98e",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 60,
+      "document_id": "document_sha256_e1b41518d35b1284a3a07936b23f997653287b5b25426f6aca4cb04ac6eaa98e",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 61,
+      "document_id": "document_sha256_e1b41518d35b1284a3a07936b23f997653287b5b25426f6aca4cb04ac6eaa98e",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 62,
+      "document_id": "document_sha256_8d15942b7c803029b811a23910302f2274bd00a85d68f3c8be8d1a6510122be6",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 63,
+      "document_id": "document_sha256_e1b41518d35b1284a3a07936b23f997653287b5b25426f6aca4cb04ac6eaa98e",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 64,
+      "document_id": "document_sha256_e1b41518d35b1284a3a07936b23f997653287b5b25426f6aca4cb04ac6eaa98e",
+      "registered_exception": true
+    }
+  ],
+  "unregistered_parent_overlap_count": 0,
+  "failure_count": 0,
+  "failures": [],
+  "model_or_retrieval_execution_performed": false
+}

@@ -1,0 +1,175 @@
+{
+  "evaluator_version": "simple-domain-rag-evaluator-v1",
+  "case_count": 32,
+  "candidate_all_groups_covered": {
+    "successes": 25,
+    "total": 32,
+    "rate": 0.78125
+  },
+  "all_groups_hit": {
+    "successes": 18,
+    "total": 32,
+    "rate": 0.5625
+  },
+  "all_evidence_spans_hit": {
+    "successes": 13,
+    "total": 32,
+    "rate": 0.40625
+  },
+  "literal_when_candidate_covered": {
+    "successes": 13,
+    "total": 25,
+    "rate": 0.52
+  },
+  "false_full": {
+    "successes": 10,
+    "total": 32,
+    "rate": 0.3125
+  },
+  "requirement_count_match": {
+    "successes": 29,
+    "total": 32,
+    "rate": 0.90625
+  },
+  "question_time_scope_match": {
+    "successes": 18,
+    "total": 32,
+    "rate": 0.5625
+  },
+  "exact_citation_slices": {
+    "successes": 32,
+    "total": 32,
+    "rate": 1.0
+  },
+  "citation_precision": 0.55,
+  "response_modes": {
+    "abstain": 4,
+    "full_answer": 23,
+    "partial_answer": 5
+  },
+  "generation_error_count": 3,
+  "input_tokens": 111060,
+  "output_tokens": 12011,
+  "latency_ms": 371821.873,
+  "segments": {
+    "table_sources": {
+      "cases": 8,
+      "candidate_all_groups_covered": {
+        "successes": 6,
+        "total": 8,
+        "rate": 0.75
+      },
+      "all_evidence_spans_hit": {
+        "successes": 4,
+        "total": 8,
+        "rate": 0.5
+      },
+      "false_full": {
+        "successes": 1,
+        "total": 8,
+        "rate": 0.125
+      }
+    },
+    "non_table_sources": {
+      "cases": 24,
+      "candidate_all_groups_covered": {
+        "successes": 19,
+        "total": 24,
+        "rate": 0.791667
+      },
+      "all_evidence_spans_hit": {
+        "successes": 9,
+        "total": 24,
+        "rate": 0.375
+      },
+      "false_full": {
+        "successes": 9,
+        "total": 24,
+        "rate": 0.375
+      }
+    },
+    "one_requirement": {
+      "cases": 8,
+      "candidate_all_groups_covered": {
+        "successes": 6,
+        "total": 8,
+        "rate": 0.75
+      },
+      "all_evidence_spans_hit": {
+        "successes": 3,
+        "total": 8,
+        "rate": 0.375
+      },
+      "false_full": {
+        "successes": 4,
+        "total": 8,
+        "rate": 0.5
+      }
+    },
+    "multiple_requirements": {
+      "cases": 24,
+      "candidate_all_groups_covered": {
+        "successes": 19,
+        "total": 24,
+        "rate": 0.791667
+      },
+      "all_evidence_spans_hit": {
+        "successes": 10,
+        "total": 24,
+        "rate": 0.416667
+      },
+      "false_full": {
+        "successes": 6,
+        "total": 24,
+        "rate": 0.25
+      }
+    }
+  },
+  "candidate_miss_case_ids": [
+    "requirement_surface_candidate_sha256_203cf37d40791938cde4f0587d310e44012f5f3cbde5f85f37e9868001eb85a1",
+    "requirement_surface_candidate_sha256_553c196f8da91fd8dbf08178d2da875462c26128b56ef98b8123fcb68dfafd28",
+    "requirement_surface_candidate_sha256_60a2838d5e2e58ae7af170f76217e884fed239b3605f7ffcda293e00f500ba5f",
+    "requirement_surface_candidate_sha256_74115673061401bdfca2f5a1ae353f8f4397ad6f8dfd7af16b94b391d01abeb3",
+    "requirement_surface_candidate_sha256_88cecb6cff7b75731ba14a50ce1d6b16147717b2264b4ced868b050e6ae6f4bf",
+    "requirement_surface_candidate_sha256_cd13b27adc78476265447e8d9a00f7b5b24ba5529077e08c88e8ea98cb6f56ab",
+    "requirement_surface_candidate_sha256_e8212afeba089b414f4194819781bd01dc4045e7dba8733c64d976e8adf9d2f9"
+  ],
+  "literal_failure_case_ids": [
+    "requirement_surface_candidate_sha256_0a62e79e96b1440b850cadcad99e64b55842f212627b33feca10857bcd12f535",
+    "requirement_surface_candidate_sha256_14ed162c4801fa8dd51b4134b76b131f1dbde72a4d4dfd44d88a5bd5108bae8d",
+    "requirement_surface_candidate_sha256_203cf37d40791938cde4f0587d310e44012f5f3cbde5f85f37e9868001eb85a1",
+    "requirement_surface_candidate_sha256_3dd180d7e8a5ac2eae56d65c035286342df4821cfd6fa35751381a65f2d0bcf9",
+    "requirement_surface_candidate_sha256_45d5706c0c00a3ec860c61b32fddd04e38674990890997a76d2a2da2769eb3ec",
+    "requirement_surface_candidate_sha256_553c196f8da91fd8dbf08178d2da875462c26128b56ef98b8123fcb68dfafd28",
+    "requirement_surface_candidate_sha256_60a2838d5e2e58ae7af170f76217e884fed239b3605f7ffcda293e00f500ba5f",
+    "requirement_surface_candidate_sha256_6a5ce49471fd0673dd30984827da55bf8d409bfd472488b3078531dfa7fadfc1",
+    "requirement_surface_candidate_sha256_74115673061401bdfca2f5a1ae353f8f4397ad6f8dfd7af16b94b391d01abeb3",
+    "requirement_surface_candidate_sha256_7a2ad69fb34564ab712e4db2edc88986f2f2dcd7cf301966c595c86335741182",
+    "requirement_surface_candidate_sha256_88cecb6cff7b75731ba14a50ce1d6b16147717b2264b4ced868b050e6ae6f4bf",
+    "requirement_surface_candidate_sha256_8ec96f9d80eb133914b0fd379e0bfde67b640a9b44062392f449d6df0bd1450c",
+    "requirement_surface_candidate_sha256_aa3a885060d826a599e2642c10c3ad991a66261cc7a198965803055fe944f8fc",
+    "requirement_surface_candidate_sha256_bffd09b0d6cbc1b0e463b550b4dce161c5932702ff64c9c034077a19ce4ef7d2",
+    "requirement_surface_candidate_sha256_cd13b27adc78476265447e8d9a00f7b5b24ba5529077e08c88e8ea98cb6f56ab",
+    "requirement_surface_candidate_sha256_da34024d628cd0553b126b87b985eada52662bc3d60290ca65aed5d437ffff8e",
+    "requirement_surface_candidate_sha256_e8212afeba089b414f4194819781bd01dc4045e7dba8733c64d976e8adf9d2f9",
+    "requirement_surface_candidate_sha256_e8f87d821752c91ec25ea2b6a690e1c9ce6b829900ed8800248832dfd568e08a",
+    "requirement_surface_candidate_sha256_f4b77d71e9d961e95d0c3d7c4abec535a01ee1b8851ae3f64f5d497b4f9446b4"
+  ],
+  "false_full_case_ids": [
+    "requirement_surface_candidate_sha256_0a62e79e96b1440b850cadcad99e64b55842f212627b33feca10857bcd12f535",
+    "requirement_surface_candidate_sha256_14ed162c4801fa8dd51b4134b76b131f1dbde72a4d4dfd44d88a5bd5108bae8d",
+    "requirement_surface_candidate_sha256_203cf37d40791938cde4f0587d310e44012f5f3cbde5f85f37e9868001eb85a1",
+    "requirement_surface_candidate_sha256_3dd180d7e8a5ac2eae56d65c035286342df4821cfd6fa35751381a65f2d0bcf9",
+    "requirement_surface_candidate_sha256_7a2ad69fb34564ab712e4db2edc88986f2f2dcd7cf301966c595c86335741182",
+    "requirement_surface_candidate_sha256_8ec96f9d80eb133914b0fd379e0bfde67b640a9b44062392f449d6df0bd1450c",
+    "requirement_surface_candidate_sha256_bffd09b0d6cbc1b0e463b550b4dce161c5932702ff64c9c034077a19ce4ef7d2",
+    "requirement_surface_candidate_sha256_cd13b27adc78476265447e8d9a00f7b5b24ba5529077e08c88e8ea98cb6f56ab",
+    "requirement_surface_candidate_sha256_da34024d628cd0553b126b87b985eada52662bc3d60290ca65aed5d437ffff8e",
+    "requirement_surface_candidate_sha256_e8f87d821752c91ec25ea2b6a690e1c9ce6b829900ed8800248832dfd568e08a"
+  ],
+  "model": "qwen3-4b-instruct-2507:ctx8192",
+  "device": "cuda",
+  "eval_set": "data/v3/evaluation/requirement_surface_query_canary_reviewed_533a4b031369cdd63872cd4f52a33d9128fbcf6cf42a344e2693b4959a76c561.jsonl",
+  "output": "outputs/v3/simple_domain_rag_eval32_qwen3_4b_instruct_ctx8192_cases.jsonl",
+  "wall_clock_ms": 282280.326
+}

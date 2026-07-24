@@ -1,0 +1,98 @@
+{
+  "probe_role": "isolated_recorded_table_view_plumbing_probe_not_benchmark",
+  "question": "서약 결정 초월 유니크 가격",
+  "table_view_source": "reports\\v3\\table_atomic_facts_arm1_ab_05ffd0f81486700a6e561ac4f35f21c15865e47315107a0d56cdf581cf47fcd8.json",
+  "table_view_exact_offset_mismatch_count": 0,
+  "generation_requests": [
+    {
+      "system": "당신은 공식 문서에서 이미 선별된 인용문만으로 한국어 답변을 작성합니다.\n규칙:\n1. 제공된 인용문에 없는 사실, 숫자, 날짜, 이름을 절대 추가하지 마세요.\n2. 인용문의 수치와 날짜는 표기를 바꾸지 말고 그대로 사용하세요.\n3. 추측하거나 일반 상식으로 보충하지 마세요.\n4. 각 요구사항에 대해 한두 문장으로 간결하게 답하세요.\n5. 인용문이 요구사항에 답하지 못하면 그 요구는 답하지 마세요.\nStructured units marked [TABLE VALUE] were already selected mechanically for the requirement. Do not judge support or reinterpret column positions. Render every attribute = value pair once, preserving each value and unit exactly.",
+      "user": "질문: 서약 결정 초월 유니크 가격\n\n아래 인용문만 사용해 답하세요.\n\n[요구 1] 서약_결정 · 유니크_가격\n- [TABLE VALUE] 서약 결정 초월 유니크 · 광휘의 소울 = 25개\n- [TABLE VALUE] 서약 결정 초월 유니크 · 상급 원소 결정 = 36개\n- [TABLE VALUE] 서약 결정 초월 유니크 · 순례의 인장 / 골드 = 순례의 인장 25개 or 125,000골드\n- [TABLE VALUE] 서약 결정 초월 유니크 · 솔리드 소울 = 1개",
+      "requirement_indices": [
+        1
+      ]
+    }
+  ],
+  "raw_model_outputs": [
+    "- 서약 결정 초월 유니크 · 광휘의 소울 = 25개  \n- 서약 결정 초월 유니크 · 상급 원소 결정 = 36개  \n- 서약 결정 초월 유니크 · 순례의 인장 / 골드 = 순례의 인장 25개 or 125,000골드  \n- 서약 결정 초월 유니크 · 솔리드 소울 = 1개"
+  ],
+  "composed": {
+    "generator_contract_version": "grounded-answer-generator-v1.0.0",
+    "generatable": [
+      {
+        "requirement_index": 1,
+        "requirement_id": "requirement_1",
+        "subject": "서약_결정",
+        "relation": "유니크_가격",
+        "expected_kind": "cost_value",
+        "spans": [
+          {
+            "span_id": "table_value:table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c:table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310:1",
+            "chunk_id": "chunk_sha256_72b83b77fa143997b8639babb8522b1f5133f91da23811116f65814c8685d969",
+            "start_char": 192,
+            "end_char": 242,
+            "text": "서약 결정 초월 유니크 · 광휘의 소울 = 25개",
+            "evidence_kind": "table_attribute_value",
+            "table_id": "table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c",
+            "row_id": "table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310",
+            "attribute": "광휘의 소울",
+            "value": "25개",
+            "exact_row_text": "| 유니크 | 25개 | 36개 | 순례의 인장 25개 or 125,000골드 | 1개 |"
+          },
+          {
+            "span_id": "table_value:table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c:table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310:2",
+            "chunk_id": "chunk_sha256_72b83b77fa143997b8639babb8522b1f5133f91da23811116f65814c8685d969",
+            "start_char": 192,
+            "end_char": 242,
+            "text": "서약 결정 초월 유니크 · 상급 원소 결정 = 36개",
+            "evidence_kind": "table_attribute_value",
+            "table_id": "table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c",
+            "row_id": "table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310",
+            "attribute": "상급 원소 결정",
+            "value": "36개",
+            "exact_row_text": "| 유니크 | 25개 | 36개 | 순례의 인장 25개 or 125,000골드 | 1개 |"
+          },
+          {
+            "span_id": "table_value:table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c:table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310:3",
+            "chunk_id": "chunk_sha256_72b83b77fa143997b8639babb8522b1f5133f91da23811116f65814c8685d969",
+            "start_char": 192,
+            "end_char": 242,
+            "text": "서약 결정 초월 유니크 · 순례의 인장 / 골드 = 순례의 인장 25개 or 125,000골드",
+            "evidence_kind": "table_attribute_value",
+            "table_id": "table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c",
+            "row_id": "table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310",
+            "attribute": "순례의 인장 / 골드",
+            "value": "순례의 인장 25개 or 125,000골드",
+            "exact_row_text": "| 유니크 | 25개 | 36개 | 순례의 인장 25개 or 125,000골드 | 1개 |"
+          },
+          {
+            "span_id": "table_value:table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c:table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310:4",
+            "chunk_id": "chunk_sha256_72b83b77fa143997b8639babb8522b1f5133f91da23811116f65814c8685d969",
+            "start_char": 192,
+            "end_char": 242,
+            "text": "서약 결정 초월 유니크 · 솔리드 소울 = 1개",
+            "evidence_kind": "table_attribute_value",
+            "table_id": "table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c",
+            "row_id": "table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310",
+            "attribute": "솔리드 소울",
+            "value": "1개",
+            "exact_row_text": "| 유니크 | 25개 | 36개 | 순례의 인장 25개 or 125,000골드 | 1개 |"
+          }
+        ],
+        "table_value_span_count": 4
+      }
+    ],
+    "unconfirmable": [],
+    "model_sees_gold": false,
+    "mode": "generated",
+    "answer_text": "- 서약 결정 초월 유니크 · 광휘의 소울 = 25개  \n- 서약 결정 초월 유니크 · 상급 원소 결정 = 36개  \n- 서약 결정 초월 유니크 · 순례의 인장 / 골드 = 순례의 인장 25개 or 125,000골드  \n- 서약 결정 초월 유니크 · 솔리드 소울 = 1개",
+    "verification": {
+      "verified": true,
+      "checked_token_count": 4,
+      "unsupported_tokens": [],
+      "required_token_count": 4,
+      "missing_required_tokens": [],
+      "verifier_contract_version": "grounded-answer-generator-v1.0.0"
+    },
+    "used_generated_text": true
+  }
+}

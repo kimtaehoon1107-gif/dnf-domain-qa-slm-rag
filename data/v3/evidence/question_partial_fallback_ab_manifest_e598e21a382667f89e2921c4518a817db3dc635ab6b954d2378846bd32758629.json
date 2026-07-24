@@ -1,0 +1,55 @@
+{
+  "decision": "DEVELOPMENT_NO_GO",
+  "evaluator_version": "question-partial-fallback-ab-v3.2.0",
+  "git_head": "5cdc150df4de68096445c4d97824d4d159a94250",
+  "inputs": {
+    "answerability_ground_truth": {
+      "path": "data/v3/evaluation/semantic_answerability_ground_truth_53cd8ae72ad4ee2f7c9b1d4370991ad74b5044d154e3657fd2008f45f71fe609.jsonl",
+      "sha256": "53cd8ae72ad4ee2f7c9b1d4370991ad74b5044d154e3657fd2008f45f71fe609"
+    },
+    "arm0_two_axis_cases": {
+      "path": "data/v3/evidence/router_backbone_mixed_metrics_cases_72fdfde24b8001ea7ab9864b431d606eb40217f581a37bcaba1274b57e15170a.jsonl",
+      "sha256": "72fdfde24b8001ea7ab9864b431d606eb40217f581a37bcaba1274b57e15170a"
+    },
+    "authored_canary_first_run_cases": {
+      "path": "data/v3/evaluation/authored_canary_first_run_cases_a326d9fd96a4cfcaf9b2d38d74f27fffe26b62dfc1364063c8258891546beecd.jsonl",
+      "sha256": "a326d9fd96a4cfcaf9b2d38d74f27fffe26b62dfc1364063c8258891546beecd"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "contract": {
+      "path": "docs/v3/question_partial_fallback_ab.md",
+      "sha256": "22bc6421f395fb00794181eaccef1d6858b36ea9722ef3717ec5f01e2654a11b"
+    },
+    "evaluator_source": {
+      "path": "src/v3/evaluate_question_partial_fallback_ab.py",
+      "sha256": "305352209bc6ec7eeb85127f16da746dcebad09e89b629f795229168935ebf42"
+    },
+    "question_classifier_source": {
+      "path": "src/v3/select_evidence.py",
+      "sha256": "9046715b6108ba39c7dae5d0c8f8764db3bbc4de3f7680c3881153c5fd09c0c9"
+    },
+    "unified_runtime_cases": {
+      "path": "data/v3/runtime/unified_runtime_cases_f28e2fbfb768c901dc4f1079f262252d645a74c7e4ee494180c2879e528f7789.jsonl",
+      "sha256": "f28e2fbfb768c901dc4f1079f262252d645a74c7e4ee494180c2879e528f7789"
+    }
+  },
+  "manifest_schema_version": "question-partial-fallback-ab-manifest-v3.2",
+  "outputs": {
+    "cases": {
+      "path": "data/v3/evidence/question_partial_fallback_ab_cases_18c3c54f0bc6411af03a6e9aca00737c7c42da1fbee077a829f49f248d4f83fd.jsonl",
+      "sha256": "18c3c54f0bc6411af03a6e9aca00737c7c42da1fbee077a829f49f248d4f83fd"
+    },
+    "report_json": {
+      "path": "reports/v3/question_partial_fallback_ab_c920fd2d259ec26c2427989ba64acd06b215f15139ff0ff4d1e9d7f1e17676df.json",
+      "sha256": "c920fd2d259ec26c2427989ba64acd06b215f15139ff0ff4d1e9d7f1e17676df"
+    },
+    "report_md": {
+      "path": "reports/v3/question_partial_fallback_ab_5aead05567895da828643ade31d66bfa37c9dc97d7c06ba8e0064805804fbff4.md",
+      "sha256": "5aead05567895da828643ade31d66bfa37c9dc97d7c06ba8e0064805804fbff4"
+    }
+  },
+  "runtime_or_canonical_promoted": false
+}

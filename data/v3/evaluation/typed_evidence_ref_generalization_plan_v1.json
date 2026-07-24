@@ -1,0 +1,130 @@
+{
+  "plan_schema_version": "typed-evidence-ref-generalization-plan-v1",
+  "created_at": "2026-07-24",
+  "status": "questions_unwritten_execution_locked",
+  "evaluation_role": "future_human_reviewed_generalization_set",
+  "target_approved_count": 64,
+  "minimum_approved_count": 60,
+  "independence": {
+    "adaptive_32_reuse_allowed": false,
+    "previous_canary_question_reuse_allowed": false,
+    "previous_evaluation_output_access_during_authoring": false,
+    "retrieval_before_freeze_allowed": false,
+    "reranker_before_freeze_allowed": false,
+    "generator_before_freeze_allowed": false,
+    "verifier_before_freeze_allowed": false,
+    "human_review_required": true,
+    "independent_holdout_claim_allowed_before_review": false
+  },
+  "slot_matrix": {
+    "rule": "Each source_id is crossed once with each primary_dimension, producing 8 x 8 = 64 preregistered slots.",
+    "source_ids": [
+      "dnf_notice",
+      "dnf_update",
+      "dnf_event",
+      "dnf_game_guide",
+      "dnf_faq",
+      "dnf_account_policy",
+      "dnf_seria_shop",
+      "dnf_monthly_item"
+    ],
+    "primary_dimensions": [
+      "temporal_role",
+      "boolean_direction",
+      "sibling_relation",
+      "multi_requirement",
+      "table_attribute",
+      "revision_selection",
+      "unsupported_or_partial",
+      "direct_fact"
+    ]
+  },
+  "dimension_requirements": {
+    "temporal_role": [
+      "published_at",
+      "effective_at",
+      "sale_start",
+      "sale_end",
+      "deletion_at",
+      "event_period"
+    ],
+    "boolean_direction": [
+      "positive",
+      "negative"
+    ],
+    "sibling_relation": "Use at least two nearby clauses or attributes whose values are easy to confuse.",
+    "multi_requirement": "Use two or three independently scored requirements.",
+    "table_attribute": [
+      "price",
+      "trade_type",
+      "deletion_at",
+      "contents"
+    ],
+    "revision_selection": [
+      "current",
+      "historical"
+    ],
+    "unsupported_or_partial": [
+      "unsupported",
+      "partial"
+    ],
+    "direct_fact": "Use a single explicit fact as a low-complexity control."
+  },
+  "required_candidate_schema": {
+    "candidate_id": "string",
+    "slot_id": "string",
+    "question_text": "string",
+    "as_of": "YYYY-MM-DD",
+    "source_id": "string",
+    "time_scope": "current|historical|mixed",
+    "expected_response_mode": "full_answer|partial_answer|abstain",
+    "requirements": [
+      {
+        "requirement_id": "string",
+        "subject": "string",
+        "relation": "string",
+        "value_type": "boolean|datetime|date|date_range|number|currency|percentage|enum|entity|entity_list|text",
+        "required_values": [
+          "typed or normalized value"
+        ],
+        "acceptable_evidence_units": [
+          {
+            "document_id": "string",
+            "chunk_id": "string",
+            "start_char": "integer",
+            "end_char": "integer",
+            "text": "exact source slice"
+          }
+        ]
+      }
+    ],
+    "review": {
+      "status": "pending|approved|rewrite|rejected",
+      "reviewer_id": "string|null",
+      "reviewed_at": "ISO-8601|null",
+      "rationale": "string|null"
+    }
+  },
+  "freeze_requirements": {
+    "approved_rows_min": 60,
+    "missing_required_fields": 0,
+    "exact_evidence_slice_failures": 0,
+    "duplicate_normalized_questions": 0,
+    "adaptive_32_exact_question_overlap": 0,
+    "previous_canary_exact_question_overlap": 0,
+    "unregistered_parent_overlap_exceptions": 0,
+    "pending_reviews": 0,
+    "content_sha256_required": true
+  },
+  "post_freeze_ab": {
+    "arm_a": "subject-anchored retrieval + previous batched split-schema generation/verifier + qwen3-8b:ctx8192",
+    "arm_b": "subject-anchored retrieval + typed value/evidence_ref relation-temporal-boolean verifier + qwen3-8b:ctx8192",
+    "shared": [
+      "frozen questions and gold",
+      "corpus and temporal overlay",
+      "BM25 and BGE-M3 indexes",
+      "BGE reranker",
+      "subject-anchored candidate construction"
+    ]
+  }
+}

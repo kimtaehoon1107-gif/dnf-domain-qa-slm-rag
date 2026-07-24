@@ -1,0 +1,15 @@
+{
+  "evaluator_version": "simple-subject-anchored-generation-v1",
+  "case_count": 4,
+  "candidate_depth": 5,
+  "model": "qwen3-8b:ctx8192",
+  "candidate_covered": 2,
+  "literal": 1,
+  "false_full": 0,
+  "response_modes": {
+    "full_answer": 1,
+    "partial_answer": 1,
+    "abstain": 2
+  },
+  "subject_gate_failures": 0
+}

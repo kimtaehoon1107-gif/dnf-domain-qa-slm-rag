@@ -1,0 +1,78 @@
+{
+  "decision": "DEVELOPMENT_GO_CANDIDATE",
+  "evaluator_version": "question-partial-hybrid-ab-v3.2.0",
+  "input_hashes_unchanged": true,
+  "inputs": {
+    "adaptive_dev": {
+      "path": "data/v3/evaluation/retrieval_dev_v3.1_b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978.jsonl",
+      "sha256": "b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978"
+    },
+    "answerability_ground_truth": {
+      "path": "data/v3/evaluation/semantic_answerability_ground_truth_53cd8ae72ad4ee2f7c9b1d4370991ad74b5044d154e3657fd2008f45f71fe609.jsonl",
+      "sha256": "53cd8ae72ad4ee2f7c9b1d4370991ad74b5044d154e3657fd2008f45f71fe609"
+    },
+    "arm0_cases": {
+      "path": "data/v3/evidence/router_backbone_mixed_metrics_cases_72fdfde24b8001ea7ab9864b431d606eb40217f581a37bcaba1274b57e15170a.jsonl",
+      "sha256": "72fdfde24b8001ea7ab9864b431d606eb40217f581a37bcaba1274b57e15170a"
+    },
+    "arm_q_cases": {
+      "path": "data/v3/evidence/question_partial_fallback_ab_cases_18c3c54f0bc6411af03a6e9aca00737c7c42da1fbee077a829f49f248d4f83fd.jsonl",
+      "sha256": "18c3c54f0bc6411af03a6e9aca00737c7c42da1fbee077a829f49f248d4f83fd"
+    },
+    "assembler_cases": {
+      "path": "data/v3/evidence/extractive_assembler_v3_chunk_diverse_cases_06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c.jsonl",
+      "sha256": "06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c"
+    },
+    "authored_canary_runtime": {
+      "path": "data/v3/evaluation/authored_canary_first_run_cases_a326d9fd96a4cfcaf9b2d38d74f27fffe26b62dfc1364063c8258891546beecd.jsonl",
+      "sha256": "a326d9fd96a4cfcaf9b2d38d74f27fffe26b62dfc1364063c8258891546beecd"
+    },
+    "canonical_claim_reranker": {
+      "path": "data/v3/evidence/claim_reranker_cases_e1f2cedb533a9af62051dcf60fca1bdf8489c39e28a3b7724459aa97dbf9fe3a.jsonl",
+      "sha256": "e1f2cedb533a9af62051dcf60fca1bdf8489c39e28a3b7724459aa97dbf9fe3a"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "contract": {
+      "path": "docs/v3/question_partial_hybrid_ab.md",
+      "sha256": "e212f4e62062c4e9b8dc80d834b0533fb4d3b5d33a3e11c16355a22609ba4366"
+    },
+    "downgraded_canary": {
+      "path": "data/v3/evaluation/early_generalization_authored_canary_28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d.jsonl",
+      "sha256": "28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d"
+    },
+    "enumeration": {
+      "path": "data/v3/evaluation/semantic_requirement_enumeration_495caba182115c2dbec6e846dca7c0809c4cb8a4de552ee1268440d254d2ba9c.jsonl",
+      "sha256": "495caba182115c2dbec6e846dca7c0809c4cb8a4de552ee1268440d254d2ba9c"
+    },
+    "evaluator_source": {
+      "path": "src/v3/evaluate_question_partial_hybrid_ab.py",
+      "sha256": "02d17e07f09ea803b2419cc0ad25dfc6bd660e0d8863793866634ed02f54f93e"
+    }
+  },
+  "manifest_schema_version": "question-partial-hybrid-ab-manifest-v3.2",
+  "outputs": {
+    "cases": {
+      "path": "data/v3/evidence/question_partial_hybrid_ab_cases_01f88a41218238a5e9474cd3901ff88a1a11ce7bc0a267dfac7986dcebc7af37.jsonl",
+      "row_count": 95,
+      "sha256": "01f88a41218238a5e9474cd3901ff88a1a11ce7bc0a267dfac7986dcebc7af37"
+    },
+    "error_audit": {
+      "path": "data/v3/evidence/mixed_answerability_error_audit_6345f72f2c27f21dc131ba8fc2432334932ec9c42b5b30a9c602840a07751dac.jsonl",
+      "row_count": 12,
+      "sha256": "6345f72f2c27f21dc131ba8fc2432334932ec9c42b5b30a9c602840a07751dac"
+    },
+    "report_json": {
+      "path": "reports/v3/question_partial_hybrid_ab_73ab1dceb9f61fd28bf92cd2efdcd7ad03d68ae1a071ff825ac237c7ea4c28fb.json",
+      "sha256": "73ab1dceb9f61fd28bf92cd2efdcd7ad03d68ae1a071ff825ac237c7ea4c28fb"
+    },
+    "report_md": {
+      "path": "reports/v3/question_partial_hybrid_ab_77bb628cc1692bd64d997f02917bdefc1f594999a52e7c3366ad02a769f93da1.md",
+      "sha256": "77bb628cc1692bd64d997f02917bdefc1f594999a52e7c3366ad02a769f93da1"
+    }
+  },
+  "runtime_or_canonical_promoted": false,
+  "source_commit": "243e6369179675fd5a4907814afcdc7c704e059b"
+}
