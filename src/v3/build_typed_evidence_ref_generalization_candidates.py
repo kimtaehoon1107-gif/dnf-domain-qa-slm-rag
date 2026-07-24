@@ -93,11 +93,11 @@ SPECS = [
     case(
         "dnf_notice",
         "sibling_relation",
-        "8033b142e6",
-        "6월 12일 세리아 특별 상점에서 종말의 계시 500개 상자와 피로도 30 회복의 비약은 각각 몇 개씩 팔았어?",
+        "22ba6f44cd",
+        "세리아와 함께한 20주년 선물 5주차 추첨에서 그래픽카드와 키보드·장패드는 각각 몇 개였어?",
         [
-            req("revelation_box_quantity", "[Event]종말의 계시 500개 상자", "sale_quantity", "number", [2], ["[Event]종말의 계시 500개 상자 2개"]),
-            req("fatigue_potion_quantity", "피로도 30 회복의 비약", "sale_quantity", "number", [2], ["피로도 30 회복의 비약 2개"]),
+            req("graphics_card_quantity", "[20th special]던전 앤 그래픽카드", "drawing_goods_quantity", "number", [4], ["[20th special]던전 앤 그래픽카드 (4개)"]),
+            req("keyboard_mousepad_quantity", "[20th special]20주년 키보드 + 장패드", "drawing_goods_quantity", "number", [12], ["[20th special]20주년 키보드 + 장패드 (12개)"]),
         ],
     ),
     case(
@@ -244,11 +244,11 @@ SPECS = [
     case(
         "dnf_event",
         "sibling_relation",
-        "9d13aacffe",
-        "2026 아라드 패스 웨딩 아바타 풀세트 상자와 웨딩 보너스 상자는 각각 언제 삭제돼?",
+        "b73226afe888",
+        "썸머 특제 피로도 30 회복의 비약은 1회차와 7회차에 각각 얼마였어?",
         [
-            req("avatar_box_deletion", "2026 아라드 패스 웨딩 아바타 풀세트 상자", "deletion_at", "datetime", ["2026-08-13T06:00:00+09:00"], ["2026 아라드 패스 웨딩 아바타 풀세트 상자(교환가능)는 2026년 8월 13일 06시 일괄 삭제됩니다."]),
-            req("bonus_box_deletion", "2026 아라드 패스 웨딩 보너스 상자", "deletion_at", "datetime", ["2026-08-13T06:00:00+09:00"], ["2026 아라드 패스 웨딩 보너스 상자(교환가능)는 2026년 8월 13일 06시 일괄 삭제됩니다."]),
+            req("first_purchase_price", "[세라샵]2026 썸머 특제 피로도 30 회복의 비약 NO.1", "price", "currency", [{"amount": 500, "unit": "세라"}], ["| 1회차 | | [세라샵]2026 썸머 특제 피로도 30 회복의 비약 NO.1 | 500세라 |"]),
+            req("seventh_purchase_price", "[세라샵]2026 썸머 특제 피로도 30 회복의 비약 NO.7", "price", "currency", [{"amount": 2000, "unit": "세라"}], ["| 7회차 | | [세라샵]2026 썸머 특제 피로도 30 회복의 비약 NO.7 | 2,000세라 |"]),
         ],
     ),
     case(
@@ -301,9 +301,12 @@ SPECS = [
     case(
         "dnf_game_guide",
         "temporal_role",
-        "24cde1942a",
-        "트레이드 가이드는 언제 업데이트됐어?",
-        [req("guide_updated_at", "트레이드 가이드", "updated_at", "date", ["2026-01-05"], ["이 문서는 2026-01-05에 업데이트 되었습니다."])],
+        "09b10ce9e52e0c25",
+        "던파ON 출석체크는 매일 몇 시에 갱신되고, 보상 교환의 1주 기준은 언제야?",
+        [
+            req("daily_reset_time", "던파ON 출석체크", "daily_reset_time", "enum", ["06:00"], ["출석체크는 매일 06시를 기준으로 갱신됩니다."]),
+            req("weekly_reset_at", "던파ON 보상 교환", "weekly_reset_at", "enum", ["매주 목요일 오전 6시"], ["1주 기준은 매주 목요일 오전 6시"]),
+        ],
     ),
     case(
         "dnf_game_guide",

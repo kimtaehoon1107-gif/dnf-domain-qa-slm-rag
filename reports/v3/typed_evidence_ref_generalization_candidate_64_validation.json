@@ -1,8 +1,8 @@
 {
-  "validator_version": "typed-evidence-ref-generalization-candidate-validator-v1",
+  "validator_version": "typed-evidence-ref-generalization-candidate-validator-v2",
   "status": "pass",
   "candidate_path": "data/review/typed_evidence_ref_generalization_candidate_64.jsonl",
-  "candidate_sha256": "a715e1d5c271debe06ee01c2caa3b4a87f88a25229c55a4cbe8c005f30f5046a",
+  "candidate_sha256": "271f1dcea56bcf9732e7201e80ef01fb5c46351391020695867c09a9dbe833e9",
   "row_count": 64,
   "source_counts": {
     "dnf_account_policy": 8,
@@ -24,12 +24,27 @@
     "temporal_role": 8,
     "unsupported_or_partial": 8
   },
-  "evidence_unit_count": 89,
+  "evidence_unit_count": 90,
   "unsupported_requirement_count": 8,
   "pending_review_count": 64,
   "execution_allowed_rows": 0,
   "training_allowed_rows": 0,
   "duplicate_question_count": 0,
+  "changed_slots_from_prior_candidate": [
+    25
+  ],
+  "unchanged_slot_count": 63,
+  "sibling_value_distinct_slots": [
+    3,
+    11,
+    19,
+    27,
+    35,
+    43,
+    51,
+    59
+  ],
+  "sibling_value_collision_slots": [],
   "prior_question_count_scanned": 165,
   "prior_parent_count_scanned": 89,
   "prior_exact_question_overlap_slots": [],

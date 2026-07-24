@@ -15,7 +15,7 @@ if __package__ in {None, ""}:
 from src.io_utils import read_jsonl
 
 
-VALIDATOR_VERSION = "typed-evidence-ref-generalization-candidate-validator-v1"
+VALIDATOR_VERSION = "typed-evidence-ref-generalization-candidate-validator-v2"
 
 
 def normalize_question(value: str) -> str:
@@ -51,6 +51,8 @@ def main() -> None:
     parser.add_argument("--chunks", type=Path, required=True)
     parser.add_argument("--prior-evaluation-dir", type=Path, required=True)
     parser.add_argument("--adaptive-32", type=Path, required=True)
+    parser.add_argument("--prior-candidates", type=Path)
+    parser.add_argument("--expected-changed-slots", type=int, nargs="*", default=[])
     parser.add_argument("--json-output", type=Path, required=True)
     parser.add_argument("--md-output", type=Path, required=True)
     args = parser.parse_args()
@@ -79,6 +81,30 @@ def main() -> None:
     for duplicate in duplicate_questions:
         fail("duplicate_question", None, duplicate)
 
+    changed_slots: list[int] = []
+    if args.prior_candidates:
+        prior_candidates = list(read_jsonl(args.prior_candidates))
+        if len(prior_candidates) != len(candidates):
+            fail(
+                "prior_candidate_row_count",
+                None,
+                f"{len(prior_candidates)} != {len(candidates)}",
+            )
+        else:
+            changed_slots = [
+                current["slot_ordinal"]
+                for prior, current in zip(prior_candidates, candidates, strict=True)
+                if prior != current
+            ]
+            if changed_slots != sorted(args.expected_changed_slots):
+                fail(
+                    "unexpected_changed_slots",
+                    None,
+                    f"{changed_slots} != {sorted(args.expected_changed_slots)}",
+                )
+
+    sibling_value_distinct_slots = []
+    sibling_value_collision_slots = []
     evidence_unit_count = 0
     unsupported_requirement_count = 0
     for row in candidates:
@@ -87,6 +113,29 @@ def main() -> None:
             fail("review_lock", slot, f"review status is {row['review']['status']}")
         if row["execution_allowed"] or row["training_allowed"]:
             fail("execution_lock", slot, "execution_allowed or training_allowed is true")
+        if row["primary_dimension"] == "sibling_relation":
+            requirements = row["requirements"]
+            sibling_values = (
+                [requirement["required_values"] for requirement in requirements]
+                if len(requirements) >= 2
+                else requirements[0]["required_values"]
+                if requirements
+                else []
+            )
+            value_keys = [
+                json.dumps(
+                    value,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
+                for value in sibling_values
+            ]
+            if len(value_keys) >= 2 and len(set(value_keys)) == len(value_keys):
+                sibling_value_distinct_slots.append(slot)
+            else:
+                sibling_value_collision_slots.append(slot)
+                fail("sibling_required_value_collision", slot, json.dumps(value_keys))
 
         statuses = []
         requirement_ids = set()
@@ -189,6 +238,10 @@ def main() -> None:
         "execution_allowed_rows": sum(bool(row["execution_allowed"]) for row in candidates),
         "training_allowed_rows": sum(bool(row["training_allowed"]) for row in candidates),
         "duplicate_question_count": len(duplicate_questions),
+        "changed_slots_from_prior_candidate": changed_slots,
+        "unchanged_slot_count": len(candidates) - len(changed_slots),
+        "sibling_value_distinct_slots": sibling_value_distinct_slots,
+        "sibling_value_collision_slots": sibling_value_collision_slots,
         "prior_question_count_scanned": len(prior_questions),
         "prior_parent_count_scanned": len(prior_parent_ids),
         "prior_exact_question_overlap_slots": prior_exact_question_overlaps,
@@ -212,6 +265,9 @@ def main() -> None:
         f"- pending human review: {report['pending_review_count']}",
         f"- 실행/학습 허용 행: {report['execution_allowed_rows']} / {report['training_allowed_rows']}",
         f"- 내부 중복 질문: {report['duplicate_question_count']}",
+        f"- 이전 초안 대비 변경 슬롯: {changed_slots}",
+        f"- 이전 초안과 동일한 슬롯: {report['unchanged_slot_count']}",
+        f"- sibling 값 충돌 슬롯: {sibling_value_collision_slots}",
         f"- 과거 질문 exact overlap: {len(prior_exact_question_overlaps)}",
         f"- 과거 gold parent overlap: {len(parent_overlaps)}",
         f"- 미등록 parent overlap: {len(unregistered_parent_overlaps)}",

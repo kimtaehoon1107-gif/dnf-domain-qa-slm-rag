@@ -350,6 +350,46 @@ await fs.writeFile(
   path.join(outputDir, "typed_evidence_ref_generalization_review_64_review.png"),
   new Uint8Array(await reviewPreview.arrayBuffer()),
 );
+const evidencePreview = await workbook.render({
+  sheetName: "Evidence",
+  autoCrop: "all",
+  scale: 0.6,
+  format: "png",
+});
+await fs.writeFile(
+  path.join(outputDir, "typed_evidence_ref_generalization_review_64_evidence.png"),
+  new Uint8Array(await evidencePreview.arrayBuffer()),
+);
+const readmePreview = await workbook.render({
+  sheetName: "README",
+  autoCrop: "all",
+  scale: 1,
+  format: "png",
+});
+await fs.writeFile(
+  path.join(outputDir, "typed_evidence_ref_generalization_review_64_readme.png"),
+  new Uint8Array(await readmePreview.arrayBuffer()),
+);
+const siblingPreview = await workbook.render({
+  sheetName: "Review",
+  range: "A1:J22",
+  scale: 1.4,
+  format: "png",
+});
+await fs.writeFile(
+  path.join(outputDir, "typed_evidence_ref_generalization_review_64_sibling_slots.png"),
+  new Uint8Array(await siblingPreview.arrayBuffer()),
+);
+const slot25Preview = await workbook.render({
+  sheetName: "Review",
+  range: "A23:J29",
+  scale: 1.4,
+  format: "png",
+});
+await fs.writeFile(
+  path.join(outputDir, "typed_evidence_ref_generalization_review_64_slot25_temporal.png"),
+  new Uint8Array(await slot25Preview.arrayBuffer()),
+);
 
 const inspection = await workbook.inspect({
   kind: "workbook,sheet,table,formula",
@@ -361,6 +401,17 @@ const inspection = await workbook.inspect({
 await fs.writeFile(
   path.join(outputDir, "typed_evidence_ref_generalization_review_64_inspection.ndjson"),
   inspection.ndjson,
+  "utf8",
+);
+const formulaErrors = await workbook.inspect({
+  kind: "match",
+  searchTerm: "#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A",
+  options: { useRegex: true, maxResults: 300 },
+  summary: "final formula error scan",
+});
+await fs.writeFile(
+  path.join(outputDir, "typed_evidence_ref_generalization_review_64_formula_errors.ndjson"),
+  formulaErrors.ndjson,
   "utf8",
 );
 
