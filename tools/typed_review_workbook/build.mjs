@@ -3,10 +3,12 @@ import path from "node:path";
 import { SpreadsheetFile, Workbook } from "@oai/artifact-tool";
 
 const root = process.cwd();
-const inputPath = path.join(
-  root,
-  "data/review/typed_evidence_ref_generalization_candidate_64.jsonl",
-);
+const inputPath = process.env.CANDIDATE_PATH
+  ? path.resolve(root, process.env.CANDIDATE_PATH)
+  : path.join(
+      root,
+      "data/review/typed_evidence_ref_generalization_candidate_64.jsonl",
+    );
 const validationPath = path.join(
   root,
   "reports/v3/typed_evidence_ref_generalization_candidate_64_validation.json",
@@ -25,6 +27,13 @@ const records = (await fs.readFile(inputPath, "utf8"))
   .split(/\r?\n/)
   .map(JSON.parse);
 const validation = JSON.parse(await fs.readFile(validationPath, "utf8"));
+const approvedCount = records.filter(
+  (record) => record.review.status === "approved",
+).length;
+const executionAllowedCount = records.filter(
+  (record) => record.execution_allowed,
+).length;
+const isSealed = approvedCount === records.length && executionAllowedCount === records.length;
 
 const workbook = Workbook.create();
 const summary = workbook.worksheets.add("Summary");
@@ -120,10 +129,31 @@ summary.getRange("E13:E20").fillDown();
 headerStyle(summary.getRange("D12:E12"));
 gridStyle(summary.getRange("D13:E20"));
 summary.getRange("A22:F25").values = [
-  ["잠금 상태", "64개 모두 pending_human_review", null, null, null, null],
-  ["평가 실행", "실행하지 않음", null, null, null, null],
-  ["승격 조건", "사람 검수 완료 후 freeze SHA 생성", null, null, null, null],
-  ["주의", "현재 파일은 검수 패킷이며 독립 성능으로 주장할 수 없음", null, null, null, null],
+  [
+    "잠금 상태",
+    isSealed ? "64개 모두 human_review_approved + SHA sealed" : "64개 모두 pending_human_review",
+    null,
+    null,
+    null,
+    null,
+  ],
+  ["평가 실행", isSealed ? "봉인본 one-shot 1회만 허용" : "실행하지 않음", null, null, null, null],
+  [
+    "승격 조건",
+    isSealed ? "실행 후 자동 고정분모 지표를 그대로 보고" : "사람 검수 완료 후 freeze SHA 생성",
+    null,
+    null,
+    null,
+    null,
+  ],
+  [
+    "주의",
+    isSealed ? "봉인 이후 질문·정답·근거 수정 및 재실행 금지" : "현재 파일은 검수 패킷이며 독립 성능으로 주장할 수 없음",
+    null,
+    null,
+    null,
+    null,
+  ],
 ];
 summary.getRange("A22:A25").format = {
   fill: lightBlue,
@@ -312,15 +342,27 @@ titleStyle(readme.getRange("A1:F1"));
 readme.getRange("A3:B13").values = [
   ["항목", "설명"],
   ["목적", "새 Typed evidence-ref 기준선의 일반화 검증용 64문항 후보를 사람 검수"],
-  ["현재 상태", "64/64 draft_complete_pending_human_review"],
-  ["평가 가능 여부", "불가 — execution_allowed=false"],
+  [
+    "현재 상태",
+    isSealed ? "64/64 human_review_approved_sealed" : "64/64 draft_complete_pending_human_review",
+  ],
+  [
+    "평가 가능 여부",
+    isSealed ? "가능 — 봉인본 one-shot 1회만" : "불가 — execution_allowed=false",
+  ],
   ["Review 시트", "질문·요구·정답 값을 확인하고 M~P열에 판정/검수자/시각/근거를 기록"],
   ["Evidence 시트", "요구별 exact source slice와 document/chunk 좌표 확인"],
   ["승인", "내용 정답과 근거가 직접 연결되며 질문이 모호하지 않을 때 approved"],
   ["Rewrite", "질문 또는 gold를 일반화 가능한 형태로 수정해야 할 때 rewrite"],
   ["Rejected", "근거 부족·중복·시점 불명확 등으로 평가 문항에 부적합할 때 rejected"],
-  ["주의", "문항 작성 후 아직 검색·reranker·Qwen3·verifier를 실행하지 않음"],
-  ["다음 단계", "사람 검수 완료 → approved 60개 이상 확인 → freeze 및 SHA 기록 → 최초 A/B"],
+  [
+    "주의",
+    isSealed ? "봉인 이후 질문·정답·근거 수정 및 재실행 금지" : "문항 작성 후 아직 검색·reranker·Qwen3·verifier를 실행하지 않음",
+  ],
+  [
+    "다음 단계",
+    isSealed ? "자동 고정분모 지표와 정직보류 false-full을 보고" : "사람 검수 완료 → approved 60개 이상 확인 → freeze 및 SHA 기록 → 최초 A/B",
+  ],
 ];
 headerStyle(readme.getRange("A3:B3"));
 gridStyle(readme.getRange("A4:B13"));

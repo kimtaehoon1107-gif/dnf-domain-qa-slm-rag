@@ -1,0 +1,262 @@
+{
+  "arm_inputs": {
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "documents": {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    "table_facts": {
+      "path": "data/v3/structured/table_atomic_facts_v3.2_1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a.jsonl",
+      "sha256": "1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a"
+    },
+    "temporal": {
+      "path": "data/v3/temporal/global_temporal_overlay_v3.2_f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317.jsonl",
+      "sha256": "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317"
+    }
+  },
+  "audit": {
+    "coordinate_failures": [],
+    "dimension_counts": {
+      "boolean_direction": 8,
+      "direct_fact": 8,
+      "multi_requirement": 8,
+      "revision_selection": 8,
+      "sibling_relation": 8,
+      "table_attribute": 8,
+      "temporal_role": 8,
+      "unsupported_or_partial": 8
+    },
+    "evidence_coordinate_count": 90,
+    "gate_pass": true,
+    "gates": {
+      "all_human_approved": true,
+      "dimension_matrix_8_by_8": true,
+      "evidence_coordinate_count_90": true,
+      "evidence_coordinates_exact": true,
+      "honest_unsupported_slots_exact": true,
+      "question_duplicates_zero": true,
+      "row_count_64": true,
+      "scoring_and_execution_open": true,
+      "source_matrix_8_by_8": true,
+      "training_locked": true
+    },
+    "honest_unsupported_slots": [
+      7,
+      15,
+      23,
+      31,
+      39,
+      47,
+      55,
+      63
+    ],
+    "source_counts": {
+      "dnf_account_policy": 8,
+      "dnf_event": 8,
+      "dnf_faq": 8,
+      "dnf_game_guide": 8,
+      "dnf_monthly_item": 8,
+      "dnf_notice": 8,
+      "dnf_seria_shop": 8,
+      "dnf_update": 8
+    }
+  },
+  "baseline_freeze_manifest": {
+    "path": "reports/v3/typed_evidence_ref_baseline_freeze_manifest.json",
+    "sha256": "efd8ac2e0d8f24dbf0a0c36480b088ae5e181a66ff01a8b367c6da315ca99b5d"
+  },
+  "candidate_input": {
+    "path": "data/review/typed_evidence_ref_generalization_candidate_64.jsonl",
+    "sha256": "271f1dcea56bcf9732e7201e80ef01fb5c46351391020695867c09a9dbe833e9"
+  },
+  "corpus": {
+    "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+    "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+  },
+  "freezer_version": "typed-evidence-ref-generalization-freezer-v1",
+  "frozen_hashes": [
+    {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    {
+      "path": "data/v3/indexes/bm25_index_af7de9bbf691aabaee464a2fe02facdf1f4b11de70d029967508357cab4948a2.json",
+      "sha256": "af7de9bbf691aabaee464a2fe02facdf1f4b11de70d029967508357cab4948a2"
+    },
+    {
+      "path": "data/v3/indexes/bm25_manifest_f963e4e6a8bd64540ec030cdd3a4e881cd4034d833655dc624b838cafae8dbea.json",
+      "sha256": "f963e4e6a8bd64540ec030cdd3a4e881cd4034d833655dc624b838cafae8dbea"
+    },
+    {
+      "path": "data/v3/indexes/dense_full_embeddings_2c294cde018eefa354971029c240dd6fd5f2a30ead757441f6dadacea110b10d.f32",
+      "sha256": "2c294cde018eefa354971029c240dd6fd5f2a30ead757441f6dadacea110b10d"
+    },
+    {
+      "path": "data/v3/indexes/dense_full_manifest_51074e7e337a64e94a7cc66c8dd7b8b3ed982bad0b3aa82e2e5f30fb84520349.json",
+      "sha256": "51074e7e337a64e94a7cc66c8dd7b8b3ed982bad0b3aa82e2e5f30fb84520349"
+    },
+    {
+      "path": "data/v3/indexes/dense_full_metadata_0343e23130322d2db046eeb5212f8fe6ca3178456036e1873ca3401634998a46.jsonl",
+      "sha256": "0343e23130322d2db046eeb5212f8fe6ca3178456036e1873ca3401634998a46"
+    },
+    {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    {
+      "path": "data/v3/structured/table_atomic_facts_v3.2_1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a.jsonl",
+      "sha256": "1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a"
+    },
+    {
+      "path": "data/v3/temporal/global_temporal_overlay_v3.2_f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317.jsonl",
+      "sha256": "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317"
+    },
+    {
+      "path": "docs/v3/generalization_64_seal_and_run.md",
+      "sha256": "f229331244a87e62eaf8221d50ef50c2ed73dc68e32101f3239c0e3982e0f3d3"
+    },
+    {
+      "path": "reports/v3/typed_evidence_ref_baseline_freeze_manifest.json",
+      "sha256": "efd8ac2e0d8f24dbf0a0c36480b088ae5e181a66ff01a8b367c6da315ca99b5d"
+    },
+    {
+      "path": "src/v3/build_subject_anchored_requirement_pools.py",
+      "sha256": "46975623ee15a76d6a0368df15d7d23c56a2e4c10216ac18418decb6fa267e91"
+    },
+    {
+      "path": "src/v3/evaluate_grounded_llm_replay.py",
+      "sha256": "8fa93d2376605b2e2be313b4be8fc3d781c6d06d0a8486c9c86f1cc451acb512"
+    },
+    {
+      "path": "src/v3/evaluate_subject_anchored_requirement_generation.py",
+      "sha256": "11ba98b5e2186bdaa9be00f507c1663b52d8810106d720a5db72f68fb8bbf5e3"
+    },
+    {
+      "path": "src/v3/evaluate_subject_anchored_retrieval_ab.py",
+      "sha256": "34116da45f7b4178e3b73a255f51864d29fc86c41714f0b7d132c4eb659baf61"
+    },
+    {
+      "path": "src/v3/freeze_typed_evidence_ref_generalization.py",
+      "sha256": "f7c153da856704ae267fd1f90e97b3534f6dc0f0d90a9820ba663ee55b974805"
+    },
+    {
+      "path": "src/v3/generate_grounded_llm_answer.py",
+      "sha256": "9aa17bafd60d69408535a32de6195840a2c86f0474e1ac0ebcfe7208cf0f289f"
+    },
+    {
+      "path": "src/v3/retrieve_v3.py",
+      "sha256": "d68ef59b5aba41b0c3daf97fccd9e980d5f329765b644f51ba5fb869d26d5308"
+    },
+    {
+      "path": "src/v3/run_typed_evidence_ref_generalization_one_shot.py",
+      "sha256": "ff6fcab0be96af2e46167dca07737c36d613b8742dd37fc54f620f9d40699460"
+    },
+    {
+      "path": "src/v3/score_evidence_reranker.py",
+      "sha256": "ba101231b2beed583a5a6077bf82f4979336195c14ab4a2c77f9750f7c73ac04"
+    },
+    {
+      "path": "src/v3/score_typed_evidence_ref_generalization.py",
+      "sha256": "dd75d38f6e78c0b92f56bf0b68f54ae1b6b11c35e6f7caabaea5be46edfd416f"
+    },
+    {
+      "path": "src/v3/simple_domain_rag.py",
+      "sha256": "bf9b8f0c9e401d6de6c8acb3d7ebe3b6992cbe2f821fda5379f3b4a1b30de7f4"
+    },
+    {
+      "path": "src/v3/subject_anchored_retrieval.py",
+      "sha256": "92127813b1b3152d30e8df34402ccb83698990f7202eeafbae3869bbd315dbb1"
+    },
+    {
+      "path": "src/v3/typed_evidence_ref.py",
+      "sha256": "4f0493cbff3257caea26a1ea0a14df42912076cc099a461d499a43551c5ca0f5"
+    },
+    {
+      "path": "tools/typed_review_workbook/build.mjs",
+      "sha256": "7509b2f5083775944c99098d822bdc0d96a3474653552fa7c31976565d87bb5b"
+    }
+  ],
+  "manifest_schema_version": "typed-evidence-ref-generalization-seal-manifest-v1",
+  "model": {
+    "num_ctx": 8192,
+    "ollama_blob_sha256": "a3de86cd1c132c822487ededd47a324c50491393e6565cd14bafa40d0b8e686f",
+    "requested_tag": "qwen3-8b:ctx8192"
+  },
+  "permissions": {
+    "execution_allowed": true,
+    "maximum_execution_attempts": 1,
+    "rerun_after_results_opened": false,
+    "sealed_scoring_allowed": true,
+    "training_allowed": false
+  },
+  "pipeline": {
+    "as_of": "2026-07-22",
+    "batch_requirements": true,
+    "candidate_pool_arm": "subject_arm_full",
+    "name": "subject_anchored_typed_evidence_ref_qwen3_8b_ctx8192",
+    "pipeline": [
+      "subject-anchored retrieval",
+      "question-level batched fixed requirements",
+      "typed value plus evidence_ref for non-table evidence",
+      "table-row branch for table evidence",
+      "relation, temporal-role and boolean verification",
+      "Qwen3 8B"
+    ],
+    "split_evidence_schema": true,
+    "typed_evidence_refs": true
+  },
+  "review": {
+    "decision": "approve_64_of_64",
+    "human_rejudication_after_run_allowed": "separate_addendum_only",
+    "reviewed_at": "2026-07-24T21:06:19.701379+09:00",
+    "reviewer_id": "kimdh"
+  },
+  "scoring": {
+    "headline_metric": "automatic_gold_value_complete_fixed_denominator",
+    "manual_credit_may_not_override_headline": true,
+    "normalization_contract": {
+      "rules": [
+        "Whitespace, punctuation, and Korean zero-padded month/day variants are normalized.",
+        "Korean and ISO dates are compared as YYYY-MM-DD; month/day-only forms use the frozen as_of year.",
+        "06시, 6시, and 06:00 are compared as 06:00; 오전/오후 are converted to 24-hour time.",
+        "Currency commas and Korean 만/억 scales are normalized to integer amount plus unit.",
+        "Percentages and plain numbers are compared numerically.",
+        "Boolean answers normalize explicit true/false and Korean positive/negative expressions.",
+        "Table-row and prose citations are equivalent only when the normalized gold value is present and the citation comes from an approved evidence chunk.",
+        "For text, enum, entity, and entity_list values, a directly cited pre-approved evidence unit is the canonical gold when required_values is a human-authored summary of that unit.",
+        "No semantic paraphrase credit is added beyond the typed normalizations above."
+      ],
+      "version": "typed-evidence-ref-generalization-normalization-v1"
+    },
+    "preregistered_gates": {
+      "generation_error_count": 0,
+      "gold_value_complete_target": "report_observed_value_without_posthoc_lowering",
+      "honest_unsupported_false_full_count": 0
+    },
+    "scorer_version": "typed-evidence-ref-generalization-scorer-v1",
+    "secondary_metric": "automatic_all_evidence_spans_hit_fixed_denominator"
+  },
+  "sealed_at": "2026-07-24T21:06:19.778537+09:00",
+  "sealed_set": {
+    "evidence_coordinate_count": 90,
+    "honest_unsupported_count": 8,
+    "honest_unsupported_slots": [
+      7,
+      15,
+      23,
+      31,
+      39,
+      47,
+      55,
+      63
+    ],
+    "path": "data/v3/evaluation/typed_evidence_ref_generalization_64_sealed_e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597.jsonl",
+    "row_count": 64,
+    "sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597",
+    "source_by_dimension_matrix": "8_sources_x_8_dimensions"
+  },
+  "status": "sealed_human_reviewed_ready_for_exactly_one_execution"
+}

@@ -1,0 +1,120 @@
+{
+  "contract_schema_version": "split-schema-generalization-comparator-contract-v1",
+  "runner_version": "split-schema-generalization-comparator-v1",
+  "evaluation_role": "posthoc_frozen_arm_comparator_after_typed_results_opened",
+  "blind_first_execution": false,
+  "purpose": "Run the previously frozen batched split-schema arm against the same sealed questions and exact candidate snapshot used by the typed evidence-ref arm.",
+  "comparison_limits": [
+    "This run is not a new blind holdout because the typed arm results were already opened.",
+    "No retrieval is rerun; the typed arm's persisted subject_arm_full candidate snapshot is reused exactly.",
+    "No prompt, generator, verifier, model, scorer, corpus, or candidate changes are allowed after this contract is hashed."
+  ],
+  "execution": {
+    "maximum_attempts": 1,
+    "rerun_allowed": false
+  },
+  "sealed_set": {
+    "path": "data/v3/evaluation/typed_evidence_ref_generalization_64_sealed_e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597.jsonl",
+    "sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597"
+  },
+  "candidate_snapshot": {
+    "path": "outputs/v3/typed_evidence_ref_generalization_64_one_shot_e56780c88fcf74d3/typed_evidence_ref_generalization_64_cases_9ae8e0443e0948457ef53e98493f81ee2909159716d20b247f85dc20429d2efb.jsonl",
+    "sha256": "9ae8e0443e0948457ef53e98493f81ee2909159716d20b247f85dc20429d2efb",
+    "candidate_pool_arm": "subject_arm_full"
+  },
+  "model": {
+    "requested_tag": "qwen3-8b:ctx8192",
+    "ollama_blob_sha256": "a3de86cd1c132c822487ededd47a324c50491393e6565cd14bafa40d0b8e686f",
+    "num_ctx": 8192,
+    "temperature": 0,
+    "max_tokens": 4000,
+    "timeout_seconds": 180
+  },
+  "pipeline": {
+    "as_of": "2026-07-22",
+    "split_evidence_schema": true,
+    "batch_requirements": true,
+    "typed_evidence_refs": false,
+    "steps": [
+      "reuse persisted subject-anchored subject_arm_full candidate snapshot",
+      "question-level batched fixed requirements",
+      "non-table answer plus exact quote schema",
+      "table table_row_ref schema",
+      "previous exact quote, answer-token and table-row verifier",
+      "Qwen3 8B"
+    ]
+  },
+  "arm_inputs": {
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "documents": {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    "temporal": {
+      "path": "data/v3/temporal/global_temporal_overlay_v3.2_f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317.jsonl",
+      "sha256": "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317"
+    },
+    "table_facts": {
+      "path": "data/v3/structured/table_atomic_facts_v3.2_1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a.jsonl",
+      "sha256": "1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a"
+    }
+  },
+  "scoring": {
+    "scorer_version": "typed-evidence-ref-generalization-scorer-v1",
+    "same_fixed_denominator_and_human_gold_as_typed_arm": true,
+    "human_rejudication_during_run": false
+  },
+  "frozen_hashes": [
+    {
+      "path": "src/v3/run_split_schema_generalization_comparator.py",
+      "sha256": "ce0e59e9b65bed3df118ac01c97bf99ad3ce671e30173afc7be557b0dd8b82d3"
+    },
+    {
+      "path": "src/v3/evaluate_grounded_llm_replay.py",
+      "sha256": "8fa93d2376605b2e2be313b4be8fc3d781c6d06d0a8486c9c86f1cc451acb512"
+    },
+    {
+      "path": "src/v3/generate_grounded_llm_answer.py",
+      "sha256": "9aa17bafd60d69408535a32de6195840a2c86f0474e1ac0ebcfe7208cf0f289f"
+    },
+    {
+      "path": "src/v3/score_typed_evidence_ref_generalization.py",
+      "sha256": "dd75d38f6e78c0b92f56bf0b68f54ae1b6b11c35e6f7caabaea5be46edfd416f"
+    },
+    {
+      "path": "reports/v3/typed_evidence_ref_baseline_freeze_manifest.json",
+      "sha256": "efd8ac2e0d8f24dbf0a0c36480b088ae5e181a66ff01a8b367c6da315ca99b5d"
+    },
+    {
+      "path": "Modelfile.qwen3-8b-ctx8192",
+      "sha256": "fda80b8332eb8f1ade9cbac990ae14b2c7fa3f011dfb333cc6bf22890493cd2b"
+    },
+    {
+      "path": "data/v3/evaluation/typed_evidence_ref_generalization_64_sealed_e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597.jsonl",
+      "sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597"
+    },
+    {
+      "path": "outputs/v3/typed_evidence_ref_generalization_64_one_shot_e56780c88fcf74d3/typed_evidence_ref_generalization_64_cases_9ae8e0443e0948457ef53e98493f81ee2909159716d20b247f85dc20429d2efb.jsonl",
+      "sha256": "9ae8e0443e0948457ef53e98493f81ee2909159716d20b247f85dc20429d2efb"
+    },
+    {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    {
+      "path": "data/v3/temporal/global_temporal_overlay_v3.2_f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317.jsonl",
+      "sha256": "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317"
+    },
+    {
+      "path": "data/v3/structured/table_atomic_facts_v3.2_1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a.jsonl",
+      "sha256": "1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a"
+    }
+  ]
+}

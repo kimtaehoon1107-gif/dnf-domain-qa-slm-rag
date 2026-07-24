@@ -1,0 +1,27 @@
+{
+  "attempt": {
+    "path": "outputs/v3/typed_evidence_ref_generalization_64_one_shot_e56780c88fcf74d3/attempt_started_5b8db545162edde3999d8218bfec012f6468ee26bce7b64bdfa0ec219bb90ae5.json",
+    "sha256": "5b8db545162edde3999d8218bfec012f6468ee26bce7b64bdfa0ec219bb90ae5"
+  },
+  "cases": {
+    "path": "outputs/v3/typed_evidence_ref_generalization_64_one_shot_e56780c88fcf74d3/typed_evidence_ref_generalization_64_cases_9ae8e0443e0948457ef53e98493f81ee2909159716d20b247f85dc20429d2efb.jsonl",
+    "sha256": "9ae8e0443e0948457ef53e98493f81ee2909159716d20b247f85dc20429d2efb"
+  },
+  "code_and_inputs_unchanged_after_seal": true,
+  "execution_count": 1,
+  "execution_manifest_schema_version": "typed-evidence-ref-generalization-execution-v1",
+  "rerun_allowed": false,
+  "runner_version": "typed-evidence-ref-generalization-one-shot-v1",
+  "seal_manifest": {
+    "path": "data/v3/evaluation/typed_evidence_ref_generalization_64_seal_manifest_bbfffbe39aa401c7d9c317c31ace393e6c78b250d1acd13ec139a5187d776cdd.json",
+    "sha256": "bbfffbe39aa401c7d9c317c31ace393e6c78b250d1acd13ec139a5187d776cdd"
+  },
+  "sealed_set": {
+    "path": "data/v3/evaluation/typed_evidence_ref_generalization_64_sealed_e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597.jsonl",
+    "sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597"
+  },
+  "summary": {
+    "path": "outputs/v3/typed_evidence_ref_generalization_64_one_shot_e56780c88fcf74d3/typed_evidence_ref_generalization_64_summary_2383d234a8f6f63652ab2773610c40716252a0a70d2d3782366011c4d416d058.json",
+    "sha256": "2383d234a8f6f63652ab2773610c40716252a0a70d2d3782366011c4d416d058"
+  }
+}
