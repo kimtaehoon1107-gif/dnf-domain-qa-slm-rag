@@ -1,10 +1,46 @@
-# DNF Domain QA SLM/RAG v2
+# DNF Domain QA SLM/RAG
 
-DNF Domain QA SLM/RAG v2 is a portfolio project for document-grounded Dungeon & Fighter Q&A. It uses the earlier `dnf-llm-eval` project as the v1 baseline, then expands the workflow into data design, labeling, RAG retrieval, answerability evaluation, RAFT-style SLM data, LoRA/QLoRA scaffolding, and a Gradio demo.
+DNF Domain QA SLM/RAG is a portfolio project for document-grounded Dungeon & Fighter Q&A. It uses the earlier `dnf-llm-eval` project as the v1 baseline, then expands the workflow into data design, labeling, RAG retrieval, answerability evaluation, RAFT-style SLM data, LoRA/QLoRA scaffolding, and a Gradio demo.
 
 The goal is not to present a generic chatbot. The goal is to show a reproducible QA/RAG/SLM pipeline where unsupported questions can be refused and evidence quality can be measured.
 
 For a concise Korean portfolio narrative, architecture, final comparison, and honest release verdict, see [`PORTFOLIO_REPORT.md`](PORTFOLIO_REPORT.md).
+
+## Latest v3 research track (2026-07-27)
+
+The current v3 track combines subject-anchored retrieval, Qwen3 8B typed
+`value + evidence_ref` generation, temporal/revision binding, and a
+typed claim verifier with fail-closed guards for registered contracts.
+
+- Official sealed one-shot: **37/64**. This remains the only generalization
+  headline.
+- Adaptive policy/month generation diagnostic: **55/64**. It is not promoted
+  because the inspected set had already influenced development.
+- Namespace-safe, addendum-aware score-only analysis of the historical
+  adaptive output reports **55/64 value-complete**, **48/64 typed-value
+  complete**, and **43/64 typed claim + approved direct evidence**. It does
+  not rebuild prompts or rerun the verifier, and is not a new model result.
+- Human review of its 14 automatic semantic flags found 3 real product
+  false-full cases (slots 3, 30, 51) and 11 narrow-gold/equivalent-evidence
+  false positives. A fresh claim-contract v7 smoke fixed slot 3, answered
+  slots 25 and 30 correctly, and safely blocked slot 51.
+- Reviewed-equivalent candidate coverage is **64/64**, but only **22/96**
+  requirements have an explicit relation contract; candidate presence is not
+  the same as claim-bound evidence sufficiency.
+- Fresh Qwen3 8B checks over slots 3, 25, 30, and 51 were correct on **3/4**;
+  the remaining wrong model selection was fail-closed, with no false-full or
+  generation error.
+- Full repository verification: **853 passed**, plus **64 subtests**.
+- Current verdict: portfolio case study **GO**; production default **NO-GO**.
+
+The main finding is that retrieval is no longer the only bottleneck. Evidence
+reduction, subject/relation/value/revision binding, list completeness, and
+evaluator adjudication dominate the remaining failures. The next untouched
+evaluation set stays deferred until the relation and cardinality contracts are
+frozen.
+
+See the [Korean v3 portfolio draft](PORTFOLIO_V3_DRAFT.md) and the
+[claim-contract round report](reports/v3/typed_evidence_ref_claim_contract_round_20260727.md).
 
 ## Latest Verified Status (2026-07-13)
 

@@ -3,6 +3,9 @@ from __future__ import annotations
 import unittest
 
 from src.v3.evaluate_grounded_llm_replay import (
+    TypedEvidenceNamespaceMismatchError,
+    _attach_typed_evidence_namespace,
+    _typed_evidence_namespace_metadata,
     build_table_rows_by_chunk,
     run_fixed_requirement_replay,
     run_replay,
@@ -67,6 +70,86 @@ def _artifacts() -> tuple[list[dict], list[dict], list[dict]]:
 
 
 class GroundedLlmReplayTest(unittest.TestCase):
+    def test_recorded_typed_namespace_must_match_rebuilt_prompt(self) -> None:
+        units = {
+            "E1": {
+                "chunk_id": "c1",
+                "start_char": 0,
+                "end_char": 10,
+            }
+        }
+        matching = {
+            "_recorded_replay_requires_namespace_match": True,
+            "typed_evidence_namespace": _typed_evidence_namespace_metadata(
+                units
+            ),
+        }
+        _attach_typed_evidence_namespace(matching, units)
+        self.assertNotIn(
+            "_recorded_replay_requires_namespace_match",
+            matching,
+        )
+
+        mismatched = {
+            "_recorded_replay_requires_namespace_match": True,
+            "typed_evidence_namespace": _typed_evidence_namespace_metadata(
+                {
+                    "E1": {
+                        "chunk_id": "c1",
+                        "start_char": 1,
+                        "end_char": 10,
+                    }
+                }
+            ),
+        }
+        with self.assertRaises(TypedEvidenceNamespaceMismatchError):
+            _attach_typed_evidence_namespace(mismatched, units)
+
+        missing = {
+            "_recorded_replay_requires_namespace_match": True,
+        }
+        with self.assertRaises(TypedEvidenceNamespaceMismatchError):
+            _attach_typed_evidence_namespace(missing, units)
+
+    def test_typed_evidence_namespace_records_stable_coordinates(self) -> None:
+        metadata = _typed_evidence_namespace_metadata(
+            {
+                "E2": {
+                    "chunk_id": "c2",
+                    "start_char": 20,
+                    "end_char": 30,
+                },
+                "E1": {
+                    "chunk_id": "c1",
+                    "start_char": 1,
+                    "end_char": 9,
+                },
+            }
+        )
+
+        self.assertEqual(
+            metadata["units"],
+            [
+                {
+                    "evidence_ref": "E1",
+                    "chunk_id": "c1",
+                    "start_char": 1,
+                    "end_char": 9,
+                },
+                {
+                    "evidence_ref": "E2",
+                    "chunk_id": "c2",
+                    "start_char": 20,
+                    "end_char": 30,
+                },
+            ],
+        )
+        self.assertRegex(metadata["sha256"], r"^[0-9a-f]{64}$")
+        self.assertEqual(
+            metadata["claim_contract_version"],
+            "typed-evidence-ref-claim-contract-v7",
+        )
+
     def test_table_rows_are_exact_deduplicated_candidate_slices(self) -> None:
         chunks, _, _ = _artifacts()
         row_text = chunks[0]["display_text"]
@@ -518,6 +601,71 @@ class GroundedLlmReplayTest(unittest.TestCase):
             rows[0]["model_call"]["calls"][0]["error"],
         )
 
+    def test_batched_mixed_or_duplicate_requirement_ids_fail_closed(
+        self,
+    ) -> None:
+        chunks, documents, temporal = _artifacts()
+        baseline = {
+            "candidate_id": "case1",
+            "arm0": {"candidate_chunk_ids": ["c1"]},
+            "arm0_score": {
+                "all_groups_hit": False,
+                "all_evidence_spans_hit": False,
+                "relevant_citation_count": 0,
+                "citation_count": 0,
+            },
+        }
+
+        for requirement_ids in (("r2", "typo"), ("r1", "r1")):
+            with self.subTest(requirement_ids=requirement_ids):
+                def invalid_batch_generator(**kwargs):
+                    del kwargs
+                    return {
+                        "output": {
+                            "requirements": [
+                                {
+                                    "requirement_id": requirement_id,
+                                    "status": "supported",
+                                    "answer": "가격은 100 세라",
+                                    "evidence": [
+                                        {
+                                            "candidate_ref": "1",
+                                            "quote": "가격은 100 세라",
+                                        }
+                                    ],
+                                }
+                                for requirement_id in requirement_ids
+                            ]
+                        },
+                        "latency_ms": 1,
+                        "usage": {"total_tokens": 1},
+                    }
+
+                rows = run_fixed_requirement_replay(
+                    reviewed_rows=[_reviewed()],
+                    baseline_rows=[baseline],
+                    chunks=chunks,
+                    documents=documents,
+                    temporal_rows=temporal,
+                    table_facts=[],
+                    model="fake",
+                    as_of="2026-07-22",
+                    reasoning_effort="high",
+                    timeout_seconds=1,
+                    non_table_batch_generator=invalid_batch_generator,
+                    split_evidence_schema=True,
+                    batch_requirements=True,
+                )
+
+                self.assertEqual(
+                    rows[0]["verified_output"]["response_mode"],
+                    "abstain",
+                )
+                self.assertIn(
+                    "batched requirement IDs differ",
+                    rows[0]["model_call"]["calls"][0]["error"],
+                )
+
     def test_batched_ordinal_requirement_ids_map_to_fixed_ids(self) -> None:
         chunks, documents, temporal = _artifacts()
         baseline = {
@@ -583,6 +731,84 @@ class GroundedLlmReplayTest(unittest.TestCase):
         self.assertEqual(
             rows[0]["model_call"]["calls"][0]["requirement_id_normalization"],
             "ordinal_to_fixed",
+        )
+
+    def test_batched_fixed_requirement_ids_may_be_reordered(self) -> None:
+        chunks, documents, temporal = _artifacts()
+        baseline = {
+            "candidate_id": "case1",
+            "arm0": {"candidate_chunk_ids": ["c1"]},
+            "arm0_score": {
+                "all_groups_hit": False,
+                "all_evidence_spans_hit": False,
+                "relevant_citation_count": 0,
+                "citation_count": 0,
+            },
+        }
+
+        def reordered_batch_generator(**kwargs):
+            return {
+                "output": {
+                    "requirements": [
+                        {
+                            "requirement_id": "r2",
+                            "status": "supported",
+                            "answer": "계정귀속",
+                            "evidence": [
+                                {
+                                    "candidate_ref": "1",
+                                    "quote": "거래 타입은 계정귀속",
+                                }
+                            ],
+                        },
+                        {
+                            "requirement_id": "r1",
+                            "status": "supported",
+                            "answer": "100 세라",
+                            "evidence": [
+                                {
+                                    "candidate_ref": "1",
+                                    "quote": "가격은 100 세라",
+                                }
+                            ],
+                        },
+                    ]
+                },
+                "latency_ms": 1,
+                "usage": {"total_tokens": 1},
+            }
+
+        rows = run_fixed_requirement_replay(
+            reviewed_rows=[_reviewed()],
+            baseline_rows=[baseline],
+            chunks=chunks,
+            documents=documents,
+            temporal_rows=temporal,
+            table_facts=[],
+            model="fake",
+            as_of="2026-07-22",
+            reasoning_effort="high",
+            timeout_seconds=1,
+            non_table_batch_generator=reordered_batch_generator,
+            split_evidence_schema=True,
+            batch_requirements=True,
+        )
+
+        self.assertEqual(
+            rows[0]["verified_output"]["response_mode"],
+            "full_answer",
+        )
+        self.assertNotIn(
+            "requirement_id_normalization",
+            rows[0]["model_call"]["calls"][0],
+        )
+        answers = {
+            requirement["requirement_id"]: requirement["answer"]
+            for requirement in rows[0]["verified_output"]["requirements"]
+        }
+        self.assertEqual(
+            answers,
+            {"r1": "100 세라", "r2": "계정귀속"},
         )
 
     def test_partial_candidate_pools_fall_back_to_baseline_per_case(self) -> None:

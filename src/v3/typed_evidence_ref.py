@@ -12,10 +12,14 @@ from urllib.request import Request, urlopen
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from src.v3.value_normalization import (
+    CURRENCY_UNITS,
     amount_of,
     boolean_evidence,
     boolean_value,
     currency_values,
+    number_values,
+    time_sequence,
+    time_values,
 )
 
 
@@ -29,16 +33,20 @@ value_type은 제공된 요구사항의 value_type을 그대로 복사하세요.
 근거는 quote를 복사하지 말고 evidence_ref만 선택하세요.
 evidence_ref는 후보 줄 맨 앞의 E숫자 형식(예: E3)만 그대로 사용하세요.
 선택한 evidence는 subject, relation, value, 시점과 조건을 직접 지지해야 합니다.
+requirement에 qualifiers가 있으면 같은 종류와 값의 주차·회차·단계가 확인되는 evidence만 선택하세요.
 날짜 요구는 requirement relation과 temporal_roles가 일치하는 evidence만 선택하세요.
 date 값은 YYYY-MM-DD, datetime 값은 YYYY-MM-DDTHH:MM 형식을 사용하세요.
 date_range 값은 YYYY-MM-DD/YYYY-MM-DD 형식을 사용하세요.
+time 값은 HH:MM, time_range 값은 HH:MM/HH:MM 형식을 사용하세요.
 boolean 값은 true 또는 false를 사용하세요.
-목록 값은 문자열 배열을 사용하세요.
+value_type이 entity_list이면 반드시 ["값1","값2"] 형태의 JSON 문자열 배열을 사용하세요. 각 원소에는 근거의 개별 값을 가능한 한 그대로 쓰고, 배열을 따옴표로 감싸 하나의 문자열로 만들지 마세요.
+cardinality가 all이면 근거가 직접 지지하는 전체 목록을 반환하고, 전체임을 판단할 수 없으면 unsupported로 두세요.
 근거가 부족하면 unsupported로 두고 value는 null, evidence_refs는 빈 배열로 반환하세요.
 """
 
 
 TypedValue = str | bool | int | float | list[str] | None
+TYPED_EVIDENCE_CONTRACT_VERSION = "typed-evidence-ref-claim-contract-v7"
 STRUCTURED_VALUE_TYPES = {
     "boolean",
     "currency",
@@ -48,6 +56,8 @@ STRUCTURED_VALUE_TYPES = {
     "number",
     "percentage",
     "price",
+    "time",
+    "time_range",
 }
 LOCAL_OLLAMA_CONTEXT_TOKENS = 8192
 LOCAL_OLLAMA_OUTPUT_TOKENS = 512
@@ -69,6 +79,215 @@ PROMPT_RELATION_TOKEN_ALIASES = {
     "rule": ("원칙", "정책"),
     "weekly": ("매주", "주간", "1주"),
 }
+RELATION_CANONICAL_VALUE_TYPES = {
+    "dailyresettime": "time",
+    "maintenancetime": "time_range",
+}
+_ORDINAL_QUALIFIER_BOUNDARY = (
+    r"(?=$|[\s\]\[(){}.,?!:;\"'·/~-]|"
+    r"(?:에서|에는|에|의|는|은|가|이|를|을|와|과|로|으로|때))"
+)
+_ORDINAL_QUALIFIER_PATTERNS = {
+    "week_index": re.compile(
+        rf"(?<!\d)(?P<value>\d{{1,3}})\s*주차"
+        rf"{_ORDINAL_QUALIFIER_BOUNDARY}"
+    ),
+    "round_index": re.compile(
+        rf"(?<!\d)(?P<value>\d{{1,3}})\s*회차"
+        rf"{_ORDINAL_QUALIFIER_BOUNDARY}"
+    ),
+    "stage_index": re.compile(
+        rf"(?<!\d)(?P<value>\d{{1,3}})\s*단계"
+        rf"{_ORDINAL_QUALIFIER_BOUNDARY}"
+    ),
+}
+
+
+def _ordinal_qualifiers_in_text(text: Any) -> dict[str, set[int]]:
+    values: dict[str, set[int]] = {}
+    for qualifier_kind, pattern in _ORDINAL_QUALIFIER_PATTERNS.items():
+        matches = {
+            int(match.group("value"))
+            for match in pattern.finditer(str(text or ""))
+            if int(match.group("value")) > 0
+        }
+        if matches:
+            values[qualifier_kind] = matches
+    return values
+
+
+def _normalized_ordinal_qualifiers(
+    requirement: dict[str, Any],
+) -> tuple[dict[str, int], bool]:
+    raw_qualifiers = requirement.get("qualifiers")
+    if raw_qualifiers is None or raw_qualifiers == "":
+        return {}, True
+    if not isinstance(raw_qualifiers, dict):
+        return {}, False
+    normalized = {}
+    for qualifier_kind in _ORDINAL_QUALIFIER_PATTERNS:
+        if qualifier_kind not in raw_qualifiers:
+            continue
+        raw_value = raw_qualifiers[qualifier_kind]
+        if isinstance(raw_value, bool):
+            return {}, False
+        try:
+            value = int(str(raw_value).strip())
+        except (TypeError, ValueError):
+            return {}, False
+        if value <= 0:
+            return {}, False
+        normalized[qualifier_kind] = value
+    return normalized, True
+
+
+def resolve_requirement_claim_contract(
+    requirement: dict[str, Any],
+    *,
+    question_text: str,
+    infer_question_ordinal: bool = True,
+) -> tuple[dict[str, Any], str, bool]:
+    """Add only an unambiguous explicit ordinal from the user question.
+
+    Frozen or planner-provided qualifiers remain authoritative. A question
+    containing multiple distinct ordinal identities is intentionally not
+    auto-distributed across requirements.
+    """
+
+    resolved = dict(requirement)
+    if resolved.get("_claim_contract_resolved") is True:
+        return (
+            resolved,
+            str(resolved["_claim_contract_qualifier_source"]),
+            bool(resolved["_claim_contract_question_consistent"]),
+        )
+    relation_key = re.sub(
+        r"[^0-9a-z가-힣]+",
+        "",
+        str(requirement.get("relation") or "").casefold(),
+    )
+    canonical_value_type = RELATION_CANONICAL_VALUE_TYPES.get(
+        relation_key
+    )
+    if canonical_value_type is not None:
+        resolved["value_type"] = canonical_value_type
+    raw_qualifiers = requirement.get("qualifiers")
+    if raw_qualifiers is None or raw_qualifiers == "":
+        qualifiers: dict[str, Any] = {}
+    elif isinstance(raw_qualifiers, dict):
+        qualifiers = dict(raw_qualifiers)
+    else:
+        return resolved, "invalid", False
+
+    explicit, valid = _normalized_ordinal_qualifiers(requirement)
+    if not valid:
+        return resolved, "invalid", False
+    question_pairs = {
+        (kind, value)
+        for kind, values in _ordinal_qualifiers_in_text(
+            question_text
+        ).items()
+        for value in values
+    }
+    inferred = next(iter(question_pairs)) if len(question_pairs) == 1 else None
+    conflict = False
+    source = "explicit" if explicit else "none"
+    if inferred is not None:
+        qualifier_kind, value = inferred
+        if qualifier_kind in explicit:
+            conflict = explicit[qualifier_kind] != value
+        elif infer_question_ordinal:
+            qualifiers[qualifier_kind] = value
+            source = (
+                "explicit_and_question_inferred"
+                if explicit
+                else "question_inferred"
+            )
+    if qualifiers:
+        resolved["qualifiers"] = qualifiers
+    return resolved, source, not conflict
+
+
+def resolve_requirement_claim_contracts(
+    requirements: list[dict[str, Any]],
+    *,
+    question_text: str,
+) -> list[dict[str, Any]]:
+    """Resolve question ordinals once across the complete requirement list."""
+
+    relation_keys = [
+        re.sub(
+            r"[^0-9a-z가-힣]+",
+            "",
+            str(requirement.get("relation") or "").casefold(),
+        )
+        for requirement in requirements
+    ]
+    infer_question_ordinal = len(requirements) == 1 or (
+        bool(relation_keys)
+        and all(relation_keys)
+        and len(set(relation_keys)) == 1
+    )
+    resolved_requirements = []
+    for requirement in requirements:
+        resolved, source, consistent = resolve_requirement_claim_contract(
+            requirement,
+            question_text=question_text,
+            infer_question_ordinal=infer_question_ordinal,
+        )
+        resolved["_claim_contract_resolved"] = True
+        resolved["_claim_contract_qualifier_source"] = source
+        resolved["_claim_contract_question_consistent"] = consistent
+        resolved_requirements.append(resolved)
+    return resolved_requirements
+
+
+def qualifier_identity_state(
+    requirement: dict[str, Any],
+    evidence_records: list[dict[str, Any]],
+) -> str:
+    required, valid = _normalized_ordinal_qualifiers(requirement)
+    if not valid:
+        return "contract_invalid"
+    if not required:
+        return "not_applicable"
+    if not evidence_records:
+        return "unproven"
+    grouped_records: dict[tuple[Any, ...], list[dict[str, Any]]] = (
+        defaultdict(list)
+    )
+    for index, record in enumerate(evidence_records):
+        identity = (
+            record.get("parent_document_id"),
+            record.get("revision_id"),
+        )
+        if identity == (None, None):
+            identity = ("record", index)
+        grouped_records[identity].append(record)
+    for qualifier_kind, expected_value in required.items():
+        for records in grouped_records.values():
+            title_values = _ordinal_qualifiers_in_text(
+                "\n".join(
+                    str(record.get("title") or "")
+                    for record in records
+                )
+            ).get(qualifier_kind, set())
+            observed = title_values or _ordinal_qualifiers_in_text(
+                "\n".join(
+                    text
+                    for record in records
+                    for text in (
+                        str(record.get("context_text") or ""),
+                        str(record.get("text") or ""),
+                    )
+                    if text
+                )
+            ).get(qualifier_kind, set())
+            if not observed:
+                return "unproven"
+            if observed != {expected_value}:
+                return "mismatch"
+    return "matched"
 
 
 class TypedRequirementSelection(BaseModel):
@@ -257,6 +476,10 @@ def _public_requirement(requirement: dict[str, Any]) -> dict[str, Any]:
         "surface",
         "value_type",
         "qualifiers",
+        "temporal_role",
+        "cardinality",
+        "expected_count",
+        "relation_surface",
     )
     return {key: requirement[key] for key in allowed if key in requirement}
 
@@ -273,6 +496,8 @@ def _prompt_value_shape_score(
         value_type = requirement.get("value_type")
         if value_type in {"date", "datetime", "date_range"}:
             score += 3 if _date_values(text, as_of) else 0
+        elif value_type in {"time", "time_range"}:
+            score += 3 if time_values(text) else 0
         elif value_type in {"price", "currency"}:
             score += 3 if currency_values(text) else 0
         elif value_type == "percentage":
@@ -352,6 +577,388 @@ def _prompt_unit_relevance_score(
     return score
 
 
+def _units_with_context(
+    units: list[dict[str, Any]],
+    selected_units: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    by_ref = {unit["evidence_ref"]: unit for unit in units}
+    selected_by_ref = {}
+    for unit in selected_units:
+        evidence_ref = unit["evidence_ref"]
+        previous = selected_by_ref.get(evidence_ref)
+        if (
+            previous is None
+            or unit["end_char"] - unit["start_char"]
+            > previous["end_char"] - previous["start_char"]
+        ):
+            selected_by_ref[evidence_ref] = unit
+    for unit in list(selected_units):
+        for evidence_ref in unit.get("context_refs", []):
+            if evidence_ref in by_ref:
+                selected_by_ref.setdefault(
+                    evidence_ref,
+                    by_ref[evidence_ref],
+                )
+    return sorted(
+        selected_by_ref.values(),
+        key=lambda unit: (
+            int(unit["candidate_ref"]),
+            unit["start_char"],
+        ),
+    )
+
+
+def _bind_policy_prompt_units(
+    units: list[dict[str, Any]],
+    *,
+    requirements: list[dict[str, Any]],
+    question: str,
+    as_of: str,
+) -> list[dict[str, Any]] | None:
+    if not requirements or not all(
+        _policy_requirement(requirement) for requirement in requirements
+    ):
+        return None
+
+    requested_years = set(_YEAR_IDENTITY_PATTERN.findall(question))
+    published_years = _question_published_years(question)
+    by_candidate: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for unit in units:
+        by_candidate[unit["candidate_ref"]].append(unit)
+
+    selected = []
+    for candidate_units in by_candidate.values():
+        first = candidate_units[0]
+        compact_title = _compact(first.get("title", ""))
+        candidate_published_years = set(
+            re.findall(r"20\d{2}", str(first.get("published_at") or ""))
+        )
+        if not candidate_published_years:
+            candidate_published_years = set(
+                re.findall(r"20\d{2}", str(first.get("title") or ""))
+            )
+        candidate_semantic_text = "\n".join(
+            "\n".join(
+                filter(
+                    None,
+                    (unit.get("context_text", ""), unit["text"]),
+                )
+            )
+            for unit in candidate_units
+        )
+        for requirement in requirements:
+            requested_identities = {
+                identity
+                for identity in _POLICY_IDENTITIES
+                if identity in _compact(requirement.get("subject", ""))
+            }
+            if (
+                not requested_identities
+                or not requested_identities
+                <= {
+                    identity
+                    for identity in _POLICY_IDENTITIES
+                    if identity in compact_title
+                }
+            ):
+                continue
+            if published_years and published_years.isdisjoint(
+                candidate_published_years
+            ):
+                continue
+            if (
+                not published_years
+                and requested_years
+                and requested_years.isdisjoint(
+                    {
+                        date_value[:4]
+                        for date_value in _role_bound_dates(
+                            requirement,
+                            candidate_units,
+                            as_of=as_of,
+                        )
+                    }
+                )
+            ):
+                continue
+            if not _relation_supported(
+                requirement,
+                candidate_semantic_text,
+                str(first.get("title") or ""),
+            ):
+                continue
+            if not _group_has_value_shape(
+                candidate_units,
+                value_type=str(requirement.get("value_type") or ""),
+                as_of=as_of,
+            ):
+                continue
+            selected.extend(candidate_units)
+            break
+    return _units_with_context(units, selected)
+
+
+def _monthly_record_header_month(text: str) -> str | None:
+    normalized = re.sub(r"^\s*#{1,6}\s*", "", text).strip()
+    bracket_match = re.fullmatch(
+        r"\[(?P<month>1[0-2]|0?[1-9])\s*월[^\]]*\]"
+        r"(?:\s*[:：-]?\s*.+)?",
+        normalized,
+    )
+    label_match = re.fullmatch(
+        r"(?P<month>1[0-2]|0?[1-9])\s*월\s*이달의\s*아이템",
+        normalized,
+    )
+    match = bracket_match or label_match
+    return str(int(match.group("month"))) if match else None
+
+
+def _monthly_bounds_from_markers(
+    markers: list[dict[str, Any]],
+    *,
+    requested_month: str,
+    document_end: int,
+) -> list[tuple[int, int]]:
+    bounds = []
+    for index, marker in enumerate(markers):
+        if marker["month"] != requested_month:
+            continue
+        start = marker["start"]
+        end = (
+            markers[index + 1]["start"]
+            if index + 1 < len(markers)
+            else document_end
+        )
+        bounds.append((start, end))
+    return bounds
+
+
+def _monthly_record_bounds(
+    chunk_units: list[dict[str, Any]],
+    requested_month: str,
+) -> list[tuple[int, int]]:
+    markers = [
+        {
+            "start": unit["start_char"],
+            "month": month,
+        }
+        for unit in sorted(chunk_units, key=lambda row: row["start_char"])
+        if (month := _monthly_record_header_month(unit["text"])) is not None
+    ]
+    return _monthly_bounds_from_markers(
+        markers,
+        requested_month=requested_month,
+        document_end=max(unit["end_char"] for unit in chunk_units),
+    )
+
+
+def _monthly_record_bounds_in_text(
+    source_text: str,
+    requested_month: str,
+) -> list[tuple[int, int]]:
+    markers = [
+        {
+            "start": line.start(),
+            "month": month,
+        }
+        for line in re.finditer(r"[^\r\n]+", source_text)
+        if (
+            month := _monthly_record_header_month(line.group())
+        ) is not None
+    ]
+    return _monthly_bounds_from_markers(
+        markers,
+        requested_month=requested_month,
+        document_end=len(source_text),
+    )
+
+
+def _monthly_sale_preamble_units(
+    chunk_units: list[dict[str, Any]],
+    *,
+    first_record_start: int,
+    requirement: dict[str, Any],
+    as_of: str,
+) -> list[dict[str, Any]]:
+    if _required_temporal_role(requirement) not in {
+        "sale_period",
+        "sale_start",
+        "sale_end",
+    }:
+        return []
+    preamble = [
+        unit
+        for unit in chunk_units
+        if unit["end_char"] <= first_record_start
+    ]
+    merged = _merge_monthly_attribute_value_units(
+        preamble,
+        requirement,
+    )
+    return [
+        unit
+        for unit in merged
+        if "판매기간" in _compact(unit["text"])
+        and _group_has_value_shape(
+            [unit],
+            value_type=str(requirement.get("value_type") or ""),
+            as_of=as_of,
+        )
+    ]
+
+
+def _merge_monthly_attribute_value_units(
+    record_units: list[dict[str, Any]],
+    requirement: dict[str, Any],
+) -> list[dict[str, Any]]:
+    ordered = sorted(record_units, key=lambda unit: unit["start_char"])
+    relation = _compact(requirement.get("relation", ""))
+    label_markers = ()
+    if "shopprice" in relation or "상점판매가" in relation:
+        label_markers = ("상점판매가", "상점판매가격", "판매가")
+    elif (
+        "tradetype" in relation
+        or "거래타입" in relation
+        or "거래유형" in relation
+    ):
+        label_markers = ("거래타입", "거래유형")
+    elif _required_temporal_role(requirement) == "deletion_at":
+        label_markers = ("삭제기일", "삭제일자", "삭제시각")
+    elif _required_temporal_role(requirement) in {
+        "sale_period",
+        "sale_start",
+        "sale_end",
+    }:
+        label_markers = ("판매기간",)
+    if not label_markers:
+        return ordered
+    merged = []
+    for index, unit in enumerate(ordered):
+        compact_text = _compact(unit["text"])
+        if (
+            len(unit["text"]) > 40
+            or compact_text not in label_markers
+            or index + 1 >= len(ordered)
+        ):
+            merged.append(unit)
+            continue
+        value_unit = ordered[index + 1]
+        if value_unit["start_char"] != unit["end_char"] + 1:
+            merged.append(unit)
+            continue
+        merged.append(
+            {
+                **unit,
+                "end_char": value_unit["end_char"],
+                "text": unit["text"] + "\n" + value_unit["text"],
+            }
+        )
+    return merged
+
+
+def _bind_monthly_prompt_units(
+    units: list[dict[str, Any]],
+    *,
+    requirements: list[dict[str, Any]],
+    as_of: str,
+) -> list[dict[str, Any]] | None:
+    requested_months = [
+        _monthly_requirement_month(requirement)
+        for requirement in requirements
+    ]
+    if (
+        not requirements
+        or any(month is None for month in requested_months)
+    ):
+        return None
+
+    by_chunk: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for unit in units:
+        if unit.get("source_id") == "dnf_monthly_item":
+            by_chunk[unit["chunk_id"]].append(unit)
+    if not by_chunk:
+        return None
+
+    selected = []
+    for requirement, requested_month in zip(
+        requirements,
+        requested_months,
+        strict=True,
+    ):
+        if requested_month is None:
+            continue
+        for chunk_units in by_chunk.values():
+            bounds = _monthly_record_bounds(
+                chunk_units,
+                requested_month,
+            )
+            if bounds:
+                selected.extend(
+                    _monthly_sale_preamble_units(
+                        chunk_units,
+                        first_record_start=bounds[0][0],
+                        requirement=requirement,
+                        as_of=as_of,
+                    )
+                )
+            for start, end in bounds:
+                record_units = [
+                    unit
+                    for unit in chunk_units
+                    if unit["start_char"] >= start
+                    and unit["end_char"] <= end
+                ]
+                record_text = "\n".join(
+                    unit["text"] for unit in record_units
+                )
+                if not _relation_supported(
+                    requirement,
+                    record_text,
+                    chunk_units[0].get("title", ""),
+                ):
+                    continue
+                if not _group_has_value_shape(
+                    record_units,
+                    value_type=str(
+                        requirement.get("value_type") or ""
+                    ),
+                    as_of=as_of,
+                ):
+                    continue
+                selected.extend(
+                    _merge_monthly_attribute_value_units(
+                        record_units,
+                        requirement,
+                    )
+                )
+    return _units_with_context(units, selected)
+
+
+def bind_prompt_evidence_units(
+    units: list[dict[str, Any]],
+    *,
+    requirements: list[dict[str, Any]],
+    question: str,
+    as_of: str,
+) -> list[dict[str, Any]]:
+    """Narrow model-visible evidence for two registered identity families."""
+
+    policy_units = _bind_policy_prompt_units(
+        units,
+        requirements=requirements,
+        question=question,
+        as_of=as_of,
+    )
+    if policy_units is not None:
+        return policy_units
+    monthly_units = _bind_monthly_prompt_units(
+        units,
+        requirements=requirements,
+        as_of=as_of,
+    )
+    return monthly_units if monthly_units is not None else units
+
+
 def select_prompt_evidence_units(
     units: list[dict[str, Any]],
     *,
@@ -365,6 +972,12 @@ def select_prompt_evidence_units(
 
     if maximum_units < 1 or maximum_text_chars < 1:
         raise RuntimeError("prompt evidence limits must be positive")
+    units = bind_prompt_evidence_units(
+        units,
+        requirements=requirements,
+        question=question,
+        as_of=as_of,
+    )
     if (
         len(units) <= maximum_units
         and sum(len(unit["text"]) for unit in units) <= maximum_text_chars
@@ -501,7 +1114,7 @@ def select_prompt_evidence_units(
     )
 
 
-def build_typed_evidence_prompt(
+def build_typed_evidence_prompt_with_candidate_units(
     *,
     question: str,
     requirements: list[dict[str, Any]],
@@ -511,7 +1124,15 @@ def build_typed_evidence_prompt(
     chunks_by_id: dict[str, dict[str, Any]],
     documents_by_id: dict[str, dict[str, Any]],
     temporal_by_document: dict[str, dict[str, Any]],
-) -> tuple[str, dict[str, dict[str, Any]]]:
+) -> tuple[
+    str,
+    dict[str, dict[str, Any]],
+    dict[str, dict[str, Any]],
+]:
+    requirements = resolve_requirement_claim_contracts(
+        requirements,
+        question_text=question,
+    )
     all_units = build_evidence_units(
         candidate_chunk_ids,
         chunks_by_id=chunks_by_id,
@@ -594,7 +1215,37 @@ def build_typed_evidence_prompt(
         + "\n\n후보 evidence units(선택 가능한 ID는 E숫자뿐):\n"
         + "\n\n".join(public_evidence_blocks)
     )
-    return prompt, {unit["evidence_ref"]: unit for unit in units}
+    return (
+        prompt,
+        {unit["evidence_ref"]: unit for unit in units},
+        {unit["evidence_ref"]: unit for unit in all_units},
+    )
+
+
+def build_typed_evidence_prompt(
+    *,
+    question: str,
+    requirements: list[dict[str, Any]],
+    question_time_scope: str,
+    as_of: str,
+    candidate_chunk_ids: list[str],
+    chunks_by_id: dict[str, dict[str, Any]],
+    documents_by_id: dict[str, dict[str, Any]],
+    temporal_by_document: dict[str, dict[str, Any]],
+) -> tuple[str, dict[str, dict[str, Any]]]:
+    prompt, visible_units, _ = (
+        build_typed_evidence_prompt_with_candidate_units(
+            question=question,
+            requirements=requirements,
+            question_time_scope=question_time_scope,
+            as_of=as_of,
+            candidate_chunk_ids=candidate_chunk_ids,
+            chunks_by_id=chunks_by_id,
+            documents_by_id=documents_by_id,
+            temporal_by_document=temporal_by_document,
+        )
+    )
+    return prompt, visible_units
 
 
 def _usage_dict(response: Any) -> dict[str, int]:
@@ -932,27 +1583,79 @@ def _content_tokens(text: str) -> set[str]:
     }
 
 
+def _is_single_clock_value(value: Any) -> bool:
+    return bool(
+        re.fullmatch(
+            r"\s*(?:(?:오전|오후)\s*)?"
+            r"(?:[01]?\d|2[0-3])"
+            r"(?::[0-5]\d|\s*시(?:\s*[0-5]?\d\s*분)?)\s*",
+            str(value or ""),
+        )
+    )
+
+
 def _text_value_supported(value: TypedValue, evidence_text: str) -> bool:
     if isinstance(value, list):
         return bool(value) and all(
             _compact(item) in _compact(evidence_text) for item in value
         )
     value_text = str(value)
+    model_times = time_values(value_text)
+    if model_times and _is_single_clock_value(value_text):
+        return model_times <= time_values(evidence_text)
     compact_value = _compact(value_text)
     compact_evidence = _compact(evidence_text)
-    if compact_value and (
-        compact_value in compact_evidence
-        or (
-            len(compact_evidence) >= 4
-            and compact_evidence in compact_value
-        )
-    ):
+    if compact_value and compact_value in compact_evidence:
         return True
     value_tokens = _content_tokens(value_text)
     evidence_tokens = _content_tokens(evidence_text)
     if not value_tokens:
         return False
-    return len(value_tokens & evidence_tokens) / len(value_tokens) >= 0.5
+    return value_tokens <= evidence_tokens
+
+
+def _entity_item_supported(value: str, evidence_text: str) -> bool:
+    compact_value = _compact(value)
+    compact_evidence = _compact(evidence_text)
+    if not compact_value:
+        return False
+    if re.fullmatch(r"\d+", str(value).strip()):
+        return bool(
+            re.search(
+                rf"(?<!\d){re.escape(str(value).strip())}(?!\d)",
+                evidence_text.casefold(),
+            )
+        )
+    if compact_value[0].isdigit() or compact_value[-1].isdigit():
+        prefix = r"(?<!\d)" if compact_value[0].isdigit() else ""
+        suffix = r"(?!\d)" if compact_value[-1].isdigit() else ""
+        return bool(
+            re.search(
+                prefix + re.escape(compact_value) + suffix,
+                compact_evidence,
+            )
+        )
+    return _text_value_supported(value, evidence_text)
+
+
+def _entity_value_supported(
+    value: TypedValue,
+    evidence_text: str,
+) -> bool:
+    if isinstance(value, list):
+        normalized_items = [_compact(item) for item in value]
+        return (
+            bool(normalized_items)
+            and all(normalized_items)
+            and len(normalized_items) == len(set(normalized_items))
+            and all(
+                _entity_item_supported(item, evidence_text)
+                for item in value
+            )
+        )
+    if not isinstance(value, str):
+        return False
+    return _entity_item_supported(value, evidence_text)
 
 
 def _value_supported(
@@ -977,6 +1680,21 @@ def _value_supported(
         return len(model_values) >= 2 and model_values <= _date_values(
             evidence_text, as_of
         )
+    if value_type == "time":
+        model_values = time_values(value)
+        return len(model_values) == 1 and model_values <= time_values(
+            evidence_text
+        )
+    if value_type == "time_range":
+        model_sequence = time_sequence(value)
+        evidence_sequence = time_sequence(evidence_text)
+        return len(model_sequence) >= 2 and any(
+            evidence_sequence[index : index + len(model_sequence)]
+            == model_sequence
+            for index in range(
+                len(evidence_sequence) - len(model_sequence) + 1
+            )
+        )
     if value_type == "percentage":
         model_values = _percentage_values(str(value))
         return bool(model_values) and model_values <= _percentage_values(
@@ -995,9 +1713,9 @@ def _value_supported(
         }
         return model_amount is not None and len(matching_values) == 1
     if value_type == "number":
-        model_values = set(re.findall(r"\d+(?:\.\d+)?", str(value)))
-        return bool(model_values) and model_values <= set(
-            re.findall(r"\d+(?:\.\d+)?", evidence_text)
+        model_values = number_values(value)
+        return bool(model_values) and model_values <= number_values(
+            evidence_text
         )
     if value_type == "boolean":
         model_value = boolean_value(value)
@@ -1020,6 +1738,7 @@ def _required_relation_groups(requirement: dict[str, Any]) -> list[tuple[str, ..
         "event_period": [("이벤트기간", "이벤트")],
         "event_start": [("이벤트기간", "이벤트")],
         "event_end": [("이벤트기간", "이벤트")],
+        "published_at": [("게시", "공지")],
         "broadcast_at": [("방송", "생방송")],
         "fixed_at": [("수정",)],
         "maintenance_time": [("점검",)],
@@ -1078,8 +1797,8 @@ def _required_relation_groups(requirement: dict[str, Any]) -> list[tuple[str, ..
         return [("길드탈퇴",), ("재가입", "가입"), ("06시",)]
     if "길드마스터권한위임조건" in relation:
         return [("길드마스터", "길드장"), ("30일",), ("위임",)]
-    if "상점판매가" in relation:
-        return [("판매가", "골드")]
+    if "shopprice" in relation or "상점판매가" in relation:
+        return [("상점판매가", "판매가")]
     if "사용시획득아이템구성" in relation:
         return [
             ("사용시", "아이템명"),
@@ -1103,7 +1822,11 @@ def _required_relation_groups(requirement: dict[str, Any]) -> list[tuple[str, ..
         return [("재발급",)]
     if "환불대상" in relation:
         return [("환불",)]
-    if "거래타입" in relation or "거래유형" in relation:
+    if (
+        "tradetype" in relation
+        or "거래타입" in relation
+        or "거래유형" in relation
+    ):
         return [
             (
                 "거래타입",
@@ -1119,8 +1842,228 @@ def _required_relation_groups(requirement: dict[str, Any]) -> list[tuple[str, ..
         return [("캐스트속도",)]
     if "이동속도" in relation:
         return [("이동속도",)]
-    surface = _compact(requirement.get("surface", ""))
+    surface = _compact(requirement.get("relation_surface", ""))
     return [(surface,)] if len(surface) >= 2 else []
+
+
+def relation_contract_state(
+    requirement: dict[str, Any],
+) -> str:
+    groups = _required_relation_groups(requirement)
+    if not groups:
+        return "unvalidated"
+    relation_surface = _compact(
+        requirement.get("relation_surface", "")
+    )
+    if (
+        relation_surface
+        and groups == [(relation_surface,)]
+    ):
+        return "surface_fallback"
+    return "explicit_alias"
+
+
+def _cardinality_validation(
+    requirement: dict[str, Any],
+    value: TypedValue,
+) -> tuple[str, bool]:
+    if requirement.get("value_type") != "entity_list":
+        return "not_applicable", True
+    if (
+        not isinstance(value, list)
+        or not value
+        or any(
+            not isinstance(item, str) or not item.strip()
+            for item in value
+        )
+    ):
+        return "shape_mismatch", False
+    normalized_items = [_compact(item) for item in value]
+    if len(normalized_items) != len(set(normalized_items)):
+        return "duplicate_values", False
+
+    cardinality = requirement.get("cardinality")
+    expected_count = requirement.get("expected_count")
+    if cardinality in {None, ""} and expected_count is None:
+        return "unspecified", True
+    if isinstance(expected_count, bool) or (
+        expected_count is not None
+        and (
+            not isinstance(expected_count, int)
+            or expected_count <= 0
+        )
+    ):
+        return "invalid_contract", False
+    if cardinality == "single":
+        return (
+            ("count_match", True)
+            if len(value) == 1
+            else ("count_mismatch", False)
+        )
+    if isinstance(expected_count, int):
+        return (
+            ("count_match", True)
+            if len(value) == expected_count
+            else ("count_mismatch", False)
+        )
+    if cardinality == "all":
+        return "all_unproven", False
+    return "invalid_contract", False
+
+
+def _requested_currency_units(
+    requirement: dict[str, Any],
+    question_text: str,
+) -> set[str]:
+    question_haystack = question_text.casefold()
+    for key in ("subject", "subject_group"):
+        subject = str(requirement.get(key) or "").casefold().strip()
+        if subject:
+            question_haystack = question_haystack.replace(
+                subject,
+                " " * len(subject),
+            )
+    qualifier_text = json.dumps(
+        requirement.get("qualifiers") or {},
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+    haystack = (question_haystack + " " + qualifier_text).casefold()
+    requested = set()
+    occupied: list[tuple[int, int]] = []
+    for alias, canonical in sorted(
+        CURRENCY_UNITS.items(),
+        key=lambda item: len(item[0]),
+        reverse=True,
+    ):
+        normalized_alias = alias.casefold()
+        if len(normalized_alias) == 1 and re.fullmatch(
+            r"[가-힣]",
+            normalized_alias,
+        ):
+            matches = re.finditer(
+                rf"(?<![가-힣]){re.escape(normalized_alias)}"
+                r"(?![가-힣])",
+                haystack,
+            )
+        else:
+            matches = re.finditer(
+                re.escape(normalized_alias),
+                haystack,
+            )
+        accepted = False
+        for match in matches:
+            if any(
+                match.start() < end and match.end() > start
+                for start, end in occupied
+            ):
+                continue
+            occupied.append((match.start(), match.end()))
+            accepted = True
+        if accepted:
+            requested.add(canonical)
+    return requested
+
+
+def _currency_values_excluding_subject(
+    text: str,
+    requirement: dict[str, Any],
+) -> set[tuple[int, str]]:
+    masked_text = text
+    for key in ("subject", "subject_group"):
+        subject = str(requirement.get(key) or "").strip()
+        if subject:
+            masked_text = re.sub(
+                re.escape(subject),
+                lambda match: " " * len(match.group()),
+                masked_text,
+                flags=re.IGNORECASE,
+            )
+    return currency_values(masked_text)
+
+
+def _unresolved_currency_ambiguity(
+    requirement: dict[str, Any],
+    value: TypedValue,
+    *,
+    question_text: str,
+    selected_units: list[dict[str, Any]],
+    all_units: list[dict[str, Any]],
+) -> set[tuple[int, str]]:
+    if requirement.get("value_type") not in {"currency", "price"}:
+        return set()
+    model_values = currency_values(value)
+    if not model_values:
+        return set()
+    selected_identities = {
+        (
+            unit.get("parent_document_id"),
+            unit.get("revision_id"),
+        )
+        for unit in selected_units
+    }
+    requested_units = _requested_currency_units(
+        requirement,
+        question_text,
+    )
+    subject_text = str(requirement.get("subject") or "")
+    compact_subject = _compact(subject_text)
+    subject_terms = [
+        _compact(term)
+        for term in re.findall(
+            r"[0-9A-Za-z가-힣]+",
+            subject_text,
+        )
+        if _compact(term)
+        not in {"상품", "아이템", "아바타", "패키지", "상자"}
+    ]
+    compact_category_stripped_subject = "".join(subject_terms)
+    subject_identities = {
+        identity
+        for identity in (
+            compact_subject,
+            compact_category_stripped_subject,
+        )
+        if len(identity) >= 4
+    }
+    candidate_values = set()
+    for unit in all_units:
+        if (
+            unit.get("parent_document_id"),
+            unit.get("revision_id"),
+        ) not in selected_identities:
+            continue
+        if qualifier_identity_state(
+            requirement,
+            [unit],
+        ) not in {"matched", "not_applicable"}:
+            continue
+        unit_text = str(unit.get("text") or "")
+        compact_unit_text = _compact(unit_text)
+        table_cells = [
+            _compact(cell)
+            for cell in unit_text.strip().strip("|").split("|")
+            if _compact(cell)
+        ] if unit_text.lstrip().startswith("|") else []
+        if table_cells:
+            subject_identity_supported = bool(
+                subject_identities & set(table_cells)
+            )
+        else:
+            subject_identity_supported = any(
+                identity in compact_unit_text
+                for identity in subject_identities
+            )
+        if not subject_identity_supported:
+            continue
+        for candidate in _currency_values_excluding_subject(
+            str(unit.get("text") or ""),
+            requirement,
+        ):
+            if requested_units and candidate[1] not in requested_units:
+                continue
+            candidate_values.add(candidate)
+    return candidate_values - model_values
 
 
 def _subject_supported(
@@ -1152,7 +2095,9 @@ def _subject_supported(
     return False
 
 
-_YEAR_IDENTITY_PATTERN = re.compile(r"(?<!\d)(20\d{2})\s*년")
+_YEAR_IDENTITY_PATTERN = re.compile(
+    r"(?<!\d)(20\d{2})(?=\s*년|[-./]\d{1,2}[-./]\d{1,2})"
+)
 _MONTH_IDENTITY_PATTERN = re.compile(
     r"(?<!\d)(1[0-2]|0?[1-9])\s*월"
 )
@@ -1165,6 +2110,12 @@ _POLICY_IDENTITIES = (
     "모바일이용약관",
     "서비스이용약관",
     "운영정책",
+)
+_PRODUCT_RECORD_SOURCE_KINDS = frozenset(
+    {"shop_product", "monthly_item"}
+)
+_PRODUCT_IDENTITY_TYPES = frozenset(
+    {"무기", "오라", "칭호", "크리쳐"}
 )
 _SHADOW_REGISTERED_RELATION_MARKERS = (
     "effectiveat",
@@ -1198,10 +2149,83 @@ _SHADOW_REGISTERED_RELATION_MARKERS = (
 )
 
 
+def _question_published_years(question_text: str) -> set[str]:
+    years = set()
+    for match in _YEAR_IDENTITY_PATTERN.finditer(question_text):
+        local_text = question_text[
+            match.start() : min(len(question_text), match.end() + 40)
+        ]
+        if re.search(r"공지|게시", local_text):
+            years.add(match.group(1))
+    return years
+
+
 def _subject_identity_conflicts(
     requirement: dict[str, Any],
     units: list[dict[str, Any]],
 ) -> bool:
+    if requirement.get("value_type") not in {"currency", "price"}:
+        product_units = [
+            unit
+            for unit in units
+            if unit.get("source_kind") in _PRODUCT_RECORD_SOURCE_KINDS
+        ]
+        requested_subject = _compact(
+            requirement.get("subject", "")
+        )
+        if product_units and requested_subject:
+            semantic_identity = _compact(
+                " ".join(
+                    " ".join(
+                        filter(
+                            None,
+                            (
+                                unit.get("context_text", ""),
+                                unit.get("text", ""),
+                                unit.get("title", ""),
+                            ),
+                        )
+                    )
+                    for unit in product_units
+                )
+            )
+            requested_types = {
+                identity_type
+                for identity_type in _PRODUCT_IDENTITY_TYPES
+                if identity_type in requested_subject
+            }
+            direct_identity = _compact(
+                " ".join(
+                    str(unit.get("text") or "")
+                    for unit in product_units
+                )
+            )
+            direct_evidence_types = {
+                identity_type
+                for identity_type in _PRODUCT_IDENTITY_TYPES
+                if identity_type in direct_identity
+            }
+            if (
+                requested_types
+                and direct_evidence_types
+                and requested_types.isdisjoint(direct_evidence_types)
+            ):
+                return True
+            if requested_subject not in semantic_identity:
+                evidence_types = direct_evidence_types
+                if not evidence_types:
+                    evidence_types = {
+                        identity_type
+                        for identity_type in _PRODUCT_IDENTITY_TYPES
+                        if identity_type in semantic_identity
+                    }
+                if (
+                    requested_types
+                    and evidence_types
+                    and requested_types.isdisjoint(evidence_types)
+                ):
+                    return True
+
     requested_identity = " ".join(
         str(requirement.get(key) or "")
         for key in ("subject", "subject_group")
@@ -1275,27 +2299,33 @@ def _policy_subject_identity_supported(
 
 def _policy_question_year_supported(
     requirement: dict[str, Any],
+    value: TypedValue,
     units: list[dict[str, Any]],
     *,
     question_text: str,
+    as_of: str,
 ) -> bool:
     if not _policy_requirement(requirement):
         return True
     requested_years = set(_YEAR_IDENTITY_PATTERN.findall(question_text))
     if not requested_years:
         return True
-    evidence_identity = " ".join(
-        str(value or "")
-        for unit in units
-        for value in (
-            unit.get("context_text"),
-            unit.get("text"),
-            unit.get("title"),
-            unit.get("published_at"),
-            unit.get("valid_from"),
-        )
-    )
-    return bool(requested_years & set(re.findall(r"20\d{2}", evidence_identity)))
+    published_years = _question_published_years(question_text)
+    if published_years:
+        evidence_published_years = {
+            year
+            for unit in units
+            for year in re.findall(
+                r"20\d{2}",
+                str(unit.get("published_at") or unit.get("title") or ""),
+            )
+        }
+        return published_years <= evidence_published_years
+    value_years = {
+        date_value[:4]
+        for date_value in _date_values(str(value), as_of)
+    }
+    return bool(value_years) and requested_years <= value_years
 
 
 def _policy_revision_effective_date_supported(
@@ -1349,42 +2379,39 @@ def _monthly_record_binding_supported(
         if chunk is None:
             continue
         source_text = chunk["display_text"]
-        local_start = max(0, unit["start_char"] - 700)
-        local_end = min(len(source_text), unit["end_char"] + 80)
-        identity_window = source_text[local_start:local_end]
-        month_matches = list(
-            _MONTHLY_RECORD_IDENTITY_PATTERN.finditer(identity_window)
+        bounds = _monthly_record_bounds_in_text(
+            source_text,
+            requested_month,
         )
-        if not month_matches:
+        if not bounds:
             continue
-        unit_start = unit["start_char"] - local_start
-        unit_end = unit["end_char"] - local_start
-
-        def distance(match: re.Match[str]) -> int:
-            if match.end() < unit_start:
-                return unit_start - match.end()
-            if match.start() > unit_end:
-                return match.start() - unit_end
-            return 0
-
-        nearest_match = min(month_matches, key=distance)
-        observed_month = (
-            nearest_match.group("bracket_month")
-            or nearest_match.group("label_month")
+        binding_text = next(
+            (
+                source_text[start:end]
+                for start, end in bounds
+                if unit["start_char"] >= start
+                and unit["end_char"] <= end
+            ),
+            None,
         )
-        if str(int(observed_month)) != requested_month:
+        if (
+            binding_text is None
+            and _required_temporal_role(requirement)
+            in {"sale_period", "sale_start", "sale_end"}
+            and unit["end_char"] <= bounds[0][0]
+            and "판매기간" in _compact(unit["text"])
+        ):
+            binding_text = unit["text"]
+        if binding_text is None:
             continue
-        local_text = identity_window
-        if "이달의아이템" not in _compact(local_text):
-            continue
-        if not _relation_supported(requirement, local_text):
+        if not _relation_supported(requirement, binding_text):
             continue
         if (
             requirement.get("value_type") in STRUCTURED_VALUE_TYPES
             and not _value_supported(
                 str(requirement.get("value_type")),
                 value,
-                local_text,
+                binding_text,
                 as_of=as_of,
             )
         ):
@@ -1399,9 +2426,12 @@ def _relation_supported(
     titles: str = "",
 ) -> bool:
     compact_text = _compact(evidence_text + " " + titles)
+    groups = _required_relation_groups(requirement)
+    if not groups:
+        return requirement.get("relation_validation_mode") != "strict"
     return all(
         any(anchor in compact_text for anchor in group)
-        for group in _required_relation_groups(requirement)
+        for group in groups
     )
 
 
@@ -1447,6 +2477,8 @@ def _group_has_value_shape(
     text = "\n".join(unit["text"] for unit in group)
     if value_type in {"date", "datetime", "date_range"}:
         return bool(_date_values(text, as_of))
+    if value_type in {"time", "time_range"}:
+        return bool(time_values(text))
     if value_type in {"price", "currency"}:
         return bool(currency_values(text))
     if value_type == "percentage":
@@ -1572,8 +2604,13 @@ def _required_temporal_role(requirement: dict[str, Any]) -> str | None:
         "date",
         "datetime",
         "date_range",
+        "time",
+        "time_range",
     }:
         return None
+    explicit_role = str(requirement.get("temporal_role") or "").strip()
+    if explicit_role:
+        return explicit_role
     relation = _compact(requirement.get("relation", ""))
     aliases = (
         (("effectiveat", "적용일", "적용시점"), "effective_at"),
@@ -1601,6 +2638,32 @@ def _required_temporal_role(requirement: dict[str, Any]) -> str | None:
     return None
 
 
+def _occurrence_local_text(
+    text: str,
+    occurrence: dict[str, Any],
+) -> str:
+    left = max(
+        (
+            text.rfind(delimiter, 0, occurrence["start"])
+            for delimiter in ("\n", "\r", ",", ";", "。", ".", "!", "?")
+        ),
+        default=-1,
+    )
+    right_candidates = [
+        position
+        for delimiter in ("\n", "\r", ",", ";", "。", ".", "!", "?")
+        if (
+            position := text.find(
+                delimiter,
+                occurrence["end"],
+            )
+        )
+        >= 0
+    ]
+    right = min(right_candidates) if right_candidates else len(text)
+    return text[left + 1 : right]
+
+
 def _temporal_roles_for_occurrence(
     unit: dict[str, Any],
     occurrence: dict[str, Any],
@@ -1610,11 +2673,17 @@ def _temporal_roles_for_occurrence(
 ) -> set[str]:
     text = unit["text"]
     compact_text = _compact(text)
-    compact_semantic_text = _compact(
+    compact_local_text = _compact(
+        _occurrence_local_text(text, occurrence)
+    )
+    compact_marker_text = _compact(
         " ".join(
             filter(
                 None,
-                (unit.get("context_text", ""), text),
+                (
+                    unit.get("context_text", ""),
+                    _occurrence_local_text(text, occurrence),
+                ),
             )
         )
     )
@@ -1637,24 +2706,24 @@ def _temporal_roles_for_occurrence(
     if occurrence["value"] in valid_to_dates:
         roles.add("valid_to")
 
-    if "다운로드" in compact_semantic_text:
+    if "다운로드" in compact_marker_text:
         roles.add("download_start")
-    if "삭제" in compact_semantic_text:
+    if "삭제" in compact_marker_text:
         roles.add("deletion_at")
-    if "방송" in compact_semantic_text:
+    if "방송" in compact_marker_text:
         roles.add("broadcast_at")
-    if "수정" in compact_semantic_text:
+    if "수정" in compact_marker_text:
         roles.add("fixed_at")
-    if "점검" in compact_semantic_text:
+    if "점검" in compact_marker_text:
         roles.add("maintenance_time")
-    if "중단" in compact_semantic_text:
+    if "중단" in compact_marker_text:
         roles.add("stopped_at")
-    if "개정" in compact_semantic_text or "시행" in compact_semantic_text:
+    if "개정" in compact_marker_text or "시행" in compact_marker_text:
         roles.add("revision_cutoff")
     if (
-        "적용" in compact_semantic_text
-        or "시행" in compact_semantic_text
-        or "업데이트" in compact_text
+        "적용" in compact_marker_text
+        or "시행" in compact_marker_text
+        or "업데이트" in compact_local_text
     ):
         roles.add("effective_at")
     if "기준" in compact_text and "업데이트" in compact_text:
@@ -1686,7 +2755,7 @@ def _unit_temporal_roles(
     as_of: str,
 ) -> set[str]:
     occurrences = _date_occurrences(unit["text"], as_of)
-    return {
+    roles = {
         role
         for occurrence in occurrences
         for role in _temporal_roles_for_occurrence(
@@ -1696,6 +2765,28 @@ def _unit_temporal_roles(
             as_of=as_of,
         )
     }
+    if time_values(unit["text"]):
+        compact_semantic_text = _compact(
+            " ".join(
+                filter(
+                    None,
+                    (unit.get("context_text", ""), unit["text"]),
+                )
+            )
+        )
+        marker_roles = {
+            "삭제": "deletion_at",
+            "방송": "broadcast_at",
+            "수정": "fixed_at",
+            "점검": "maintenance_time",
+            "중단": "stopped_at",
+        }
+        roles.update(
+            role
+            for marker, role in marker_roles.items()
+            if marker in compact_semantic_text
+        )
+    return roles
 
 
 def _temporal_role_matches(
@@ -1712,6 +2803,32 @@ def _temporal_role_matches(
     return bool(allowed & observed_roles)
 
 
+def _role_bound_dates(
+    requirement: dict[str, Any],
+    units: list[dict[str, Any]],
+    *,
+    as_of: str,
+) -> set[str]:
+    required_role = _required_temporal_role(requirement)
+    if required_role is None:
+        return set()
+    dates = set()
+    for unit in units:
+        occurrences = _date_occurrences(unit["text"], as_of)
+        for occurrence in occurrences:
+            if _temporal_role_matches(
+                required_role,
+                _temporal_roles_for_occurrence(
+                    unit,
+                    occurrence,
+                    occurrences,
+                    as_of=as_of,
+                ),
+            ):
+                dates.add(occurrence["value"])
+    return dates
+
+
 def _temporal_role_supported(
     requirement: dict[str, Any],
     value: TypedValue,
@@ -1724,7 +2841,17 @@ def _temporal_role_supported(
         return True
     value_dates = _date_values(str(value), as_of)
     if not value_dates:
-        return False
+        value_times = time_values(value)
+        if not value_times:
+            return False
+        role_supported_times = set()
+        for unit in units:
+            if _temporal_role_matches(
+                required_role,
+                _unit_temporal_roles(unit, as_of=as_of),
+            ):
+                role_supported_times.update(time_values(unit["text"]))
+        return value_times <= role_supported_times
     role_supported_dates = set()
     for unit in units:
         text = unit["text"]
@@ -1777,6 +2904,19 @@ def _render_value(value_type: str, value: TypedValue) -> str:
     ):
         start, end = text.split("/")
         return f"{_render_value('date', start)} ~ {_render_value('date', end)}"
+    if value_type == "time" and re.fullmatch(
+        r"(?:[01]\d|2[0-3]):[0-5]\d",
+        text,
+    ):
+        hour, minute = (int(part) for part in text.split(":"))
+        suffix = f" {minute}분" if minute else ""
+        return f"{hour}시{suffix}"
+    if value_type == "time_range" and re.fullmatch(
+        r"(?:[01]\d|2[0-3]):[0-5]\d/(?:[01]\d|2[0-3]):[0-5]\d",
+        text,
+    ):
+        start, end = text.split("/")
+        return f"{_render_value('time', start)} ~ {_render_value('time', end)}"
     return text
 
 
@@ -1789,11 +2929,22 @@ def verify_typed_requirement_selection(
     evidence_units_by_ref: dict[str, dict[str, Any]],
     chunks_by_id: dict[str, dict[str, Any]],
     as_of: str,
+    candidate_evidence_units_by_ref: (
+        dict[str, dict[str, Any]] | None
+    ) = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     parsed = (
         output
         if isinstance(output, TypedRequirementSelection)
         else TypedRequirementSelection.model_validate(output)
+    )
+    (
+        requirement,
+        qualifier_contract_source,
+        qualifier_question_consistent,
+    ) = resolve_requirement_claim_contract(
+        requirement,
+        question_text=question_text,
     )
     failures = []
     raw_evidence_refs = list(parsed.evidence_refs)
@@ -1820,6 +2971,52 @@ def verify_typed_requirement_selection(
         parsed.value_type, parsed.value_type
     )
     normalized_value = parsed.value
+    value_shape_repair = None
+    if (
+        expected_value_type == "entity_list"
+        and isinstance(normalized_value, str)
+    ):
+        try:
+            decoded_list = json.loads(normalized_value)
+        except json.JSONDecodeError:
+            decoded_list = None
+        if (
+            isinstance(decoded_list, list)
+            and decoded_list
+            and all(
+                isinstance(item, str) and item.strip()
+                for item in decoded_list
+            )
+        ):
+            normalized_value = decoded_list
+            value_shape_repair = "json_array_string"
+    relation_key = re.sub(
+        r"[^0-9a-z가-힣]+",
+        "",
+        str(requirement.get("relation") or "").casefold(),
+    )
+    relation_canonical_value_type = (
+        RELATION_CANONICAL_VALUE_TYPES.get(relation_key)
+    )
+    if (
+        relation_canonical_value_type == "time"
+        and normalized_value_type in {"enum", "str", "string", "text"}
+    ):
+        normalized_times = time_sequence(normalized_value)
+        if len(normalized_times) == 1:
+            normalized_value_type = "time"
+            normalized_value = normalized_times[0]
+            value_shape_repair = "legacy_relation_time"
+    elif (
+        relation_canonical_value_type == "time_range"
+        and normalized_value_type
+        in {"date_range", "enum", "str", "string", "text"}
+    ):
+        normalized_times = time_sequence(normalized_value)
+        if len(normalized_times) == 2:
+            normalized_value_type = "time_range"
+            normalized_value = "/".join(normalized_times)
+            value_shape_repair = "legacy_relation_time_range"
     if (
         normalized_value_type in {"str", "string", "text"}
         and expected_value_type not in STRUCTURED_VALUE_TYPES
@@ -1841,8 +3038,42 @@ def verify_typed_requirement_selection(
     selected_units = []
     citations = []
     citation_refs = set()
+    unresolved_currency_values: set[tuple[int, str]] = set()
+    requested_currency_units: set[str] = set()
+    model_currency_units: set[str] = set()
+    qualifier_validation_state = "not_evaluated"
     if normalized_value_type != expected_value_type:
         failures.append("value_type_mismatch")
+    if (
+        expected_value_type == "entity_list"
+        and parsed.status == "supported"
+        and (
+            not isinstance(normalized_value, list)
+            or not normalized_value
+            or any(
+                not isinstance(item, str) or not item.strip()
+                for item in normalized_value
+            )
+        )
+    ):
+        failures.append("entity_list_value_shape_mismatch")
+    cardinality_state = "not_evaluated"
+    cardinality_supported = True
+    if parsed.status == "supported":
+        cardinality_state, cardinality_supported = (
+            _cardinality_validation(
+                requirement,
+                normalized_value,
+            )
+        )
+        if cardinality_state == "count_mismatch":
+            failures.append("cardinality_count_mismatch")
+        elif cardinality_state == "duplicate_values":
+            failures.append("entity_list_duplicate_values")
+        elif cardinality_state == "invalid_contract":
+            failures.append("cardinality_contract_invalid")
+        elif cardinality_state == "all_unproven":
+            failures.append("cardinality_all_unproven")
     if parsed.status == "supported":
         for evidence_ref in evidence_refs:
             unit = evidence_units_by_ref.get(evidence_ref)
@@ -1946,8 +3177,10 @@ def verify_typed_requirement_selection(
         )
         policy_question_year_supported = _policy_question_year_supported(
             requirement,
+            normalized_value,
             selected_units,
             question_text=question_text,
+            as_of=as_of,
         )
         policy_revision_date_supported = (
             _policy_revision_effective_date_supported(
@@ -1964,31 +3197,33 @@ def verify_typed_requirement_selection(
             chunks_by_id=chunks_by_id,
             as_of=as_of,
         )
+        if (
+            _monthly_requirement_month(requirement) is not None
+            and monthly_record_supported
+        ):
+            relation_supported = True
+        relation_validation_state = relation_contract_state(
+            requirement
+        )
+        qualifier_validation_state = qualifier_identity_state(
+            requirement,
+            selected_units,
+        )
         answer_value_source = "model_typed_value"
-        if normalized_value_type not in STRUCTURED_VALUE_TYPES:
-            relevant_units = []
-            for unit in selected_units:
-                unit_semantic_text = "\n".join(
-                    filter(
-                        None,
-                        (unit.get("context_text", ""), unit["text"]),
-                    )
-                )
-                if (
-                    _subject_supported(
-                        requirement, unit_semantic_text, unit["title"]
-                    )
-                    and _relation_supported(
-                        requirement, unit_semantic_text, unit["title"]
-                    )
-                ):
-                    relevant_units.append(unit)
-            answer_units = relevant_units or selected_units
-            normalized_value = "\n".join(
-                unit["text"] for unit in answer_units
+        if normalized_value_type in {
+            "enum",
+            "entity",
+            "entity_list",
+        }:
+            value_supported = _entity_value_supported(
+                normalized_value,
+                combined_text,
             )
-            value_supported = bool(normalized_value)
-            answer_value_source = "selected_exact_evidence"
+        elif normalized_value_type not in STRUCTURED_VALUE_TYPES:
+            value_supported = _text_value_supported(
+                normalized_value,
+                combined_text,
+            )
         elif (
             normalized_value_type in {"price", "currency"}
             and not currency_values(normalized_value)
@@ -2029,13 +3264,46 @@ def verify_typed_requirement_selection(
                 combined_text,
                 as_of=as_of,
             )
+        if normalized_value_type in {"currency", "price"}:
+            requested_currency_units = _requested_currency_units(
+                requirement,
+                question_text,
+            )
+            model_currency_units = {
+                unit for _, unit in currency_values(normalized_value)
+            }
+            if (
+                requested_currency_units
+                and model_currency_units
+                and not model_currency_units <= requested_currency_units
+            ):
+                failures.append("currency_unit_mismatch")
+            ambiguity_units_by_ref = (
+                candidate_evidence_units_by_ref
+                if candidate_evidence_units_by_ref is not None
+                else evidence_units_by_ref
+            )
+            unresolved_currency_values = (
+                _unresolved_currency_ambiguity(
+                    requirement,
+                    normalized_value,
+                    question_text=question_text,
+                    selected_units=selected_units,
+                    all_units=list(ambiguity_units_by_ref.values()),
+                )
+            )
         if not value_supported:
             failures.append("typed_value_not_supported_by_evidence")
         if not subject_supported:
             failures.append("subject_not_supported_by_evidence")
         if identity_conflict:
             failures.append("subject_identity_conflict")
-        if not relation_supported:
+        if (
+            relation_validation_state == "unvalidated"
+            and requirement.get("relation_validation_mode") == "strict"
+        ):
+            failures.append("relation_unvalidated")
+        elif not relation_supported:
             failures.append("relation_not_supported_by_evidence")
         if not temporal_supported:
             failures.append("temporal_role_mismatch")
@@ -2047,12 +3315,33 @@ def verify_typed_requirement_selection(
             failures.append("policy_revision_effective_date_mismatch")
         if not monthly_record_supported:
             failures.append("monthly_record_binding_failed")
-        colocated = value_supported if normalized_value_type == "boolean" else False
+        if qualifier_contract_source == "invalid":
+            failures.append("qualifier_contract_invalid")
+        elif not qualifier_question_consistent:
+            failures.append("qualifier_question_contract_conflict")
+        if qualifier_validation_state == "mismatch":
+            failures.append("qualifier_identity_mismatch")
+        elif qualifier_validation_state == "unproven":
+            failures.append("qualifier_identity_unproven")
+        elif qualifier_validation_state == "contract_invalid":
+            failures.append("qualifier_contract_invalid")
+        if unresolved_currency_values:
+            failures.append(
+                "currency_qualifier_ambiguity_unresolved"
+            )
+        colocated = (
+            value_supported
+            if normalized_value_type == "boolean"
+            else bool(
+                _monthly_requirement_month(requirement) is not None
+                and monthly_record_supported
+                and value_supported
+                and subject_supported
+                and temporal_supported
+            )
+        )
         if normalized_value_type != "boolean":
-            grouped_units: dict[str, list[dict[str, Any]]] = defaultdict(list)
-            for unit in selected_units:
-                grouped_units[unit["parent_document_id"]].append(unit)
-            for units in grouped_units.values():
+            for units in _selected_evidence_groups(selected_units):
                 text = "\n".join(unit["text"] for unit in units)
                 semantic_text = "\n".join(
                     "\n".join(
@@ -2064,16 +3353,27 @@ def verify_typed_requirement_selection(
                     for unit in units
                 )
                 titles = " ".join(unit["title"] for unit in units)
-                colocated_value_supported = (
-                    bool(text)
-                    if normalized_value_type not in STRUCTURED_VALUE_TYPES
-                    else _value_supported(
+                if normalized_value_type in {
+                    "enum",
+                    "entity",
+                    "entity_list",
+                }:
+                    colocated_value_supported = _entity_value_supported(
+                        normalized_value,
+                        text,
+                    )
+                elif normalized_value_type not in STRUCTURED_VALUE_TYPES:
+                    colocated_value_supported = _text_value_supported(
+                        normalized_value,
+                        text,
+                    )
+                else:
+                    colocated_value_supported = _value_supported(
                         normalized_value_type,
                         normalized_value,
                         text,
                         as_of=as_of,
                     )
-                )
                 if (
                     colocated_value_supported
                     and _subject_supported(requirement, semantic_text, titles)
@@ -2081,6 +3381,11 @@ def verify_typed_requirement_selection(
                     and _temporal_role_supported(
                         requirement, normalized_value, units, as_of=as_of
                     )
+                    and qualifier_identity_state(
+                        requirement,
+                        units,
+                    )
+                    in {"matched", "not_applicable"}
                 ):
                     colocated = True
                     break
@@ -2104,6 +3409,7 @@ def verify_typed_requirement_selection(
         "citations": citations if exposed else [],
     }
     audit = {
+        "claim_contract_version": TYPED_EVIDENCE_CONTRACT_VERSION,
         "requirement_id": requirement["requirement_id"],
         "model_status": parsed.status,
         "exposed_status": decision["status"],
@@ -2111,11 +3417,34 @@ def verify_typed_requirement_selection(
         "value_type": normalized_value_type,
         "model_value_type": parsed.value_type,
         "normalized_value": normalized_value,
+        "value_shape_repair": value_shape_repair,
         "answer_value_source": (
             answer_value_source
             if parsed.status == "supported"
             else None
         ),
+        "relation_validation_state": relation_contract_state(
+            requirement
+        ),
+        "would_reject_if_relation_fail_closed": bool(
+            parsed.status == "supported"
+            and relation_contract_state(requirement)
+            == "unvalidated"
+        ),
+        "cardinality_validation_state": cardinality_state,
+        "would_reject_if_cardinality_fail_closed": bool(
+            parsed.status == "supported"
+            and not cardinality_supported
+        ),
+        "resolved_qualifiers": requirement.get("qualifiers") or {},
+        "qualifier_contract_source": qualifier_contract_source,
+        "qualifier_validation_state": qualifier_validation_state,
+        "unresolved_currency_values": [
+            {"amount": amount, "unit": unit}
+            for amount, unit in sorted(unresolved_currency_values)
+        ],
+        "requested_currency_units": sorted(requested_currency_units),
+        "model_currency_units": sorted(model_currency_units),
         "evidence_refs": evidence_refs,
         "raw_evidence_refs": raw_evidence_refs,
         "expanded_context_refs": [

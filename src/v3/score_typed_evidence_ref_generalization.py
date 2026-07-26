@@ -8,22 +8,30 @@ from src.v3.value_normalization import (
     CURRENCY_UNITS,
     boolean_value,
     currency_values,
+    number_values,
+    time_sequence,
+    time_values,
 )
 
 
-SCORER_VERSION = "typed-evidence-ref-generalization-scorer-v2"
+SCORER_VERSION = "typed-evidence-ref-generalization-scorer-v7"
 NORMALIZATION_CONTRACT = {
-    "version": "typed-evidence-ref-generalization-normalization-v2",
+    "version": "typed-evidence-ref-generalization-normalization-v7",
     "rules": [
         "Whitespace, punctuation, and Korean zero-padded month/day variants are normalized.",
         "Korean and ISO dates are compared as YYYY-MM-DD; month/day-only forms use the frozen as_of year.",
         "06시, 6시, and 06:00 are compared as 06:00; 오전/오후 are converted to 24-hour time.",
+        "time and time_range values use the same ordered clock normalization in the verifier and scorer.",
+        "Plain numbers normalize commas and Korean 만/억 scales in both the verifier and scorer.",
         "Currency commas, Korean 만/억 scales, domain currency units, and unit-first count forms are normalized to integer amount plus unit.",
         "Percentages and plain numbers are compared numerically.",
         "Boolean answers normalize explicit true/false and Korean positive/negative actions while protecting 불가 state nouns.",
-        "Table-row and prose citations are equivalent only when the normalized gold value is present and the citation comes from an approved evidence chunk.",
-        "For text, enum, entity, and entity_list values, a directly cited pre-approved evidence unit is the canonical gold when required_values is a human-authored summary of that unit.",
+        "Strict typed evidence must contain the expected normalized value inside its overlap with a pre-approved evidence unit; boundary-only overlap and same-chunk fallback are not allowed.",
+        "Entity values that begin or end with digits use numeric boundaries, so 110 does not match 1100.",
+        "For text, enum, entity, and entity_list values, a citation must fully cover a pre-approved evidence unit to use that unit as canonical gold when required_values is a human-authored summary.",
         "No semantic paraphrase credit is added beyond the typed normalizations above.",
+        "Automatic semantic false-full is reported separately from unsupported-question false-full and still requires human evidence adjudication.",
+        "A blocked model claim is labeled verifier_rejected_model_claim; overreject versus correct reject is a separate human adjudication.",
     ],
 }
 
@@ -56,37 +64,6 @@ def _date_values(value: Any, *, as_of: str) -> set[str]:
     return values
 
 
-def _time_values(value: Any) -> set[str]:
-    text = str(value or "")
-    values = {
-        f"{int(match.group(1)):02d}:{int(match.group(2)):02d}"
-        for match in re.finditer(r"(?<!\d)([01]?\d|2[0-3]):([0-5]\d)(?!\d)", text)
-    }
-    for match in re.finditer(
-        r"(?:(오전|오후)\s*)?([01]?\d|2[0-3])\s*시(?:\s*([0-5]?\d)\s*분)?",
-        text,
-    ):
-        meridiem = match.group(1)
-        hour = int(match.group(2))
-        minute = int(match.group(3) or 0)
-        if meridiem == "오전" and hour == 12:
-            hour = 0
-        elif meridiem == "오후" and hour < 12:
-            hour += 12
-        values.add(f"{hour:02d}:{minute:02d}")
-    return values
-
-
-def _number_values(value: Any) -> set[float]:
-    text = str(value or "")
-    values = set()
-    for match in re.finditer(r"(?<![\d,])(\d[\d,]*(?:\.\d+)?)\s*(만|억)?", text):
-        amount = float(match.group(1).replace(",", ""))
-        scale = {"만": 10_000, "억": 100_000_000}.get(match.group(2), 1)
-        values.add(amount * scale)
-    return values
-
-
 def _percentage_values(value: Any) -> set[float]:
     return {
         float(match.group(1))
@@ -111,13 +88,9 @@ def value_present(expected: Any, value_type: str, observed: Any, *, as_of: str) 
             observed
         )
     if isinstance(expected, dict):
-        amount = expected.get("amount")
-        unit = _compact(expected.get("unit"))
-        return (
-            isinstance(amount, (int, float))
-            and float(amount) in _number_values(observed)
-            and bool(unit)
-            and unit in _compact(observed)
+        normalized = _expected_currency(expected)
+        return normalized is not None and normalized in currency_values(
+            observed
         )
     if value_type in {"currency", "price"}:
         normalized = _expected_currency(expected)
@@ -126,25 +99,56 @@ def value_present(expected: Any, value_type: str, observed: Any, *, as_of: str) 
         expected_values = (
             {float(expected)}
             if isinstance(expected, (int, float))
-            else _percentage_values(expected) or _number_values(expected)
+            else _percentage_values(expected) or number_values(expected)
         )
         return bool(expected_values) and expected_values <= _percentage_values(observed)
     if value_type == "number" or isinstance(expected, (int, float)):
-        return float(expected) in _number_values(observed)
+        return float(expected) in number_values(observed)
+    if value_type == "time":
+        expected_times = time_values(expected)
+        return len(expected_times) == 1 and expected_times <= time_values(
+            observed
+        )
+    if value_type == "time_range":
+        expected_times = time_sequence(expected)
+        observed_times = time_sequence(observed)
+        return len(expected_times) >= 2 and any(
+            observed_times[index : index + len(expected_times)]
+            == expected_times
+            for index in range(
+                len(observed_times) - len(expected_times) + 1
+            )
+        )
 
     expected_text = str(expected)
     if re.fullmatch(r"20\d{2}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?(?:[+-]\d{2}:\d{2})?", expected_text):
         expected_date = expected_text[:10]
         expected_time = expected_text[11:16]
-        return expected_date in _date_values(observed, as_of=as_of) and expected_time in _time_values(
+        return expected_date in _date_values(observed, as_of=as_of) and expected_time in time_values(
             observed
         )
     if re.fullmatch(r"20\d{2}-\d{2}-\d{2}", expected_text):
         return expected_text in _date_values(observed, as_of=as_of)
     if re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", expected_text):
-        return expected_text in _time_values(observed)
+        return expected_text in time_values(observed)
 
     compact_expected = _compact(expected_text)
+    if (
+        value_type in {"entity", "entity_list"}
+        and compact_expected
+        and (
+            compact_expected[0].isdigit()
+            or compact_expected[-1].isdigit()
+        )
+    ):
+        prefix = r"(?<!\d)" if compact_expected[0].isdigit() else ""
+        suffix = r"(?!\d)" if compact_expected[-1].isdigit() else ""
+        return bool(
+            re.search(
+                prefix + re.escape(compact_expected) + suffix,
+                _compact(observed),
+            )
+        )
     return bool(compact_expected) and compact_expected in _compact(observed)
 
 
@@ -171,12 +175,33 @@ def _citation_supports_unit(
 ) -> bool:
     if citation.get("chunk_id") != unit["chunk_id"]:
         return False
-    citation_start = int(citation.get("start_char") or 0)
-    citation_end = int(citation.get("end_char") or 0)
-    overlaps = citation_start < unit["end_char"] and unit["start_char"] < citation_end
-    return overlaps or (
-        value_present(expected, value_type, citation.get("text", ""), as_of=as_of)
-        and value_present(expected, value_type, unit["text"], as_of=as_of)
+    citation_start = citation.get("start_char")
+    citation_end = citation.get("end_char")
+    if not isinstance(citation_start, int) or not isinstance(
+        citation_end,
+        int,
+    ):
+        return False
+    covers_unit = (
+        citation_start <= unit["start_char"]
+        and citation_end >= unit["end_char"]
+    )
+    if value_type not in _STRICT_VALUE_TYPES:
+        return covers_unit
+
+    overlap_start = max(citation_start, unit["start_char"])
+    overlap_end = min(citation_end, unit["end_char"])
+    if overlap_start >= overlap_end:
+        return False
+    unit_text = str(unit.get("text") or "")
+    overlap_text = unit_text[
+        overlap_start - unit["start_char"] : overlap_end - unit["start_char"]
+    ]
+    return value_present(
+        expected,
+        value_type,
+        overlap_text,
+        as_of=as_of,
     )
 
 
@@ -189,7 +214,41 @@ _STRICT_VALUE_TYPES = {
     "number",
     "percentage",
     "price",
+    "time",
+    "time_range",
 }
+
+
+def _approved_evidence_groups(
+    requirement: dict[str, Any],
+    *,
+    as_of: str,
+) -> list[list[dict[str, Any]]]:
+    values = requirement.get("required_values") or []
+    units = requirement.get("acceptable_evidence_units") or []
+    if not values or not units:
+        return [[]]
+
+    groups = []
+    for value_index, value in enumerate(values):
+        matching_units = [
+            unit
+            for unit in units
+            if value_present(
+                value,
+                requirement["value_type"],
+                unit["text"],
+                as_of=as_of,
+            )
+        ]
+        if (
+            not matching_units
+            and requirement["value_type"] not in _STRICT_VALUE_TYPES
+            and len(units) == len(values)
+        ):
+            matching_units = [units[value_index]]
+        groups.append(matching_units)
+    return groups
 
 
 def score_generalization_cases(
@@ -232,24 +291,8 @@ def score_generalization_cases(
             )
             evidence_complete = False
             if expected_supported and values:
-                units = requirement["acceptable_evidence_units"]
-                value_hits = []
-                for value_index, value in enumerate(values):
-                    matching_units = [
-                        unit
-                        for unit in units
-                        if value_present(
-                            value,
-                            requirement["value_type"],
-                            unit["text"],
-                            as_of=sealed["as_of"],
-                        )
-                    ]
-                    if not matching_units and len(units) == len(values):
-                        matching_units = [units[value_index]]
-                    elif not matching_units:
-                        matching_units = units
-                    value_hits.append(
+                value_hits = [
+                    (
                         any(
                             _citation_supports_unit(
                                 citation,
@@ -262,6 +305,15 @@ def score_generalization_cases(
                             for unit in matching_units
                         )
                     )
+                    for value, matching_units in zip(
+                        values,
+                        _approved_evidence_groups(
+                            requirement,
+                            as_of=sealed["as_of"],
+                        ),
+                        strict=True,
+                    )
+                ]
                 evidence_complete = all(value_hits)
             normalized_value_complete = bool(
                 expected_supported
@@ -283,7 +335,15 @@ def score_generalization_cases(
                 and requirement["value_type"] not in _STRICT_VALUE_TYPES
                 and evidence_complete
             )
+            typed_claim_complete = bool(
+                normalized_value_complete and evidence_complete
+            )
             false_full = not expected_supported and exposed_supported
+            automatic_false_supported = bool(
+                expected_supported
+                and exposed_supported
+                and not typed_claim_complete
+            )
             requirement_scores.append(
                 {
                     "requirement_id": requirement_id,
@@ -291,9 +351,14 @@ def score_generalization_cases(
                     "exposed_status": decision.get("status"),
                     "model_status": audit.get("model_status"),
                     "gold_value_complete": value_complete,
+                    "typed_answer_value_complete": (
+                        normalized_value_complete
+                    ),
+                    "typed_claim_complete": typed_claim_complete,
                     "evidence_span_hit": evidence_complete,
                     "citation_slices_exact": citation_slices_exact,
                     "false_full": false_full,
+                    "automatic_false_supported": automatic_false_supported,
                     "answer": answer,
                     "failure_reasons": audit.get("failure_reasons", []),
                 }
@@ -308,13 +373,39 @@ def score_generalization_cases(
         gold_complete = bool(supported_scores) and all(
             row["gold_value_complete"] for row in supported_scores
         )
+        typed_answer_complete = bool(supported_scores) and all(
+            row["typed_answer_value_complete"]
+            for row in supported_scores
+        )
+        supported_typed_claim_complete = bool(supported_scores) and all(
+            row["typed_claim_complete"] for row in supported_scores
+        )
+        false_full = any(row["false_full"] for row in requirement_scores)
+        typed_claim_complete = (
+            supported_typed_claim_complete and not false_full
+        )
         if gold_complete:
             outcome = "correct"
         elif supported_exposed == 0:
             outcome = "no_response"
         else:
             outcome = "incorrect"
-        false_full = any(row["false_full"] for row in requirement_scores)
+        if typed_claim_complete:
+            typed_outcome = "correct"
+        elif supported_exposed == 0:
+            typed_outcome = "no_response"
+        else:
+            typed_outcome = "incorrect"
+        automatic_semantic_false_full = bool(
+            run["verified_output"].get("response_mode") == "full_answer"
+            and (
+                false_full
+                or any(
+                    row["automatic_false_supported"]
+                    for row in requirement_scores
+                )
+            )
+        )
         unsupported_expected = any(
             row["expected_status"] == "unsupported" for row in requirement_scores
         )
@@ -323,12 +414,19 @@ def score_generalization_cases(
         )
         candidate_pools = run.get("requirement_candidate_chunk_ids") or []
         candidate_complete = all(
-            bool(
-                set(candidate_pools[index])
-                & {
-                    unit["chunk_id"]
-                    for unit in requirement["acceptable_evidence_units"]
-                }
+            all(
+                bool(
+                    set(
+                        candidate_pools[index]
+                        if index < len(candidate_pools)
+                        else []
+                    )
+                    & {unit["chunk_id"] for unit in evidence_group}
+                )
+                for evidence_group in _approved_evidence_groups(
+                    requirement,
+                    as_of=sealed["as_of"],
+                )
             )
             for index, requirement in enumerate(sealed["requirements"])
             if requirement["expected_status"] == "supported"
@@ -337,6 +435,9 @@ def score_generalization_cases(
             "slot_ordinal": sealed["slot_ordinal"],
             "outcome": outcome,
             "gold_value_complete": gold_complete,
+            "typed_answer_value_complete": typed_answer_complete,
+            "typed_claim_complete": typed_claim_complete,
+            "typed_outcome": typed_outcome,
             "all_evidence_spans_hit": bool(supported_scores)
             and all(row["evidence_span_hit"] for row in supported_scores),
             "candidate_all_gold_covered": candidate_complete,
@@ -345,12 +446,18 @@ def score_generalization_cases(
             ),
             "has_unsupported_requirement": unsupported_expected,
             "false_full": false_full,
+            "automatic_semantic_false_full": automatic_semantic_false_full,
             "honest_unsupported_abstention": unsupported_expected and not false_full,
             "generation_error": generation_error,
             "requirement_scores": requirement_scores,
         }
         if false_full:
             failure_stage = "unsupported_false_full"
+        elif (
+            automatic_semantic_false_full
+            and typed_outcome != "correct"
+        ):
+            failure_stage = "automatic_semantic_false_full"
         elif generation_error:
             failure_stage = "generation_error"
         elif not candidate_complete:
@@ -362,7 +469,7 @@ def score_generalization_cases(
             and row["exposed_status"] != "supported_exact"
             for row in supported_scores
         ):
-            failure_stage = "verifier_overreject"
+            failure_stage = "verifier_rejected_model_claim"
         elif outcome == "no_response":
             failure_stage = "generator_abstain"
         else:
@@ -372,6 +479,9 @@ def score_generalization_cases(
 
     total = len(scored_rows)
     outcome_counts = Counter(row["holdout_score"]["outcome"] for row in scored_rows)
+    typed_outcome_counts = Counter(
+        row["holdout_score"]["typed_outcome"] for row in scored_rows
+    )
     honest_rows = [
         row for row in scored_rows if row["holdout_score"]["has_unsupported_requirement"]
     ]
@@ -394,10 +504,29 @@ def score_generalization_cases(
             "successes": sum(row["holdout_score"]["gold_value_complete"] for row in scored_rows),
             "total": total,
         },
+        "typed_answer_value_complete": {
+            "successes": sum(
+                row["holdout_score"]["typed_answer_value_complete"]
+                for row in scored_rows
+            ),
+            "total": total,
+        },
+        "typed_claim_complete": {
+            "successes": sum(
+                row["holdout_score"]["typed_claim_complete"]
+                for row in scored_rows
+            ),
+            "total": total,
+        },
         "outcomes": {
             "correct": outcome_counts["correct"],
             "incorrect": outcome_counts["incorrect"],
             "no_response": outcome_counts["no_response"],
+        },
+        "typed_outcomes": {
+            "correct": typed_outcome_counts["correct"],
+            "incorrect": typed_outcome_counts["incorrect"],
+            "no_response": typed_outcome_counts["no_response"],
         },
         "all_evidence_spans_hit": {
             "successes": sum(
@@ -420,6 +549,88 @@ def score_generalization_cases(
             "false_full": sum(row["holdout_score"]["false_full"] for row in honest_rows),
             "total": len(honest_rows),
         },
+        "automatic_semantic_false_full": {
+            "count": sum(
+                row["holdout_score"]["automatic_semantic_false_full"]
+                for row in scored_rows
+            ),
+            "slots": [
+                row["holdout_score"]["slot_ordinal"]
+                for row in scored_rows
+                if row["holdout_score"]["automatic_semantic_false_full"]
+            ],
+        },
+        "relation_validation": {
+            "explicit_alias": sum(
+                audit.get("relation_validation_state") == "explicit_alias"
+                for row in scored_rows
+                for audit in row["verified_output"]["verification"].get(
+                    "requirements",
+                    [],
+                )
+            ),
+            "surface_fallback": sum(
+                audit.get("relation_validation_state") == "surface_fallback"
+                for row in scored_rows
+                for audit in row["verified_output"]["verification"].get(
+                    "requirements",
+                    [],
+                )
+            ),
+            "unvalidated": sum(
+                audit.get("relation_validation_state") == "unvalidated"
+                for row in scored_rows
+                for audit in row["verified_output"]["verification"].get(
+                    "requirements",
+                    [],
+                )
+            ),
+            "total": sum(
+                1
+                for row in scored_rows
+                for audit in row["verified_output"]["verification"].get(
+                    "requirements",
+                    [],
+                )
+                if audit.get("relation_validation_state")
+                in {
+                    "explicit_alias",
+                    "surface_fallback",
+                    "unvalidated",
+                }
+            ),
+            "exposed_unvalidated_slots": sorted(
+                {
+                    row["holdout_score"]["slot_ordinal"]
+                    for row in scored_rows
+                    if any(
+                        audit.get("relation_validation_state")
+                        == "unvalidated"
+                        and audit.get("exposed_status")
+                        == "supported_exact"
+                        for audit in row["verified_output"]["verification"].get(
+                            "requirements",
+                            [],
+                        )
+                    )
+                }
+            ),
+        },
+        "verifier_rejection_reasons": dict(
+            sorted(
+                Counter(
+                    reason
+                    for row in scored_rows
+                    for audit in row["verified_output"]["verification"].get(
+                        "requirements",
+                        [],
+                    )
+                    if audit.get("model_status") == "supported"
+                    and audit.get("exposed_status") != "supported_exact"
+                    for reason in audit.get("failure_reasons", [])
+                ).items()
+            )
+        ),
         "generation_error_count": sum(
             row["holdout_score"]["generation_error"] for row in scored_rows
         ),
@@ -444,6 +655,7 @@ def score_generalization_cases(
             for row in scored_rows
             if row["holdout_score"]["outcome"] != "correct"
             or row["holdout_score"]["false_full"]
+            or row["holdout_score"]["automatic_semantic_false_full"]
         ],
     }
     failure_rows = [
@@ -461,13 +673,21 @@ def score_generalization_cases(
             "slot_ordinal": row["holdout_score"]["slot_ordinal"],
             "failure_stage": row["holdout_score"]["failure_stage"],
             "outcome": row["holdout_score"]["outcome"],
+            "typed_outcome": row["holdout_score"]["typed_outcome"],
             "false_full": row["holdout_score"]["false_full"],
+            "automatic_semantic_false_full": row["holdout_score"][
+                "automatic_semantic_false_full"
+            ],
         }
         for row in failure_rows
     ]
     summary["gates"] = {
         "generation_error_zero": summary["generation_error_count"] == 0,
         "honest_unsupported_false_full_zero": summary["honest_unsupported"]["false_full"]
+        == 0,
+        "automatic_semantic_false_full_zero": summary[
+            "automatic_semantic_false_full"
+        ]["count"]
         == 0,
     }
     return scored_rows, summary

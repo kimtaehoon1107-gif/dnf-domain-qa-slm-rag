@@ -51,6 +51,11 @@ DEFAULT_TABLE_FACTS = Path(
     "table_atomic_facts_v3.2_"
     "1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a.jsonl"
 )
+DEFAULT_EQUIVALENT_EVIDENCE_ADDENDUM = Path(
+    "data/v3/evaluation/"
+    "typed_evidence_ref_generalization_64_"
+    "equivalent_evidence_addendum_20260727.jsonl"
+)
 DEFAULT_OUTPUT = Path(
     "outputs/v3/diagnostics/"
     "typed_evidence_ref_generalization_64_precision_fix_verifier_only.jsonl"
@@ -63,6 +68,146 @@ DEFAULT_SUMMARY = Path(
 
 class RecordedGenerationError(RuntimeError):
     pass
+
+
+def apply_reviewed_equivalent_evidence_overlay(
+    sealed_rows: list[dict[str, Any]],
+    addendum_rows: list[dict[str, Any]],
+    *,
+    chunks_by_id: dict[str, dict[str, Any]],
+    documents_by_id: dict[str, dict[str, Any]],
+    sealed_sha256: str,
+    corpus_chunks_sha256: str,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Append reviewed evidence without changing the sealed claim target."""
+
+    overlaid_rows = copy.deepcopy(sealed_rows)
+    sealed_by_id = {
+        row["candidate_id"]: row for row in overlaid_rows
+    }
+    if len(sealed_by_id) != len(overlaid_rows):
+        raise RuntimeError("sealed candidate IDs are not unique")
+
+    applied = []
+    correction_required = []
+    duplicate_count = 0
+    for addendum in addendum_rows:
+        if addendum.get("evaluation_role") != (
+            "reviewed_equivalent_evidence_addendum_not_sealed_rewrite"
+        ):
+            raise RuntimeError("unexpected equivalent-evidence addendum role")
+        if addendum.get("sealed_artifact_sha256") != sealed_sha256:
+            raise RuntimeError("equivalent-evidence sealed SHA mismatch")
+        if addendum.get("corpus_chunks_sha256") != corpus_chunks_sha256:
+            raise RuntimeError("equivalent-evidence corpus SHA mismatch")
+
+        candidate_id = addendum["candidate_id"]
+        sealed = sealed_by_id.get(candidate_id)
+        if sealed is None:
+            raise RuntimeError("equivalent-evidence candidate ID missing")
+        if sealed["slot_ordinal"] != addendum["slot_ordinal"]:
+            raise RuntimeError("equivalent-evidence slot mismatch")
+        requirements = {
+            requirement["requirement_id"]: requirement
+            for requirement in sealed["requirements"]
+        }
+        requirement_id = addendum["requirement_id"]
+        requirement = requirements.get(requirement_id)
+        if requirement is None:
+            raise RuntimeError("equivalent-evidence requirement ID missing")
+
+        unit = copy.deepcopy(addendum["acceptable_evidence_unit"])
+        chunk = chunks_by_id.get(unit["chunk_id"])
+        if chunk is None:
+            raise RuntimeError("equivalent-evidence chunk missing")
+        start = unit["start_char"]
+        end = unit["end_char"]
+        if (
+            not isinstance(start, int)
+            or not isinstance(end, int)
+            or start < 0
+            or end <= start
+            or chunk["display_text"][start:end] != unit["text"]
+        ):
+            raise RuntimeError("equivalent-evidence coordinates mismatch")
+        if (
+            unit["document_id"] != chunk["parent_document_id"]
+            or unit["source_id"] != chunk["source_id"]
+            or unit["document_status"] != chunk["status"]
+        ):
+            raise RuntimeError("equivalent-evidence chunk metadata mismatch")
+        document = documents_by_id.get(unit["document_id"])
+        if document is None:
+            raise RuntimeError("equivalent-evidence document missing")
+        for key in (
+            "canonical_url",
+            "source_id",
+            "status",
+            "title",
+        ):
+            unit_key = "document_status" if key == "status" else key
+            if unit.get(unit_key) != document.get(key):
+                raise RuntimeError(
+                    f"equivalent-evidence document {key} mismatch"
+                )
+
+        if requirement["expected_status"] != "supported":
+            correction_required.append(
+                {
+                    "slot_ordinal": sealed["slot_ordinal"],
+                    "candidate_id": candidate_id,
+                    "requirement_id": requirement_id,
+                    "reason": "sealed_claim_target_is_unsupported",
+                }
+            )
+            continue
+
+        units = requirement["acceptable_evidence_units"]
+        coordinate = (
+            unit["chunk_id"],
+            unit["start_char"],
+            unit["end_char"],
+        )
+        same_coordinate = [
+            existing
+            for existing in units
+            if (
+                existing["chunk_id"],
+                existing["start_char"],
+                existing["end_char"],
+            )
+            == coordinate
+        ]
+        if same_coordinate:
+            if same_coordinate != [unit]:
+                raise RuntimeError(
+                    "equivalent-evidence coordinate metadata conflict"
+                )
+            duplicate_count += 1
+            continue
+        units.append(unit)
+        applied.append(
+            {
+                "slot_ordinal": sealed["slot_ordinal"],
+                "candidate_id": candidate_id,
+                "requirement_id": requirement_id,
+                "chunk_id": unit["chunk_id"],
+                "start_char": unit["start_char"],
+                "end_char": unit["end_char"],
+            }
+        )
+
+    return overlaid_rows, {
+        "mode": "evidence_only_diagnostic_overlay",
+        "sealed_claim_targets_changed": False,
+        "applied_count": len(applied),
+        "duplicate_count": duplicate_count,
+        "claim_target_correction_required_count": len(
+            correction_required
+        ),
+        "applied": applied,
+        "claim_target_correction_required": correction_required,
+    }
 
 
 def _compatible_reviewed(row: dict[str, Any]) -> dict[str, Any]:
@@ -105,6 +250,7 @@ def _recorded_generator(calls: list[dict[str, Any]]):
             raise RecordedGenerationError(
                 str(call.get("error") or "recorded call has no output")
             )
+        call["_recorded_replay_requires_namespace_match"] = True
         return call
 
     def assert_consumed() -> None:
@@ -231,6 +377,19 @@ def main() -> None:
     parser.add_argument("--documents", type=Path, default=DEFAULT_DOCUMENTS)
     parser.add_argument("--temporal", type=Path, default=DEFAULT_TEMPORAL)
     parser.add_argument("--table-facts", type=Path, default=DEFAULT_TABLE_FACTS)
+    parser.add_argument(
+        "--equivalent-evidence-addendum",
+        type=Path,
+        default=DEFAULT_EQUIVALENT_EVIDENCE_ADDENDUM,
+    )
+    parser.add_argument(
+        "--rescore-source-only",
+        action="store_true",
+        help=(
+            "Do not rebuild the prompt or replay evidence refs. Re-score the "
+            "stored verified output with the reviewed evidence overlay."
+        ),
+    )
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY)
     args = parser.parse_args()
@@ -244,7 +403,11 @@ def main() -> None:
     if output_path.exists() or summary_path.exists():
         raise RuntimeError("diagnostic output or summary already exists")
 
-    sealed_rows = read_jsonl(resolved(args.sealed))
+    sealed_path = resolved(args.sealed)
+    chunks_path = resolved(args.chunks)
+    documents_path = resolved(args.documents)
+    addendum_path = resolved(args.equivalent_evidence_addendum)
+    sealed_rows = read_jsonl(sealed_path)
     source_rows = read_jsonl(resolved(args.source))
     if len(sealed_rows) != 64 or len(source_rows) != 64:
         raise RuntimeError("diagnostic requires exactly 64 sealed and source rows")
@@ -255,88 +418,105 @@ def main() -> None:
     ordered_sources = [
         source_by_id[sealed["candidate_id"]] for sealed in sealed_rows
     ]
-    recorded_calls = [
-        call
-        for source in ordered_sources
-        for call in source["model_call"]["calls"]
-    ]
-    generator, assert_consumed = _recorded_generator(recorded_calls)
-    reviewed_rows = [_compatible_reviewed(row) for row in sealed_rows]
-    baseline_rows = [
-        _baseline_row(sealed, source)
-        for sealed, source in zip(
-            sealed_rows,
-            ordered_sources,
-            strict=True,
-        )
-    ]
-    pool_rows = [
-        _candidate_pool_row(sealed, source)
-        for sealed, source in zip(
-            sealed_rows,
-            ordered_sources,
-            strict=True,
-        )
-    ]
-
-    chunks = read_jsonl(resolved(args.chunks))
-    generated_rows = run_fixed_requirement_replay(
-        reviewed_rows=reviewed_rows,
-        baseline_rows=baseline_rows,
-        chunks=chunks,
-        documents=read_jsonl(resolved(args.documents)),
-        temporal_rows=read_jsonl(resolved(args.temporal)),
-        table_facts=read_jsonl(resolved(args.table_facts)),
-        model="qwen3-8b:ctx8192",
-        as_of="2026-07-22",
-        reasoning_effort="high",
-        timeout_seconds=180,
-        batch_generator=generator,
-        typed_batch_generator=generator,
-        split_evidence_schema=True,
-        batch_requirements=True,
-        typed_evidence_refs=True,
-        candidate_pool_rows=pool_rows,
-        candidate_pool_arm="subject_arm_full",
-    )
-    assert_consumed()
-
-    replay_rows = []
-    for generated, source in zip(
-        generated_rows,
-        ordered_sources,
-        strict=True,
-    ):
-        if (
-            generated["candidate_chunk_ids"]
-            != source["candidate_chunk_ids"]
-            or generated["requirement_candidate_chunk_ids"]
-            != source["requirement_candidate_chunk_ids"]
-        ):
-            raise RuntimeError(
-                f"candidate replay mismatch: {generated['candidate_id']}"
-            )
-        if any(
-            "output" not in call
-            for call in source["model_call"]["calls"]
-        ):
-            generated["verified_output"] = copy.deepcopy(
-                source["verified_output"]
-            )
-        replay_rows.append(
-            {
-                **generated,
-                "model_call": source["model_call"],
-                "slot_ordinal": source["slot_ordinal"],
-                "source_id": source["source_id"],
-                "primary_dimension": source["primary_dimension"],
-                "retrieval": source["retrieval"],
-            }
-        )
-
+    chunks = read_jsonl(chunks_path)
+    documents = read_jsonl(documents_path)
     chunks_by_id = {row["chunk_id"]: row for row in chunks}
+    scoring_rows, overlay_summary = (
+        apply_reviewed_equivalent_evidence_overlay(
+            sealed_rows,
+            read_jsonl(addendum_path),
+            chunks_by_id=chunks_by_id,
+            documents_by_id={
+                row["document_id"]: row for row in documents
+            },
+            sealed_sha256=file_sha256(sealed_path),
+            corpus_chunks_sha256=file_sha256(chunks_path),
+        )
+    )
+    if args.rescore_source_only:
+        replay_rows = copy.deepcopy(ordered_sources)
+    else:
+        recorded_calls = [
+            call
+            for source in ordered_sources
+            for call in source["model_call"]["calls"]
+        ]
+        generator, assert_consumed = _recorded_generator(recorded_calls)
+        reviewed_rows = [
+            _compatible_reviewed(row) for row in sealed_rows
+        ]
+        baseline_rows = [
+            _baseline_row(sealed, source)
+            for sealed, source in zip(
+                sealed_rows,
+                ordered_sources,
+                strict=True,
+            )
+        ]
+        pool_rows = [
+            _candidate_pool_row(sealed, source)
+            for sealed, source in zip(
+                sealed_rows,
+                ordered_sources,
+                strict=True,
+            )
+        ]
+        generated_rows = run_fixed_requirement_replay(
+            reviewed_rows=reviewed_rows,
+            baseline_rows=baseline_rows,
+            chunks=chunks,
+            documents=documents,
+            temporal_rows=read_jsonl(resolved(args.temporal)),
+            table_facts=read_jsonl(resolved(args.table_facts)),
+            model="qwen3-8b:ctx8192",
+            as_of="2026-07-22",
+            reasoning_effort="high",
+            timeout_seconds=180,
+            batch_generator=generator,
+            typed_batch_generator=generator,
+            split_evidence_schema=True,
+            batch_requirements=True,
+            typed_evidence_refs=True,
+            candidate_pool_rows=pool_rows,
+            candidate_pool_arm="subject_arm_full",
+        )
+        assert_consumed()
+
+        replay_rows = []
+        for generated, source in zip(
+            generated_rows,
+            ordered_sources,
+            strict=True,
+        ):
+            if (
+                generated["candidate_chunk_ids"]
+                != source["candidate_chunk_ids"]
+                or generated["requirement_candidate_chunk_ids"]
+                != source["requirement_candidate_chunk_ids"]
+            ):
+                raise RuntimeError(
+                    f"candidate replay mismatch: {generated['candidate_id']}"
+                )
+            if any(
+                "output" not in call
+                for call in source["model_call"]["calls"]
+            ):
+                generated["verified_output"] = copy.deepcopy(
+                    source["verified_output"]
+                )
+            replay_rows.append(
+                {
+                    **generated,
+                    "model_call": source["model_call"],
+                    "slot_ordinal": source["slot_ordinal"],
+                    "source_id": source["source_id"],
+                    "primary_dimension": source["primary_dimension"],
+                    "retrieval": source["retrieval"],
+                }
+            )
+
     scored_rows, score_summary = score_generalization_cases(
-        sealed_rows,
+        scoring_rows,
         replay_rows,
         chunks_by_id=chunks_by_id,
     )
@@ -404,17 +584,30 @@ def main() -> None:
     ]
     summary = {
         "evaluation_role": (
-            "post_hoc_diagnostic_only_not_a_generalization_score"
+            "post_hoc_addendum_rescore_only_not_a_generalization_score"
+            if args.rescore_source_only
+            else "post_hoc_diagnostic_only_not_a_generalization_score"
         ),
         "headline_replacement_allowed": False,
-        "sealed_result_preserved": {
+        "source_result_preserved": {
             "gold_value_complete": {"successes": old_correct, "total": 64},
             "source_path": args.source.as_posix(),
             "source_sha256": file_sha256(resolved(args.source)),
+            "note": (
+                "This is the stored source run, not the official sealed "
+                "one-shot headline."
+            ),
+        },
+        "official_sealed_artifact_preserved": {
+            "path": args.sealed.as_posix(),
+            "sha256": file_sha256(sealed_path),
+            "score_recomputed_or_replaced": False,
         },
         "diagnostic_replay": {
             "new_model_calls": 0,
             "retrieval_reexecuted": False,
+            "verifier_reexecuted": not args.rescore_source_only,
+            "stored_verified_output_reused": args.rescore_source_only,
             "stored_candidates_reused": True,
             "stored_model_outputs_reused": True,
             "scorer_version": SCORER_VERSION,
@@ -429,19 +622,24 @@ def main() -> None:
             "changed_slot_count": len(changes),
             "score_summary": score_summary,
         },
+        "reviewed_equivalent_evidence_overlay": {
+            **overlay_summary,
+            "path": args.equivalent_evidence_addendum.as_posix(),
+            "sha256": file_sha256(addendum_path),
+        },
         "changes": changes,
         "inputs": {
             "sealed": {
                 "path": args.sealed.as_posix(),
-                "sha256": file_sha256(resolved(args.sealed)),
+                "sha256": file_sha256(sealed_path),
             },
             "chunks": {
                 "path": args.chunks.as_posix(),
-                "sha256": file_sha256(resolved(args.chunks)),
+                "sha256": file_sha256(chunks_path),
             },
             "documents": {
                 "path": args.documents.as_posix(),
-                "sha256": file_sha256(resolved(args.documents)),
+                "sha256": file_sha256(documents_path),
             },
             "temporal": {
                 "path": args.temporal.as_posix(),
@@ -465,7 +663,7 @@ def main() -> None:
         json.dumps(
             {
                 "evaluation_role": summary["evaluation_role"],
-                "sealed_score": f"{old_correct}/64",
+                "source_score": f"{old_correct}/64",
                 "diagnostic_score": f"{new_correct}/64",
                 "score_delta": new_correct - old_correct,
                 "recovered_slots": recovered_slots,

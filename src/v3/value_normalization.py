@@ -36,6 +36,27 @@ _CURRENCY_REVERSE_COUNT = re.compile(
 _AMOUNT = re.compile(
     r"(?<![\d,])(?P<amount>\d[\d,]*(?:\.\d+)?)\s*(?P<scale>만|억)?"
 )
+_NON_PLAIN_NUMBER_PATTERNS = (
+    _CURRENCY_FORWARD,
+    _CURRENCY_REVERSE_COUNT,
+    re.compile(
+        r"(?<!\d)20\d{2}\s*(?:년|[./-])\s*\d{1,2}"
+        r"\s*(?:월|[./-])\s*\d{1,2}\s*일?"
+    ),
+    re.compile(r"(?<!\d)\d{1,2}\s*월\s*\d{1,2}\s*일"),
+    re.compile(
+        r"(?<![\d.])(?:0?[1-9]|1[0-2])[./]"
+        r"(?:0?[1-9]|[12]\d|3[01])(?![\d.])"
+    ),
+    re.compile(r"(?<!\d)20\d{2}\s*년"),
+    re.compile(r"(?<!\d)(?:[01]?\d|2[0-3]):[0-5]\d(?!\d)"),
+    re.compile(
+        r"(?<!\d)(?:(?:오전|오후)\s*)?"
+        r"(?:[01]?\d|2[0-3])\s*시"
+        r"(?:\s*[0-5]?\d\s*분)?"
+    ),
+    re.compile(r"(?<!\d)\d+(?:\.\d+)?\s*%"),
+)
 
 _BOOLEAN_POSITIVE_MARKERS = (
     "교환가능",
@@ -93,6 +114,79 @@ def amount_of(value: Any) -> int | None:
     if match is None:
         return None
     return _scaled_amount(match.group("amount"), match.group("scale"))
+
+
+def number_values(value: Any) -> set[float]:
+    text_chars = list(str(value or ""))
+    text = "".join(text_chars)
+    for pattern in _NON_PLAIN_NUMBER_PATTERNS:
+        for match in pattern.finditer(text):
+            text_chars[match.start() : match.end()] = (
+                " " for _ in range(match.end() - match.start())
+            )
+    text = "".join(text_chars)
+    values = set()
+    for match in re.finditer(
+        r"(?<![\d,])(\d[\d,]*(?:\.\d+)?)\s*(만|억)?",
+        text,
+    ):
+        amount = float(match.group(1).replace(",", ""))
+        scale = {"만": 10_000, "억": 100_000_000}.get(
+            match.group(2),
+            1,
+        )
+        values.add(amount * scale)
+    return values
+
+
+def time_sequence(value: Any) -> list[str]:
+    text = str(value or "")
+    occurrences: list[tuple[int, int, str]] = []
+    for match in re.finditer(
+        r"(?<!\d)([01]?\d|2[0-3]):([0-5]\d)(?!\d)",
+        text,
+    ):
+        occurrences.append(
+            (
+                match.start(),
+                match.end(),
+                f"{int(match.group(1)):02d}:{int(match.group(2)):02d}",
+            )
+        )
+    for match in re.finditer(
+        r"(?:(오전|오후)\s*)?([01]?\d|2[0-3])\s*시"
+        r"(?:\s*([0-5]?\d)\s*분)?",
+        text,
+    ):
+        meridiem = match.group(1)
+        hour = int(match.group(2))
+        minute = int(match.group(3) or 0)
+        if meridiem == "오전" and hour == 12:
+            hour = 0
+        elif meridiem == "오후" and hour < 12:
+            hour += 12
+        occurrences.append(
+            (
+                match.start(),
+                match.end(),
+                f"{hour:02d}:{minute:02d}",
+            )
+        )
+    sequence = []
+    occupied: list[tuple[int, int]] = []
+    for start, end, normalized in sorted(occurrences):
+        if any(
+            start < other_end and end > other_start
+            for other_start, other_end in occupied
+        ):
+            continue
+        occupied.append((start, end))
+        sequence.append(normalized)
+    return sequence
+
+
+def time_values(value: Any) -> set[str]:
+    return set(time_sequence(value))
 
 
 def boolean_evidence(value: Any) -> set[bool]:

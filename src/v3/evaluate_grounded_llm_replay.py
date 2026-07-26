@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -27,9 +28,11 @@ from src.v3.generate_grounded_llm_answer import (
     verify_requirement_selection,
 )
 from src.v3.typed_evidence_ref import (
+    TYPED_EVIDENCE_CONTRACT_VERSION,
     assess_requirement_evidence_sufficiency_shadow,
-    build_typed_evidence_prompt,
+    build_typed_evidence_prompt_with_candidate_units,
     generate_typed_evidence_output,
+    resolve_requirement_claim_contracts,
     verify_typed_requirement_selection,
 )
 
@@ -61,6 +64,61 @@ DEFAULT_TABLE_FACTS = Path(
 DEFAULT_OUTPUT = Path("outputs/v3/grounded_llm_replay_cases.jsonl")
 DEFAULT_SUMMARY = Path("reports/v3/grounded_llm_replay_summary.json")
 Generator = Callable[..., dict[str, Any]]
+
+
+class TypedEvidenceNamespaceMismatchError(RuntimeError):
+    """Stored E-reference coordinates do not match the rebuilt prompt."""
+
+
+def _typed_evidence_namespace_metadata(
+    units_by_ref: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    units = [
+        {
+            "evidence_ref": evidence_ref,
+            "chunk_id": unit["chunk_id"],
+            "start_char": unit["start_char"],
+            "end_char": unit["end_char"],
+        }
+        for evidence_ref, unit in sorted(
+            units_by_ref.items(),
+            key=lambda item: int(item[0][1:]),
+        )
+    ]
+    payload = json.dumps(
+        units,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return {
+        "claim_contract_version": TYPED_EVIDENCE_CONTRACT_VERSION,
+        "units": units,
+        "sha256": hashlib.sha256(payload).hexdigest(),
+    }
+
+
+def _attach_typed_evidence_namespace(
+    call: dict[str, Any],
+    units_by_ref: dict[str, dict[str, Any]],
+) -> None:
+    current_namespace = _typed_evidence_namespace_metadata(units_by_ref)
+    replay_requires_match = bool(
+        call.pop("_recorded_replay_requires_namespace_match", False)
+    )
+    recorded_namespace = call.get("typed_evidence_namespace")
+    if replay_requires_match and recorded_namespace != current_namespace:
+        raise TypedEvidenceNamespaceMismatchError(
+            "recorded typed evidence namespace does not match rebuilt prompt"
+        )
+    if (
+        recorded_namespace is not None
+        and recorded_namespace != current_namespace
+    ):
+        raise TypedEvidenceNamespaceMismatchError(
+            "generator typed evidence namespace does not match rebuilt prompt"
+        )
+    call["typed_evidence_namespace"] = current_namespace
 
 
 def _ratio(successes: int, total: int) -> dict[str, Any]:
@@ -479,34 +537,38 @@ def run_fixed_requirement_replay(
     results = []
     for row_index, reviewed in enumerate(reviewed_rows, 1):
         baseline = baseline_by_id[reviewed["candidate_id"]]
+        resolved_requirements = resolve_requirement_claim_contracts(
+            reviewed["requirements"],
+            question_text=reviewed["question_text"],
+        )
         baseline_candidate_ids = list(baseline["arm0"]["candidate_chunk_ids"])
         if (
             candidate_pool_rows is None
             or reviewed["candidate_id"] not in candidate_pools_by_id
         ):
             requirement_candidate_ids = [
-                list(baseline_candidate_ids) for _ in reviewed["requirements"]
+                list(baseline_candidate_ids) for _ in resolved_requirements
             ]
         else:
             pools = candidate_pools_by_id[reviewed["candidate_id"]][
                 "requirement_candidate_pools"
             ]
-            if len(pools) != len(reviewed["requirements"]):
+            if len(pools) != len(resolved_requirements):
                 raise RuntimeError("Requirement candidate pool count differs from requirements")
             requirement_candidate_ids = [
                 list(pool[candidate_pool_arm]["candidate_chunk_ids"])
                 for pool in pools
             ]
         decisions: list[dict[str, Any] | None] = [
-            None for _ in reviewed["requirements"]
+            None for _ in resolved_requirements
         ]
         audits: list[dict[str, Any] | None] = [
-            None for _ in reviewed["requirements"]
+            None for _ in resolved_requirements
         ]
         calls = []
         evidence_modes = []
         for requirement, candidate_ids in zip(
-            reviewed["requirements"], requirement_candidate_ids, strict=True
+            resolved_requirements, requirement_candidate_ids, strict=True
         ):
             matching_table_rows = select_table_rows_for_requirement(
                 table_rows_by_chunk, requirement
@@ -533,11 +595,16 @@ def run_fixed_requirement_replay(
             for (evidence_mode, candidate_id_tuple), indices in grouped_indices.items():
                 candidate_ids = list(candidate_id_tuple)
                 grouped_requirements = [
-                    reviewed["requirements"][index] for index in indices
+                    resolved_requirements[index] for index in indices
                 ]
                 typed_units_by_ref = None
+                typed_candidate_units_by_ref = None
                 if typed_evidence_refs and evidence_mode == "non_table":
-                    prompt, typed_units_by_ref = build_typed_evidence_prompt(
+                    (
+                        prompt,
+                        typed_units_by_ref,
+                        typed_candidate_units_by_ref,
+                    ) = build_typed_evidence_prompt_with_candidate_units(
                         question=reviewed["question_text"],
                         requirements=grouped_requirements,
                         question_time_scope=reviewed["time_scope"],
@@ -586,6 +653,15 @@ def run_fixed_requirement_replay(
                         reasoning_effort=reasoning_effort,
                         timeout_seconds=timeout_seconds,
                     )
+                    if (
+                        typed_evidence_refs
+                        and evidence_mode == "non_table"
+                        and typed_units_by_ref is not None
+                    ):
+                        _attach_typed_evidence_namespace(
+                            call,
+                            typed_units_by_ref,
+                        )
                     if sufficiency_shadow:
                         call["sufficiency_shadow"] = sufficiency_shadow
                     selections = call["output"]["requirements"]
@@ -611,16 +687,6 @@ def run_fixed_requirement_replay(
                             selection["requirement_id"] for selection in selections
                         ]
                         call["requirement_id_normalization"] = "ordinal_to_fixed"
-                    elif (
-                        len(selection_ids) == len(expected_ids)
-                        and selection_ids != expected_ids
-                    ):
-                        for selection, expected_id in zip(
-                            selections, expected_ids, strict=True
-                        ):
-                            selection["requirement_id"] = expected_id
-                        selection_ids = expected_ids
-                        call["requirement_id_normalization"] = "positional_to_fixed"
                     if (
                         len(selection_ids) != len(set(selection_ids))
                         or set(selection_ids) != set(expected_ids)
@@ -637,7 +703,7 @@ def run_fixed_requirement_replay(
                         for selection in selections
                     }
                     for requirement_index in indices:
-                        requirement = reviewed["requirements"][requirement_index]
+                        requirement = resolved_requirements[requirement_index]
                         selection = selections_by_id[requirement["requirement_id"]]
                         if typed_evidence_refs and evidence_mode == "non_table":
                             if typed_units_by_ref is None:
@@ -657,12 +723,16 @@ def run_fixed_requirement_replay(
                                 evidence_units_by_ref=typed_units_by_ref,
                                 chunks_by_id=chunks_by_id,
                                 as_of=as_of,
+                                candidate_evidence_units_by_ref=(
+                                    typed_candidate_units_by_ref
+                                ),
                             )
                         elif evidence_mode == "non_table":
                             decision, audit = verify_non_table_requirement_selection(
                                 selection,
                                 requirement=requirement,
                                 question_time_scope=reviewed["time_scope"],
+                                question_text=reviewed["question_text"],
                                 candidate_chunk_ids=candidate_ids,
                                 chunks_by_id=chunks_by_id,
                                 documents_by_id=documents_by_id,
@@ -673,6 +743,7 @@ def run_fixed_requirement_replay(
                                 selection,
                                 requirement=requirement,
                                 question_time_scope=reviewed["time_scope"],
+                                question_text=reviewed["question_text"],
                                 candidate_chunk_ids=candidate_ids,
                                 chunks_by_id=chunks_by_id,
                                 documents_by_id=documents_by_id,
@@ -681,6 +752,8 @@ def run_fixed_requirement_replay(
                             )
                         decisions[requirement_index] = decision
                         audits[requirement_index] = audit
+                except TypedEvidenceNamespaceMismatchError:
+                    raise
                 except Exception as exc:
                     error = f"{type(exc).__name__}: {exc}"
                     call = {
@@ -688,10 +761,20 @@ def run_fixed_requirement_replay(
                         "batch_protocol_error": error,
                         "error": error,
                     }
+                    if (
+                        typed_evidence_refs
+                        and evidence_mode == "non_table"
+                        and typed_units_by_ref is not None
+                    ):
+                        call["typed_evidence_namespace"] = (
+                            _typed_evidence_namespace_metadata(
+                                typed_units_by_ref
+                            )
+                        )
                     if sufficiency_shadow:
                         call["sufficiency_shadow"] = sufficiency_shadow
                     for requirement_index in indices:
-                        requirement = reviewed["requirements"][requirement_index]
+                        requirement = resolved_requirements[requirement_index]
                         decisions[requirement_index] = {
                             "requirement_id": requirement["requirement_id"],
                             "question_part": requirement.get("surface")
@@ -717,7 +800,7 @@ def run_fixed_requirement_replay(
                 evidence_mode,
             ) in enumerate(
                 zip(
-                    reviewed["requirements"],
+                    resolved_requirements,
                     requirement_candidate_ids,
                     evidence_modes,
                     strict=True,
@@ -751,6 +834,7 @@ def run_fixed_requirement_replay(
                             call["output"],
                             requirement=requirement,
                             question_time_scope=reviewed["time_scope"],
+                            question_text=reviewed["question_text"],
                             candidate_chunk_ids=candidate_ids,
                             chunks_by_id=chunks_by_id,
                             documents_by_id=documents_by_id,
@@ -761,6 +845,7 @@ def run_fixed_requirement_replay(
                             call["output"],
                             requirement=requirement,
                             question_time_scope=reviewed["time_scope"],
+                            question_text=reviewed["question_text"],
                             candidate_chunk_ids=candidate_ids,
                             chunks_by_id=chunks_by_id,
                             documents_by_id=documents_by_id,

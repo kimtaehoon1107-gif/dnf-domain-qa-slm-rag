@@ -13,10 +13,18 @@ from src.v3.typed_evidence_ref import (
     build_typed_evidence_prompt,
     generate_typed_evidence_output,
     parse_typed_requirement_batch,
+    resolve_requirement_claim_contract,
+    resolve_requirement_claim_contracts,
     select_prompt_evidence_units,
     verify_typed_requirement_selection,
 )
-from src.v3.value_normalization import boolean_evidence, currency_values
+from src.v3.value_normalization import (
+    boolean_evidence,
+    currency_values,
+    number_values,
+    time_sequence,
+    time_values,
+)
 
 
 def _artifacts(
@@ -423,6 +431,489 @@ class TypedEvidenceRefTest(unittest.TestCase):
                 text[unit["start_char"] : unit["end_char"]],
                 unit["text"],
             )
+
+    def test_policy_prompt_binds_the_requested_policy_identity_before_generation(
+        self,
+    ) -> None:
+        chunks = {
+            "sera": {
+                "chunk_id": "sera",
+                "parent_document_id": "sera_doc",
+                "display_text": (
+                    "### 공지사항\n"
+                    "세라 이용약관 개정 안내\n"
+                    "▒ 적용 일자\n"
+                    "- 2026년 5월 28일(목)"
+                ),
+                "default_exposure": True,
+                "status": "current",
+            },
+            "mobile": {
+                "chunk_id": "mobile",
+                "parent_document_id": "mobile_doc",
+                "display_text": (
+                    "### 공지사항\n"
+                    "운영정책, 모바일 이용약관 개정 안내\n"
+                    "▒ 적용 일자\n"
+                    "- 2026년 3월 15일\n"
+                    "던전앤파이터 세라이용약관을 참고할 수 있습니다."
+                ),
+                "default_exposure": True,
+                "status": "current",
+            },
+        }
+        documents = {
+            "sera_doc": {
+                "document_id": "sera_doc",
+                "source_id": "dnf_notice",
+                "title": "세라 이용약관 개정 안내",
+                "published_at": "2026-04-23",
+                "revision_id": "sera_revision",
+                "status": "current",
+                "default_exposure": True,
+            },
+            "mobile_doc": {
+                "document_id": "mobile_doc",
+                "source_id": "dnf_notice",
+                "title": "운영정책, 모바일 이용약관 개정 안내",
+                "published_at": "2026-02-13",
+                "revision_id": "mobile_revision",
+                "status": "current",
+                "default_exposure": True,
+            },
+        }
+        temporal = {
+            document_id: {
+                "document_id": document_id,
+                "revision_id": document["revision_id"],
+                "validity_state": "current",
+                "retrieval_action_current": "allow",
+            }
+            for document_id, document in documents.items()
+        }
+
+        prompt, visible_units = build_typed_evidence_prompt(
+            question="2026년 세라 이용약관 개정안은 언제부터 적용돼?",
+            requirements=[
+                {
+                    "requirement_id": "effective_date",
+                    "subject": "세라 이용약관 개정안",
+                    "relation": "effective_at",
+                    "value_type": "date",
+                }
+            ],
+            question_time_scope="current",
+            as_of="2026-07-22",
+            candidate_chunk_ids=["sera", "mobile"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+
+        self.assertIn("2026년 5월 28일", prompt)
+        self.assertNotIn("2026년 3월 15일", prompt)
+        self.assertEqual(
+            {unit["chunk_id"] for unit in visible_units.values()},
+            {"sera"},
+        )
+
+    def test_policy_prompt_binds_the_explicit_historical_year_before_generation(
+        self,
+    ) -> None:
+        chunks = {
+            "historical": {
+                "chunk_id": "historical",
+                "parent_document_id": "historical_doc",
+                "display_text": (
+                    "### 공지사항\n"
+                    "던전앤파이터 운영정책 변경 안내\n"
+                    "2025년 11월 1일 자로 변경이 예정되어 안내 드립니다."
+                ),
+                "default_exposure": True,
+                "status": "current",
+            },
+            "current": {
+                "chunk_id": "current",
+                "parent_document_id": "current_doc",
+                "display_text": (
+                    "### 운영정책\n"
+                    "시행일자\n"
+                    "2026년 03월 15일\n"
+                    "2025년 11월 01일"
+                ),
+                "default_exposure": True,
+                "status": "current",
+            },
+        }
+        documents = {
+            "historical_doc": {
+                "document_id": "historical_doc",
+                "source_id": "dnf_notice",
+                "title": "던전앤파이터 운영정책 변경 안내",
+                "published_at": "2025-10-02",
+                "revision_id": "historical_revision",
+                "status": "current",
+                "default_exposure": True,
+            },
+            "current_doc": {
+                "document_id": "current_doc",
+                "source_id": "dnf_account_policy",
+                "source_kind": "account_policy",
+                "title": "던전앤파이터 운영정책 (2026-03-15 시행)",
+                "published_at": "2026-03-15",
+                "valid_from": "2026-03-15",
+                "revision_id": "current_revision",
+                "status": "current",
+                "default_exposure": True,
+            },
+        }
+        temporal = {
+            "historical_doc": {
+                "document_id": "historical_doc",
+                "revision_id": "historical_revision",
+                "validity_state": "current",
+                "retrieval_action_current": "allow",
+            },
+            "current_doc": {
+                "document_id": "current_doc",
+                "revision_id": "current_revision",
+                "source_kind": "account_policy",
+                "valid_from": "2026-03-15",
+                "validity_state": "current",
+                "retrieval_action_current": "allow",
+            },
+        }
+
+        prompt, visible_units = build_typed_evidence_prompt(
+            question=(
+                "2025년에 공지된 던전앤파이터 운영정책 변경은 "
+                "언제 시행될 예정이었어?"
+            ),
+            requirements=[
+                {
+                    "requirement_id": "policy_effective_date",
+                    "subject": "던전앤파이터 운영정책 변경",
+                    "relation": "effective_at",
+                    "value_type": "date",
+                }
+            ],
+            question_time_scope="historical",
+            as_of="2026-07-22",
+            candidate_chunk_ids=["historical", "current"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+
+        self.assertIn("2025년 11월 1일 자로 변경", prompt)
+        self.assertNotIn("2026년 03월 15일", prompt)
+        self.assertEqual(
+            {unit["chunk_id"] for unit in visible_units.values()},
+            {"historical"},
+        )
+
+    def test_policy_prompt_accepts_effective_year_from_body(
+        self,
+    ) -> None:
+        chunks = {
+            "correct": {
+                "chunk_id": "correct",
+                "parent_document_id": "correct_doc",
+                "display_text": (
+                    "세라 이용약관 변경 안내\n"
+                    "개정 약관은 2026년 1월 2일부터 시행됩니다."
+                ),
+                "default_exposure": True,
+                "status": "current",
+            },
+            "sibling": {
+                "chunk_id": "sibling",
+                "parent_document_id": "sibling_doc",
+                "display_text": (
+                    "세라 이용약관 변경 안내\n"
+                    "개정 약관은 2025년 12월 2일부터 시행됩니다."
+                ),
+                "default_exposure": True,
+                "status": "current",
+            },
+        }
+        documents = {
+            "correct_doc": {
+                "document_id": "correct_doc",
+                "source_id": "dnf_notice",
+                "title": "세라 이용약관 변경 안내",
+                "published_at": "2025-12-20",
+                "revision_id": "correct_revision",
+                "status": "current",
+                "default_exposure": True,
+            },
+            "sibling_doc": {
+                "document_id": "sibling_doc",
+                "source_id": "dnf_notice",
+                "title": "세라 이용약관 변경 안내",
+                "published_at": "2025-11-20",
+                "revision_id": "sibling_revision",
+                "status": "current",
+                "default_exposure": True,
+            },
+        }
+        temporal = {
+            document_id: {
+                "document_id": document_id,
+                "revision_id": document["revision_id"],
+                "validity_state": "current",
+                "retrieval_action_current": "allow",
+            }
+            for document_id, document in documents.items()
+        }
+
+        prompt, visible_units = build_typed_evidence_prompt(
+            question="2026년 세라 이용약관은 언제부터 시행돼?",
+            requirements=[
+                {
+                    "requirement_id": "effective_date",
+                    "subject": "세라 이용약관",
+                    "relation": "effective_at",
+                    "value_type": "date",
+                }
+            ],
+            question_time_scope="current",
+            as_of="2026-07-22",
+            candidate_chunk_ids=["correct", "sibling"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+
+        self.assertIn("2026년 1월 2일부터 시행", prompt)
+        self.assertNotIn("2025년 12월 2일부터 시행", prompt)
+        self.assertEqual(
+            {unit["chunk_id"] for unit in visible_units.values()},
+            {"correct"},
+        )
+
+    def test_monthly_prompt_does_not_leak_previous_month_record(
+        self,
+    ) -> None:
+        text = (
+            "# [6월 이달의 아이템]\n"
+            "상점판매가\n"
+            "3,000만 골드\n"
+            "# [7월 이달의 아이템]\n"
+            "상점판매가\n"
+            "4,000만 골드"
+        )
+        chunks, documents, temporal = _artifacts(
+            text,
+            title="이달의 아이템",
+        )
+        documents["d1"]["source_id"] = "dnf_monthly_item"
+
+        prompt, visible_units = build_typed_evidence_prompt(
+            question="7월 이달의 아이템 상점 판매가는 얼마야?",
+            requirements=[
+                {
+                    "requirement_id": "shop_price",
+                    "subject": "7월 이달의 아이템",
+                    "relation": "shop_price",
+                    "value_type": "currency",
+                }
+            ],
+            question_time_scope="current",
+            as_of="2026-07-22",
+            candidate_chunk_ids=["c1"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+
+        self.assertIn("4,000만 골드", prompt)
+        self.assertNotIn("3,000만 골드", prompt)
+        self.assertNotIn(
+            "3,000만 골드",
+            "\n".join(unit["text"] for unit in visible_units.values()),
+        )
+
+    def test_monthly_prompt_keeps_shared_preamble_for_first_record(
+        self,
+    ) -> None:
+        text = (
+            "### 이달의 아이템\n"
+            "판매기간: 06.25 ~ 07.30\n"
+            "# [7월 이달의 아이템]\n"
+            "상점판매가\n"
+            "4,000만 골드"
+        )
+        chunks, documents, temporal = _artifacts(
+            text,
+            title="이달의 아이템",
+        )
+        documents["d1"]["source_id"] = "dnf_monthly_item"
+
+        prompt, visible_units = build_typed_evidence_prompt(
+            question="7월 이달의 아이템 판매 기간은 언제야?",
+            requirements=[
+                {
+                    "requirement_id": "sale_period",
+                    "subject": "7월 이달의 아이템",
+                    "relation": "sale_period",
+                    "temporal_role": "sale_period",
+                    "value_type": "date_range",
+                }
+            ],
+            question_time_scope="current",
+            as_of="2026-07-22",
+            candidate_chunk_ids=["c1"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+
+        visible_text = "\n".join(
+            unit["text"] for unit in visible_units.values()
+        )
+        self.assertIn("판매기간: 06.25 ~ 07.30", prompt)
+        self.assertIn("판매기간: 06.25 ~ 07.30", visible_text)
+
+    def test_monthly_prompt_keeps_only_the_requested_month_record(
+        self,
+    ) -> None:
+        chunks = {
+            "monthly": {
+                "chunk_id": "monthly",
+                "parent_document_id": "monthly_doc",
+                "display_text": (
+                    "### 이달의 아이템\n"
+                    "판매기간: 06.25 ~ 07.30\n"
+                    "# [7월 이달의 아이템] : "
+                    "[7월]스페셜 클론 레어 아바타 풀세트 상자\n"
+                    "사용 시 [7월]클론 레어 아바타 상자를 획득합니다.\n"
+                    "상점판매가\n"
+                    "4,000만 골드\n"
+                    "거래타입\n"
+                    "교환가능\n"
+                    "삭제기일\n"
+                    "2026년 08월 13일 06시 일괄삭제"
+                ),
+                "default_exposure": True,
+                "status": "current",
+            },
+            "sibling": {
+                "chunk_id": "sibling",
+                "parent_document_id": "sibling_doc",
+                "display_text": (
+                    "# 특별 아이템\n"
+                    "| 아이템명 | 무기 강화권 상자 |\n"
+                    "| 상점판매가격 | 2,000만 골드 |\n"
+                    "| 거래타입 | 교환가능 |\n"
+                    "7월 이달의 아이템"
+                ),
+                "default_exposure": True,
+                "status": "current",
+            },
+        }
+        documents = {
+            "monthly_doc": {
+                "document_id": "monthly_doc",
+                "source_id": "dnf_monthly_item",
+                "title": "이달의 아이템",
+                "published_at": "2026-06-25",
+                "revision_id": "monthly_revision",
+                "status": "current",
+                "default_exposure": True,
+            },
+            "sibling_doc": {
+                "document_id": "sibling_doc",
+                "source_id": "dnf_seria_shop",
+                "title": "7월 이달의 아이템",
+                "published_at": "2026-06-25",
+                "revision_id": "sibling_revision",
+                "status": "current",
+                "default_exposure": True,
+            },
+        }
+        temporal = {
+            document_id: {
+                "document_id": document_id,
+                "revision_id": document["revision_id"],
+                "validity_state": "current",
+                "retrieval_action_current": "allow",
+            }
+            for document_id, document in documents.items()
+        }
+
+        prompt, visible_units = build_typed_evidence_prompt(
+            question=(
+                "7월 이달의 아이템의 상점 판매가, 거래 타입, 삭제 시각은 "
+                "각각 얼마, 무엇, 언제야?"
+            ),
+            requirements=[
+                {
+                    "requirement_id": "shop_price",
+                    "subject": "7월 이달의 아이템",
+                    "relation": "shop_price",
+                    "value_type": "currency",
+                },
+                {
+                    "requirement_id": "trade_type",
+                    "subject": "7월 이달의 아이템",
+                    "relation": "trade_type",
+                    "value_type": "enum",
+                },
+                {
+                    "requirement_id": "deletion_at",
+                    "subject": "7월 이달의 아이템",
+                    "relation": "deletion_at",
+                    "value_type": "datetime",
+                },
+            ],
+            question_time_scope="current",
+            as_of="2026-07-22",
+            candidate_chunk_ids=["monthly", "sibling"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+
+        self.assertIn("4,000만 골드", prompt)
+        self.assertIn("2026년 08월 13일 06시", prompt)
+        self.assertIn("[7월]스페셜 클론 레어 아바타", prompt)
+        self.assertIn(
+            "거래타입\n교환가능",
+            [unit["text"] for unit in visible_units.values()],
+        )
+        self.assertNotIn("2,000만 골드", prompt)
+        self.assertEqual(
+            {unit["source_id"] for unit in visible_units.values()},
+            {"dnf_monthly_item"},
+        )
+        trade_ref = next(
+            evidence_ref
+            for evidence_ref, unit in visible_units.items()
+            if unit["text"] == "거래타입\n교환가능"
+        )
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "trade_type",
+                "status": "supported",
+                "value_type": "enum",
+                "value": "교환가능",
+                "evidence_refs": [trade_ref],
+            },
+            requirement={
+                "requirement_id": "trade_type",
+                "subject": "7월 이달의 아이템",
+                "relation": "trade_type",
+                "value_type": "enum",
+            },
+            question_time_scope="current",
+            question_text="7월 이달의 아이템 거래 타입은 뭐야?",
+            evidence_units_by_ref=visible_units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+        self.assertEqual(decision["status"], "supported_exact", audit)
+        self.assertEqual(decision["answer"], "교환가능")
 
     def test_large_policy_prompt_keeps_relevant_late_units_within_budget(
         self,
@@ -1368,7 +1859,9 @@ class TypedEvidenceRefTest(unittest.TestCase):
             ],
         )
 
-    def test_free_text_answer_is_rendered_from_selected_exact_evidence(self) -> None:
+    def test_free_text_rejects_value_not_supported_by_selected_evidence(
+        self,
+    ) -> None:
         text = (
             "길드 콘텐츠를 이용한 경우 해당 길드는 해제될 수 있습니다.\n"
             "① 특정 개인이나 단체에 대한 비난이나 명예 훼손을 하는 경우"
@@ -1400,12 +1893,470 @@ class TypedEvidenceRefTest(unittest.TestCase):
             as_of="2026-07-22",
         )
 
+        self.assertEqual(decision["status"], "unsupported")
+        self.assertIn(
+            "typed_value_not_supported_by_evidence",
+            audit["failure_reasons"],
+        )
+
+    def test_free_text_preserves_grounded_typed_value(self) -> None:
+        text = (
+            "이용제한 이의 제기의 접수 채널은 고객센터입니다."
+        )
+        chunks, units, _, _ = _units(text, title="이용제한 안내")
+        evidence_ref = _ref_containing(units, text)
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "appeal_channel",
+                "status": "supported",
+                "value_type": "text",
+                "value": "고객센터",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "appeal_channel",
+                "subject": "이용제한 이의 제기",
+                "relation": "접수 채널",
+                "surface": "접수 채널",
+                "value_type": "text",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "supported_exact")
+        self.assertEqual(decision["answer"], "고객센터")
+        self.assertEqual(audit["answer_value_source"], "model_typed_value")
+
+    def test_shared_time_and_number_normalization(self) -> None:
+        self.assertEqual(time_values("매일 오전 6시"), {"06:00"})
+        self.assertEqual(
+            time_sequence("04:30 ~ 10:00"),
+            ["04:30", "10:00"],
+        )
+        self.assertEqual(number_values("4,000"), {4000.0})
+        self.assertEqual(
+            number_values("2026년 4월 2일 04:30"),
+            set(),
+        )
+        self.assertEqual(number_values("4/2 정기점검"), set())
+        self.assertEqual(number_values("4.2 정기점검"), set())
+        self.assertEqual(
+            number_values("판매기간 6.25 ~ 7.30"),
+            set(),
+        )
+        self.assertEqual(number_values("계정당 4회"), {4.0})
+        self.assertEqual(number_values("가격은 4,000만 골드"), set())
+        self.assertTrue(
+            _value_supported(
+                "enum",
+                "06:00",
+                "매일 06시에 초기화됩니다.",
+                as_of="2026-07-22",
+            )
+        )
+        self.assertFalse(
+            _value_supported(
+                "number",
+                4,
+                "구매 횟수 기준은 2026년 4월 2일 공지입니다.",
+                as_of="2026-07-22",
+            )
+        )
+        self.assertFalse(
+            _value_supported(
+                "entity",
+                "매일 06:00 갱신",
+                "삭제 시각은 06시입니다.",
+                as_of="2026-07-22",
+            )
+        )
+        self.assertTrue(
+            _value_supported(
+                "time_range",
+                "04:30/10:00",
+                "점검 시간은 04:30 ~ 10:00입니다.",
+                as_of="2026-07-22",
+            )
+        )
+        self.assertFalse(
+            _value_supported(
+                "time_range",
+                "10:00/04:30",
+                "점검 시간은 04:30 ~ 10:00입니다.",
+                as_of="2026-07-22",
+            )
+        )
+        self.assertTrue(
+            _value_supported(
+                "number",
+                4000,
+                "필요 수량은 4,000개입니다.",
+                as_of="2026-07-22",
+            )
+        )
+
+    def test_entity_list_requires_a_nonempty_string_array(self) -> None:
+        text = "무한 올빼미는 마을, 던전에서 사용할 수 있습니다."
+        chunks_by_id, units, _, _ = _units(
+            text,
+            title="무한 올빼미",
+        )
+        evidence_ref = next(iter(units))
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "usable_locations",
+                "status": "supported",
+                "value_type": "entity_list",
+                "value": "마을, 던전",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "usable_locations",
+                "subject": "무한 올빼미",
+                "relation": "usable_locations",
+                "value_type": "entity_list",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks_by_id,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "unsupported")
+        self.assertIn(
+            "entity_list_value_shape_mismatch",
+            audit["failure_reasons"],
+        )
+
+    def test_entity_list_repairs_only_a_json_array_string(self) -> None:
+        text = "무한 올빼미는 마을, 던전에서 사용할 수 있습니다."
+        chunks_by_id, units, _, _ = _units(
+            text,
+            title="무한 올빼미",
+        )
+        evidence_ref = next(iter(units))
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "usable_locations",
+                "status": "supported",
+                "value_type": "entity_list",
+                "value": '["마을","던전"]',
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "usable_locations",
+                "subject": "무한 올빼미",
+                "relation": "usable_locations",
+                "value_type": "entity_list",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks_by_id,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "supported_exact")
+        self.assertEqual(decision["answer"], "마을, 던전")
+        self.assertEqual(
+            audit["value_shape_repair"],
+            "json_array_string",
+        )
+
+    def test_entity_list_expected_count_is_enforced(self) -> None:
+        text = "무한 올빼미는 마을, 던전에서 사용할 수 있습니다."
+        chunks_by_id, units, _, _ = _units(
+            text,
+            title="무한 올빼미",
+        )
+        evidence_ref = next(iter(units))
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "usable_locations",
+                "status": "supported",
+                "value_type": "entity_list",
+                "value": ["던전"],
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "usable_locations",
+                "subject": "무한 올빼미",
+                "relation": "usable_locations",
+                "value_type": "entity_list",
+                "cardinality": "all",
+                "expected_count": 2,
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks_by_id,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "unsupported")
+        self.assertIn(
+            "cardinality_count_mismatch",
+            audit["failure_reasons"],
+        )
+        self.assertEqual(
+            audit["cardinality_validation_state"],
+            "count_mismatch",
+        )
+
+    def test_cardinality_all_without_closure_fails_closed(
+        self,
+    ) -> None:
+        text = "무한 올빼미는 마을, 던전에서 사용할 수 있습니다."
+        chunks_by_id, units, _, _ = _units(
+            text,
+            title="무한 올빼미",
+        )
+        evidence_ref = next(iter(units))
+        output = {
+            "requirement_id": "usable_locations",
+            "status": "supported",
+            "value_type": "entity_list",
+            "value": ["마을", "던전"],
+            "evidence_refs": [evidence_ref],
+        }
+        requirement = {
+            "requirement_id": "usable_locations",
+            "subject": "무한 올빼미",
+            "relation": "usable_locations",
+            "value_type": "entity_list",
+            "cardinality": "all",
+        }
+
+        decision, audit = (
+            verify_typed_requirement_selection(
+                output,
+                requirement=requirement,
+                question_time_scope="current",
+                evidence_units_by_ref=units,
+                chunks_by_id=chunks_by_id,
+                as_of="2026-07-22",
+            )
+        )
+        self.assertEqual(
+            decision["status"],
+            "unsupported",
+        )
+        self.assertEqual(
+            audit["cardinality_validation_state"],
+            "all_unproven",
+        )
+        self.assertIn(
+            "cardinality_all_unproven",
+            audit["failure_reasons"],
+        )
+        self.assertTrue(
+            audit[
+                "would_reject_if_cardinality_fail_closed"
+            ]
+        )
+
+    def test_relation_contract_states_and_shadow_mode(self) -> None:
+        text = (
+            "게임 이용제한 이의신청의 접수 채널은 "
+            "고객센터입니다."
+        )
+        chunks_by_id, units, _, _ = _units(
+            text,
+            title="게임 이용제한 이의신청",
+        )
+        evidence_ref = next(iter(units))
+        output = {
+            "requirement_id": "appeal_channel",
+            "status": "supported",
+            "value_type": "text",
+            "value": "고객센터",
+            "evidence_refs": [evidence_ref],
+        }
+        base_requirement = {
+            "requirement_id": "appeal_channel",
+            "subject": "게임 이용제한 이의신청",
+            "relation": "unknown_appeal_destination",
+            "value_type": "text",
+        }
+
+        shadow_decision, shadow_audit = (
+            verify_typed_requirement_selection(
+                output,
+                requirement=base_requirement,
+                question_time_scope="current",
+                evidence_units_by_ref=units,
+                chunks_by_id=chunks_by_id,
+                as_of="2026-07-22",
+            )
+        )
+        self.assertEqual(
+            shadow_decision["status"],
+            "supported_exact",
+        )
+        self.assertEqual(
+            shadow_audit["relation_validation_state"],
+            "unvalidated",
+        )
+        self.assertTrue(
+            shadow_audit["would_reject_if_relation_fail_closed"]
+        )
+
+        strict_decision, strict_audit = (
+            verify_typed_requirement_selection(
+                output,
+                requirement={
+                    **base_requirement,
+                    "relation_validation_mode": "strict",
+                },
+                question_time_scope="current",
+                evidence_units_by_ref=units,
+                chunks_by_id=chunks_by_id,
+                as_of="2026-07-22",
+            )
+        )
+        self.assertEqual(strict_decision["status"], "unsupported")
+        self.assertIn(
+            "relation_unvalidated",
+            strict_audit["failure_reasons"],
+        )
+
+        surface_decision, surface_audit = (
+            verify_typed_requirement_selection(
+                output,
+                requirement={
+                    **base_requirement,
+                    "relation_surface": "접수 채널",
+                },
+                question_time_scope="current",
+                evidence_units_by_ref=units,
+                chunks_by_id=chunks_by_id,
+                as_of="2026-07-22",
+            )
+        )
+        self.assertEqual(
+            surface_decision["status"],
+            "supported_exact",
+        )
+        self.assertEqual(
+            surface_audit["relation_validation_state"],
+            "surface_fallback",
+        )
+
+    def test_known_relation_uses_explicit_alias_contract(self) -> None:
+        text = "아이템의 거래타입은 교환가능입니다."
+        chunks_by_id, units, _, _ = _units(
+            text,
+            title="아이템",
+        )
+        evidence_ref = next(iter(units))
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "trade_type",
+                "status": "supported",
+                "value_type": "enum",
+                "value": "교환가능",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "trade_type",
+                "subject": "아이템",
+                "relation": "trade_type",
+                "value_type": "enum",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks_by_id,
+            as_of="2026-07-22",
+        )
+
         self.assertEqual(decision["status"], "supported_exact")
         self.assertEqual(
-            decision["answer"],
-            "① 특정 개인이나 단체에 대한 비난이나 명예 훼손을 하는 경우",
+            audit["relation_validation_state"],
+            "explicit_alias",
         )
-        self.assertEqual(audit["answer_value_source"], "selected_exact_evidence")
+
+    def test_colocation_does_not_cross_chunks_in_same_parent(self) -> None:
+        chunks = {
+            "c1": {
+                "chunk_id": "c1",
+                "parent_document_id": "d1",
+                "display_text": "상품 A 상점 판매가 안내",
+                "default_exposure": True,
+                "status": "current",
+            },
+            "c2": {
+                "chunk_id": "c2",
+                "parent_document_id": "d1",
+                "display_text": "다른 상품의 가격은 2,600 세라입니다.",
+                "default_exposure": True,
+                "status": "current",
+            },
+        }
+        documents = {
+            "d1": {
+                "document_id": "d1",
+                "source_id": "dnf_seria_shop",
+                "title": "상품 A 판매 안내",
+                "published_at": "2026-07-01",
+                "revision_id": "r1",
+                "status": "current",
+                "default_exposure": True,
+            }
+        }
+        temporal = {
+            "d1": {
+                "document_id": "d1",
+                "revision_id": "r1",
+                "validity_state": "current",
+                "retrieval_action_current": "allow",
+            }
+        }
+        units = build_evidence_units(
+            ["c1", "c2"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+        units_by_ref = {unit["evidence_ref"]: unit for unit in units}
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "price",
+                "status": "supported",
+                "value_type": "currency",
+                "value": "2,600 세라",
+                "evidence_refs": [
+                    _ref_containing(units_by_ref, "상품 A 상점 판매가 안내"),
+                    _ref_containing(
+                        units_by_ref,
+                        "다른 상품의 가격은 2,600 세라입니다.",
+                    ),
+                ],
+            },
+            requirement={
+                "requirement_id": "price",
+                "subject": "상품 A",
+                "relation": "상점 판매가",
+                "surface": "상점 판매가",
+                "value_type": "currency",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units_by_ref,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "unsupported")
+        self.assertIn(
+            "subject_relation_value_not_colocated",
+            audit["failure_reasons"],
+        )
 
     def test_boolean_model_value_cannot_override_negative_evidence(self) -> None:
         text = (
@@ -1522,6 +2473,118 @@ class TypedEvidenceRefTest(unittest.TestCase):
         self.assertEqual(decision["status"], "supported_exact")
         self.assertEqual(decision["answer"], "12,900 세라")
         self.assertEqual(audit["failure_reasons"], [])
+
+    def test_currency_sibling_values_require_a_question_qualifier(
+        self,
+    ) -> None:
+        text = (
+            "상의 클론 아바타 가격은 2,600 세라입니다.\n"
+            "상의 클론 아바타 가격은 15 골드 코인입니다."
+        )
+        chunks_by_id, units, _, _ = _units(
+            text,
+            title="상의 클론 아바타",
+        )
+        gold_coin_ref = _ref_containing(
+            units,
+            "상의 클론 아바타 가격은 15 골드 코인입니다.",
+        )
+        output = {
+            "requirement_id": "price",
+            "status": "supported",
+            "value_type": "currency",
+            "value": "15 골드 코인",
+            "evidence_refs": [gold_coin_ref],
+        }
+        requirement = {
+            "requirement_id": "price",
+            "subject": "상의 클론 아바타",
+            "relation": "price",
+            "value_type": "currency",
+        }
+
+        ambiguous_decision, ambiguous_audit = (
+            verify_typed_requirement_selection(
+                output,
+                requirement=requirement,
+                question_time_scope="current",
+                question_text="상의 클론 아바타 가격은 얼마야?",
+                evidence_units_by_ref=units,
+                chunks_by_id=chunks_by_id,
+                as_of="2026-07-22",
+            )
+        )
+        self.assertEqual(
+            ambiguous_decision["status"],
+            "unsupported",
+        )
+        self.assertIn(
+            "currency_qualifier_ambiguity_unresolved",
+            ambiguous_audit["failure_reasons"],
+        )
+        self.assertEqual(
+            ambiguous_audit["unresolved_currency_values"],
+            [{"amount": 2600, "unit": "세라"}],
+        )
+
+        qualified_decision, qualified_audit = (
+            verify_typed_requirement_selection(
+                output,
+                requirement=requirement,
+                question_time_scope="current",
+                question_text=(
+                    "상의 클론 아바타의 골드 코인 가격은 얼마야?"
+                ),
+                evidence_units_by_ref=units,
+                chunks_by_id=chunks_by_id,
+                as_of="2026-07-22",
+            )
+        )
+        self.assertEqual(
+            qualified_decision["status"],
+            "supported_exact",
+            qualified_audit,
+        )
+
+    def test_currency_ambiguity_uses_exact_table_subject_cells(
+        self,
+    ) -> None:
+        text = (
+            "| 은 금고 | 40 칸 | 400 세라 |\n"
+            "| 세련된 은 금고 | 56 칸 | 800 세라 |"
+        )
+        chunks_by_id, units, _, _ = _units(
+            text,
+            title="금고 업그레이드",
+        )
+        silver_ref = _ref_containing(
+            units,
+            "| 은 금고 | 40 칸 | 400 세라 |",
+        )
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "price",
+                "status": "supported",
+                "value_type": "currency",
+                "value": "400 세라",
+                "evidence_refs": [silver_ref],
+            },
+            requirement={
+                "requirement_id": "price",
+                "subject": "은 금고",
+                "relation": "price",
+                "value_type": "currency",
+            },
+            question_time_scope="current",
+            question_text="은 금고의 가격은 얼마야?",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks_by_id,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "supported_exact", audit)
+        self.assertEqual(audit["unresolved_currency_values"], [])
 
     def test_boolean_state_noun_passes_public_verifier(self) -> None:
         text = (
@@ -1823,14 +2886,14 @@ class TypedEvidenceRefTest(unittest.TestCase):
                 "output": {
                     "requirements": [
                         {
-                            "requirement_id": "price_value",
+                            "requirement_id": "r1",
                             "status": "supported",
                             "value_type": "price",
                             "value": "100 세라",
                             "evidence_refs": [evidence_ref],
                         },
                         {
-                            "requirement_id": "trade_value",
+                            "requirement_id": "r2",
                             "status": "supported",
                             "value_type": "trade_type",
                             "value": "계정귀속",
@@ -1861,9 +2924,9 @@ class TypedEvidenceRefTest(unittest.TestCase):
 
         self.assertEqual(len(calls), 1)
         self.assertEqual(rows[0]["model_call"]["call_count"], 1)
-        self.assertEqual(
-            rows[0]["model_call"]["calls"][0]["requirement_id_normalization"],
-            "positional_to_fixed",
+        self.assertNotIn(
+            "requirement_id_normalization",
+            rows[0]["model_call"]["calls"][0],
         )
         shadow = rows[0]["model_call"]["calls"][0]["sufficiency_shadow"]
         self.assertEqual(
@@ -1876,6 +2939,263 @@ class TypedEvidenceRefTest(unittest.TestCase):
             rows[0]["llm_score"]["all_evidence_spans_hit"], rows[0]
         )
         self.assertEqual(rows[0]["verified_output"]["response_mode"], "full_answer")
+
+    def test_single_explicit_ordinal_is_inferred_without_guessing_ambiguous_ones(
+        self,
+    ) -> None:
+        requirement = {
+            "requirement_id": "quantity",
+            "subject": "추첨 상품",
+            "relation": "수량",
+            "value_type": "number",
+        }
+
+        resolved, source, consistent = resolve_requirement_claim_contract(
+            requirement,
+            question_text="5주차 추첨 상품은 몇 개야?",
+        )
+        self.assertEqual(resolved["qualifiers"], {"week_index": 5})
+        self.assertEqual(source, "question_inferred")
+        self.assertTrue(consistent)
+
+        for question in (
+            "5주 동안 추첨 상품은 몇 개야?",
+            "1회차와 7회차 추첨 상품은 각각 몇 개야?",
+            "5주차와 5단계 보상은 각각 몇 개야?",
+        ):
+            with self.subTest(question=question):
+                unresolved, unresolved_source, unresolved_consistent = (
+                    resolve_requirement_claim_contract(
+                        requirement,
+                        question_text=question,
+                    )
+                )
+                self.assertNotIn("qualifiers", unresolved)
+                self.assertEqual(unresolved_source, "none")
+                self.assertTrue(unresolved_consistent)
+
+    def test_question_ordinal_is_visible_in_typed_prompt(self) -> None:
+        chunks, documents, temporal = _artifacts(
+            "그래픽카드는 4개입니다.",
+            title="[5주차] 추첨 당첨자 발표",
+        )
+        prompt, _ = build_typed_evidence_prompt(
+            question="5주차 그래픽카드는 몇 개야?",
+            requirements=[
+                {
+                    "requirement_id": "quantity",
+                    "subject": "그래픽카드",
+                    "relation": "수량",
+                    "value_type": "number",
+                }
+            ],
+            question_time_scope="current",
+            as_of="2026-07-22",
+            candidate_chunk_ids=["c1"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+
+        self.assertIn('"qualifiers":{"week_index":5}', prompt)
+
+    def test_same_relation_requirements_share_question_ordinal(self) -> None:
+        resolved = resolve_requirement_claim_contracts(
+            [
+                {
+                    "requirement_id": "reward_quantity",
+                    "relation": "보상 수량",
+                    "value_type": "number",
+                },
+                {
+                    "requirement_id": "bonus_quantity",
+                    "relation": "보상 수량",
+                    "value_type": "number",
+                },
+            ],
+            question_text="5주차 기본 보상과 추가 보상 수량은 각각 몇 개야?",
+        )
+
+        self.assertEqual(
+            [requirement["qualifiers"] for requirement in resolved],
+            [{"week_index": 5}, {"week_index": 5}],
+        )
+        for requirement in resolved:
+            rerun, source, consistent = resolve_requirement_claim_contract(
+                requirement,
+                question_text="5주차 기본 보상과 추가 보상 수량은 각각 몇 개야?",
+            )
+            self.assertEqual(rerun["qualifiers"], {"week_index": 5})
+            self.assertEqual(source, "question_inferred")
+            self.assertTrue(consistent)
+
+    def test_question_ordinal_does_not_leak_across_mixed_relations(self) -> None:
+        resolved = resolve_requirement_claim_contracts(
+            [
+                {
+                    "requirement_id": "reward_quantity",
+                    "relation": "보상 수량",
+                    "value_type": "number",
+                },
+                {
+                    "requirement_id": "shop_price",
+                    "relation": "상점 가격",
+                    "value_type": "currency",
+                },
+            ],
+            question_text="5주차 보상 수량과 상점 가격은 얼마야?",
+        )
+
+        self.assertNotIn("qualifiers", resolved[0])
+        self.assertNotIn("qualifiers", resolved[1])
+        rerun, source, consistent = resolve_requirement_claim_contract(
+            resolved[1],
+            question_text="5주차 보상 수량과 상점 가격은 얼마야?",
+        )
+        self.assertNotIn("qualifiers", rerun)
+        self.assertEqual(source, "none")
+        self.assertTrue(consistent)
+
+    def test_explicit_planner_ordinal_remains_in_mixed_relations(self) -> None:
+        resolved = resolve_requirement_claim_contracts(
+            [
+                {
+                    "requirement_id": "reward_quantity",
+                    "relation": "보상 수량",
+                    "value_type": "number",
+                    "qualifiers": {"week_index": 5},
+                },
+                {
+                    "requirement_id": "shop_price",
+                    "relation": "상점 가격",
+                    "value_type": "currency",
+                },
+            ],
+            question_text="5주차 보상 수량과 상점 가격은 얼마야?",
+        )
+
+        self.assertEqual(
+            resolved[0]["qualifiers"],
+            {"week_index": 5},
+        )
+        self.assertNotIn("qualifiers", resolved[1])
+        rerun, source, consistent = resolve_requirement_claim_contract(
+            resolved[0],
+            question_text="5주차 보상 수량과 상점 가격은 얼마야?",
+        )
+        self.assertEqual(rerun["qualifiers"], {"week_index": 5})
+        self.assertEqual(source, "explicit")
+        self.assertTrue(consistent)
+
+    def test_wrong_week_is_rejected_even_when_numeric_value_matches(self) -> None:
+        text = "그래픽카드는 4개입니다."
+        chunks, units, _, _ = _units(
+            text,
+            title="[1주차] 추첨 당첨자 발표",
+        )
+        evidence_ref = _ref_containing(units, text)
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "quantity",
+                "status": "supported",
+                "value_type": "number",
+                "value": 4,
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "quantity",
+                "subject": "그래픽카드",
+                "relation": "수량",
+                "value_type": "number",
+            },
+            question_time_scope="current",
+            question_text="5주차 그래픽카드는 몇 개야?",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "unsupported")
+        self.assertIn(
+            "qualifier_identity_mismatch",
+            audit["failure_reasons"],
+        )
+        self.assertEqual(audit["resolved_qualifiers"], {"week_index": 5})
+        self.assertEqual(
+            audit["qualifier_contract_source"],
+            "question_inferred",
+        )
+
+    def test_matching_week_passes_and_missing_week_is_unproven(self) -> None:
+        text = "그래픽카드는 4개입니다."
+        requirement = {
+            "requirement_id": "quantity",
+            "subject": "그래픽카드",
+            "relation": "수량",
+            "value_type": "number",
+        }
+        output = {
+            "requirement_id": "quantity",
+            "status": "supported",
+            "value_type": "number",
+            "value": 4,
+            "evidence_refs": ["E1"],
+        }
+
+        matching_chunks, matching_units, _, _ = _units(
+            text,
+            title="[5주차] 추첨 당첨자 발표",
+        )
+        matching_output = dict(output)
+        matching_output["evidence_refs"] = [
+            _ref_containing(matching_units, text)
+        ]
+        matching_decision, matching_audit = (
+            verify_typed_requirement_selection(
+                matching_output,
+                requirement=requirement,
+                question_time_scope="current",
+                question_text="5주차 그래픽카드는 몇 개야?",
+                evidence_units_by_ref=matching_units,
+                chunks_by_id=matching_chunks,
+                as_of="2026-07-22",
+            )
+        )
+        self.assertEqual(
+            matching_decision["status"],
+            "supported_exact",
+            matching_audit,
+        )
+        self.assertEqual(
+            matching_audit["qualifier_validation_state"],
+            "matched",
+        )
+
+        unproven_chunks, unproven_units, _, _ = _units(
+            text,
+            title="추첨 당첨자 발표",
+        )
+        unproven_output = dict(output)
+        unproven_output["evidence_refs"] = [
+            _ref_containing(unproven_units, text)
+        ]
+        unproven_decision, unproven_audit = (
+            verify_typed_requirement_selection(
+                unproven_output,
+                requirement=requirement,
+                question_time_scope="current",
+                question_text="5주차 그래픽카드는 몇 개야?",
+                evidence_units_by_ref=unproven_units,
+                chunks_by_id=unproven_chunks,
+                as_of="2026-07-22",
+            )
+        )
+        self.assertEqual(unproven_decision["status"], "unsupported")
+        self.assertIn(
+            "qualifier_identity_unproven",
+            unproven_audit["failure_reasons"],
+        )
 
 
 if __name__ == "__main__":

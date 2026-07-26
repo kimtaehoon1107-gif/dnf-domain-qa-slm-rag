@@ -483,6 +483,13 @@ class GroundedLlmAnswerTest(unittest.TestCase):
         self.assertEqual(decision["status"], "supported_exact")
         self.assertEqual(decision["citations"][0]["text"], "상품 A의 가격은 100 세라")
         self.assertEqual(audit["matching_table_row_ids"], ["target"])
+        self.assertEqual(
+            audit["relation_validation_state"],
+            "unvalidated",
+        )
+        self.assertTrue(
+            audit["would_reject_if_relation_fail_closed"]
+        )
 
     def test_table_verifier_normalizes_datetime_to_exact_row_value(self) -> None:
         chunks, documents, temporal = _fixtures()

@@ -8,6 +8,13 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from src.v3.typed_evidence_ref import (
+    qualifier_identity_state,
+    relation_contract_state,
+    resolve_requirement_claim_contract,
+    resolve_requirement_claim_contracts,
+)
+
 
 SYSTEM_INSTRUCTIONS = """당신은 던전앤파이터 공식 문서 근거만 사용하는 QA 모델입니다.
 질문에서 직접 요구한 답변 항목을 질문 순서대로 빠짐없이 분리하세요.
@@ -410,6 +417,10 @@ def build_requirement_prompt(
     temporal_by_document: dict[str, dict[str, Any]],
     table_rows_by_chunk: dict[str, list[dict[str, Any]]] | None = None,
 ) -> str:
+    requirement = resolve_requirement_claim_contract(
+        requirement,
+        question_text=question,
+    )[0]
     selected_rows = select_table_rows_for_requirement(
         table_rows_by_chunk or {}, requirement
     )
@@ -456,6 +467,10 @@ def build_batched_requirement_prompt(
     table_rows_by_chunk: dict[str, list[dict[str, Any]]] | None = None,
     include_table_rows: bool,
 ) -> str:
+    requirements = resolve_requirement_claim_contracts(
+        requirements,
+        question_text=question,
+    )
     candidates = _candidate_payload(
         candidate_chunk_ids,
         chunks_by_id=chunks_by_id,
@@ -753,6 +768,7 @@ def _verify_parsed_requirement_selection(
     *,
     requirement: dict[str, Any],
     question_time_scope: str,
+    question_text: str,
     candidate_chunk_ids: list[str],
     chunks_by_id: dict[str, dict[str, Any]],
     documents_by_id: dict[str, dict[str, Any]],
@@ -760,6 +776,14 @@ def _verify_parsed_requirement_selection(
     table_rows_by_chunk: dict[str, list[dict[str, Any]]] | None = None,
     allow_table_rows: bool,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
+    (
+        requirement,
+        qualifier_contract_source,
+        qualifier_question_consistent,
+    ) = resolve_requirement_claim_contract(
+        requirement,
+        question_text=question_text,
+    )
     candidate_ref_to_chunk_id = {
         str(index): chunk_id for index, chunk_id in enumerate(candidate_chunk_ids, 1)
     }
@@ -768,6 +792,7 @@ def _verify_parsed_requirement_selection(
     cited_table_rows = []
     resolved_answer = parsed.answer
     answer_value_source = "model_answer" if parsed.status == "supported" else None
+    qualifier_validation_state = "not_evaluated"
     selected_rows = (
         select_table_rows_for_requirement(table_rows_by_chunk or {}, requirement)
         if allow_table_rows
@@ -862,6 +887,30 @@ def _verify_parsed_requirement_selection(
                     if len(unique_table_values) == 1:
                         resolved_answer = unique_table_values[0]
                         answer_value_source = "selected_table_fact"
+        qualifier_records = []
+        for citation in citations:
+            document = documents_by_id.get(citation["parent_document_id"])
+            qualifier_records.append(
+                {
+                    **citation,
+                    "title": document.get("title", "") if document else "",
+                    "context_text": "",
+                }
+            )
+        qualifier_validation_state = qualifier_identity_state(
+            requirement,
+            qualifier_records,
+        )
+        if qualifier_contract_source == "invalid":
+            failures.append("qualifier_contract_invalid")
+        elif not qualifier_question_consistent:
+            failures.append("qualifier_question_contract_conflict")
+        if qualifier_validation_state == "mismatch":
+            failures.append("qualifier_identity_mismatch")
+        elif qualifier_validation_state == "unproven":
+            failures.append("qualifier_identity_unproven")
+        elif qualifier_validation_state == "contract_invalid":
+            failures.append("qualifier_contract_invalid")
     elif parsed.answer.strip() or parsed.evidence:
         failures.append("unsupported_payload_discarded")
     exposed = parsed.status == "supported" and bool(citations) and not failures
@@ -877,8 +926,18 @@ def _verify_parsed_requirement_selection(
         "model_status": parsed.status,
         "exposed_status": decision["status"],
         "failure_reasons": failures,
+        "relation_validation_state": relation_contract_state(
+            requirement
+        ),
+        "would_reject_if_relation_fail_closed": bool(
+            parsed.status == "supported"
+            and relation_contract_state(requirement) == "unvalidated"
+        ),
         "matching_table_row_ids": [row["row_id"] for row in cited_table_rows],
         "answer_value_source": answer_value_source,
+        "resolved_qualifiers": requirement.get("qualifiers") or {},
+        "qualifier_contract_source": qualifier_contract_source,
+        "qualifier_validation_state": qualifier_validation_state,
     }
     return decision, audit
 
@@ -888,6 +947,7 @@ def verify_requirement_selection(
     *,
     requirement: dict[str, Any],
     question_time_scope: str,
+    question_text: str = "",
     candidate_chunk_ids: list[str],
     chunks_by_id: dict[str, dict[str, Any]],
     documents_by_id: dict[str, dict[str, Any]],
@@ -903,6 +963,7 @@ def verify_requirement_selection(
         parsed,
         requirement=requirement,
         question_time_scope=question_time_scope,
+        question_text=question_text,
         candidate_chunk_ids=candidate_chunk_ids,
         chunks_by_id=chunks_by_id,
         documents_by_id=documents_by_id,
@@ -917,6 +978,7 @@ def verify_non_table_requirement_selection(
     *,
     requirement: dict[str, Any],
     question_time_scope: str,
+    question_text: str = "",
     candidate_chunk_ids: list[str],
     chunks_by_id: dict[str, dict[str, Any]],
     documents_by_id: dict[str, dict[str, Any]],
@@ -931,6 +993,7 @@ def verify_non_table_requirement_selection(
         parsed,
         requirement=requirement,
         question_time_scope=question_time_scope,
+        question_text=question_text,
         candidate_chunk_ids=candidate_chunk_ids,
         chunks_by_id=chunks_by_id,
         documents_by_id=documents_by_id,
