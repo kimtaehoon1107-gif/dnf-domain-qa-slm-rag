@@ -1,0 +1,397 @@
+{
+  "evaluation_role": "post_hoc_diagnostic_only_not_a_generalization_score",
+  "headline_replacement_allowed": false,
+  "sealed_result_preserved": {
+    "gold_value_complete": {
+      "successes": 44,
+      "total": 64
+    },
+    "source_path": "outputs/v3/diagnostics/typed_evidence_ref_requirement_evidence_reduction_full64_20260726.jsonl",
+    "source_sha256": "3055c2e72750f99bdb8b9bcce7df69f855f60e4ec3aabaa551efffd917a40c69"
+  },
+  "diagnostic_replay": {
+    "new_model_calls": 0,
+    "retrieval_reexecuted": false,
+    "stored_candidates_reused": true,
+    "stored_model_outputs_reused": true,
+    "scorer_version": "typed-evidence-ref-generalization-scorer-v2",
+    "normalization_contract": {
+      "version": "typed-evidence-ref-generalization-normalization-v2",
+      "rules": [
+        "Whitespace, punctuation, and Korean zero-padded month/day variants are normalized.",
+        "Korean and ISO dates are compared as YYYY-MM-DD; month/day-only forms use the frozen as_of year.",
+        "06시, 6시, and 06:00 are compared as 06:00; 오전/오후 are converted to 24-hour time.",
+        "Currency commas, Korean 만/억 scales, domain currency units, and unit-first count forms are normalized to integer amount plus unit.",
+        "Percentages and plain numbers are compared numerically.",
+        "Boolean answers normalize explicit true/false and Korean positive/negative actions while protecting 불가 state nouns.",
+        "Table-row and prose citations are equivalent only when the normalized gold value is present and the citation comes from an approved evidence chunk.",
+        "For text, enum, entity, and entity_list values, a directly cited pre-approved evidence unit is the canonical gold when required_values is a human-authored summary of that unit.",
+        "No semantic paraphrase credit is added beyond the typed normalizations above."
+      ]
+    },
+    "gold_value_complete": {
+      "successes": 43,
+      "total": 64
+    },
+    "score_delta": -1,
+    "recovered_slots": [],
+    "regressed_slots": [
+      47
+    ],
+    "changed_slot_count": 2,
+    "score_summary": {
+      "scorer_version": "typed-evidence-ref-generalization-scorer-v2",
+      "normalization_contract": {
+        "version": "typed-evidence-ref-generalization-normalization-v2",
+        "rules": [
+          "Whitespace, punctuation, and Korean zero-padded month/day variants are normalized.",
+          "Korean and ISO dates are compared as YYYY-MM-DD; month/day-only forms use the frozen as_of year.",
+          "06시, 6시, and 06:00 are compared as 06:00; 오전/오후 are converted to 24-hour time.",
+          "Currency commas, Korean 만/억 scales, domain currency units, and unit-first count forms are normalized to integer amount plus unit.",
+          "Percentages and plain numbers are compared numerically.",
+          "Boolean answers normalize explicit true/false and Korean positive/negative actions while protecting 불가 state nouns.",
+          "Table-row and prose citations are equivalent only when the normalized gold value is present and the citation comes from an approved evidence chunk.",
+          "For text, enum, entity, and entity_list values, a directly cited pre-approved evidence unit is the canonical gold when required_values is a human-authored summary of that unit.",
+          "No semantic paraphrase credit is added beyond the typed normalizations above."
+        ]
+      },
+      "fixed_denominator": 64,
+      "gold_value_complete": {
+        "successes": 43,
+        "total": 64
+      },
+      "outcomes": {
+        "correct": 43,
+        "incorrect": 9,
+        "no_response": 12
+      },
+      "all_evidence_spans_hit": {
+        "successes": 34,
+        "total": 64
+      },
+      "candidate_all_gold_covered": {
+        "successes": 54,
+        "total": 64
+      },
+      "honest_unsupported": {
+        "slots": [
+          7,
+          15,
+          23,
+          31,
+          39,
+          47,
+          55,
+          63
+        ],
+        "correct_abstentions": 7,
+        "false_full": 1,
+        "total": 8
+      },
+      "generation_error_count": 0,
+      "all_citation_slices_exact": true,
+      "latency_ms": {
+        "total": 345981.503,
+        "mean": 5405.961,
+        "p50": 4959.165,
+        "p95": 6875.593
+      },
+      "usage": {
+        "input_tokens": 111191,
+        "output_tokens": 5603,
+        "total_tokens": 116794
+      },
+      "failure_slots": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        11,
+        12,
+        13,
+        20,
+        23,
+        25,
+        30,
+        31,
+        34,
+        35,
+        38,
+        43,
+        47,
+        51,
+        60,
+        62
+      ],
+      "failure_breakdown": {
+        "generator_value_selection": 8,
+        "retrieval_missing_gold": 10,
+        "unsupported_false_full": 1,
+        "verifier_overreject": 5
+      },
+      "failure_cases": [
+        {
+          "slot_ordinal": 2,
+          "failure_stage": "verifier_overreject",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 3,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 4,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 5,
+          "failure_stage": "verifier_overreject",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 6,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 7,
+          "failure_stage": "verifier_overreject",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 8,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "correct",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 11,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 12,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 13,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 20,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 23,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 25,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 30,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 31,
+          "failure_stage": "unsupported_false_full",
+          "outcome": "correct",
+          "false_full": true
+        },
+        {
+          "slot_ordinal": 34,
+          "failure_stage": "verifier_overreject",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 35,
+          "failure_stage": "verifier_overreject",
+          "outcome": "incorrect",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 38,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 41,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "correct",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 43,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 47,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 51,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 60,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        },
+        {
+          "slot_ordinal": 62,
+          "failure_stage": "retrieval_missing_gold",
+          "outcome": "no_response",
+          "false_full": false
+        }
+      ],
+      "gates": {
+        "generation_error_zero": true,
+        "honest_unsupported_false_full_zero": false
+      }
+    }
+  },
+  "changes": [
+    {
+      "slot_ordinal": 47,
+      "candidate_id": "typed_generalization_candidate_sha256_693dbf1b8b65878364427dea29e9f618fe7f32a6316daaf878bf184861787dce",
+      "question_text": "게임 이용제한에 이의가 있으면 어디로 신청하고, 처리 기한은 정확히 며칠이야?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "retrieval_missing_gold"
+      },
+      "after": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "retrieval_missing_gold"
+      },
+      "requirements": [
+        {
+          "requirement_id": "appeal_channel",
+          "status": {
+            "before": "supported_exact",
+            "after": "unsupported"
+          },
+          "answer": {
+            "before": "마이핀과 함께 고객센터로 1:1 문의 해주시면, 확인 후 안내해 드리겠습니다.",
+            "after": ""
+          },
+          "failure_reasons": {
+            "before": [],
+            "after": [
+              "evidence_ref_not_in_candidates",
+              "typed_value_not_supported_by_evidence",
+              "subject_not_supported_by_evidence",
+              "subject_relation_value_not_colocated"
+            ]
+          },
+          "normalized_value": {
+            "before": "마이핀과 함께 고객센터로 1:1 문의 해주시면, 확인 후 안내해 드리겠습니다.",
+            "after": ""
+          }
+        }
+      ]
+    },
+    {
+      "slot_ordinal": 62,
+      "candidate_id": "typed_generalization_candidate_sha256_d5e9278ef4bf9e8657eef9e210d53f5e14a291b50260ba4b62ace0b30323de87",
+      "question_text": "6월 이달의 아이템은 언제 일괄 삭제됐어?",
+      "before": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "retrieval_missing_gold"
+      },
+      "after": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "retrieval_missing_gold"
+      },
+      "requirements": [
+        {
+          "requirement_id": "deletion_at",
+          "status": {
+            "before": "unsupported",
+            "after": "unsupported"
+          },
+          "answer": {
+            "before": "",
+            "after": ""
+          },
+          "failure_reasons": {
+            "before": [
+              "subject_identity_conflict"
+            ],
+            "after": [
+              "subject_identity_conflict",
+              "monthly_record_binding_failed"
+            ]
+          },
+          "normalized_value": {
+            "before": "2026-08-13T06:00",
+            "after": "2026-08-13T06:00"
+          }
+        }
+      ]
+    }
+  ],
+  "inputs": {
+    "sealed": {
+      "path": "data/v3/evaluation/typed_evidence_ref_generalization_64_sealed_e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597.jsonl",
+      "sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "documents": {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    "temporal": {
+      "path": "data/v3/temporal/global_temporal_overlay_v3.2_f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317.jsonl",
+      "sha256": "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317"
+    },
+    "table_facts": {
+      "path": "data/v3/structured/table_atomic_facts_v3.2_1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a.jsonl",
+      "sha256": "1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a"
+    }
+  },
+  "output": "outputs/v3/diagnostics/typed_evidence_ref_requirement_evidence_reduction_binding_verifier_replay_v2_20260727.jsonl"
+}

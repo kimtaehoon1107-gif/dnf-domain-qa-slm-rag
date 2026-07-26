@@ -1156,6 +1156,46 @@ _YEAR_IDENTITY_PATTERN = re.compile(r"(?<!\d)(20\d{2})\s*년")
 _MONTH_IDENTITY_PATTERN = re.compile(
     r"(?<!\d)(1[0-2]|0?[1-9])\s*월"
 )
+_MONTHLY_RECORD_IDENTITY_PATTERN = re.compile(
+    r"(?:\[(?P<bracket_month>1[0-2]|0?[1-9])\s*월(?:[^\]]*)\]"
+    r"|(?<!\d)(?P<label_month>1[0-2]|0?[1-9])\s*월\s*이달의\s*아이템)"
+)
+_POLICY_IDENTITIES = (
+    "세라이용약관",
+    "모바일이용약관",
+    "서비스이용약관",
+    "운영정책",
+)
+_SHADOW_REGISTERED_RELATION_MARKERS = (
+    "effectiveat",
+    "적용일",
+    "적용시점",
+    "deletionat",
+    "삭제일",
+    "삭제시각",
+    "salestart",
+    "saleend",
+    "saleperiod",
+    "판매시작",
+    "판매종료",
+    "판매기간",
+    "eventstart",
+    "eventend",
+    "eventperiod",
+    "이벤트시작",
+    "이벤트종료",
+    "이벤트기간",
+    "publishedat",
+    "게시일",
+    "게시시각",
+    "revisioncutoff",
+    "개정기준일",
+    "shopprice",
+    "상점판매가",
+    "tradetype",
+    "거래타입",
+    "거래유형",
+)
 
 
 def _subject_identity_conflicts(
@@ -1191,6 +1231,168 @@ def _subject_identity_conflicts(
     return False
 
 
+def _policy_requirement(requirement: dict[str, Any]) -> bool:
+    subject = _compact(requirement.get("subject", ""))
+    return (
+        _required_temporal_role(requirement)
+        in {"effective_at", "revision_cutoff"}
+        and any(identity in subject for identity in _POLICY_IDENTITIES)
+    )
+
+
+def _policy_subject_identity_supported(
+    requirement: dict[str, Any],
+    units: list[dict[str, Any]],
+) -> bool:
+    if not _policy_requirement(requirement):
+        return True
+    requested = {
+        identity
+        for identity in _POLICY_IDENTITIES
+        if identity in _compact(requirement.get("subject", ""))
+    }
+    evidence_identity = _compact(
+        " ".join(
+            " ".join(
+                filter(
+                    None,
+                    (
+                        unit.get("context_text", ""),
+                        unit.get("text", ""),
+                        unit.get("title", ""),
+                    ),
+                )
+            )
+            for unit in units
+        )
+    )
+    return bool(requested) and requested <= {
+        identity
+        for identity in _POLICY_IDENTITIES
+        if identity in evidence_identity
+    }
+
+
+def _policy_question_year_supported(
+    requirement: dict[str, Any],
+    units: list[dict[str, Any]],
+    *,
+    question_text: str,
+) -> bool:
+    if not _policy_requirement(requirement):
+        return True
+    requested_years = set(_YEAR_IDENTITY_PATTERN.findall(question_text))
+    if not requested_years:
+        return True
+    evidence_identity = " ".join(
+        str(value or "")
+        for unit in units
+        for value in (
+            unit.get("context_text"),
+            unit.get("text"),
+            unit.get("title"),
+            unit.get("published_at"),
+            unit.get("valid_from"),
+        )
+    )
+    return bool(requested_years & set(re.findall(r"20\d{2}", evidence_identity)))
+
+
+def _policy_revision_effective_date_supported(
+    requirement: dict[str, Any],
+    value: TypedValue,
+    units: list[dict[str, Any]],
+    *,
+    as_of: str,
+) -> bool:
+    if not _policy_requirement(requirement):
+        return True
+    policy_units = [
+        unit
+        for unit in units
+        if unit.get("source_id") == "dnf_account_policy"
+    ]
+    if not policy_units:
+        return True
+    value_dates = _date_values(str(value), as_of)
+    active_revision_dates = {
+        date_value
+        for unit in policy_units
+        for date_value in _date_values(str(unit.get("valid_from") or ""), as_of)
+    }
+    return bool(active_revision_dates) and value_dates <= active_revision_dates
+
+
+def _monthly_requirement_month(
+    requirement: dict[str, Any],
+) -> str | None:
+    subject = str(requirement.get("subject") or "")
+    if "이달의아이템" not in _compact(subject):
+        return None
+    match = _MONTH_IDENTITY_PATTERN.search(subject)
+    return str(int(match.group(1))) if match else None
+
+
+def _monthly_record_binding_supported(
+    requirement: dict[str, Any],
+    value: TypedValue,
+    units: list[dict[str, Any]],
+    *,
+    chunks_by_id: dict[str, dict[str, Any]],
+    as_of: str,
+) -> bool:
+    requested_month = _monthly_requirement_month(requirement)
+    if requested_month is None:
+        return True
+    for unit in units:
+        chunk = chunks_by_id.get(unit["chunk_id"])
+        if chunk is None:
+            continue
+        source_text = chunk["display_text"]
+        local_start = max(0, unit["start_char"] - 700)
+        local_end = min(len(source_text), unit["end_char"] + 80)
+        identity_window = source_text[local_start:local_end]
+        month_matches = list(
+            _MONTHLY_RECORD_IDENTITY_PATTERN.finditer(identity_window)
+        )
+        if not month_matches:
+            continue
+        unit_start = unit["start_char"] - local_start
+        unit_end = unit["end_char"] - local_start
+
+        def distance(match: re.Match[str]) -> int:
+            if match.end() < unit_start:
+                return unit_start - match.end()
+            if match.start() > unit_end:
+                return match.start() - unit_end
+            return 0
+
+        nearest_match = min(month_matches, key=distance)
+        observed_month = (
+            nearest_match.group("bracket_month")
+            or nearest_match.group("label_month")
+        )
+        if str(int(observed_month)) != requested_month:
+            continue
+        local_text = identity_window
+        if "이달의아이템" not in _compact(local_text):
+            continue
+        if not _relation_supported(requirement, local_text):
+            continue
+        if (
+            requirement.get("value_type") in STRUCTURED_VALUE_TYPES
+            and not _value_supported(
+                str(requirement.get("value_type")),
+                value,
+                local_text,
+                as_of=as_of,
+            )
+        ):
+            continue
+        return True
+    return False
+
+
 def _relation_supported(
     requirement: dict[str, Any],
     evidence_text: str,
@@ -1221,6 +1423,108 @@ def _selected_evidence_groups(
         if current:
             groups.append(current)
     return groups
+
+
+def _shadow_relation_is_registered(
+    requirement: dict[str, Any],
+) -> bool:
+    relation = _compact(requirement.get("relation", ""))
+    return (
+        _required_temporal_role(requirement) is not None
+        or any(
+            marker in relation
+            for marker in _SHADOW_REGISTERED_RELATION_MARKERS
+        )
+    )
+
+
+def _group_has_value_shape(
+    group: list[dict[str, Any]],
+    *,
+    value_type: str,
+    as_of: str,
+) -> bool:
+    text = "\n".join(unit["text"] for unit in group)
+    if value_type in {"date", "datetime", "date_range"}:
+        return bool(_date_values(text, as_of))
+    if value_type in {"price", "currency"}:
+        return bool(currency_values(text))
+    if value_type == "percentage":
+        return bool(_percentage_values(text))
+    if value_type == "number":
+        return bool(re.search(r"\d", text))
+    if value_type == "boolean":
+        return bool(boolean_evidence(text))
+    return bool(_content_tokens(text))
+
+
+def assess_requirement_evidence_sufficiency_shadow(
+    requirement: dict[str, Any],
+    *,
+    evidence_units_by_ref: dict[str, dict[str, Any]],
+    as_of: str,
+) -> dict[str, Any]:
+    """Report whether one visible evidence group satisfies a narrow gate."""
+
+    if not _shadow_relation_is_registered(requirement):
+        return {
+            "requirement_id": requirement["requirement_id"],
+            "scope": "model_visible_evidence",
+            "assessable": False,
+            "would_trigger": False,
+            "reason": "unregistered_relation_excluded",
+            "supporting_group_refs": [],
+        }
+    required_role = _required_temporal_role(requirement)
+    for group in _selected_evidence_groups(
+        list(evidence_units_by_ref.values())
+    ):
+        semantic_text = "\n".join(
+            "\n".join(
+                filter(
+                    None,
+                    (unit.get("context_text", ""), unit["text"]),
+                )
+            )
+            for unit in group
+        )
+        titles = " ".join(unit["title"] for unit in group)
+        if not _subject_supported(requirement, semantic_text, titles):
+            continue
+        if not _relation_supported(requirement, semantic_text, titles):
+            continue
+        if required_role is not None and not any(
+            _temporal_role_matches(
+                required_role,
+                _unit_temporal_roles(unit, as_of=as_of),
+            )
+            for unit in group
+        ):
+            continue
+        if not _group_has_value_shape(
+            group,
+            value_type=str(requirement.get("value_type") or ""),
+            as_of=as_of,
+        ):
+            continue
+        return {
+            "requirement_id": requirement["requirement_id"],
+            "scope": "model_visible_evidence",
+            "assessable": True,
+            "would_trigger": False,
+            "reason": "same_group_support_found",
+            "supporting_group_refs": [
+                unit["evidence_ref"] for unit in group
+            ],
+        }
+    return {
+        "requirement_id": requirement["requirement_id"],
+        "scope": "model_visible_evidence",
+        "assessable": True,
+        "would_trigger": True,
+        "reason": "same_group_support_missing",
+        "supporting_group_refs": [],
+    }
 
 
 def _boolean_supported_by_relation_group(
@@ -1481,6 +1785,7 @@ def verify_typed_requirement_selection(
     *,
     requirement: dict[str, Any],
     question_time_scope: str,
+    question_text: str = "",
     evidence_units_by_ref: dict[str, dict[str, Any]],
     chunks_by_id: dict[str, dict[str, Any]],
     as_of: str,
@@ -1635,6 +1940,30 @@ def verify_typed_requirement_selection(
             selected_units,
             as_of=as_of,
         )
+        policy_identity_supported = _policy_subject_identity_supported(
+            requirement,
+            selected_units,
+        )
+        policy_question_year_supported = _policy_question_year_supported(
+            requirement,
+            selected_units,
+            question_text=question_text,
+        )
+        policy_revision_date_supported = (
+            _policy_revision_effective_date_supported(
+                requirement,
+                normalized_value,
+                selected_units,
+                as_of=as_of,
+            )
+        )
+        monthly_record_supported = _monthly_record_binding_supported(
+            requirement,
+            normalized_value,
+            selected_units,
+            chunks_by_id=chunks_by_id,
+            as_of=as_of,
+        )
         answer_value_source = "model_typed_value"
         if normalized_value_type not in STRUCTURED_VALUE_TYPES:
             relevant_units = []
@@ -1710,6 +2039,14 @@ def verify_typed_requirement_selection(
             failures.append("relation_not_supported_by_evidence")
         if not temporal_supported:
             failures.append("temporal_role_mismatch")
+        if not policy_identity_supported:
+            failures.append("policy_subject_identity_mismatch")
+        if not policy_question_year_supported:
+            failures.append("policy_question_year_mismatch")
+        if not policy_revision_date_supported:
+            failures.append("policy_revision_effective_date_mismatch")
+        if not monthly_record_supported:
+            failures.append("monthly_record_binding_failed")
         colocated = value_supported if normalized_value_type == "boolean" else False
         if normalized_value_type != "boolean":
             grouped_units: dict[str, list[dict[str, Any]]] = defaultdict(list)

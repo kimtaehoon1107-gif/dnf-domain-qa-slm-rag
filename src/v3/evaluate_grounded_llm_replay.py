@@ -27,6 +27,7 @@ from src.v3.generate_grounded_llm_answer import (
     verify_requirement_selection,
 )
 from src.v3.typed_evidence_ref import (
+    assess_requirement_evidence_sufficiency_shadow,
     build_typed_evidence_prompt,
     generate_typed_evidence_output,
     verify_typed_requirement_selection,
@@ -546,7 +547,16 @@ def run_fixed_requirement_replay(
                         documents_by_id=documents_by_id,
                         temporal_by_document=temporal_by_document,
                     )
+                    sufficiency_shadow = [
+                        assess_requirement_evidence_sufficiency_shadow(
+                            requirement,
+                            evidence_units_by_ref=typed_units_by_ref,
+                            as_of=as_of,
+                        )
+                        for requirement in grouped_requirements
+                    ]
                 else:
+                    sufficiency_shadow = []
                     prompt = build_batched_requirement_prompt(
                         question=reviewed["question_text"],
                         requirements=grouped_requirements,
@@ -576,6 +586,8 @@ def run_fixed_requirement_replay(
                         reasoning_effort=reasoning_effort,
                         timeout_seconds=timeout_seconds,
                     )
+                    if sufficiency_shadow:
+                        call["sufficiency_shadow"] = sufficiency_shadow
                     selections = call["output"]["requirements"]
                     selection_ids = [
                         selection["requirement_id"] for selection in selections
@@ -641,6 +653,7 @@ def run_fixed_requirement_replay(
                                 },
                                 requirement=requirement,
                                 question_time_scope=reviewed["time_scope"],
+                                question_text=reviewed["question_text"],
                                 evidence_units_by_ref=typed_units_by_ref,
                                 chunks_by_id=chunks_by_id,
                                 as_of=as_of,
@@ -675,6 +688,8 @@ def run_fixed_requirement_replay(
                         "batch_protocol_error": error,
                         "error": error,
                     }
+                    if sufficiency_shadow:
+                        call["sufficiency_shadow"] = sufficiency_shadow
                     for requirement_index in indices:
                         requirement = reviewed["requirements"][requirement_index]
                         decisions[requirement_index] = {

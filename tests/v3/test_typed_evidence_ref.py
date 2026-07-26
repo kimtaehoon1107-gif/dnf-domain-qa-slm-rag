@@ -8,6 +8,7 @@ from src.v3.evaluate_grounded_llm_replay import run_fixed_requirement_replay
 from src.v3.typed_evidence_ref import (
     _local_ollama_request_chars,
     _value_supported,
+    assess_requirement_evidence_sufficiency_shadow,
     build_evidence_units,
     build_typed_evidence_prompt,
     generate_typed_evidence_output,
@@ -236,12 +237,18 @@ class TypedEvidenceRefTest(unittest.TestCase):
         )
 
     def test_matching_month_identity_is_allowed(self) -> None:
-        text = "특별 아이템은 트로피컬 바캉스 패키지입니다."
+        text = (
+            "8월 이달의 아이템\n"
+            "특별 아이템은 트로피컬 바캉스 패키지입니다."
+        )
         chunks_by_id, units, _, _ = _units(
             text,
             title="8월 이달의 아이템",
         )
-        evidence_ref = _ref_containing(units, text)
+        evidence_ref = _ref_containing(
+            units,
+            "특별 아이템은 트로피컬 바캉스 패키지입니다.",
+        )
 
         decision, audit = verify_typed_requirement_selection(
             {
@@ -258,6 +265,126 @@ class TypedEvidenceRefTest(unittest.TestCase):
                 "value_type": "entity",
             },
             question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks_by_id,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "supported_exact", audit)
+
+    def test_monthly_value_before_the_month_record_is_rejected(self) -> None:
+        text = (
+            "# 특별 아이템\n"
+            "| 아이템명 | 무기 강화권 상자 |\n"
+            "| 상점판매가격 | 2,000만 골드 |\n"
+            "* 이 표는 별도의 특별 아이템 정보입니다. "
+            "이달의 아이템 목록과는 다른 레코드입니다. "
+            "관련 주의사항과 이용 방법을 확인해 주세요.\n"
+            "7월 이달의 아이템"
+        )
+        chunks_by_id, units, _, _ = _units(
+            text,
+            title="7월 이달의 아이템",
+        )
+        evidence_ref = _ref_containing(
+            units,
+            "| 상점판매가격 | 2,000만 골드 |",
+        )
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "shop_price",
+                "status": "supported",
+                "value_type": "currency",
+                "value": "2,000만 골드",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "shop_price",
+                "subject": "7월 이달의 아이템",
+                "relation": "shop_price",
+                "value_type": "currency",
+            },
+            question_time_scope="current",
+            question_text="7월 이달의 아이템 상점 판매가는 얼마야?",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks_by_id,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "unsupported")
+        self.assertIn(
+            "monthly_record_binding_failed",
+            audit["failure_reasons"],
+        )
+
+    def test_monthly_value_after_the_month_record_is_allowed(self) -> None:
+        text = (
+            "### 이달의 아이템\n"
+            "[7월]스페셜 클론 레어 아바타 풀세트 상자\n"
+            "상점판매가\n"
+            "4,000만 골드"
+        )
+        chunks_by_id, units, _, _ = _units(
+            text,
+            title="이달의 아이템",
+        )
+        evidence_ref = _ref_containing(units, "4,000만 골드")
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "shop_price",
+                "status": "supported",
+                "value_type": "currency",
+                "value": "4,000만 골드",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "shop_price",
+                "subject": "7월 이달의 아이템",
+                "relation": "shop_price",
+                "value_type": "currency",
+            },
+            question_time_scope="current",
+            question_text="7월 이달의 아이템 상점 판매가는 얼마야?",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks_by_id,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "supported_exact", audit)
+
+    def test_monthly_sale_period_can_precede_the_month_item_label(self) -> None:
+        text = (
+            "### 이달의 아이템\n"
+            "판매기간: 06.25 ~ 07.30\n"
+            "[7월]스페셜 클론 레어 아바타 풀세트 상자"
+        )
+        chunks_by_id, units, _, _ = _units(
+            text,
+            title="이달의 아이템",
+        )
+        evidence_ref = _ref_containing(
+            units,
+            "판매기간: 06.25 ~ 07.30",
+        )
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "sale_period",
+                "status": "supported",
+                "value_type": "date_range",
+                "value": "2026-06-25/2026-07-30",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "sale_period",
+                "subject": "7월 이달의 아이템",
+                "relation": "sale_period",
+                "value_type": "date_range",
+            },
+            question_time_scope="current",
+            question_text="7월 이달의 아이템 판매 기간은 언제야?",
             evidence_units_by_ref=units,
             chunks_by_id=chunks_by_id,
             as_of="2026-07-22",
@@ -557,6 +684,53 @@ class TypedEvidenceRefTest(unittest.TestCase):
             [unit["evidence_ref"] for unit in selected],
             ["E2"],
         )
+
+    def test_sufficiency_shadow_requires_one_complete_evidence_group(
+        self,
+    ) -> None:
+        text = (
+            "### 이달의 아이템\n"
+            "[7월]스페셜 클론 레어 아바타 풀세트 상자\n"
+            "상점판매가\n"
+            "4,000만 골드"
+        )
+        _, units, _, _ = _units(text, title="이달의 아이템")
+
+        result = assess_requirement_evidence_sufficiency_shadow(
+            {
+                "requirement_id": "shop_price",
+                "subject": "7월 이달의 아이템",
+                "relation": "shop_price",
+                "value_type": "currency",
+            },
+            evidence_units_by_ref=units,
+            as_of="2026-07-22",
+        )
+
+        self.assertTrue(result["assessable"])
+        self.assertFalse(result["would_trigger"])
+        self.assertTrue(result["supporting_group_refs"])
+
+    def test_sufficiency_shadow_excludes_unregistered_relations(self) -> None:
+        _, units, _, _ = _units(
+            "세리아방의 NPC 세리아",
+            title="세리아의 특별 상점",
+        )
+
+        result = assess_requirement_evidence_sufficiency_shadow(
+            {
+                "requirement_id": "location",
+                "subject": "세리아의 특별 상점",
+                "relation": "location",
+                "value_type": "text",
+            },
+            evidence_units_by_ref=units,
+            as_of="2026-07-22",
+        )
+
+        self.assertFalse(result["assessable"])
+        self.assertFalse(result["would_trigger"])
+        self.assertEqual(result["reason"], "unregistered_relation_excluded")
 
     def test_datetime_normalization_accepts_korean_source_and_iso_value(self) -> None:
         text = "삭제일자: 2026년 8월 13일 06시 일괄삭제"
@@ -862,6 +1036,149 @@ class TypedEvidenceRefTest(unittest.TestCase):
 
         self.assertEqual(decision["status"], "supported_exact")
         self.assertEqual(audit["failure_reasons"], [])
+
+    def test_policy_subject_identity_mismatch_is_rejected(self) -> None:
+        text = "▒ 적용 일자\n- 2026년 3월 15일"
+        chunks, units, _, _ = _units(
+            text,
+            title="운영정책, 모바일 이용약관 개정 안내",
+        )
+        evidence_ref = _ref_containing(units, "- 2026년 3월 15일")
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "effective_date",
+                "status": "supported",
+                "value_type": "date",
+                "value": "2026-03-15",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "effective_date",
+                "subject": "세라 이용약관 개정안",
+                "relation": "effective_at",
+                "value_type": "date",
+            },
+            question_time_scope="current",
+            question_text="2026년 세라 이용약관 개정안은 언제 적용돼?",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "unsupported")
+        self.assertIn(
+            "policy_subject_identity_mismatch",
+            audit["failure_reasons"],
+        )
+
+    def test_policy_question_year_mismatch_is_rejected(self) -> None:
+        text = "### 운영정책\n시행일자\n2026년 03월 15일"
+        chunks, documents, temporal = _artifacts(
+            text,
+            title="던전앤파이터 운영정책 (2026-03-15 시행)",
+            published_at="2026-03-15",
+        )
+        documents["d1"]["source_id"] = "dnf_account_policy"
+        temporal["d1"].update(
+            {
+                "source_kind": "account_policy",
+                "valid_from": "2026-03-15",
+            }
+        )
+        unit_rows = build_evidence_units(
+            ["c1"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+        units = {unit["evidence_ref"]: unit for unit in unit_rows}
+        evidence_ref = _ref_containing(units, "2026년 03월 15일")
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "effective_date",
+                "status": "supported",
+                "value_type": "date",
+                "value": "2026-03-15",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "effective_date",
+                "subject": "던전앤파이터 운영정책 변경",
+                "relation": "effective_at",
+                "value_type": "date",
+            },
+            question_time_scope="historical",
+            question_text=(
+                "2025년에 공지된 던전앤파이터 운영정책 변경은 "
+                "언제 시행될 예정이었어?"
+            ),
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "unsupported")
+        self.assertIn(
+            "policy_question_year_mismatch",
+            audit["failure_reasons"],
+        )
+
+    def test_current_policy_rejects_a_non_active_revision_date(self) -> None:
+        text = (
+            "### 운영정책\n"
+            "시행일자\n"
+            "2026년 03월 15일\n"
+            "2025년 11월 01일"
+        )
+        chunks, documents, temporal = _artifacts(
+            text,
+            title="던전앤파이터 운영정책 (2026-03-15 시행)",
+            published_at="2026-03-15",
+        )
+        documents["d1"]["source_id"] = "dnf_account_policy"
+        temporal["d1"].update(
+            {
+                "source_kind": "account_policy",
+                "valid_from": "2026-03-15",
+            }
+        )
+        unit_rows = build_evidence_units(
+            ["c1"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+        units = {unit["evidence_ref"]: unit for unit in unit_rows}
+        evidence_ref = _ref_containing(units, "2025년 11월 01일")
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "effective_date",
+                "status": "supported",
+                "value_type": "date",
+                "value": "2025-11-01",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "effective_date",
+                "subject": "던전앤파이터 운영정책",
+                "relation": "effective_at",
+                "value_type": "date",
+            },
+            question_time_scope="current",
+            question_text="현재 운영정책은 언제부터 시행됐어?",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "unsupported")
+        self.assertIn(
+            "policy_revision_effective_date_mismatch",
+            audit["failure_reasons"],
+        )
 
     def test_revision_cutoff_accepts_labeled_update_baseline(self) -> None:
         text = (
@@ -1548,6 +1865,13 @@ class TypedEvidenceRefTest(unittest.TestCase):
             rows[0]["model_call"]["calls"][0]["requirement_id_normalization"],
             "positional_to_fixed",
         )
+        shadow = rows[0]["model_call"]["calls"][0]["sufficiency_shadow"]
+        self.assertEqual(
+            [row["requirement_id"] for row in shadow],
+            ["r1", "r2"],
+        )
+        self.assertFalse(shadow[0]["assessable"])
+        self.assertFalse(shadow[1]["would_trigger"])
         self.assertTrue(
             rows[0]["llm_score"]["all_evidence_spans_hit"], rows[0]
         )

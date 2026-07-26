@@ -1,5 +1,31 @@
 # Agent Handoff - DNF Domain QA SLM/RAG
 
+## 2026-07-27 Product-router freeze and semantic-binding diagnostics
+
+- Commit `7e38005` freezes the current product router, native Ollama protocol,
+  and requirement-aware evidence reduction. Tests at freeze: v3 `702 passed`
+  plus `54` subtests; legacy `72 passed`.
+- The official sealed one-shot remains `37/64`. No artifact was rewritten and
+  no new generalization or production score is claimed.
+- Slots 8 and 41 are recorded in a separate reviewed equivalent-evidence
+  addendum. The sealed file remains byte-identical.
+- The narrow same-evidence-group sufficiency gate was measured in shadow only:
+  `21/96` requirements were assessable and only slots `5,7` would trigger.
+  Slot 7 is a correct unsupported case, so real fallback retrieval remains
+  disabled and deferred.
+- Verifier-only replay over the adaptive product-router run changed five wrong
+  supported cases (`1,6,60,61,63`) into safe abstentions, with score
+  `50/64 -> 50/64`, regressions `0`, new model calls `0`, and retrieval calls
+  `0`.
+- The new hard checks bind policy subject/revision/effective date and monthly
+  month/record/attribute/value. This is a safety diagnostic, not a promotion.
+- A replay of an older requirement-reduction artifact reports slot 47 as a
+  regression only because its stored `E19` no longer exists in the rebuilt
+  prompt namespace. Do not attribute that protocol-incompatible replay result
+  to the new binding checks.
+
+See `reports/v3/product_router_semantic_binding_round_20260727.md`.
+
 ## 2026-07-25 Latest pipeline full-64 adaptive diagnostic
 
 The current temporal-role prompt, relation-group/currency verifier, table
