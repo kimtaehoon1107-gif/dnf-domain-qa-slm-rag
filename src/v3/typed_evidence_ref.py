@@ -7,8 +7,9 @@ import time
 from collections import defaultdict
 from datetime import date
 from typing import Any, Literal
+from urllib.request import Request, urlopen
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from src.v3.value_normalization import (
     amount_of,
@@ -47,6 +48,26 @@ STRUCTURED_VALUE_TYPES = {
     "number",
     "percentage",
     "price",
+}
+LOCAL_OLLAMA_CONTEXT_TOKENS = 8192
+LOCAL_OLLAMA_OUTPUT_TOKENS = 512
+LOCAL_OLLAMA_REQUEST_CHAR_LIMIT = 12_000
+MAX_PROMPT_EVIDENCE_UNITS = 48
+MAX_PROMPT_EVIDENCE_TEXT_CHARS = 6_500
+PROMPT_RELATION_TOKEN_ALIASES = {
+    "action": ("조치", "설정", "허용"),
+    "channel": ("채널", "송출", "라이브"),
+    "change": ("변경", "개정"),
+    "daily": ("매일", "일일", "1일"),
+    "exception": ("예외", "단", "경우"),
+    "impact": ("영향", "불가"),
+    "method": ("방법", "방식", "통해"),
+    "notice": ("공지", "안내", "알림"),
+    "payment": ("결제",),
+    "reissue": ("재발급",),
+    "reset": ("갱신", "초기화", "기준"),
+    "rule": ("원칙", "정책"),
+    "weekly": ("매주", "주간", "1주"),
 }
 
 
@@ -240,6 +261,246 @@ def _public_requirement(requirement: dict[str, Any]) -> dict[str, Any]:
     return {key: requirement[key] for key in allowed if key in requirement}
 
 
+def _prompt_value_shape_score(
+    unit: dict[str, Any],
+    requirements: list[dict[str, Any]],
+    *,
+    as_of: str,
+) -> int:
+    text = unit["text"]
+    score = 0
+    for requirement in requirements:
+        value_type = requirement.get("value_type")
+        if value_type in {"date", "datetime", "date_range"}:
+            score += 3 if _date_values(text, as_of) else 0
+        elif value_type in {"price", "currency"}:
+            score += 3 if currency_values(text) else 0
+        elif value_type == "percentage":
+            score += 3 if _percentage_values(text) else 0
+        elif value_type == "number":
+            score += 2 if re.search(r"\d", text) else 0
+        elif value_type == "boolean":
+            score += 2 if boolean_evidence(text) else 0
+    return score
+
+
+def _prompt_unit_relevance_score(
+    unit: dict[str, Any],
+    requirements: list[dict[str, Any]],
+    *,
+    question: str,
+    as_of: str,
+) -> int:
+    unit_semantic_text = " ".join(
+        filter(
+            None,
+            (unit.get("context_text", ""), unit["text"]),
+        )
+    )
+    compact_text = _compact(unit_semantic_text)
+    compact_title = _compact(unit["title"])
+    unit_terms = _content_tokens(
+        " ".join(
+            filter(
+                None,
+                (
+                    unit.get("context_text", ""),
+                    unit["text"],
+                    unit["title"],
+                ),
+            )
+        )
+    )
+    score = _prompt_value_shape_score(unit, requirements, as_of=as_of)
+    for requirement in requirements:
+        required_role = _required_temporal_role(requirement)
+        if required_role and required_role in _unit_temporal_roles(
+            unit,
+            as_of=as_of,
+        ):
+            score += 12
+        for group in _required_relation_groups(requirement):
+            if any(anchor and anchor in compact_text for anchor in group):
+                score += 6
+        for key in ("subject", "subject_group", "surface"):
+            anchor = _compact(requirement.get(key, ""))
+            if anchor and anchor in compact_text:
+                score += 4
+            elif anchor and anchor in compact_title:
+                score += 1
+        requirement_terms = set().union(
+            *(
+                _content_tokens(str(requirement.get(key, "")))
+                for key in ("subject", "subject_group", "surface")
+            )
+        )
+        score += min(4, len(requirement_terms & unit_terms))
+        relation_tokens = re.findall(
+            r"[a-z0-9]+",
+            str(requirement.get("relation", "")).lower(),
+        )
+        for relation_token in relation_tokens:
+            aliases = PROMPT_RELATION_TOKEN_ALIASES.get(relation_token, ())
+            if any(_compact(alias) in compact_text for alias in aliases):
+                score += 4
+    query_terms = {
+        _compact(token)
+        for token in re.findall(r"[0-9A-Za-z가-힣]+", question)
+        if len(_compact(token)) >= 2
+    }
+    score += min(4, sum(term in compact_text for term in query_terms))
+    return score
+
+
+def select_prompt_evidence_units(
+    units: list[dict[str, Any]],
+    *,
+    requirements: list[dict[str, Any]],
+    question: str,
+    as_of: str,
+    maximum_units: int = MAX_PROMPT_EVIDENCE_UNITS,
+    maximum_text_chars: int = MAX_PROMPT_EVIDENCE_TEXT_CHARS,
+) -> list[dict[str, Any]]:
+    """Keep exact evidence coordinates while reducing model-visible noise."""
+
+    if maximum_units < 1 or maximum_text_chars < 1:
+        raise RuntimeError("prompt evidence limits must be positive")
+    if (
+        len(units) <= maximum_units
+        and sum(len(unit["text"]) for unit in units) <= maximum_text_chars
+    ):
+        return list(units)
+
+    by_ref = {unit["evidence_ref"]: unit for unit in units}
+    by_candidate: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for unit in units:
+        by_candidate[unit["candidate_ref"]].append(unit)
+    for candidate_units in by_candidate.values():
+        candidate_units.sort(key=lambda row: row["start_char"])
+
+    scores = {
+        unit["evidence_ref"]: _prompt_unit_relevance_score(
+            unit,
+            requirements,
+            question=question,
+            as_of=as_of,
+        )
+        for unit in units
+    }
+    selected_refs: set[str] = set()
+    selected_chars = 0
+
+    def add(unit: dict[str, Any]) -> bool:
+        nonlocal selected_chars
+        evidence_ref = unit["evidence_ref"]
+        if evidence_ref in selected_refs:
+            return True
+        text_chars = len(unit["text"])
+        if len(selected_refs) >= maximum_units:
+            return False
+        if selected_refs and selected_chars + text_chars > maximum_text_chars:
+            return False
+        selected_refs.add(evidence_ref)
+        selected_chars += text_chars
+        return True
+
+    def add_with_context(unit: dict[str, Any]) -> None:
+        add(unit)
+        for context_ref in unit.get("context_refs", []):
+            context_unit = by_ref.get(context_ref)
+            if context_unit is not None:
+                add(context_unit)
+        candidate_units = by_candidate[unit["candidate_ref"]]
+        index = candidate_units.index(unit)
+        for neighbor_index in (index - 1, index + 1):
+            if 0 <= neighbor_index < len(candidate_units):
+                add(candidate_units[neighbor_index])
+
+    requirement_reserved = []
+    for requirement in requirements:
+        requirement_scores = {
+            unit["evidence_ref"]: _prompt_unit_relevance_score(
+                unit,
+                [requirement],
+                question=question,
+                as_of=as_of,
+            )
+            for unit in units
+        }
+        maximum_requirement_score = max(
+            requirement_scores.values(),
+            default=0,
+        )
+        minimum_requirement_score = max(
+            3,
+            (maximum_requirement_score + 1) // 2,
+        )
+        if maximum_requirement_score < 3:
+            continue
+        ranked_for_requirement = sorted(
+            units,
+            key=lambda unit: (
+                -requirement_scores[unit["evidence_ref"]],
+                int(unit["candidate_ref"]),
+                unit["start_char"],
+            ),
+        )
+        best_candidate_ref = ranked_for_requirement[0]["candidate_ref"]
+        candidate_ranked = [
+            unit
+            for unit in ranked_for_requirement
+            if unit["candidate_ref"] == best_candidate_ref
+        ]
+        for unit in candidate_ranked[:2]:
+            if (
+                requirement_scores[unit["evidence_ref"]]
+                < minimum_requirement_score
+            ):
+                continue
+            if add(unit):
+                requirement_reserved.append(unit)
+    for unit in requirement_reserved:
+        add_with_context(unit)
+
+    maximum_score = max(scores.values(), default=0)
+    minimum_score = max(5, (maximum_score + 1) // 2)
+    confident_selection = maximum_score >= 5
+    for candidate_ref in sorted(by_candidate, key=int):
+        best = max(
+            by_candidate[candidate_ref],
+            key=lambda unit: (
+                scores[unit["evidence_ref"]],
+                -unit["start_char"],
+            ),
+        )
+        if (
+            not confident_selection
+            or scores[best["evidence_ref"]] >= minimum_score
+        ):
+            add_with_context(best)
+
+    ranked = sorted(
+        units,
+        key=lambda unit: (
+            -scores[unit["evidence_ref"]],
+            int(unit["candidate_ref"]),
+            unit["start_char"],
+        ),
+    )
+    for unit in ranked:
+        if scores[unit["evidence_ref"]] < minimum_score:
+            break
+        add_with_context(unit)
+
+    return sorted(
+        (by_ref[evidence_ref] for evidence_ref in selected_refs),
+        key=lambda unit: (
+            int(unit["candidate_ref"]),
+            unit["start_char"],
+        ),
+    )
+
+
 def build_typed_evidence_prompt(
     *,
     question: str,
@@ -251,11 +512,17 @@ def build_typed_evidence_prompt(
     documents_by_id: dict[str, dict[str, Any]],
     temporal_by_document: dict[str, dict[str, Any]],
 ) -> tuple[str, dict[str, dict[str, Any]]]:
-    units = build_evidence_units(
+    all_units = build_evidence_units(
         candidate_chunk_ids,
         chunks_by_id=chunks_by_id,
         documents_by_id=documents_by_id,
         temporal_by_document=temporal_by_document,
+    )
+    units = select_prompt_evidence_units(
+        all_units,
+        requirements=requirements,
+        question=question,
+        as_of=as_of,
     )
     public_evidence_blocks = []
     units_by_candidate_ref: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -292,6 +559,19 @@ def build_typed_evidence_prompt(
                         )
                     )
                     or "none"
+                )
+                + (
+                    "\tnormalized_dates="
+                    + ",".join(
+                        sorted(
+                            _date_values(
+                                candidate_unit["text"],
+                                as_of,
+                            )
+                        )
+                    )
+                    if _date_values(candidate_unit["text"], as_of)
+                    else ""
                 )
                 + "\t"
                 + candidate_unit["text"].replace("\t", " ")
@@ -341,6 +621,158 @@ def _usage_dict(response: Any) -> dict[str, int]:
     }
 
 
+def parse_typed_requirement_batch(
+    raw_content: str,
+) -> tuple[TypedRequirementBatchOutput, list[dict[str, Any]]]:
+    try:
+        payload = json.loads(raw_content)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("local Ollama returned invalid JSON") from exc
+    if not isinstance(payload, dict) or not isinstance(
+        payload.get("requirements"), list
+    ):
+        raise RuntimeError("local Ollama output is missing requirements")
+
+    selections = []
+    validation_errors = []
+    for index, raw_requirement in enumerate(payload["requirements"]):
+        try:
+            selections.append(
+                TypedRequirementSelection.model_validate(raw_requirement)
+            )
+        except ValidationError as exc:
+            requirement_id = (
+                raw_requirement.get("requirement_id")
+                if isinstance(raw_requirement, dict)
+                else None
+            )
+            value_type = (
+                raw_requirement.get("value_type")
+                if isinstance(raw_requirement, dict)
+                else None
+            )
+            if not isinstance(requirement_id, str) or not requirement_id.strip():
+                raise RuntimeError(
+                    f"requirement {index} has no recoverable requirement_id"
+                ) from exc
+            if not isinstance(value_type, str) or not value_type.strip():
+                raise RuntimeError(
+                    f"requirement {index} has no recoverable value_type"
+                ) from exc
+            selections.append(
+                TypedRequirementSelection(
+                    requirement_id=requirement_id,
+                    status="unsupported",
+                    value_type=value_type,
+                    value=None,
+                    evidence_refs=[],
+                )
+            )
+            validation_errors.append(
+                {
+                    "requirement_index": index,
+                    "requirement_id": requirement_id,
+                    "action": "downgraded_to_unsupported",
+                    "errors": exc.errors(include_url=False),
+                }
+            )
+    return (
+        TypedRequirementBatchOutput(requirements=selections),
+        validation_errors,
+    )
+
+
+def _local_ollama_chat_url(base_url: str) -> str:
+    normalized = base_url.rstrip("/")
+    if normalized.endswith("/v1"):
+        normalized = normalized[:-3]
+    return f"{normalized}/api/chat"
+
+
+def _local_ollama_request_chars(prompt: str) -> int:
+    schema = json.dumps(
+        TypedRequirementBatchOutput.model_json_schema(),
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+    return len(TYPED_EVIDENCE_SYSTEM_INSTRUCTIONS) + len(prompt) + len(schema)
+
+
+def _generate_local_ollama_typed(
+    *,
+    prompt: str,
+    model: str,
+    base_url: str,
+    timeout_seconds: float,
+) -> dict[str, Any]:
+    request_chars = _local_ollama_request_chars(prompt)
+    if request_chars > LOCAL_OLLAMA_REQUEST_CHAR_LIMIT:
+        raise RuntimeError(
+            "prompt_budget_exceeded: "
+            f"{request_chars}>{LOCAL_OLLAMA_REQUEST_CHAR_LIMIT} request chars"
+        )
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": TYPED_EVIDENCE_SYSTEM_INSTRUCTIONS},
+            {"role": "user", "content": prompt},
+        ],
+        "stream": False,
+        "think": False,
+        "format": TypedRequirementBatchOutput.model_json_schema(),
+        "options": {
+            "temperature": 0,
+            "num_ctx": LOCAL_OLLAMA_CONTEXT_TOKENS,
+            "num_predict": LOCAL_OLLAMA_OUTPUT_TOKENS,
+        },
+    }
+    request = Request(
+        _local_ollama_chat_url(base_url),
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    started = time.perf_counter()
+    with urlopen(request, timeout=timeout_seconds) as response:
+        raw_response = json.loads(response.read().decode("utf-8"))
+    message = raw_response.get("message") or {}
+    raw_content = str(message.get("content") or "")
+    reasoning_content = str(
+        message.get("thinking") or message.get("reasoning") or ""
+    )
+    usage = {
+        "input_tokens": int(raw_response.get("prompt_eval_count") or 0),
+        "output_tokens": int(raw_response.get("eval_count") or 0),
+    }
+    usage["total_tokens"] = usage["input_tokens"] + usage["output_tokens"]
+    result = {
+        "requested_model": model,
+        "returned_model": raw_response.get("model") or model,
+        "provider": "ollama_native",
+        "usage": usage,
+        "latency_ms": round((time.perf_counter() - started) * 1000, 3),
+        "finish_reason": raw_response.get("done_reason"),
+        "raw_content": raw_content,
+        "reasoning_content": reasoning_content,
+        "thinking_enabled": False,
+        "max_output_tokens": LOCAL_OLLAMA_OUTPUT_TOKENS,
+        "request_chars": request_chars,
+    }
+    try:
+        parsed, validation_errors = parse_typed_requirement_batch(raw_content)
+    except Exception as exc:
+        return {
+            **result,
+            "output": {"requirements": []},
+            "protocol_error": f"{type(exc).__name__}: {exc}",
+        }
+    return {
+        **result,
+        "output": parsed.model_dump(),
+        "schema_validation_errors": validation_errors,
+    }
+
+
 def generate_typed_evidence_output(
     *,
     prompt: str,
@@ -348,37 +780,31 @@ def generate_typed_evidence_output(
     reasoning_effort: str = "high",
     timeout_seconds: float = 120.0,
 ) -> dict[str, Any]:
+    base_url = os.environ.get("OPENAI_BASE_URL", "")
+    local_ollama = "localhost:11434" in base_url or "127.0.0.1:11434" in base_url
+    if local_ollama:
+        return _generate_local_ollama_typed(
+            prompt=prompt,
+            model=model,
+            base_url=base_url,
+            timeout_seconds=timeout_seconds,
+        )
     if not os.environ.get("OPENAI_API_KEY"):
         raise RuntimeError("OPENAI_API_KEY is required")
     from openai import OpenAI, __version__ as sdk_version
 
-    base_url = os.environ.get("OPENAI_BASE_URL", "")
-    local_ollama = "localhost:11434" in base_url or "127.0.0.1:11434" in base_url
     client = OpenAI(max_retries=2, timeout=timeout_seconds)
     started = time.perf_counter()
-    if local_ollama:
-        response = client.beta.chat.completions.parse(
-            model=model,
-            messages=[
-                {"role": "system", "content": TYPED_EVIDENCE_SYSTEM_INSTRUCTIONS},
-                {"role": "user", "content": prompt},
-            ],
-            response_format=TypedRequirementBatchOutput,
-            temperature=0,
-            max_tokens=4000,
-        )
-        parsed = response.choices[0].message.parsed
-    else:
-        response = client.responses.parse(
-            model=model,
-            reasoning={"effort": reasoning_effort},
-            instructions=TYPED_EVIDENCE_SYSTEM_INSTRUCTIONS,
-            input=prompt,
-            text_format=TypedRequirementBatchOutput,
-            max_output_tokens=4000,
-            store=False,
-        )
-        parsed = response.output_parsed
+    response = client.responses.parse(
+        model=model,
+        reasoning={"effort": reasoning_effort},
+        instructions=TYPED_EVIDENCE_SYSTEM_INSTRUCTIONS,
+        input=prompt,
+        text_format=TypedRequirementBatchOutput,
+        max_output_tokens=4000,
+        store=False,
+    )
+    parsed = response.output_parsed
     if parsed is None:
         raise RuntimeError("Model returned no parsed structured output")
     return {
@@ -388,7 +814,7 @@ def generate_typed_evidence_output(
         "openai_sdk_version": sdk_version,
         "usage": _usage_dict(response),
         "latency_ms": round((time.perf_counter() - started) * 1000, 3),
-        "provider": "ollama_openai_compatible" if local_ollama else "openai",
+        "provider": "openai",
     }
 
 
@@ -722,6 +1148,45 @@ def _subject_supported(
             2, (len(terms) + 1) // 2
         )
         if sum(term in haystack for term in terms) >= required_matches:
+            return True
+    return False
+
+
+_YEAR_IDENTITY_PATTERN = re.compile(r"(?<!\d)(20\d{2})\s*년")
+_MONTH_IDENTITY_PATTERN = re.compile(
+    r"(?<!\d)(1[0-2]|0?[1-9])\s*월"
+)
+
+
+def _subject_identity_conflicts(
+    requirement: dict[str, Any],
+    units: list[dict[str, Any]],
+) -> bool:
+    requested_identity = " ".join(
+        str(requirement.get(key) or "")
+        for key in ("subject", "subject_group")
+    )
+    requested_years = set(_YEAR_IDENTITY_PATTERN.findall(requested_identity))
+    requested_months = {
+        str(int(value))
+        for value in _MONTH_IDENTITY_PATTERN.findall(requested_identity)
+    }
+    if not requested_years and not requested_months:
+        return False
+    for unit in units:
+        title = str(unit.get("title") or "")
+        title_years = set(_YEAR_IDENTITY_PATTERN.findall(title))
+        title_months = {
+            str(int(value))
+            for value in _MONTH_IDENTITY_PATTERN.findall(title)
+        }
+        if requested_years and title_years and requested_years.isdisjoint(
+            title_years
+        ):
+            return True
+        if requested_months and title_months and requested_months.isdisjoint(
+            title_months
+        ):
             return True
     return False
 
@@ -1154,6 +1619,10 @@ def verify_typed_requirement_selection(
             )
         )
         combined_titles = " ".join(unit["title"] for unit in selected_units)
+        identity_conflict = _subject_identity_conflicts(
+            requirement,
+            selected_units,
+        )
         subject_supported = _subject_supported(
             requirement, combined_semantic_text, combined_titles
         )
@@ -1235,6 +1704,8 @@ def verify_typed_requirement_selection(
             failures.append("typed_value_not_supported_by_evidence")
         if not subject_supported:
             failures.append("subject_not_supported_by_evidence")
+        if identity_conflict:
+            failures.append("subject_identity_conflict")
         if not relation_supported:
             failures.append("relation_not_supported_by_evidence")
         if not temporal_supported:

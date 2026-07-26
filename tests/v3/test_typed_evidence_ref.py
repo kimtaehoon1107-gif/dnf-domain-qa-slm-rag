@@ -1,12 +1,18 @@
 from __future__ import annotations
 
+import json
 import unittest
+from unittest.mock import patch
 
 from src.v3.evaluate_grounded_llm_replay import run_fixed_requirement_replay
 from src.v3.typed_evidence_ref import (
+    _local_ollama_request_chars,
     _value_supported,
     build_evidence_units,
     build_typed_evidence_prompt,
+    generate_typed_evidence_output,
+    parse_typed_requirement_batch,
+    select_prompt_evidence_units,
     verify_typed_requirement_selection,
 )
 from src.v3.value_normalization import boolean_evidence, currency_values
@@ -75,7 +81,190 @@ def _ref_containing(units: dict[str, dict], needle: str) -> str:
     )
 
 
+class _FakeHttpResponse:
+    def __init__(self, payload: dict) -> None:
+        self.payload = payload
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        return False
+
+    def read(self) -> bytes:
+        return json.dumps(self.payload).encode("utf-8")
+
+
 class TypedEvidenceRefTest(unittest.TestCase):
+    def test_invalid_requirement_is_downgraded_without_losing_valid_sibling(
+        self,
+    ) -> None:
+        parsed, errors = parse_typed_requirement_batch(
+            json.dumps(
+                {
+                    "requirements": [
+                        {
+                            "requirement_id": "r1",
+                            "status": "supported",
+                            "value_type": "number",
+                            "value": 10,
+                            "evidence_refs": ["E1"],
+                        },
+                        {
+                            "requirement_id": "r2",
+                            "status": "supported",
+                            "value_type": "number",
+                            "value": None,
+                            "evidence_refs": [],
+                        },
+                    ]
+                }
+            )
+        )
+
+        self.assertEqual(parsed.requirements[0].status, "supported")
+        self.assertEqual(parsed.requirements[1].status, "unsupported")
+        self.assertIsNone(parsed.requirements[1].value)
+        self.assertEqual(parsed.requirements[1].evidence_refs, [])
+        self.assertEqual(errors[0]["requirement_index"], 1)
+
+    def test_local_ollama_uses_think_false_and_bounded_output(self) -> None:
+        response = {
+            "model": "qwen3-8b:ctx8192",
+            "done_reason": "stop",
+            "prompt_eval_count": 100,
+            "eval_count": 20,
+            "message": {
+                "content": json.dumps(
+                    {
+                        "requirements": [
+                            {
+                                "requirement_id": "r1",
+                                "status": "unsupported",
+                                "value_type": "number",
+                                "value": None,
+                                "evidence_refs": [],
+                            }
+                        ]
+                    }
+                ),
+                "thinking": "",
+            },
+        }
+        captured = {}
+
+        def fake_urlopen(request, timeout):
+            captured["payload"] = json.loads(request.data.decode("utf-8"))
+            captured["timeout"] = timeout
+            return _FakeHttpResponse(response)
+
+        with (
+            patch.dict(
+                "os.environ",
+                {
+                    "OPENAI_BASE_URL": "http://localhost:11434/v1",
+                    "OPENAI_API_KEY": "ollama",
+                },
+                clear=False,
+            ),
+            patch("src.v3.typed_evidence_ref.urlopen", fake_urlopen),
+        ):
+            result = generate_typed_evidence_output(
+                prompt="짧은 프롬프트",
+                model="qwen3-8b:ctx8192",
+                timeout_seconds=3,
+            )
+
+        self.assertIs(captured["payload"]["think"], False)
+        self.assertEqual(captured["payload"]["options"]["num_predict"], 512)
+        self.assertEqual(captured["payload"]["options"]["num_ctx"], 8192)
+        self.assertEqual(result["provider"], "ollama_native")
+        self.assertEqual(result["finish_reason"], "stop")
+        self.assertEqual(result["usage"]["output_tokens"], 20)
+        self.assertEqual(result["raw_content"], response["message"]["content"])
+
+    def test_local_ollama_rejects_oversized_prompt_before_request(self) -> None:
+        with patch.dict(
+            "os.environ",
+            {
+                "OPENAI_BASE_URL": "http://localhost:11434/v1",
+                "OPENAI_API_KEY": "ollama",
+            },
+            clear=False,
+        ):
+            with self.assertRaisesRegex(
+                RuntimeError,
+                "prompt_budget_exceeded",
+            ):
+                generate_typed_evidence_output(
+                    prompt="가" * 20_000,
+                    model="qwen3-8b:ctx8192",
+                )
+
+    def test_month_identity_conflict_is_rejected(self) -> None:
+        text = "특별 아이템은 트로피컬 바캉스 패키지입니다."
+        chunks_by_id, units, _, _ = _units(
+            text,
+            title="7월 이달의 아이템",
+        )
+        evidence_ref = _ref_containing(units, text)
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "august_item",
+                "status": "supported",
+                "value_type": "entity",
+                "value": "트로피컬 바캉스 패키지",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "august_item",
+                "subject": "8월 이달의 아이템",
+                "relation": "item_name",
+                "value_type": "entity",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks_by_id,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "unsupported")
+        self.assertIn(
+            "subject_identity_conflict",
+            audit["failure_reasons"],
+        )
+
+    def test_matching_month_identity_is_allowed(self) -> None:
+        text = "특별 아이템은 트로피컬 바캉스 패키지입니다."
+        chunks_by_id, units, _, _ = _units(
+            text,
+            title="8월 이달의 아이템",
+        )
+        evidence_ref = _ref_containing(units, text)
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "august_item",
+                "status": "supported",
+                "value_type": "entity",
+                "value": "트로피컬 바캉스 패키지",
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "august_item",
+                "subject": "8월 이달의 아이템",
+                "relation": "item_name",
+                "value_type": "entity",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks_by_id,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "supported_exact", audit)
+
     def test_evidence_units_restore_exact_source_coordinates(self) -> None:
         text = "제목\n첫 문장입니다. 둘째 문장입니다.\n마지막 줄"
         chunks, documents, temporal = _artifacts(text, title="테스트")
@@ -107,6 +296,267 @@ class TypedEvidenceRefTest(unittest.TestCase):
                 text[unit["start_char"] : unit["end_char"]],
                 unit["text"],
             )
+
+    def test_large_policy_prompt_keeps_relevant_late_units_within_budget(
+        self,
+    ) -> None:
+        irrelevant = "\n".join(
+            f"관계없는 정책 조항 {index}" for index in range(100)
+        )
+        text = (
+            "### 운영정책\n"
+            f"{irrelevant}\n"
+            "시행일자\n"
+            "2026년 03월 15일"
+        )
+        chunks, documents, temporal = _artifacts(
+            text,
+            title="던전앤파이터 운영정책 (2026-03-15 시행)",
+        )
+        documents["d1"]["source_id"] = "dnf_account_policy"
+        temporal["d1"].update(
+            {
+                "source_kind": "account_policy",
+                "valid_from": "2026-03-15",
+            }
+        )
+        requirement = {
+            "requirement_id": "effective_date",
+            "subject": "던전앤파이터 운영정책",
+            "relation": "effective_at",
+            "value_type": "date",
+        }
+        all_units = build_evidence_units(
+            ["c1"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+
+        prompt, visible_units = build_typed_evidence_prompt(
+            question="현재 던전앤파이터 운영정책은 언제부터 시행됐어?",
+            requirements=[requirement],
+            question_time_scope="current",
+            as_of="2026-07-22",
+            candidate_chunk_ids=["c1"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+
+        self.assertLess(len(visible_units), len(all_units))
+        self.assertLessEqual(len(visible_units), 8)
+        self.assertIn("시행일자", prompt)
+        self.assertIn("2026년 03월 15일", prompt)
+        self.assertIn("normalized_dates=2026-03-15", prompt)
+        self.assertLessEqual(_local_ollama_request_chars(prompt), 12_000)
+        for unit in visible_units.values():
+            self.assertEqual(
+                text[unit["start_char"] : unit["end_char"]],
+                unit["text"],
+            )
+
+    def test_prompt_selection_drops_weaker_duplicate_period_candidate(
+        self,
+    ) -> None:
+        common = {
+            "parent_document_id": "d1",
+            "source_id": "dnf_test",
+            "source_kind": None,
+            "published_at": None,
+            "valid_from": None,
+            "valid_to": None,
+            "context_text": "",
+            "context_refs": [],
+        }
+        units = [
+            {
+                **common,
+                "evidence_ref": "E1",
+                "candidate_ref": "1",
+                "chunk_id": "c1",
+                "title": "이달의 아이템",
+                "start_char": 0,
+                "end_char": 23,
+                "text": "판매기간: 06.25 ~ 07.30",
+            },
+            {
+                **common,
+                "evidence_ref": "E2",
+                "candidate_ref": "2",
+                "chunk_id": "c2",
+                "title": "트로피컬 바캉스 패키지",
+                "start_char": 0,
+                "end_char": 10,
+                "text": "7월 이달의 아이템",
+            },
+            {
+                **common,
+                "evidence_ref": "E3",
+                "candidate_ref": "2",
+                "chunk_id": "c2",
+                "title": "트로피컬 바캉스 패키지",
+                "start_char": 11,
+                "end_char": 34,
+                "text": "2026.06.25 ~ 2026.07.30",
+            },
+        ]
+
+        selected = select_prompt_evidence_units(
+            units,
+            requirements=[
+                {
+                    "requirement_id": "sale_period",
+                    "subject": "7월 이달의 아이템",
+                    "relation": "sale_period",
+                    "value_type": "date_range",
+                }
+            ],
+            question="7월 이달의 아이템 판매 기간은 언제야?",
+            as_of="2026-07-22",
+            maximum_units=2,
+        )
+
+        self.assertEqual(
+            [unit["evidence_ref"] for unit in selected],
+            ["E1"],
+        )
+
+    def test_prompt_selection_reserves_evidence_for_each_requirement(
+        self,
+    ) -> None:
+        common = {
+            "parent_document_id": "d1",
+            "source_id": "dnf_notice",
+            "source_kind": "notice",
+            "published_at": None,
+            "valid_from": None,
+            "valid_to": None,
+            "context_text": "",
+            "context_refs": [],
+            "title": "브라우저 결제 권한 안내",
+        }
+        units = [
+            {
+                **common,
+                "evidence_ref": "E1",
+                "candidate_ref": "1",
+                "chunk_id": "c1",
+                "start_char": 0,
+                "end_char": 10,
+                "text": "안내 문서 제목",
+            },
+            {
+                **common,
+                "evidence_ref": "E2",
+                "candidate_ref": "1",
+                "chunk_id": "c1",
+                "start_char": 11,
+                "end_char": 35,
+                "text": "로컬 네트워크 변경으로 ISP 결제가 불가능합니다.",
+            },
+            {
+                **common,
+                "evidence_ref": "E3",
+                "candidate_ref": "1",
+                "chunk_id": "c1",
+                "start_char": 36,
+                "end_char": 62,
+                "text": "권한 알림이 표시되면 로컬 네트워크 접근을 허용합니다.",
+            },
+            {
+                **common,
+                "evidence_ref": "E4",
+                "candidate_ref": "2",
+                "chunk_id": "c2",
+                "start_char": 0,
+                "end_char": 15,
+                "text": "관련 없는 브라우저 설정",
+            },
+        ]
+
+        selected = select_prompt_evidence_units(
+            units,
+            requirements=[
+                {
+                    "requirement_id": "payment_impact",
+                    "subject": "ISP 결제 영향",
+                    "relation": "payment_impact",
+                    "value_type": "text",
+                },
+                {
+                    "requirement_id": "permission_action",
+                    "subject": "로컬 네트워크 권한 알림",
+                    "relation": "recommended_action",
+                    "value_type": "enum",
+                },
+            ],
+            question=(
+                "ISP 결제에 어떤 영향이 있고 권한 알림이 뜨면 "
+                "어떻게 해야 해?"
+            ),
+            as_of="2026-07-22",
+            maximum_units=3,
+        )
+
+        selected_refs = {unit["evidence_ref"] for unit in selected}
+        self.assertIn("E2", selected_refs)
+        self.assertIn("E3", selected_refs)
+
+    def test_prompt_selection_prefers_notice_method_over_change_schedule(
+        self,
+    ) -> None:
+        common = {
+            "parent_document_id": "d1",
+            "source_id": "dnf_account_policy",
+            "source_kind": "account_policy",
+            "published_at": None,
+            "valid_from": None,
+            "valid_to": None,
+            "context_text": "",
+            "context_refs": [],
+            "title": "던전앤파이터 운영정책",
+        }
+        units = [
+            {
+                **common,
+                "evidence_ref": "E1",
+                "candidate_ref": "1",
+                "chunk_id": "c1",
+                "start_char": 0,
+                "end_char": 24,
+                "text": "운영정책이 11월 1일 자로 변경될 예정입니다.",
+            },
+            {
+                **common,
+                "evidence_ref": "E2",
+                "candidate_ref": "2",
+                "chunk_id": "c2",
+                "start_char": 0,
+                "end_char": 36,
+                "text": "운영정책 변경 시 홈페이지 공지를 통해 알려드립니다.",
+            },
+        ]
+
+        selected = select_prompt_evidence_units(
+            units,
+            requirements=[
+                {
+                    "requirement_id": "change_notice_method",
+                    "subject": "던전앤파이터 운영정책",
+                    "relation": "change_notice_method",
+                    "value_type": "text",
+                }
+            ],
+            question="운영정책이 변경될 때 어떤 방식으로 알려줘?",
+            as_of="2026-07-22",
+            maximum_units=1,
+        )
+
+        self.assertEqual(
+            [unit["evidence_ref"] for unit in selected],
+            ["E2"],
+        )
 
     def test_datetime_normalization_accepts_korean_source_and_iso_value(self) -> None:
         text = "삭제일자: 2026년 8월 13일 06시 일괄삭제"

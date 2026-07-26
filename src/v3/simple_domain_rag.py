@@ -28,6 +28,9 @@ from src.v3.grounded_answer_generator import extract_factual_tokens
 from src.v3.question_router import (
     DEFAULT_AS_OF,
     DEFAULT_OVERLAY,
+    SOURCE_TO_INTENT,
+    SOURCE_TO_KIND,
+    SOURCE_TO_STORE,
     build_source_entity_index,
     route_question,
 )
@@ -44,7 +47,7 @@ from src.v3.score_evidence_reranker import (
 )
 
 
-SIMPLE_RAG_VERSION = "dnf-simple-domain-rag-v1"
+SIMPLE_RAG_VERSION = "dnf-simple-domain-rag-v2"
 DEFAULT_RETRIEVAL_DEPTH = 20
 DEFAULT_RERANK_DEPTH = 5
 GLOBAL_TEMPORAL_OVERLAY = Path(
@@ -170,18 +173,163 @@ def select_top_reranked(
     )[:depth]
 
 
-def search_policy_for_simple_route(route: dict[str, Any]) -> SearchPolicy:
-    """Keep temporal safety without restricting retrieval to a predicted source."""
+def append_one_baseline_fallback(
+    routed: list[dict[str, Any]],
+    baseline: list[dict[str, Any]],
+    *,
+    maximum: int,
+) -> list[dict[str, Any]]:
+    """Preserve one pre-router candidate without reopening the full source pool."""
 
+    if maximum < len(routed):
+        raise RuntimeError("maximum must preserve every routed candidate")
+    if len(routed) >= maximum:
+        return list(routed)
+    seen = {row["chunk_id"] for row in routed}
+    fallback = next(
+        (row for row in baseline if row["chunk_id"] not in seen),
+        None,
+    )
+    return [*routed, fallback] if fallback is not None else list(routed)
+
+
+def _replace_simple_route_source(
+    route: dict[str, Any],
+    *,
+    source_id: str,
+    signal: str,
+    time_scope: str = "current",
+) -> dict[str, Any]:
+    source_kinds = list(SOURCE_TO_KIND.get(source_id, ()))
+    if source_id == "dnf_update" and not source_kinds:
+        source_kinds = ["patch_note"]
+    routing_signals = {
+        **route.get("routing_signals", {}),
+        "explicit": [
+            *route.get("routing_signals", {}).get("explicit", []),
+            signal,
+        ],
+    }
+    current = time_scope == "current"
+    return {
+        **route,
+        "intent": SOURCE_TO_INTENT[source_id],
+        "matched_intents": [SOURCE_TO_INTENT[source_id]],
+        "required_sources": [SOURCE_TO_STORE[source_id]],
+        "source_ids": [source_id],
+        "source_kinds": source_kinds,
+        "time_scope": time_scope,
+        "temporal_as_of": None,
+        "default_exposure_only": current,
+        "allowed_statuses": (
+            ["current", "upcoming"]
+            if current
+            else ["current", "expired", "superseded", "unknown"]
+        ),
+        "needs_decomposition": False,
+        "needs_clarification": False,
+        "clarification_reason": None,
+        "route_action": "retrieve",
+        "routing_signals": routing_signals,
+    }
+
+
+def refine_simple_domain_route(
+    question: str,
+    route: dict[str, Any],
+) -> dict[str, Any]:
+    """Apply high-confidence product routes without changing the frozen router."""
+
+    normalized = " ".join(question.lower().split())
+    if any(
+        marker in normalized
+        for marker in ("npay 포인트", "넥슨 쿠폰", "세라 쿠폰")
+    ):
+        return _replace_simple_route_source(
+            route,
+            source_id="dnf_faq",
+            signal="simple:faq_support",
+        )
+    if "던파on 출석체크" in normalized:
+        return _replace_simple_route_source(
+            route,
+            source_id="dnf_game_guide",
+            signal="simple:guide_attendance",
+        )
+    if (
+        "운영정책" in normalized
+        and any(marker in normalized for marker in ("변경", "개정"))
+        and any(
+            marker in normalized
+            for marker in ("공지", "시행", "적용", "예정", "언제")
+        )
+    ):
+        return _replace_simple_route_source(
+            route,
+            source_id="dnf_notice",
+            signal="simple:policy_change_notice",
+            time_scope="historical",
+        )
+    general_notice = any(
+        marker in normalized
+        for marker in (
+            "chrome",
+            "isp 결제",
+            "권한 알림",
+            "세리아의 특별 상점",
+        )
+    ) or (
+        "추첨" in normalized
+        and any(
+            marker in normalized
+            for marker in ("세리아와 함께한", "20주년 선물")
+        )
+    )
+    if general_notice:
+        return _replace_simple_route_source(
+            route,
+            source_id="dnf_notice",
+            signal="simple:general_notice",
+        )
+    if "이달의 아이템" in normalized or "이달 의 아이템" in normalized:
+        return _replace_simple_route_source(
+            route,
+            source_id="dnf_monthly_item",
+            signal="simple:monthly_item",
+            time_scope="historical" if "삭제됐" in normalized else "current",
+        )
+    if "패키지에 포함" in normalized or "이벤트 퀘스트" in normalized:
+        return _replace_simple_route_source(
+            route,
+            source_id="dnf_event",
+            signal="simple:event_document",
+        )
+    if "업데이트에서" in normalized:
+        return _replace_simple_route_source(
+            route,
+            source_id="dnf_update",
+            signal="simple:update_document",
+        )
+    return route
+
+
+def search_policy_for_simple_route(route: dict[str, Any]) -> SearchPolicy:
+    """Apply explicit source routes and preserve fallback for inferred routes."""
+
+    explicit_signals = route.get("routing_signals", {}).get("explicit", [])
+    routed_sources = tuple(route.get("source_ids") or ())
+    source_ids = (
+        routed_sources
+        if explicit_signals and len(routed_sources) == 1
+        else None
+    )
     if route.get("time_scope") == "current":
-        return SearchPolicy(as_of=DEFAULT_AS_OF)
-    as_of = route.get("temporal_as_of")
-    if not as_of:
-        raise RuntimeError("historical route is missing temporal_as_of")
+        return SearchPolicy(as_of=DEFAULT_AS_OF, source_ids=source_ids)
     return SearchPolicy(
         default_exposure_only=False,
         allowed_statuses=None,
-        as_of=as_of,
+        as_of=route.get("temporal_as_of"),
+        source_ids=source_ids,
     )
 
 
@@ -287,14 +435,35 @@ class SimpleDomainRAG:
             source_entity_index=self._source_entity_index,
             overlay_rows=self._overlay_rows,
         )
+        route = refine_simple_domain_route(question, route)
         if route["route_action"] != "retrieve":
             return {"route": route, "hits": []}, []
+        baseline_pairs = [
+            (
+                question,
+                self._artifacts.chunks_by_id[hit["chunk_id"]]["retrieval_text"],
+            )
+            for hit in global_hits
+        ]
+        baseline_selected = select_top_reranked(
+            global_hits,
+            self._score_pairs(baseline_pairs),
+            depth=self.rerank_depth,
+        )
+        policy = search_policy_for_simple_route(route)
+        if (
+            policy.source_ids is None
+            and policy.default_exposure_only
+            and policy.allowed_statuses == ("current", "upcoming")
+            and policy.as_of == DEFAULT_AS_OF
+        ):
+            return {"route": route, "hits": global_hits}, baseline_selected
         hits = retrieve_with_embedding(
             question,
             query_embedding,
             self._artifacts,
             top_k=self.retrieval_depth,
-            policy=search_policy_for_simple_route(route),
+            policy=policy,
         )
         routed = {"route": route, "hits": hits}
         pairs = [
@@ -309,6 +478,12 @@ class SimpleDomainRAG:
             self._score_pairs(pairs),
             depth=self.rerank_depth,
         )
+        if policy.source_ids is not None:
+            selected = append_one_baseline_fallback(
+                selected,
+                baseline_selected,
+                maximum=self.rerank_depth + 1,
+            )
         return routed, selected
 
     def answer(self, question: str) -> dict[str, Any]:

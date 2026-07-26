@@ -1,0 +1,512 @@
+{
+  "evaluation_role": "targeted_adaptive_generation_smoke_not_generalization",
+  "model": "qwen3-8b:ctx8192",
+  "slots": [
+    21,
+    40,
+    41
+  ],
+  "retrieval_reexecuted": false,
+  "stored_candidate_pools_reused": true,
+  "new_model_calls": 3,
+  "previous_error_slots": [
+    21,
+    40
+  ],
+  "previous_correct_slots": [
+    41
+  ],
+  "transitions": {
+    "recovered": [
+      21
+    ],
+    "persistent_error": [
+      40
+    ],
+    "preserved_correct": [],
+    "new_regression": [
+      41
+    ]
+  },
+  "score_summary": {
+    "scorer_version": "typed-evidence-ref-generalization-scorer-v2",
+    "normalization_contract": {
+      "version": "typed-evidence-ref-generalization-normalization-v2",
+      "rules": [
+        "Whitespace, punctuation, and Korean zero-padded month/day variants are normalized.",
+        "Korean and ISO dates are compared as YYYY-MM-DD; month/day-only forms use the frozen as_of year.",
+        "06시, 6시, and 06:00 are compared as 06:00; 오전/오후 are converted to 24-hour time.",
+        "Currency commas, Korean 만/억 scales, domain currency units, and unit-first count forms are normalized to integer amount plus unit.",
+        "Percentages and plain numbers are compared numerically.",
+        "Boolean answers normalize explicit true/false and Korean positive/negative actions while protecting 불가 state nouns.",
+        "Table-row and prose citations are equivalent only when the normalized gold value is present and the citation comes from an approved evidence chunk.",
+        "For text, enum, entity, and entity_list values, a directly cited pre-approved evidence unit is the canonical gold when required_values is a human-authored summary of that unit.",
+        "No semantic paraphrase credit is added beyond the typed normalizations above."
+      ]
+    },
+    "fixed_denominator": 3,
+    "gold_value_complete": {
+      "successes": 1,
+      "total": 3
+    },
+    "outcomes": {
+      "correct": 1,
+      "incorrect": 1,
+      "no_response": 1
+    },
+    "all_evidence_spans_hit": {
+      "successes": 1,
+      "total": 3
+    },
+    "candidate_all_gold_covered": {
+      "successes": 2,
+      "total": 3
+    },
+    "honest_unsupported": {
+      "slots": [],
+      "correct_abstentions": 0,
+      "false_full": 0,
+      "total": 0
+    },
+    "generation_error_count": 1,
+    "all_citation_slices_exact": true,
+    "latency_ms": {
+      "total": 20360.193,
+      "mean": 6786.731,
+      "p50": 4990.075,
+      "p95": 15370.118
+    },
+    "usage": {
+      "input_tokens": 6964,
+      "output_tokens": 148,
+      "total_tokens": 7112
+    },
+    "failure_slots": [
+      40,
+      41
+    ],
+    "failure_breakdown": {
+      "generation_error": 1,
+      "generator_value_selection": 1
+    },
+    "failure_cases": [
+      {
+        "slot_ordinal": 40,
+        "failure_stage": "generator_value_selection",
+        "outcome": "incorrect",
+        "false_full": false
+      },
+      {
+        "slot_ordinal": 41,
+        "failure_stage": "generation_error",
+        "outcome": "no_response",
+        "false_full": false
+      }
+    ],
+    "gates": {
+      "generation_error_zero": false,
+      "honest_unsupported_false_full_zero": true
+    }
+  },
+  "cases": [
+    {
+      "slot_ordinal": 21,
+      "question_text": "파도 X 폭권 패키지의 '운명을 담는 재단사 플래티넘'은 공격력과 버프력을 각각 몇 퍼센트 증폭해?",
+      "previous_category": "previous_error",
+      "previous": {
+        "outcome": "no_response",
+        "failure_stage": "generation_error",
+        "model_output": [
+          null
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "attack_amplification",
+              "question_part": "attack_amplification",
+              "status": "supported_exact",
+              "answer": "40%",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c",
+                  "parent_document_id": "document_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "start_char": 0,
+                  "end_char": 29,
+                  "text": "# 운명을 담는 재단사 플래티넘 크리쳐 외형 및 옵션",
+                  "evidence_ref": "E1"
+                },
+                {
+                  "chunk_id": "chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c",
+                  "parent_document_id": "document_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "start_char": 73,
+                  "end_char": 199,
+                  "text": "| 전직별 지정 스킬 +1 보기 공격력 증폭 +40% 버프력 증폭 +10% 모든 속성 강화 + 40 힘/지능/체력/정신력 +150 물리/마법 크리티컬 히트 +3% 모든 속도 +2% MP MAX +5% 모험가 명성 +1261 |",
+                  "evidence_ref": "E5"
+                }
+              ]
+            },
+            {
+              "requirement_id": "buff_amplification",
+              "question_part": "buff_amplification",
+              "status": "supported_exact",
+              "answer": "10%",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c",
+                  "parent_document_id": "document_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "start_char": 0,
+                  "end_char": 29,
+                  "text": "# 운명을 담는 재단사 플래티넘 크리쳐 외형 및 옵션",
+                  "evidence_ref": "E1"
+                },
+                {
+                  "chunk_id": "chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c",
+                  "parent_document_id": "document_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "start_char": 73,
+                  "end_char": 199,
+                  "text": "| 전직별 지정 스킬 +1 보기 공격력 증폭 +40% 버프력 증폭 +10% 모든 속성 강화 + 40 힘/지능/체력/정신력 +150 물리/마법 크리티컬 히트 +3% 모든 속도 +2% MP MAX +5% 모험가 명성 +1261 |",
+                  "evidence_ref": "E5"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 40% [chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c] [chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c]\n- 10% [chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c] [chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "attack_amplification",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "percentage",
+                "model_value_type": "percentage",
+                "normalized_value": "40%",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E5"
+                ],
+                "raw_evidence_refs": [
+                  "E5"
+                ],
+                "expanded_context_refs": [
+                  "E1"
+                ]
+              },
+              {
+                "requirement_id": "buff_amplification",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "percentage",
+                "model_value_type": "percentage",
+                "normalized_value": "10%",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E5"
+                ],
+                "raw_evidence_refs": [
+                  "E5"
+                ],
+                "expanded_context_refs": [
+                  "E1"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "provider": "ollama_native",
+              "usage": {
+                "input_tokens": 4550,
+                "output_tokens": 70,
+                "total_tokens": 4620
+              },
+              "latency_ms": 15370.118,
+              "finish_reason": "stop",
+              "raw_content": "{\"requirements\": [{\"requirement_id\":\"attack_amplification\",\"status\":\"supported\",\"value_type\":\"percentage\",\"evidence_refs\":[\"E5\"],\"value\":\"40%\"},{\"requirement_id\":\"buff_amplification\",\"status\":\"supported\",\"value_type\":\"percentage\",\"evidence_refs\":[\"E5\"],\"value\":\"10%\"}]}",
+              "reasoning_content": "",
+              "thinking_enabled": false,
+              "max_output_tokens": 512,
+              "request_chars": 8779,
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "attack_amplification",
+                    "status": "supported",
+                    "value_type": "percentage",
+                    "value": "40%",
+                    "evidence_refs": [
+                      "E5"
+                    ]
+                  },
+                  {
+                    "requirement_id": "buff_amplification",
+                    "status": "supported",
+                    "value_type": "percentage",
+                    "value": "10%",
+                    "evidence_refs": [
+                      "E5"
+                    ]
+                  }
+                ]
+              },
+              "schema_validation_errors": []
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 15370.118,
+          "usage": {
+            "input_tokens": 4550,
+            "output_tokens": 70,
+            "total_tokens": 4620
+          }
+        }
+      },
+      "transition": "recovered"
+    },
+    {
+      "slot_ordinal": 40,
+      "question_text": "이벤트로 받은 세라 또는 넥슨 쿠폰은 어디에서 사용할 수 있어?",
+      "previous_category": "previous_error",
+      "previous": {
+        "outcome": "incorrect",
+        "failure_stage": "generator_value_selection",
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E10",
+                  "E11"
+                ],
+                "requirement_id": "redeem_location",
+                "status": "supported",
+                "value": "던전앤파이터 홈페이지의 '세라 쿠폰 입력'을 통해 사용할 수 있습니다.",
+                "value_type": "text"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "incorrect",
+        "failure_stage": "generator_value_selection",
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "redeem_location",
+              "question_part": "redeem_location",
+              "status": "supported_exact",
+              "answer": "- 던파 홈페이지 접속 → 홈페이지 메인의 '세라 쿠폰 입력' 선택​",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_6cb3a88b665e41901755b9df41f730b5d490c2580e1d385a87af380473ef7047",
+                  "parent_document_id": "document_sha256_1f805d9e762ebf71cdb6fb8431c74adba5b88e822e6c75db210104a752c8cb34",
+                  "source_id": "dnf_faq",
+                  "revision_id": "revision_sha256_1f805d9e762ebf71cdb6fb8431c74adba5b88e822e6c75db210104a752c8cb34",
+                  "start_char": 45,
+                  "end_char": 126,
+                  "text": "편의점, 마트 등에서 구매한 세라카드는 사용할 수 없습니다. 다만 이벤트로 지급된 쿠폰은 홈페이지 '세라 쿠폰 입력'을 통해 충전할 수 있습니다.",
+                  "evidence_ref": "E10"
+                },
+                {
+                  "chunk_id": "chunk_sha256_6cb3a88b665e41901755b9df41f730b5d490c2580e1d385a87af380473ef7047",
+                  "parent_document_id": "document_sha256_1f805d9e762ebf71cdb6fb8431c74adba5b88e822e6c75db210104a752c8cb34",
+                  "source_id": "dnf_faq",
+                  "revision_id": "revision_sha256_1f805d9e762ebf71cdb6fb8431c74adba5b88e822e6c75db210104a752c8cb34",
+                  "start_char": 127,
+                  "end_char": 165,
+                  "text": "- 던파 홈페이지 접속 → 홈페이지 메인의 '세라 쿠폰 입력' 선택​",
+                  "evidence_ref": "E11"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- - 던파 홈페이지 접속 → 홈페이지 메인의 '세라 쿠폰 입력' 선택​ [chunk_sha256_6cb3a88b665e41901755b9df41f730b5d490c2580e1d385a87af380473ef7047] [chunk_sha256_6cb3a88b665e41901755b9df41f730b5d490c2580e1d385a87af380473ef7047]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "redeem_location",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "text",
+                "model_value_type": "text",
+                "normalized_value": "- 던파 홈페이지 접속 → 홈페이지 메인의 '세라 쿠폰 입력' 선택​",
+                "answer_value_source": "selected_exact_evidence",
+                "evidence_refs": [
+                  "E11"
+                ],
+                "raw_evidence_refs": [
+                  "E11"
+                ],
+                "expanded_context_refs": [
+                  "E10"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "provider": "ollama_native",
+              "usage": {
+                "input_tokens": 2414,
+                "output_tokens": 78,
+                "total_tokens": 2492
+              },
+              "latency_ms": 4990.075,
+              "finish_reason": "stop",
+              "raw_content": "{\n  \"requirements\": [\n    {\n      \"requirement_id\": \"redeem_location\",\n      \"status\": \"supported\",\n      \"value_type\": \"text\",\n      \"evidence_refs\": [\"E11\"],\n      \"value\": \"던파 홈페이지 접속 → 홈페이지 메인의 '세라 쿠폰 입력'\"\n    }\n  ]\n}",
+              "reasoning_content": "",
+              "thinking_enabled": false,
+              "max_output_tokens": 512,
+              "request_chars": 5669,
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "redeem_location",
+                    "status": "supported",
+                    "value_type": "text",
+                    "value": "던파 홈페이지 접속 → 홈페이지 메인의 '세라 쿠폰 입력'",
+                    "evidence_refs": [
+                      "E11"
+                    ]
+                  }
+                ]
+              },
+              "schema_validation_errors": []
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 4990.075,
+          "usage": {
+            "input_tokens": 2414,
+            "output_tokens": 78,
+            "total_tokens": 2492
+          }
+        }
+      },
+      "transition": "persistent_error"
+    },
+    {
+      "slot_ordinal": 41,
+      "question_text": "현재 던전앤파이터 운영정책은 언제부터 시행됐어?",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": "retrieval_missing_gold",
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E3",
+                  "E118",
+                  "E145"
+                ],
+                "requirement_id": "effective_date",
+                "status": "supported",
+                "value": "2026-03-15",
+                "value_type": "date"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "no_response",
+        "failure_stage": "generation_error",
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "abstain",
+          "requirements": [
+            {
+              "requirement_id": "effective_date",
+              "question_part": "effective_at",
+              "status": "unsupported",
+              "answer": "",
+              "citations": []
+            }
+          ],
+          "rendered_answer": "",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "effective_date",
+                "model_status": null,
+                "exposed_status": "unsupported",
+                "failure_reasons": [
+                  "generation_error:RuntimeError"
+                ],
+                "generation_error": "RuntimeError: prompt_budget_exceeded: 15936>12000 request chars"
+              }
+            ],
+            "raw_output_passed_without_sanitization": false,
+            "all_exposed_citations_verified": true,
+            "generation_error": "RuntimeError: prompt_budget_exceeded: 15936>12000 request chars"
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "requested_model": "qwen3-8b:ctx8192",
+              "batch_protocol_error": "RuntimeError: prompt_budget_exceeded: 15936>12000 request chars",
+              "error": "RuntimeError: prompt_budget_exceeded: 15936>12000 request chars"
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 0,
+          "usage": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "total_tokens": 0
+          }
+        }
+      },
+      "transition": "new_regression"
+    }
+  ],
+  "inputs": {
+    "sealed_sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597",
+    "source_sha256": "9ae8e0443e0948457ef53e98493f81ee2909159716d20b247f85dc20429d2efb",
+    "chunks_sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885",
+    "documents_sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d",
+    "temporal_sha256": "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317",
+    "table_facts_sha256": "1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a"
+  },
+  "output": "outputs/v3/diagnostics/typed_evidence_ref_generation_protocol_slots21_40_41_20260726.jsonl"
+}

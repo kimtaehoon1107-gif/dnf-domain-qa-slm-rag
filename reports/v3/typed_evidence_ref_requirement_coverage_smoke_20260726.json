@@ -1,0 +1,2011 @@
+{
+  "evaluation_role": "targeted_adaptive_generation_smoke_not_generalization",
+  "model": "qwen3-8b:ctx8192",
+  "slots": [
+    4,
+    20,
+    21,
+    25,
+    35,
+    38,
+    40,
+    41,
+    43,
+    63
+  ],
+  "retrieval_reexecuted": false,
+  "stored_candidate_pools_reused": true,
+  "new_model_calls": 10,
+  "previous_error_slots": [
+    21,
+    35,
+    40
+  ],
+  "previous_correct_slots": [
+    4,
+    20,
+    25,
+    38,
+    41,
+    43,
+    63
+  ],
+  "transitions": {
+    "recovered": [
+      21,
+      35,
+      40
+    ],
+    "persistent_error": [],
+    "preserved_correct": [
+      4,
+      25,
+      38,
+      41,
+      43,
+      63
+    ],
+    "new_regression": [
+      20
+    ]
+  },
+  "score_summary": {
+    "scorer_version": "typed-evidence-ref-generalization-scorer-v2",
+    "normalization_contract": {
+      "version": "typed-evidence-ref-generalization-normalization-v2",
+      "rules": [
+        "Whitespace, punctuation, and Korean zero-padded month/day variants are normalized.",
+        "Korean and ISO dates are compared as YYYY-MM-DD; month/day-only forms use the frozen as_of year.",
+        "06시, 6시, and 06:00 are compared as 06:00; 오전/오후 are converted to 24-hour time.",
+        "Currency commas, Korean 만/억 scales, domain currency units, and unit-first count forms are normalized to integer amount plus unit.",
+        "Percentages and plain numbers are compared numerically.",
+        "Boolean answers normalize explicit true/false and Korean positive/negative actions while protecting 불가 state nouns.",
+        "Table-row and prose citations are equivalent only when the normalized gold value is present and the citation comes from an approved evidence chunk.",
+        "For text, enum, entity, and entity_list values, a directly cited pre-approved evidence unit is the canonical gold when required_values is a human-authored summary of that unit.",
+        "No semantic paraphrase credit is added beyond the typed normalizations above."
+      ]
+    },
+    "fixed_denominator": 10,
+    "gold_value_complete": {
+      "successes": 9,
+      "total": 10
+    },
+    "outcomes": {
+      "correct": 9,
+      "incorrect": 1,
+      "no_response": 0
+    },
+    "all_evidence_spans_hit": {
+      "successes": 7,
+      "total": 10
+    },
+    "candidate_all_gold_covered": {
+      "successes": 9,
+      "total": 10
+    },
+    "honest_unsupported": {
+      "slots": [
+        63
+      ],
+      "correct_abstentions": 1,
+      "false_full": 0,
+      "total": 1
+    },
+    "generation_error_count": 0,
+    "all_citation_slices_exact": true,
+    "latency_ms": {
+      "total": 56427.361,
+      "mean": 5642.736,
+      "p50": 5021.704,
+      "p95": 8547.754
+    },
+    "usage": {
+      "input_tokens": 23397,
+      "output_tokens": 1132,
+      "total_tokens": 24529
+    },
+    "failure_slots": [
+      20
+    ],
+    "failure_breakdown": {
+      "generator_value_selection": 1,
+      "retrieval_missing_gold": 1
+    },
+    "failure_cases": [
+      {
+        "slot_ordinal": 20,
+        "failure_stage": "generator_value_selection",
+        "outcome": "incorrect",
+        "false_full": false
+      },
+      {
+        "slot_ordinal": 41,
+        "failure_stage": "retrieval_missing_gold",
+        "outcome": "correct",
+        "false_full": false
+      }
+    ],
+    "gates": {
+      "generation_error_zero": true,
+      "honest_unsupported_false_full_zero": true
+    }
+  },
+  "cases": [
+    {
+      "slot_ordinal": 4,
+      "question_text": "Chrome 141 업데이트로 ISP 결제에 어떤 영향이 있었고, 권한 알림이 뜨면 어떻게 해야 했어?",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E11"
+                ],
+                "requirement_id": "payment_impact",
+                "status": "supported",
+                "value": "로컬 네트워크 Local Network Access가 기본 활성화로 변경되어 ISP 결제 불가",
+                "value_type": "text"
+              },
+              {
+                "evidence_refs": [
+                  "E12"
+                ],
+                "requirement_id": "permission_action",
+                "status": "supported",
+                "value": "allow_with_warning",
+                "value_type": "enum"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "payment_impact",
+              "question_part": "payment_impact",
+              "status": "supported_exact",
+              "answer": "영향 : 구글 크롬 브라우저 업데이트로 [로컬 네트워크 Local Network Access']이 기본 활성화로 변경되어 ISP 결제 불가 4.",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_9de3e9229cf67aff857e491937cdad538298a7729df5499dc49ab72cdde1b673",
+                  "parent_document_id": "document_sha256_079f23d51a3f56a736ea69eee0f6f4e5fcdcb01d2364bad1550c93a8a2c0c2e9",
+                  "source_id": "dnf_notice",
+                  "revision_id": "revision_sha256_079f23d51a3f56a736ea69eee0f6f4e5fcdcb01d2364bad1550c93a8a2c0c2e9",
+                  "start_char": 0,
+                  "end_char": 8,
+                  "text": "### 공지사항",
+                  "evidence_ref": "E1"
+                },
+                {
+                  "chunk_id": "chunk_sha256_9de3e9229cf67aff857e491937cdad538298a7729df5499dc49ab72cdde1b673",
+                  "parent_document_id": "document_sha256_079f23d51a3f56a736ea69eee0f6f4e5fcdcb01d2364bad1550c93a8a2c0c2e9",
+                  "source_id": "dnf_notice",
+                  "revision_id": "revision_sha256_079f23d51a3f56a736ea69eee0f6f4e5fcdcb01d2364bad1550c93a8a2c0c2e9",
+                  "start_char": 266,
+                  "end_char": 346,
+                  "text": "영향 : 구글 크롬 브라우저 업데이트로 [로컬 네트워크 Local Network Access']이 기본 활성화로 변경되어 ISP 결제 불가 4.",
+                  "evidence_ref": "E11"
+                }
+              ]
+            },
+            {
+              "requirement_id": "permission_action",
+              "question_part": "recommended_action",
+              "status": "supported_exact",
+              "answer": "조치방법 : - 페이북, ISP 결제 선택 후 로컬 네트워크 엑세스 허용/차단 알럿 발생 시, 허용 설정 - 주소 입력창 좌측 설정 버튼에서 ‘로컬 네트워크 엑세스’ 허용 설정 (경로 : 브라우저 설정 > 개인정보 보호 및 보안 > 사이트 설정 > 현재 사이트 선택) 안내 드리는 내용 참고하셔서 이용에 불편 없으시길 바랍니다.",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_9de3e9229cf67aff857e491937cdad538298a7729df5499dc49ab72cdde1b673",
+                  "parent_document_id": "document_sha256_079f23d51a3f56a736ea69eee0f6f4e5fcdcb01d2364bad1550c93a8a2c0c2e9",
+                  "source_id": "dnf_notice",
+                  "revision_id": "revision_sha256_079f23d51a3f56a736ea69eee0f6f4e5fcdcb01d2364bad1550c93a8a2c0c2e9",
+                  "start_char": 0,
+                  "end_char": 8,
+                  "text": "### 공지사항",
+                  "evidence_ref": "E1"
+                },
+                {
+                  "chunk_id": "chunk_sha256_9de3e9229cf67aff857e491937cdad538298a7729df5499dc49ab72cdde1b673",
+                  "parent_document_id": "document_sha256_079f23d51a3f56a736ea69eee0f6f4e5fcdcb01d2364bad1550c93a8a2c0c2e9",
+                  "source_id": "dnf_notice",
+                  "revision_id": "revision_sha256_079f23d51a3f56a736ea69eee0f6f4e5fcdcb01d2364bad1550c93a8a2c0c2e9",
+                  "start_char": 347,
+                  "end_char": 530,
+                  "text": "조치방법 : - 페이북, ISP 결제 선택 후 로컬 네트워크 엑세스 허용/차단 알럿 발생 시, 허용 설정 - 주소 입력창 좌측 설정 버튼에서 ‘로컬 네트워크 엑세스’ 허용 설정 (경로 : 브라우저 설정 > 개인정보 보호 및 보안 > 사이트 설정 > 현재 사이트 선택) 안내 드리는 내용 참고하셔서 이용에 불편 없으시길 바랍니다.",
+                  "evidence_ref": "E12"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 영향 : 구글 크롬 브라우저 업데이트로 [로컬 네트워크 Local Network Access']이 기본 활성화로 변경되어 ISP 결제 불가 4. [chunk_sha256_9de3e9229cf67aff857e491937cdad538298a7729df5499dc49ab72cdde1b673] [chunk_sha256_9de3e9229cf67aff857e491937cdad538298a7729df5499dc49ab72cdde1b673]\n- 조치방법 : - 페이북, ISP 결제 선택 후 로컬 네트워크 엑세스 허용/차단 알럿 발생 시, 허용 설정 - 주소 입력창 좌측 설정 버튼에서 ‘로컬 네트워크 엑세스’ 허용 설정 (경로 : 브라우저 설정 > 개인정보 보호 및 보안 > 사이트 설정 > 현재 사이트 선택) 안내 드리는 내용 참고하셔서 이용에 불편 없으시길 바랍니다. [chunk_sha256_9de3e9229cf67aff857e491937cdad538298a7729df5499dc49ab72cdde1b673] [chunk_sha256_9de3e9229cf67aff857e491937cdad538298a7729df5499dc49ab72cdde1b673]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "payment_impact",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "text",
+                "model_value_type": "text",
+                "normalized_value": "영향 : 구글 크롬 브라우저 업데이트로 [로컬 네트워크 Local Network Access']이 기본 활성화로 변경되어 ISP 결제 불가 4.",
+                "answer_value_source": "selected_exact_evidence",
+                "evidence_refs": [
+                  "E11"
+                ],
+                "raw_evidence_refs": [
+                  "E11"
+                ],
+                "expanded_context_refs": [
+                  "E1"
+                ]
+              },
+              {
+                "requirement_id": "permission_action",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "enum",
+                "model_value_type": "enum",
+                "normalized_value": "조치방법 : - 페이북, ISP 결제 선택 후 로컬 네트워크 엑세스 허용/차단 알럿 발생 시, 허용 설정 - 주소 입력창 좌측 설정 버튼에서 ‘로컬 네트워크 엑세스’ 허용 설정 (경로 : 브라우저 설정 > 개인정보 보호 및 보안 > 사이트 설정 > 현재 사이트 선택) 안내 드리는 내용 참고하셔서 이용에 불편 없으시길 바랍니다.",
+                "answer_value_source": "selected_exact_evidence",
+                "evidence_refs": [
+                  "E12"
+                ],
+                "raw_evidence_refs": [
+                  "E12"
+                ],
+                "expanded_context_refs": [
+                  "E1"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "provider": "ollama_native",
+              "usage": {
+                "input_tokens": 1159,
+                "output_tokens": 126,
+                "total_tokens": 1285
+              },
+              "latency_ms": 5340.623,
+              "finish_reason": "stop",
+              "raw_content": "{\"requirements\": [{\"requirement_id\": \"payment_impact\", \"status\": \"supported\", \"value_type\": \"text\", \"evidence_refs\": [\"E11\"], \"value\": \"구글 크롬 브라우저 업데이트로 [로컬 네트워크 Local Network Access']이 기본 활성화로 변경되어 ISP 결제 불가\"}, {\"requirement_id\": \"permission_action\", \"status\": \"supported\", \"value_type\": \"enum\", \"evidence_refs\": [\"E12\"], \"value\": \"허용 설정\"}] }",
+              "reasoning_content": "",
+              "thinking_enabled": false,
+              "max_output_tokens": 512,
+              "request_chars": 3372,
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "payment_impact",
+                    "status": "supported",
+                    "value_type": "text",
+                    "value": "구글 크롬 브라우저 업데이트로 [로컬 네트워크 Local Network Access']이 기본 활성화로 변경되어 ISP 결제 불가",
+                    "evidence_refs": [
+                      "E11"
+                    ]
+                  },
+                  {
+                    "requirement_id": "permission_action",
+                    "status": "supported",
+                    "value_type": "enum",
+                    "value": "허용 설정",
+                    "evidence_refs": [
+                      "E12"
+                    ]
+                  }
+                ]
+              },
+              "schema_validation_errors": []
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 5340.623,
+          "usage": {
+            "input_tokens": 1159,
+            "output_tokens": 126,
+            "total_tokens": 1285
+          }
+        }
+      },
+      "transition": "preserved_correct"
+    },
+    {
+      "slot_ordinal": 20,
+      "question_text": "미카엘라 프리뷰 방송은 언제 열리고, 어디에서 볼 수 있어?",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E17"
+                ],
+                "requirement_id": "broadcast_at",
+                "status": "supported",
+                "value": "2026-07-25T19:00",
+                "value_type": "datetime"
+              },
+              {
+                "evidence_refs": [
+                  "E1",
+                  "E17"
+                ],
+                "requirement_id": "channels",
+                "status": "supported",
+                "value": [
+                  "넥슨 라이브",
+                  "YouTube 던파TV"
+                ],
+                "value_type": "entity_list"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "incorrect",
+        "failure_stage": "generator_value_selection",
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "partial_answer",
+          "requirements": [
+            {
+              "requirement_id": "broadcast_at",
+              "question_part": "broadcast_at",
+              "status": "supported_exact",
+              "answer": "2026년 7월 25일 19시",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_f68c78778cef502069076dcf5a8935ca5145018198a723a2c892d0ae7f09e64f",
+                  "parent_document_id": "document_sha256_8778ae28b6314bfa635fe5d28630b58ba0c3069571b18e4673b0f2c5ba3cc499",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_8778ae28b6314bfa635fe5d28630b58ba0c3069571b18e4673b0f2c5ba3cc499",
+                  "start_char": 0,
+                  "end_char": 14,
+                  "text": "# 미카엘라 Preview",
+                  "evidence_ref": "E16"
+                },
+                {
+                  "chunk_id": "chunk_sha256_f68c78778cef502069076dcf5a8935ca5145018198a723a2c892d0ae7f09e64f",
+                  "parent_document_id": "document_sha256_8778ae28b6314bfa635fe5d28630b58ba0c3069571b18e4673b0f2c5ba3cc499",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_8778ae28b6314bfa635fe5d28630b58ba0c3069571b18e4673b0f2c5ba3cc499",
+                  "start_char": 15,
+                  "end_char": 153,
+                  "text": "## 신의 침묵 속에서 길을 잃은 성자, 미카엘라. 그 앞에 펼쳐질 새로운 싸움의 시작. 미카엘라 레이드 프리뷰 방송에 모험가님을 초대합니다. 온라인 생중계 일정 온라인 생중계 채널 2026년 7월 25일(토) 오후 7시 넥슨 라이브 던파TV 채널",
+                  "evidence_ref": "E17"
+                }
+              ]
+            },
+            {
+              "requirement_id": "channels",
+              "question_part": "broadcast_channels",
+              "status": "unsupported",
+              "answer": "",
+              "citations": []
+            }
+          ],
+          "rendered_answer": "- 2026년 7월 25일 19시 [chunk_sha256_f68c78778cef502069076dcf5a8935ca5145018198a723a2c892d0ae7f09e64f] [chunk_sha256_f68c78778cef502069076dcf5a8935ca5145018198a723a2c892d0ae7f09e64f]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "broadcast_at",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "datetime",
+                "model_value_type": "datetime",
+                "normalized_value": "2026-07-25T19:00",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E17"
+                ],
+                "raw_evidence_refs": [
+                  "E17"
+                ],
+                "expanded_context_refs": [
+                  "E16"
+                ]
+              },
+              {
+                "requirement_id": "channels",
+                "model_status": "unsupported",
+                "exposed_status": "unsupported",
+                "failure_reasons": [],
+                "value_type": "entity_list",
+                "model_value_type": "entity_list",
+                "normalized_value": null,
+                "answer_value_source": null,
+                "evidence_refs": [],
+                "raw_evidence_refs": [],
+                "expanded_context_refs": []
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "provider": "ollama_native",
+              "usage": {
+                "input_tokens": 1923,
+                "output_tokens": 116,
+                "total_tokens": 2039
+              },
+              "latency_ms": 4995.494,
+              "finish_reason": "stop",
+              "raw_content": "{\n  \"requirements\": [\n    {\n      \"requirement_id\": \"broadcast_at\",\n      \"status\": \"supported\",\n      \"value_type\": \"datetime\",\n      \"evidence_refs\": [\"E17\"],\n      \"value\": \"2026-07-25T19:00\"\n    },\n    {\n      \"requirement_id\": \"channels\",\n      \"status\": \"unsupported\",\n      \"value_type\": \"entity_list\",\n      \"evidence_refs\": [],\n      \"value\": null\n    }\n  ]\n}",
+              "reasoning_content": "",
+              "thinking_enabled": false,
+              "max_output_tokens": 512,
+              "request_chars": 4850,
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "broadcast_at",
+                    "status": "supported",
+                    "value_type": "datetime",
+                    "value": "2026-07-25T19:00",
+                    "evidence_refs": [
+                      "E17"
+                    ]
+                  },
+                  {
+                    "requirement_id": "channels",
+                    "status": "unsupported",
+                    "value_type": "entity_list",
+                    "value": null,
+                    "evidence_refs": []
+                  }
+                ]
+              },
+              "schema_validation_errors": []
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 4995.494,
+          "usage": {
+            "input_tokens": 1923,
+            "output_tokens": 116,
+            "total_tokens": 2039
+          }
+        }
+      },
+      "transition": "new_regression"
+    },
+    {
+      "slot_ordinal": 21,
+      "question_text": "파도 X 폭권 패키지의 '운명을 담는 재단사 플래티넘'은 공격력과 버프력을 각각 몇 퍼센트 증폭해?",
+      "previous_category": "previous_error",
+      "previous": {
+        "outcome": "no_response",
+        "failure_stage": "generation_error",
+        "model_output": [
+          null
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "attack_amplification",
+              "question_part": "attack_amplification",
+              "status": "supported_exact",
+              "answer": "40%",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c",
+                  "parent_document_id": "document_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "start_char": 0,
+                  "end_char": 29,
+                  "text": "# 운명을 담는 재단사 플래티넘 크리쳐 외형 및 옵션",
+                  "evidence_ref": "E1"
+                },
+                {
+                  "chunk_id": "chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c",
+                  "parent_document_id": "document_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "start_char": 73,
+                  "end_char": 199,
+                  "text": "| 전직별 지정 스킬 +1 보기 공격력 증폭 +40% 버프력 증폭 +10% 모든 속성 강화 + 40 힘/지능/체력/정신력 +150 물리/마법 크리티컬 히트 +3% 모든 속도 +2% MP MAX +5% 모험가 명성 +1261 |",
+                  "evidence_ref": "E5"
+                }
+              ]
+            },
+            {
+              "requirement_id": "buff_amplification",
+              "question_part": "buff_amplification",
+              "status": "supported_exact",
+              "answer": "10%",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c",
+                  "parent_document_id": "document_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "start_char": 0,
+                  "end_char": 29,
+                  "text": "# 운명을 담는 재단사 플래티넘 크리쳐 외형 및 옵션",
+                  "evidence_ref": "E1"
+                },
+                {
+                  "chunk_id": "chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c",
+                  "parent_document_id": "document_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "source_id": "dnf_event",
+                  "revision_id": "revision_sha256_11a284ad25122986b71b171ec6835c67d08383dbe6f9d6c283c385f28761ee1c",
+                  "start_char": 73,
+                  "end_char": 199,
+                  "text": "| 전직별 지정 스킬 +1 보기 공격력 증폭 +40% 버프력 증폭 +10% 모든 속성 강화 + 40 힘/지능/체력/정신력 +150 물리/마법 크리티컬 히트 +3% 모든 속도 +2% MP MAX +5% 모험가 명성 +1261 |",
+                  "evidence_ref": "E5"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 40% [chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c] [chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c]\n- 10% [chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c] [chunk_sha256_3e856093aac7d3dcec46077118c9abfec39446512ae0f4b2fe66ca2a34edca9c]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "attack_amplification",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "percentage",
+                "model_value_type": "percentage",
+                "normalized_value": "40%",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E5"
+                ],
+                "raw_evidence_refs": [
+                  "E5"
+                ],
+                "expanded_context_refs": [
+                  "E1"
+                ]
+              },
+              {
+                "requirement_id": "buff_amplification",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "percentage",
+                "model_value_type": "percentage",
+                "normalized_value": "10%",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E5"
+                ],
+                "raw_evidence_refs": [
+                  "E5"
+                ],
+                "expanded_context_refs": [
+                  "E1"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "provider": "ollama_native",
+              "usage": {
+                "input_tokens": 2391,
+                "output_tokens": 70,
+                "total_tokens": 2461
+              },
+              "latency_ms": 4553.621,
+              "finish_reason": "stop",
+              "raw_content": "{\"requirements\": [{\"requirement_id\":\"attack_amplification\",\"status\":\"supported\",\"value_type\":\"percentage\",\"evidence_refs\":[\"E5\"],\"value\":\"40%\"},{\"requirement_id\":\"buff_amplification\",\"status\":\"supported\",\"value_type\":\"percentage\",\"evidence_refs\":[\"E5\"],\"value\":\"10%\"}]}",
+              "reasoning_content": "",
+              "thinking_enabled": false,
+              "max_output_tokens": 512,
+              "request_chars": 5200,
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "attack_amplification",
+                    "status": "supported",
+                    "value_type": "percentage",
+                    "value": "40%",
+                    "evidence_refs": [
+                      "E5"
+                    ]
+                  },
+                  {
+                    "requirement_id": "buff_amplification",
+                    "status": "supported",
+                    "value_type": "percentage",
+                    "value": "10%",
+                    "evidence_refs": [
+                      "E5"
+                    ]
+                  }
+                ]
+              },
+              "schema_validation_errors": []
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 4553.621,
+          "usage": {
+            "input_tokens": 2391,
+            "output_tokens": 70,
+            "total_tokens": 2461
+          }
+        }
+      },
+      "transition": "recovered"
+    },
+    {
+      "slot_ordinal": 25,
+      "question_text": "던파ON 출석체크는 매일 몇 시에 갱신되고, 보상 교환의 1주 기준은 언제야?",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E3"
+                ],
+                "requirement_id": "daily_reset_time",
+                "status": "supported",
+                "value": "06시",
+                "value_type": "enum"
+              },
+              {
+                "evidence_refs": [
+                  "E7"
+                ],
+                "requirement_id": "weekly_reset_at",
+                "status": "supported",
+                "value": "매주 목요일 오전 6시",
+                "value_type": "enum"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "daily_reset_time",
+              "question_part": "daily_reset_time",
+              "status": "supported_exact",
+              "answer": "출석체크는 매일 06시를 기준으로 갱신됩니다.\n1일 기준은 오전 6시~ 다음 날 오전 6시이며, 점검 시에는 출석체크에 참여할 수 없습니다.",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_ecbd48044df650c1df8ce923008c63f5ecf780be047fd761ca8f9518369f015e",
+                  "parent_document_id": "document_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "source_id": "dnf_game_guide",
+                  "revision_id": "revision_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "start_char": 0,
+                  "end_char": 14,
+                  "text": "# 던파ON 출석체크 방법",
+                  "evidence_ref": "E1"
+                },
+                {
+                  "chunk_id": "chunk_sha256_ecbd48044df650c1df8ce923008c63f5ecf780be047fd761ca8f9518369f015e",
+                  "parent_document_id": "document_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "source_id": "dnf_game_guide",
+                  "revision_id": "revision_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "start_char": 92,
+                  "end_char": 117,
+                  "text": "출석체크는 매일 06시를 기준으로 갱신됩니다.",
+                  "evidence_ref": "E3"
+                },
+                {
+                  "chunk_id": "chunk_sha256_f7a8d65e6f96fc028f6367a374be93c9a7fcc7260fe6d84baaf63895034e4480",
+                  "parent_document_id": "document_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "source_id": "dnf_game_guide",
+                  "revision_id": "revision_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "start_char": 0,
+                  "end_char": 7,
+                  "text": "## 주의사항",
+                  "evidence_ref": "E13"
+                },
+                {
+                  "chunk_id": "chunk_sha256_f7a8d65e6f96fc028f6367a374be93c9a7fcc7260fe6d84baaf63895034e4480",
+                  "parent_document_id": "document_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "source_id": "dnf_game_guide",
+                  "revision_id": "revision_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "start_char": 8,
+                  "end_char": 32,
+                  "text": "### [던파ON 포인트 및 출석체크 안내]",
+                  "evidence_ref": "E14"
+                },
+                {
+                  "chunk_id": "chunk_sha256_f7a8d65e6f96fc028f6367a374be93c9a7fcc7260fe6d84baaf63895034e4480",
+                  "parent_document_id": "document_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "source_id": "dnf_game_guide",
+                  "revision_id": "revision_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "start_char": 132,
+                  "end_char": 184,
+                  "text": "1일 기준은 오전 6시~ 다음 날 오전 6시이며, 점검 시에는 출석체크에 참여할 수 없습니다.",
+                  "evidence_ref": "E18"
+                }
+              ]
+            },
+            {
+              "requirement_id": "weekly_reset_at",
+              "question_part": "weekly_reset_at",
+              "status": "supported_exact",
+              "answer": "- 1일 기준은 오전 6시~ 다음 날 오전 6시 / 1주 기준은 매주 목요일 오전 6시 / 1월 기준은 매월 1일 오전 6시",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_6e8d119cb7eb75d41cbb6524549de7f332d4f962085797df8b9d68e1fad174be",
+                  "parent_document_id": "document_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "source_id": "dnf_game_guide",
+                  "revision_id": "revision_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "start_char": 0,
+                  "end_char": 17,
+                  "text": "### [보상 교환 관련 안내]",
+                  "evidence_ref": "E5"
+                },
+                {
+                  "chunk_id": "chunk_sha256_6e8d119cb7eb75d41cbb6524549de7f332d4f962085797df8b9d68e1fad174be",
+                  "parent_document_id": "document_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "source_id": "dnf_game_guide",
+                  "revision_id": "revision_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "start_char": 18,
+                  "end_char": 48,
+                  "text": "각 보상의 제한 조건과 삭제 일자를 꼭 확인해 주세요.",
+                  "evidence_ref": "E6"
+                },
+                {
+                  "chunk_id": "chunk_sha256_6e8d119cb7eb75d41cbb6524549de7f332d4f962085797df8b9d68e1fad174be",
+                  "parent_document_id": "document_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "source_id": "dnf_game_guide",
+                  "revision_id": "revision_sha256_b7bc843187a068ea6f4781b051c77e872a203cbe726dd21f09b10ce9e52e0c25",
+                  "start_char": 49,
+                  "end_char": 118,
+                  "text": "- 1일 기준은 오전 6시~ 다음 날 오전 6시 / 1주 기준은 매주 목요일 오전 6시 / 1월 기준은 매월 1일 오전 6시",
+                  "evidence_ref": "E7"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 출석체크는 매일 06시를 기준으로 갱신됩니다.\n1일 기준은 오전 6시~ 다음 날 오전 6시이며, 점검 시에는 출석체크에 참여할 수 없습니다. [chunk_sha256_ecbd48044df650c1df8ce923008c63f5ecf780be047fd761ca8f9518369f015e] [chunk_sha256_ecbd48044df650c1df8ce923008c63f5ecf780be047fd761ca8f9518369f015e] [chunk_sha256_f7a8d65e6f96fc028f6367a374be93c9a7fcc7260fe6d84baaf63895034e4480] [chunk_sha256_f7a8d65e6f96fc028f6367a374be93c9a7fcc7260fe6d84baaf63895034e4480] [chunk_sha256_f7a8d65e6f96fc028f6367a374be93c9a7fcc7260fe6d84baaf63895034e4480]\n- - 1일 기준은 오전 6시~ 다음 날 오전 6시 / 1주 기준은 매주 목요일 오전 6시 / 1월 기준은 매월 1일 오전 6시 [chunk_sha256_6e8d119cb7eb75d41cbb6524549de7f332d4f962085797df8b9d68e1fad174be] [chunk_sha256_6e8d119cb7eb75d41cbb6524549de7f332d4f962085797df8b9d68e1fad174be] [chunk_sha256_6e8d119cb7eb75d41cbb6524549de7f332d4f962085797df8b9d68e1fad174be]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "daily_reset_time",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "enum",
+                "model_value_type": "enum",
+                "normalized_value": "출석체크는 매일 06시를 기준으로 갱신됩니다.\n1일 기준은 오전 6시~ 다음 날 오전 6시이며, 점검 시에는 출석체크에 참여할 수 없습니다.",
+                "answer_value_source": "selected_exact_evidence",
+                "evidence_refs": [
+                  "E3",
+                  "E18"
+                ],
+                "raw_evidence_refs": [
+                  "E3",
+                  "E18"
+                ],
+                "expanded_context_refs": [
+                  "E1",
+                  "E13",
+                  "E14"
+                ]
+              },
+              {
+                "requirement_id": "weekly_reset_at",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "enum",
+                "model_value_type": "enum",
+                "normalized_value": "- 1일 기준은 오전 6시~ 다음 날 오전 6시 / 1주 기준은 매주 목요일 오전 6시 / 1월 기준은 매월 1일 오전 6시",
+                "answer_value_source": "selected_exact_evidence",
+                "evidence_refs": [
+                  "E7"
+                ],
+                "raw_evidence_refs": [
+                  "E7"
+                ],
+                "expanded_context_refs": [
+                  "E5",
+                  "E6"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "provider": "ollama_native",
+              "usage": {
+                "input_tokens": 1587,
+                "output_tokens": 124,
+                "total_tokens": 1711
+              },
+              "latency_ms": 7398.185,
+              "finish_reason": "stop",
+              "raw_content": "{\n  \"requirements\": [\n    {\n      \"requirement_id\": \"daily_reset_time\",\n      \"status\": \"supported\",\n      \"value_type\": \"enum\",\n      \"evidence_refs\": [\"E3\", \"E18\"],\n      \"value\": \"06:00\"\n    },\n    {\n      \"requirement_id\": \"weekly_reset_at\",\n      \"status\": \"supported\",\n      \"value_type\": \"enum\",\n      \"evidence_refs\": [\"E7\"],\n      \"value\": \"매주 목요일 오전 6시\"\n    }\n  ]\n}",
+              "reasoning_content": "",
+              "thinking_enabled": false,
+              "max_output_tokens": 512,
+              "request_chars": 4292,
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "daily_reset_time",
+                    "status": "supported",
+                    "value_type": "enum",
+                    "value": "06:00",
+                    "evidence_refs": [
+                      "E3",
+                      "E18"
+                    ]
+                  },
+                  {
+                    "requirement_id": "weekly_reset_at",
+                    "status": "supported",
+                    "value_type": "enum",
+                    "value": "매주 목요일 오전 6시",
+                    "evidence_refs": [
+                      "E7"
+                    ]
+                  }
+                ]
+              },
+              "schema_validation_errors": []
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 7398.185,
+          "usage": {
+            "input_tokens": 1587,
+            "output_tokens": 124,
+            "total_tokens": 1711
+          }
+        }
+      },
+      "transition": "preserved_correct"
+    },
+    {
+      "slot_ordinal": 35,
+      "question_text": "히든 레어 아바타를 같은 계정 캐릭터와 다른 계정 캐릭터에게 넘길 때 교환불가 타입으로 바뀌는지 각각 알려줘.",
+      "previous_category": "previous_error",
+      "previous": {
+        "outcome": "incorrect",
+        "failure_stage": "verifier_overreject",
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E5"
+                ],
+                "requirement_id": "same_account_trade_type",
+                "status": "supported",
+                "value": false,
+                "value_type": "boolean"
+              },
+              {
+                "evidence_refs": [
+                  "E6",
+                  "E7"
+                ],
+                "requirement_id": "other_account_trade_type",
+                "status": "supported",
+                "value": true,
+                "value_type": "boolean"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "same_account_trade_type",
+              "question_part": "changes_to_untradeable",
+              "status": "supported_exact",
+              "answer": "아니오",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_2073dab6b05ec247292284a0a0a5455a63b1faada4b6ab78a1c64f8dc71b8a22",
+                  "parent_document_id": "document_sha256_0f18c2d9347d988bec5f4392da02cdd14585f9a53085b978884e22839220188d",
+                  "source_id": "dnf_faq",
+                  "revision_id": "revision_sha256_0f18c2d9347d988bec5f4392da02cdd14585f9a53085b978884e22839220188d",
+                  "start_char": 140,
+                  "end_char": 165,
+                  "text": "거래타입이 교환불가 상태로 변경되지 않습니다.",
+                  "evidence_ref": "E5"
+                }
+              ]
+            },
+            {
+              "requirement_id": "other_account_trade_type",
+              "question_part": "changes_to_untradeable",
+              "status": "supported_exact",
+              "answer": "예",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_2073dab6b05ec247292284a0a0a5455a63b1faada4b6ab78a1c64f8dc71b8a22",
+                  "parent_document_id": "document_sha256_0f18c2d9347d988bec5f4392da02cdd14585f9a53085b978884e22839220188d",
+                  "source_id": "dnf_faq",
+                  "revision_id": "revision_sha256_0f18c2d9347d988bec5f4392da02cdd14585f9a53085b978884e22839220188d",
+                  "start_char": 208,
+                  "end_char": 246,
+                  "text": "교환불가 타입으로 변경되니 아바타 이동/거래 시 유의 부탁 드립니다.",
+                  "evidence_ref": "E7"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 아니오 [chunk_sha256_2073dab6b05ec247292284a0a0a5455a63b1faada4b6ab78a1c64f8dc71b8a22]\n- 예 [chunk_sha256_2073dab6b05ec247292284a0a0a5455a63b1faada4b6ab78a1c64f8dc71b8a22]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "same_account_trade_type",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "boolean",
+                "model_value_type": "boolean",
+                "normalized_value": false,
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E5"
+                ],
+                "raw_evidence_refs": [
+                  "E5"
+                ],
+                "expanded_context_refs": []
+              },
+              {
+                "requirement_id": "other_account_trade_type",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "boolean",
+                "model_value_type": "boolean",
+                "normalized_value": true,
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E7"
+                ],
+                "raw_evidence_refs": [
+                  "E7"
+                ],
+                "expanded_context_refs": []
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "provider": "ollama_native",
+              "usage": {
+                "input_tokens": 4188,
+                "output_tokens": 83,
+                "total_tokens": 4271
+              },
+              "latency_ms": 5721.816,
+              "finish_reason": "stop",
+              "raw_content": "{\"requirements\": [{\"requirement_id\": \"same_account_trade_type\", \"status\": \"supported\", \"value_type\": \"boolean\", \"evidence_refs\": [\"E5\"], \"value\": false}, {\"requirement_id\": \"other_account_trade_type\", \"status\": \"supported\", \"value_type\": \"boolean\", \"evidence_refs\": [\"E7\"], \"value\": true}]}",
+              "reasoning_content": "",
+              "thinking_enabled": false,
+              "max_output_tokens": 512,
+              "request_chars": 8072,
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "same_account_trade_type",
+                    "status": "supported",
+                    "value_type": "boolean",
+                    "value": false,
+                    "evidence_refs": [
+                      "E5"
+                    ]
+                  },
+                  {
+                    "requirement_id": "other_account_trade_type",
+                    "status": "supported",
+                    "value_type": "boolean",
+                    "value": true,
+                    "evidence_refs": [
+                      "E7"
+                    ]
+                  }
+                ]
+              },
+              "schema_validation_errors": []
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 5721.816,
+          "usage": {
+            "input_tokens": 4188,
+            "output_tokens": 83,
+            "total_tokens": 4271
+          }
+        }
+      },
+      "transition": "recovered"
+    },
+    {
+      "slot_ordinal": 38,
+      "question_text": "고블린패드 신규 발급은 언제 중단됐고, 기존 이용자는 재발급할 수 있어?",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E2"
+                ],
+                "requirement_id": "new_issue_stopped_at",
+                "status": "supported",
+                "value": "2020-06-25",
+                "value_type": "date"
+              },
+              {
+                "evidence_refs": [
+                  "E4",
+                  "E10",
+                  "E44"
+                ],
+                "requirement_id": "reissue_existing_user",
+                "status": "supported",
+                "value": true,
+                "value_type": "boolean"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "historical",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "new_issue_stopped_at",
+              "question_part": "stopped_at",
+              "status": "supported_exact",
+              "answer": "2020년 6월 25일",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_611d6ec7b679543c445c77c70c5ed92310845f2e236c60044afc3180d47601ce",
+                  "parent_document_id": "document_sha256_0e2e3708a583908218fceddd24deac9ec99ed336ffe2f48ffd34b5b0203b50ef",
+                  "source_id": "dnf_faq",
+                  "revision_id": "revision_sha256_0e2e3708a583908218fceddd24deac9ec99ed336ffe2f48ffd34b5b0203b50ef",
+                  "start_char": 29,
+                  "end_char": 87,
+                  "text": "고블린패드의 신규 발급이 2020년 6월 25일 부로 중단되었습니다. - 관련 공지사항: [☞ 바로가기]",
+                  "evidence_ref": "E2"
+                }
+              ]
+            },
+            {
+              "requirement_id": "reissue_existing_user",
+              "question_part": "can_reissue",
+              "status": "supported_exact",
+              "answer": "예",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_611d6ec7b679543c445c77c70c5ed92310845f2e236c60044afc3180d47601ce",
+                  "parent_document_id": "document_sha256_0e2e3708a583908218fceddd24deac9ec99ed336ffe2f48ffd34b5b0203b50ef",
+                  "source_id": "dnf_faq",
+                  "revision_id": "revision_sha256_0e2e3708a583908218fceddd24deac9ec99ed336ffe2f48ffd34b5b0203b50ef",
+                  "start_char": 170,
+                  "end_char": 250,
+                  "text": "※ 기존 이용 중이신 경우 비밀번호 변경, 재발급이 가능합니다. - 비밀번호 변경: 인게임 내에서 가능 - 재발급: 홈페이지 [☞ 바로가기] ​",
+                  "evidence_ref": "E4"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 2020년 6월 25일 [chunk_sha256_611d6ec7b679543c445c77c70c5ed92310845f2e236c60044afc3180d47601ce]\n- 예 [chunk_sha256_611d6ec7b679543c445c77c70c5ed92310845f2e236c60044afc3180d47601ce]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "new_issue_stopped_at",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "date",
+                "model_value_type": "date",
+                "normalized_value": "2020-06-25",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E2"
+                ],
+                "raw_evidence_refs": [
+                  "E2"
+                ],
+                "expanded_context_refs": []
+              },
+              {
+                "requirement_id": "reissue_existing_user",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "boolean",
+                "model_value_type": "boolean",
+                "normalized_value": true,
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E4"
+                ],
+                "raw_evidence_refs": [
+                  "E4"
+                ],
+                "expanded_context_refs": []
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "provider": "ollama_native",
+              "usage": {
+                "input_tokens": 1073,
+                "output_tokens": 117,
+                "total_tokens": 1190
+              },
+              "latency_ms": 5824.514,
+              "finish_reason": "stop",
+              "raw_content": "{\n  \"requirements\": [\n    {\n      \"requirement_id\": \"new_issue_stopped_at\",\n      \"status\": \"supported\",\n      \"value_type\": \"date\",\n      \"evidence_refs\": [\"E2\"],\n      \"value\": \"2020-06-25\"\n    },\n    {\n      \"requirement_id\": \"reissue_existing_user\",\n      \"status\": \"supported\",\n      \"value_type\": \"boolean\",\n      \"evidence_refs\": [\"E4\"],\n      \"value\": true\n    }\n  ]\n}",
+              "reasoning_content": "",
+              "thinking_enabled": false,
+              "max_output_tokens": 512,
+              "request_chars": 3298,
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "new_issue_stopped_at",
+                    "status": "supported",
+                    "value_type": "date",
+                    "value": "2020-06-25",
+                    "evidence_refs": [
+                      "E2"
+                    ]
+                  },
+                  {
+                    "requirement_id": "reissue_existing_user",
+                    "status": "supported",
+                    "value_type": "boolean",
+                    "value": true,
+                    "evidence_refs": [
+                      "E4"
+                    ]
+                  }
+                ]
+              },
+              "schema_validation_errors": []
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 5824.514,
+          "usage": {
+            "input_tokens": 1073,
+            "output_tokens": 117,
+            "total_tokens": 1190
+          }
+        }
+      },
+      "transition": "preserved_correct"
+    },
+    {
+      "slot_ordinal": 40,
+      "question_text": "이벤트로 받은 세라 또는 넥슨 쿠폰은 어디에서 사용할 수 있어?",
+      "previous_category": "previous_error",
+      "previous": {
+        "outcome": "incorrect",
+        "failure_stage": "generator_value_selection",
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E10",
+                  "E11"
+                ],
+                "requirement_id": "redeem_location",
+                "status": "supported",
+                "value": "던전앤파이터 홈페이지의 '세라 쿠폰 입력'을 통해 사용할 수 있습니다.",
+                "value_type": "text"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "redeem_location",
+              "question_part": "redeem_location",
+              "status": "supported_exact",
+              "answer": "던파ON이 아닌, 던전앤파이터 홈페이지를 이용해주세요.​\n- 던파 홈페이지 접속 → 홈페이지 메인의 '세라 쿠폰 입력' 선택​\n던파 홈페이지 충전 창 → 기타 → 세라카드\n던파 홈페이지 충전 창 → 넥슨카드",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_5927e937cb18a4ac2b79b1cbe8a9b5dc05eadf7efc18d9d0efab501cb37832dd",
+                  "parent_document_id": "document_sha256_0c6454727eb4b218ba26bc6586e062f13d0c5be75e8c062c190f149f22357028",
+                  "source_id": "dnf_faq",
+                  "revision_id": "revision_sha256_0c6454727eb4b218ba26bc6586e062f13d0c5be75e8c062c190f149f22357028",
+                  "start_char": 94,
+                  "end_char": 125,
+                  "text": "던파ON이 아닌, 던전앤파이터 홈페이지를 이용해주세요.​",
+                  "evidence_ref": "E4"
+                },
+                {
+                  "chunk_id": "chunk_sha256_6cb3a88b665e41901755b9df41f730b5d490c2580e1d385a87af380473ef7047",
+                  "parent_document_id": "document_sha256_1f805d9e762ebf71cdb6fb8431c74adba5b88e822e6c75db210104a752c8cb34",
+                  "source_id": "dnf_faq",
+                  "revision_id": "revision_sha256_1f805d9e762ebf71cdb6fb8431c74adba5b88e822e6c75db210104a752c8cb34",
+                  "start_char": 45,
+                  "end_char": 126,
+                  "text": "편의점, 마트 등에서 구매한 세라카드는 사용할 수 없습니다. 다만 이벤트로 지급된 쿠폰은 홈페이지 '세라 쿠폰 입력'을 통해 충전할 수 있습니다.",
+                  "evidence_ref": "E10"
+                },
+                {
+                  "chunk_id": "chunk_sha256_6cb3a88b665e41901755b9df41f730b5d490c2580e1d385a87af380473ef7047",
+                  "parent_document_id": "document_sha256_1f805d9e762ebf71cdb6fb8431c74adba5b88e822e6c75db210104a752c8cb34",
+                  "source_id": "dnf_faq",
+                  "revision_id": "revision_sha256_1f805d9e762ebf71cdb6fb8431c74adba5b88e822e6c75db210104a752c8cb34",
+                  "start_char": 127,
+                  "end_char": 165,
+                  "text": "- 던파 홈페이지 접속 → 홈페이지 메인의 '세라 쿠폰 입력' 선택​",
+                  "evidence_ref": "E11"
+                },
+                {
+                  "chunk_id": "chunk_sha256_1fc85edb8fd0daa872b162f40d94e07b9f6ac51e07f8db70b1299161a43d1181",
+                  "parent_document_id": "document_sha256_0f99033c39d00795995efe1767870cf0f241dfa4f1be71ec5c5dac1717964d8d",
+                  "source_id": "dnf_faq",
+                  "revision_id": "revision_sha256_0f99033c39d00795995efe1767870cf0f241dfa4f1be71ec5c5dac1717964d8d",
+                  "start_char": 113,
+                  "end_char": 137,
+                  "text": "던파 홈페이지 충전 창 → 기타 → 세라카드",
+                  "evidence_ref": "E16"
+                },
+                {
+                  "chunk_id": "chunk_sha256_1fc85edb8fd0daa872b162f40d94e07b9f6ac51e07f8db70b1299161a43d1181",
+                  "parent_document_id": "document_sha256_0f99033c39d00795995efe1767870cf0f241dfa4f1be71ec5c5dac1717964d8d",
+                  "source_id": "dnf_faq",
+                  "revision_id": "revision_sha256_0f99033c39d00795995efe1767870cf0f241dfa4f1be71ec5c5dac1717964d8d",
+                  "start_char": 148,
+                  "end_char": 167,
+                  "text": "던파 홈페이지 충전 창 → 넥슨카드",
+                  "evidence_ref": "E18"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 던파ON이 아닌, 던전앤파이터 홈페이지를 이용해주세요.​\n- 던파 홈페이지 접속 → 홈페이지 메인의 '세라 쿠폰 입력' 선택​\n던파 홈페이지 충전 창 → 기타 → 세라카드\n던파 홈페이지 충전 창 → 넥슨카드 [chunk_sha256_5927e937cb18a4ac2b79b1cbe8a9b5dc05eadf7efc18d9d0efab501cb37832dd] [chunk_sha256_6cb3a88b665e41901755b9df41f730b5d490c2580e1d385a87af380473ef7047] [chunk_sha256_6cb3a88b665e41901755b9df41f730b5d490c2580e1d385a87af380473ef7047] [chunk_sha256_1fc85edb8fd0daa872b162f40d94e07b9f6ac51e07f8db70b1299161a43d1181] [chunk_sha256_1fc85edb8fd0daa872b162f40d94e07b9f6ac51e07f8db70b1299161a43d1181]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "redeem_location",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "text",
+                "model_value_type": "text",
+                "normalized_value": "던파ON이 아닌, 던전앤파이터 홈페이지를 이용해주세요.​\n- 던파 홈페이지 접속 → 홈페이지 메인의 '세라 쿠폰 입력' 선택​\n던파 홈페이지 충전 창 → 기타 → 세라카드\n던파 홈페이지 충전 창 → 넥슨카드",
+                "answer_value_source": "selected_exact_evidence",
+                "evidence_refs": [
+                  "E4",
+                  "E11",
+                  "E16",
+                  "E18"
+                ],
+                "raw_evidence_refs": [
+                  "E4",
+                  "E11",
+                  "E16",
+                  "E18"
+                ],
+                "expanded_context_refs": [
+                  "E10"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "provider": "ollama_native",
+              "usage": {
+                "input_tokens": 2414,
+                "output_tokens": 93,
+                "total_tokens": 2507
+              },
+              "latency_ms": 5021.704,
+              "finish_reason": "stop",
+              "raw_content": "{\n  \"requirements\": [\n    {\n      \"requirement_id\": \"redeem_location\",\n      \"status\": \"supported\",\n      \"value_type\": \"text\",\n      \"evidence_refs\": [\"E4\", \"E11\", \"E16\", \"E18\"],\n      \"value\": \"던파ON이 아닌, 던전앤파이터 홈페이지를 이용해주세요.\"\n    }\n  ]\n}",
+              "reasoning_content": "",
+              "thinking_enabled": false,
+              "max_output_tokens": 512,
+              "request_chars": 5669,
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "redeem_location",
+                    "status": "supported",
+                    "value_type": "text",
+                    "value": "던파ON이 아닌, 던전앤파이터 홈페이지를 이용해주세요.",
+                    "evidence_refs": [
+                      "E4",
+                      "E11",
+                      "E16",
+                      "E18"
+                    ]
+                  }
+                ]
+              },
+              "schema_validation_errors": []
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 5021.704,
+          "usage": {
+            "input_tokens": 2414,
+            "output_tokens": 93,
+            "total_tokens": 2507
+          }
+        }
+      },
+      "transition": "recovered"
+    },
+    {
+      "slot_ordinal": 41,
+      "question_text": "현재 던전앤파이터 운영정책은 언제부터 시행됐어?",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": "retrieval_missing_gold",
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E3",
+                  "E118",
+                  "E145"
+                ],
+                "requirement_id": "effective_date",
+                "status": "supported",
+                "value": "2026-03-15",
+                "value_type": "date"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": "retrieval_missing_gold",
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "effective_date",
+              "question_part": "effective_at",
+              "status": "supported_exact",
+              "answer": "2026년 3월 15일",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_9fef8454ca5da401a3eb86ef4919448898883b1f891861c4670207059eaf3c33",
+                  "parent_document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "source_id": "dnf_account_policy",
+                  "revision_id": "revision_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "start_char": 0,
+                  "end_char": 8,
+                  "text": "### 운영정책",
+                  "evidence_ref": "E1"
+                },
+                {
+                  "chunk_id": "chunk_sha256_9fef8454ca5da401a3eb86ef4919448898883b1f891861c4670207059eaf3c33",
+                  "parent_document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "source_id": "dnf_account_policy",
+                  "revision_id": "revision_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "start_char": 14,
+                  "end_char": 27,
+                  "text": "2026년 03월 15일",
+                  "evidence_ref": "E3"
+                },
+                {
+                  "chunk_id": "chunk_sha256_15cf260ff6e53ec7aee7f2bf777c7d9c548d3551b049e287843b00c9b0c91790",
+                  "parent_document_id": "document_sha256_0729e99a8f2a7bff82aa522667d519d80a194369910a8c020f54825ab627c51d",
+                  "source_id": "dnf_notice",
+                  "revision_id": "revision_sha256_0729e99a8f2a7bff82aa522667d519d80a194369910a8c020f54825ab627c51d",
+                  "start_char": 0,
+                  "end_char": 8,
+                  "text": "### 공지사항",
+                  "evidence_ref": "E118"
+                },
+                {
+                  "chunk_id": "chunk_sha256_15cf260ff6e53ec7aee7f2bf777c7d9c548d3551b049e287843b00c9b0c91790",
+                  "parent_document_id": "document_sha256_0729e99a8f2a7bff82aa522667d519d80a194369910a8c020f54825ab627c51d",
+                  "source_id": "dnf_notice",
+                  "revision_id": "revision_sha256_0729e99a8f2a7bff82aa522667d519d80a194369910a8c020f54825ab627c51d",
+                  "start_char": 268,
+                  "end_char": 275,
+                  "text": "▒ 적용 일자",
+                  "evidence_ref": "E128"
+                },
+                {
+                  "chunk_id": "chunk_sha256_15cf260ff6e53ec7aee7f2bf777c7d9c548d3551b049e287843b00c9b0c91790",
+                  "parent_document_id": "document_sha256_0729e99a8f2a7bff82aa522667d519d80a194369910a8c020f54825ab627c51d",
+                  "source_id": "dnf_notice",
+                  "revision_id": "revision_sha256_0729e99a8f2a7bff82aa522667d519d80a194369910a8c020f54825ab627c51d",
+                  "start_char": 276,
+                  "end_char": 291,
+                  "text": "- 2025년 11월 1일​",
+                  "evidence_ref": "E129"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- 2026년 3월 15일 [chunk_sha256_9fef8454ca5da401a3eb86ef4919448898883b1f891861c4670207059eaf3c33] [chunk_sha256_9fef8454ca5da401a3eb86ef4919448898883b1f891861c4670207059eaf3c33] [chunk_sha256_15cf260ff6e53ec7aee7f2bf777c7d9c548d3551b049e287843b00c9b0c91790] [chunk_sha256_15cf260ff6e53ec7aee7f2bf777c7d9c548d3551b049e287843b00c9b0c91790] [chunk_sha256_15cf260ff6e53ec7aee7f2bf777c7d9c548d3551b049e287843b00c9b0c91790]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "effective_date",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "date",
+                "model_value_type": "date",
+                "normalized_value": "2026-03-15",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E3",
+                  "E129"
+                ],
+                "raw_evidence_refs": [
+                  "E3",
+                  "E129"
+                ],
+                "expanded_context_refs": [
+                  "E1",
+                  "E118",
+                  "E128"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "provider": "ollama_native",
+              "usage": {
+                "input_tokens": 2344,
+                "output_tokens": 74,
+                "total_tokens": 2418
+              },
+              "latency_ms": 4572.041,
+              "finish_reason": "stop",
+              "raw_content": "{\n  \"requirements\": [\n    {\n      \"requirement_id\": \"effective_date\",\n      \"status\": \"supported\",\n      \"value_type\": \"date\",\n      \"evidence_refs\": [\"E3\", \"E129\"],\n      \"value\": \"2026-03-15\"\n    }\n  ]\n}",
+              "reasoning_content": "",
+              "thinking_enabled": false,
+              "max_output_tokens": 512,
+              "request_chars": 5497,
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "effective_date",
+                    "status": "supported",
+                    "value_type": "date",
+                    "value": "2026-03-15",
+                    "evidence_refs": [
+                      "E3",
+                      "E129"
+                    ]
+                  }
+                ]
+              },
+              "schema_validation_errors": []
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 4572.041,
+          "usage": {
+            "input_tokens": 2344,
+            "output_tokens": 74,
+            "total_tokens": 2418
+          }
+        }
+      },
+      "transition": "preserved_correct"
+    },
+    {
+      "slot_ordinal": 43,
+      "question_text": "고객 간 사적 분쟁에 회사가 개입하는 원칙과 예외는 무엇이야?",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E32"
+                ],
+                "requirement_id": "general_rule",
+                "status": "supported",
+                "value": "회사는 고객의 정상적인 활동이나 고객 간의 사적인 분쟁에 개입하지 않는 것을 원칙으로 합니다. 단, 아래와 같은 경우에는 해당 행위를 경고하거나 게임이용을 제한할 수 있습니다.",
+                "value_type": "text"
+              },
+              {
+                "evidence_refs": [
+                  "E33",
+                  "E34",
+                  "E35"
+                ],
+                "requirement_id": "exception",
+                "status": "supported",
+                "value": "① 비인가 프로그램 사용, 타인의 게임이용방해 등 원활한 게임 진행에 부정적 영향을 준다고 판단될 경우 ② 사적인 분쟁이라고 하더라도 불특정 다수의 고객에게 피해를 입히는 경우 ③ 고객 간의 분쟁으로 게임 질서를 어지럽히거나 실정법을 위반하는 행동이라고 판단될 경우",
+                "value_type": "text"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "full_answer",
+          "requirements": [
+            {
+              "requirement_id": "general_rule",
+              "question_part": "company_intervention_rule",
+              "status": "supported_exact",
+              "answer": "[3-3] 회사는 고객의 정상적인 활동이나 고객 간의 사적인 분쟁에 개입하지 않는 것을 원칙으로 합니다. 단, 아래와 같은 경우에는 해당 행위를 경고하거나 게임이용을 제한할 수 있습니다.",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_89cd3ff19da0087bafabc531b84e42e0f9792150cc38c3797cafc3c67317f787",
+                  "parent_document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "source_id": "dnf_account_policy",
+                  "revision_id": "revision_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "start_char": 1450,
+                  "end_char": 1554,
+                  "text": "[3-3] 회사는 고객의 정상적인 활동이나 고객 간의 사적인 분쟁에 개입하지 않는 것을 원칙으로 합니다. 단, 아래와 같은 경우에는 해당 행위를 경고하거나 게임이용을 제한할 수 있습니다.",
+                  "evidence_ref": "E32"
+                }
+              ]
+            },
+            {
+              "requirement_id": "exception",
+              "question_part": "intervention_exception",
+              "status": "supported_exact",
+              "answer": "① 비인가 프로그램 사용, 타인의 게임이용방해 등 원활한 게임 진행에 부정적 영향을 준다고 판단될 경우\n② 사적인 분쟁이라고 하더라도 불특정 다수의 고객에게 피해를 입히는 경우\n③ 고객 간의 분쟁으로 게임 질서를 어지럽히거나 실정법을 위반하는 행동이라고 판단될 경우",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_89cd3ff19da0087bafabc531b84e42e0f9792150cc38c3797cafc3c67317f787",
+                  "parent_document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "source_id": "dnf_account_policy",
+                  "revision_id": "revision_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "start_char": 1450,
+                  "end_char": 1554,
+                  "text": "[3-3] 회사는 고객의 정상적인 활동이나 고객 간의 사적인 분쟁에 개입하지 않는 것을 원칙으로 합니다. 단, 아래와 같은 경우에는 해당 행위를 경고하거나 게임이용을 제한할 수 있습니다.",
+                  "evidence_ref": "E32"
+                },
+                {
+                  "chunk_id": "chunk_sha256_89cd3ff19da0087bafabc531b84e42e0f9792150cc38c3797cafc3c67317f787",
+                  "parent_document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "source_id": "dnf_account_policy",
+                  "revision_id": "revision_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "start_char": 1555,
+                  "end_char": 1612,
+                  "text": "① 비인가 프로그램 사용, 타인의 게임이용방해 등 원활한 게임 진행에 부정적 영향을 준다고 판단될 경우",
+                  "evidence_ref": "E33"
+                },
+                {
+                  "chunk_id": "chunk_sha256_89cd3ff19da0087bafabc531b84e42e0f9792150cc38c3797cafc3c67317f787",
+                  "parent_document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "source_id": "dnf_account_policy",
+                  "revision_id": "revision_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "start_char": 1613,
+                  "end_char": 1653,
+                  "text": "② 사적인 분쟁이라고 하더라도 불특정 다수의 고객에게 피해를 입히는 경우",
+                  "evidence_ref": "E34"
+                },
+                {
+                  "chunk_id": "chunk_sha256_89cd3ff19da0087bafabc531b84e42e0f9792150cc38c3797cafc3c67317f787",
+                  "parent_document_id": "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "source_id": "dnf_account_policy",
+                  "revision_id": "revision_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                  "start_char": 1654,
+                  "end_char": 1703,
+                  "text": "③ 고객 간의 분쟁으로 게임 질서를 어지럽히거나 실정법을 위반하는 행동이라고 판단될 경우",
+                  "evidence_ref": "E35"
+                }
+              ]
+            }
+          ],
+          "rendered_answer": "- [3-3] 회사는 고객의 정상적인 활동이나 고객 간의 사적인 분쟁에 개입하지 않는 것을 원칙으로 합니다. 단, 아래와 같은 경우에는 해당 행위를 경고하거나 게임이용을 제한할 수 있습니다. [chunk_sha256_89cd3ff19da0087bafabc531b84e42e0f9792150cc38c3797cafc3c67317f787]\n- ① 비인가 프로그램 사용, 타인의 게임이용방해 등 원활한 게임 진행에 부정적 영향을 준다고 판단될 경우\n② 사적인 분쟁이라고 하더라도 불특정 다수의 고객에게 피해를 입히는 경우\n③ 고객 간의 분쟁으로 게임 질서를 어지럽히거나 실정법을 위반하는 행동이라고 판단될 경우 [chunk_sha256_89cd3ff19da0087bafabc531b84e42e0f9792150cc38c3797cafc3c67317f787] [chunk_sha256_89cd3ff19da0087bafabc531b84e42e0f9792150cc38c3797cafc3c67317f787] [chunk_sha256_89cd3ff19da0087bafabc531b84e42e0f9792150cc38c3797cafc3c67317f787] [chunk_sha256_89cd3ff19da0087bafabc531b84e42e0f9792150cc38c3797cafc3c67317f787]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "general_rule",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "text",
+                "model_value_type": "text",
+                "normalized_value": "[3-3] 회사는 고객의 정상적인 활동이나 고객 간의 사적인 분쟁에 개입하지 않는 것을 원칙으로 합니다. 단, 아래와 같은 경우에는 해당 행위를 경고하거나 게임이용을 제한할 수 있습니다.",
+                "answer_value_source": "selected_exact_evidence",
+                "evidence_refs": [
+                  "E32"
+                ],
+                "raw_evidence_refs": [
+                  "E32"
+                ],
+                "expanded_context_refs": []
+              },
+              {
+                "requirement_id": "exception",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "text",
+                "model_value_type": "text",
+                "normalized_value": "① 비인가 프로그램 사용, 타인의 게임이용방해 등 원활한 게임 진행에 부정적 영향을 준다고 판단될 경우\n② 사적인 분쟁이라고 하더라도 불특정 다수의 고객에게 피해를 입히는 경우\n③ 고객 간의 분쟁으로 게임 질서를 어지럽히거나 실정법을 위반하는 행동이라고 판단될 경우",
+                "answer_value_source": "selected_exact_evidence",
+                "evidence_refs": [
+                  "E33",
+                  "E34",
+                  "E35"
+                ],
+                "raw_evidence_refs": [
+                  "E33",
+                  "E34",
+                  "E35"
+                ],
+                "expanded_context_refs": [
+                  "E32"
+                ]
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "provider": "ollama_native",
+              "usage": {
+                "input_tokens": 3281,
+                "output_tokens": 240,
+                "total_tokens": 3521
+              },
+              "latency_ms": 8547.754,
+              "finish_reason": "stop",
+              "raw_content": "{\n  \"requirements\": [\n    {\n      \"requirement_id\": \"general_rule\",\n      \"status\": \"supported\",\n      \"value_type\": \"text\",\n      \"evidence_refs\": [\"E32\"],\n      \"value\": \"회사는 고객의 정상적인 활동이나 고객 간의 사적인 분쟁에 개입하지 않는 것을 원칙으로 합니다.\"\n    },\n    {\n      \"requirement_id\": \"exception\",\n      \"status\": \"supported\",\n      \"value_type\": \"text\",\n      \"evidence_refs\": [\"E33\", \"E34\", \"E35\"],\n      \"value\": \"① 비인가 프로그램 사용, 타인의 게임이용방해 등 원활한 게임 진행에 부정적 영향을 준다고 판단될 경우, ② 사적인 분쟁이라고 하더라도 불특정 다수의 고객에게 피해를 입히는 경우, ③ 고객 간의 분쟁으로 게임 질서를 어지럽히거나 실정법을 위반하는 행동이라고 판단될 경우\"\n    }\n  ]\n}",
+              "reasoning_content": "",
+              "thinking_enabled": false,
+              "max_output_tokens": 512,
+              "request_chars": 7379,
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "general_rule",
+                    "status": "supported",
+                    "value_type": "text",
+                    "value": "회사는 고객의 정상적인 활동이나 고객 간의 사적인 분쟁에 개입하지 않는 것을 원칙으로 합니다.",
+                    "evidence_refs": [
+                      "E32"
+                    ]
+                  },
+                  {
+                    "requirement_id": "exception",
+                    "status": "supported",
+                    "value_type": "text",
+                    "value": "① 비인가 프로그램 사용, 타인의 게임이용방해 등 원활한 게임 진행에 부정적 영향을 준다고 판단될 경우, ② 사적인 분쟁이라고 하더라도 불특정 다수의 고객에게 피해를 입히는 경우, ③ 고객 간의 분쟁으로 게임 질서를 어지럽히거나 실정법을 위반하는 행동이라고 판단될 경우",
+                    "evidence_refs": [
+                      "E33",
+                      "E34",
+                      "E35"
+                    ]
+                  }
+                ]
+              },
+              "schema_validation_errors": []
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 8547.754,
+          "usage": {
+            "input_tokens": 3281,
+            "output_tokens": 240,
+            "total_tokens": 3521
+          }
+        }
+      },
+      "transition": "preserved_correct"
+    },
+    {
+      "slot_ordinal": 63,
+      "question_text": "7월 이달의 아이템 상점 판매가와 8월 이달의 아이템 이름을 알려줘.",
+      "previous_category": "previous_correct",
+      "previous": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "model_output": [
+          {
+            "requirements": [
+              {
+                "evidence_refs": [
+                  "E156"
+                ],
+                "requirement_id": "july_shop_price",
+                "status": "supported",
+                "value": "4,000만 골드",
+                "value_type": "currency"
+              },
+              {
+                "evidence_refs": [],
+                "requirement_id": "august_item_name",
+                "status": "unsupported",
+                "value": null,
+                "value_type": "entity"
+              }
+            ]
+          }
+        ]
+      },
+      "current": {
+        "outcome": "correct",
+        "failure_stage": null,
+        "verified_output": {
+          "question_time_scope": "current",
+          "model_response_mode": null,
+          "response_mode": "partial_answer",
+          "requirements": [
+            {
+              "requirement_id": "july_shop_price",
+              "question_part": "shop_price",
+              "status": "supported_exact",
+              "answer": "40,000,000 골드",
+              "citations": [
+                {
+                  "chunk_id": "chunk_sha256_1e200bc0cdffe60c3f742c8e66ebd900a5ff746af8f90f7cc3da4a2e670c84c0",
+                  "parent_document_id": "document_sha256_1a11b23c9bcd3547a00d029da9d1f466000a6a647259dca466ca5a9e5adef567",
+                  "source_id": "dnf_seria_shop",
+                  "revision_id": "revision_sha256_1a11b23c9bcd3547a00d029da9d1f466000a6a647259dca466ca5a9e5adef567",
+                  "start_char": 0,
+                  "end_char": 41,
+                  "text": "# [7월 이달의 아이템] : [7월]스페셜 클론 레어 아바타 풀세트 상자",
+                  "evidence_ref": "E68"
+                },
+                {
+                  "chunk_id": "chunk_sha256_1e200bc0cdffe60c3f742c8e66ebd900a5ff746af8f90f7cc3da4a2e670c84c0",
+                  "parent_document_id": "document_sha256_1a11b23c9bcd3547a00d029da9d1f466000a6a647259dca466ca5a9e5adef567",
+                  "source_id": "dnf_seria_shop",
+                  "revision_id": "revision_sha256_1a11b23c9bcd3547a00d029da9d1f466000a6a647259dca466ca5a9e5adef567",
+                  "start_char": 146,
+                  "end_char": 168,
+                  "text": "| 상점판매가격 | 4,000만 골드 |",
+                  "evidence_ref": "E73"
+                }
+              ]
+            },
+            {
+              "requirement_id": "august_item_name",
+              "question_part": "item_name",
+              "status": "unsupported",
+              "answer": "",
+              "citations": []
+            }
+          ],
+          "rendered_answer": "- 40,000,000 골드 [chunk_sha256_1e200bc0cdffe60c3f742c8e66ebd900a5ff746af8f90f7cc3da4a2e670c84c0] [chunk_sha256_1e200bc0cdffe60c3f742c8e66ebd900a5ff746af8f90f7cc3da4a2e670c84c0]",
+          "verification": {
+            "requirements": [
+              {
+                "requirement_id": "july_shop_price",
+                "model_status": "supported",
+                "exposed_status": "supported_exact",
+                "failure_reasons": [],
+                "value_type": "currency",
+                "model_value_type": "currency",
+                "normalized_value": "40,000,000 골드",
+                "answer_value_source": "model_typed_value",
+                "evidence_refs": [
+                  "E73"
+                ],
+                "raw_evidence_refs": [
+                  "E73"
+                ],
+                "expanded_context_refs": [
+                  "E68"
+                ]
+              },
+              {
+                "requirement_id": "august_item_name",
+                "model_status": "unsupported",
+                "exposed_status": "unsupported",
+                "failure_reasons": [],
+                "value_type": "entity",
+                "model_value_type": "entity",
+                "normalized_value": null,
+                "answer_value_source": null,
+                "evidence_refs": [],
+                "raw_evidence_refs": [],
+                "expanded_context_refs": []
+              }
+            ],
+            "raw_output_passed_without_sanitization": true,
+            "all_exposed_citations_verified": true
+          }
+        },
+        "model_call": {
+          "requested_model": "qwen3-8b:ctx8192",
+          "calls": [
+            {
+              "requested_model": "qwen3-8b:ctx8192",
+              "returned_model": "qwen3-8b:ctx8192",
+              "provider": "ollama_native",
+              "usage": {
+                "input_tokens": 3037,
+                "output_tokens": 89,
+                "total_tokens": 3126
+              },
+              "latency_ms": 4451.609,
+              "finish_reason": "stop",
+              "raw_content": "{\"requirements\": [{\"requirement_id\": \"july_shop_price\", \"status\": \"supported\", \"value_type\": \"currency\", \"evidence_refs\": [\"E73\"], \"value\": \"40000000\"}, {\"requirement_id\": \"august_item_name\", \"status\": \"unsupported\", \"value_type\": \"entity\", \"evidence_refs\": [], \"value\": null}]}",
+              "reasoning_content": "",
+              "thinking_enabled": false,
+              "max_output_tokens": 512,
+              "request_chars": 6607,
+              "output": {
+                "requirements": [
+                  {
+                    "requirement_id": "july_shop_price",
+                    "status": "supported",
+                    "value_type": "currency",
+                    "value": "40000000",
+                    "evidence_refs": [
+                      "E73"
+                    ]
+                  },
+                  {
+                    "requirement_id": "august_item_name",
+                    "status": "unsupported",
+                    "value_type": "entity",
+                    "value": null,
+                    "evidence_refs": []
+                  }
+                ]
+              },
+              "schema_validation_errors": []
+            }
+          ],
+          "call_count": 1,
+          "latency_ms": 4451.609,
+          "usage": {
+            "input_tokens": 3037,
+            "output_tokens": 89,
+            "total_tokens": 3126
+          }
+        }
+      },
+      "transition": "preserved_correct"
+    }
+  ],
+  "inputs": {
+    "sealed_sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597",
+    "source_sha256": "9ae8e0443e0948457ef53e98493f81ee2909159716d20b247f85dc20429d2efb",
+    "chunks_sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885",
+    "documents_sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d",
+    "temporal_sha256": "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317",
+    "table_facts_sha256": "1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a"
+  },
+  "output": "outputs/v3/diagnostics/typed_evidence_ref_requirement_coverage_smoke_20260726.jsonl"
+}
