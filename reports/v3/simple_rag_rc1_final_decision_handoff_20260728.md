@@ -175,6 +175,7 @@ Product Router 사람 기준 후보 회수: 55/64
    - 원문 인용
    - 문서 제목·출처·날짜
    - 안전 검증으로 차단된 이유
+   - RC1 전용 실행 경로: `python app/simple_rag_rc1_demo.py`
 5. README 또는 포트폴리오 보고서에는 다음 흐름을 사용한다.
 
 ```text
