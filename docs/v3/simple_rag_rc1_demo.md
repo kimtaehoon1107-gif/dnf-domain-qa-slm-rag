@@ -12,6 +12,9 @@ Simple RAG v2 @ f34eec0
 → A1~A3 최소 안전장치
 ```
 
+봉인 실행과 동일하게 BGE-M3와 reranker는 CPU를 기본값으로 사용하고,
+Ollama의 Qwen 생성은 로컬 Ollama 설정에 따른다.
+
 데모 시작 시 다음을 확인한다.
 
 - `src/v3/simple_domain_rag.py`가 봉인된 v2 SHA와 일치

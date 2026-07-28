@@ -101,7 +101,7 @@ class SimpleRAGRC1:
         *,
         root: Path,
         model: str = MODEL_TAG,
-        device: str | None = None,
+        device: str = "cpu",
         timeout: float = 180.0,
         base: Any | None = None,
     ) -> None:
@@ -217,7 +217,7 @@ def main() -> None:
         default=Path(__file__).resolve().parents[2],
     )
     parser.add_argument("--model", default=MODEL_TAG)
-    parser.add_argument("--device")
+    parser.add_argument("--device", default="cpu")
     parser.add_argument("--timeout", type=float, default=180.0)
     args = parser.parse_args()
 
