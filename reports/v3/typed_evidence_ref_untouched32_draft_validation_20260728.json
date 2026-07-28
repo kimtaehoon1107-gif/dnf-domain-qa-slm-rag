@@ -1,0 +1,104 @@
+{
+  "validator_version": "typed-evidence-ref-unexecuted32-draft-validator-v1",
+  "status": "pass",
+  "candidate_path": "data/review/typed_evidence_ref_untouched32_candidate_20260728.jsonl",
+  "candidate_sha256": "2a131c3425e2c8d7affc848ab5b335d31173aa6fd01f73f985b5e851157a718a",
+  "row_count": 32,
+  "requirement_count": 53,
+  "evidence_unit_count": 49,
+  "unsupported_requirement_count": 4,
+  "source_counts": {
+    "dnf_account_policy": 4,
+    "dnf_event": 4,
+    "dnf_faq": 4,
+    "dnf_game_guide": 4,
+    "dnf_monthly_item": 4,
+    "dnf_notice": 4,
+    "dnf_seria_shop": 4,
+    "dnf_update": 4
+  },
+  "dimension_counts": {
+    "boolean_direction": 4,
+    "direct_fact": 4,
+    "multi_requirement": 4,
+    "revision_selection": 4,
+    "sibling_relation": 4,
+    "table_attribute": 4,
+    "temporal_role": 4,
+    "unsupported_or_partial": 4
+  },
+  "pending_review_count": 32,
+  "execution_allowed_rows": 0,
+  "training_allowed_rows": 0,
+  "prior_question_count_scanned": 261,
+  "prior_exact_question_overlap_slots": [],
+  "prior_parent_overlap_count": 12,
+  "prior_parent_overlaps": [
+    {
+      "slot_ordinal": 4,
+      "document_id": "document_sha256_cedffb9e8861a96d80c1e7d2a1026925fb074264e8d4079ede49c666037272dd",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 6,
+      "document_id": "document_sha256_02c3b128896e1e3040f725af3ad4831e517a42efb2a5dfbde6bea828efd7f78c",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 9,
+      "document_id": "document_sha256_cc205a8439b2f921ecebce31ac1cb0e8691894ec13f44da7b4a95b6a39a95d18",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 10,
+      "document_id": "document_sha256_39da28f9916af1dda35dc7657f7db382d0524ccef2b91677859d1898334a2638",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 11,
+      "document_id": "document_sha256_d59f3c4278301e5fe7a5a25fa132c9295f4eb699be7a8ef6c0067f7b84b31a87",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 12,
+      "document_id": "document_sha256_d101696874e336a8628e6fe0b03ca9b906d0c03bf71c562d4e0a80058794459d",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 18,
+      "document_id": "document_sha256_6b70826ab9c99482b9c4a4b926aa06e003e4293d93f39c3772d1d835e3d72383",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 20,
+      "document_id": "document_sha256_88867a7a23e9d5b4abbb173290b6e9771c6bdf8535b8edeab0d6b2f7bc36edaa",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 28,
+      "document_id": "document_sha256_06c565de28c5644374faf5bc29fda19ebb457b7c3d2b57f266e797490a28f130",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 30,
+      "document_id": "document_sha256_2c55b66582aafe1daabe2d338479754fff2b85fb397134606401fbd562a35a5d",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 31,
+      "document_id": "document_sha256_8d15942b7c803029b811a23910302f2274bd00a85d68f3c8be8d1a6510122be6",
+      "registered_exception": true
+    },
+    {
+      "slot_ordinal": 32,
+      "document_id": "document_sha256_aa29165b9617ffd053c975a270d8da5b25339a564f95cb7bf46604788b8baec8",
+      "registered_exception": true
+    }
+  ],
+  "failures": [],
+  "retrieval_run_performed": false,
+  "generation_run_performed": false,
+  "evaluation_run_performed": false,
+  "freeze_allowed": false,
+  "next_action": "human_review"
+}
