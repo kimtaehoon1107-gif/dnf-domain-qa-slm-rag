@@ -76,7 +76,7 @@ def test_requirement_assignment_exposes_partial_overlap() -> None:
     assert result["value_presence"] == "value_present_partial"
 
 
-def test_extracts_same_line_numeric_orphan_only() -> None:
+def test_runtime_binding_removes_same_line_numeric_orphan() -> None:
     chunks = [
         {
             "source_id": "dnf_update",
@@ -93,9 +93,7 @@ def test_extracts_same_line_numeric_orphan_only() -> None:
         }
     ]
     rows = extract_numeric_orphan_fragments(chunks)
-    assert len(rows) == 1
-    assert rows[0]["fragment_text"] == "(20초 → 18초)"
-    assert rows[0]["fragment_type"] == "parenthetical"
+    assert rows == []
     assert classify_orphan_fragment("20초 → 18초") == "arrow"
 
 

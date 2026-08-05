@@ -9,6 +9,12 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 SIMPLE_EVIDENCE_REF_VERSION = "dnf-simple-evidence-ref-v1"
 ATOMIC_EVIDENCE_REF_VERSION = "dnf-simple-atomic-evidence-ref-v1"
 DEFAULT_MAX_ATOMIC_UNITS = 12
+_TRAILING_PARENTHETICAL_MAX_CHARS = 30
+_PREDICATE_ENDING = re.compile(
+    r"(?:습니다|입니다|됩니다|합니다|했습니다|였습니다|있습니다|없습니다|"
+    r"않습니다|이다|했다|된다|한다|있다|없다|않다|임|함|됨)"
+    r"[.!?)]*$"
+)
 SIMPLE_EVIDENCE_REF_SYSTEM_INSTRUCTIONS = """당신은 던전앤파이터 공식 문서만 근거로 답하는 QA 모델입니다.
 질문 전체에 답하는 result 하나만 반환하고, 요구사항을 새로 만들거나 분해하지 마세요.
 근거가 충분하면 supported, 일부만 답할 수 있으면 partial, 부족하면 unsupported로 표시하세요.
@@ -184,7 +190,46 @@ def _sentence_spans(
         start = line_start + match.start() + left
         end = line_start + match.start() + right
         spans.append((start, end, raw[left:right]))
-    return spans
+    merged = []
+    for span in spans:
+        if merged and _should_bind_trailing_parenthetical(
+            merged[-1],
+            span,
+            line=text,
+            line_start=line_start,
+        ):
+            previous = merged.pop()
+            start = previous[0]
+            end = span[1]
+            merged.append(
+                (start, end, text[start - line_start : end - line_start])
+            )
+        else:
+            merged.append(span)
+    return merged
+
+
+def _should_bind_trailing_parenthetical(
+    previous: tuple[int, int, str],
+    fragment: tuple[int, int, str],
+    *,
+    line: str,
+    line_start: int,
+) -> bool:
+    text = fragment[2].strip()
+    gap = line[
+        previous[1] - line_start : fragment[0] - line_start
+    ]
+    return bool(
+        previous[2].rstrip().endswith((".", "!", "?"))
+        and gap.strip() == ""
+        and text.startswith("(")
+        and text.endswith(")")
+        and text.count("(") == text.count(")")
+        and len(text) <= _TRAILING_PARENTHETICAL_MAX_CHARS
+        and re.search(r"\d", text)
+        and not _PREDICATE_ENDING.search(text)
+    )
 
 
 def _is_table_separator(text: str) -> bool:
