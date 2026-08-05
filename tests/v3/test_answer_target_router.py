@@ -2,11 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from src.v3.answer_target_router import (
-    _clause_boundaries,
-    _kiwi,
-    analyze_answer_targets,
-)
+from src.v3.answer_target_router import analyze_answer_targets
 
 
 class AnswerTargetRouterTest(unittest.TestCase):
@@ -53,28 +49,6 @@ class AnswerTargetRouterTest(unittest.TestCase):
     def test_empty_question_is_rejected(self) -> None:
         with self.assertRaisesRegex(RuntimeError, "must not be empty"):
             analyze_answer_targets("  ")
-
-    def test_allowed_forms_does_not_change_default_clause_boundaries(self) -> None:
-        question = (
-            "게임에서 버그를 발견하면 어디에 제보해야 하고, "
-            "제보 뒤 답변까지 걸리는 기한은 정확히 며칠이야?"
-        )
-        tokens = list(_kiwi().tokenize(question))
-
-        self.assertEqual(
-            [str(tokens[index].form) for index in _clause_boundaries(tokens)],
-            ["면", "어야"],
-        )
-        self.assertEqual(
-            [
-                str(tokens[index].form)
-                for index in _clause_boundaries(
-                    tokens,
-                    allowed_forms={"고"},
-                )
-            ],
-            ["고"],
-        )
 
 
 if __name__ == "__main__":

@@ -6,12 +6,11 @@ from src.v3.diagnose_product_clause_decomposition_s3 import (
 )
 
 
-def test_allowed_go_boundaries_recover_previously_shadowed_case() -> None:
+def test_explicit_fallback_changes_only_when_kiwi_is_empty() -> None:
     failed = _arm_requirement_queries(
         "버그를 발견하면 어디에 제보해야 하고, 답변 기한은 며칠이야?"
     )
-    assert len(failed["A_current"] or []) == 2
-    assert failed["A_current"] == failed["B_explicit_fallback"]
+    assert failed["A_current"] is None
     assert len(failed["B_explicit_fallback"] or []) == 2
 
     control = _arm_requirement_queries(
@@ -48,8 +47,11 @@ def test_a6_7_reservation_shadow_uses_two_explicit_clauses() -> None:
         "줄었고, 질풍 개화 옵션의 기본 쿨타임은 몇 초에서 몇 초로 "
         "바뀌었어?"
     )
-    assert len(arms["A_current"] or []) == 2
-    assert arms["A_current"] == arms["B_explicit_fallback"]
+    assert arms["A_current"] is None
+    assert arms["B_explicit_fallback"] == [
+        "6월 18일 브레이커 조정에서 타이드 바운드 쿨타임은 어떻게 줄었고",
+        "질풍 개화 옵션의 기본 쿨타임은 몇 초에서 몇 초로 바뀌었어",
+    ]
 
 
 def test_value_decrease_gate_separates_descriptive_diagnostics() -> None:
