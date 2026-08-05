@@ -1796,6 +1796,193 @@ def answer_product_rag_from_candidates(
     }
 
 
+def _fanout_ref(prefix: str, value: Any) -> str:
+    reference = str(value or "")
+    return f"{prefix}{reference}" if reference else reference
+
+
+def _merge_requirement_fanout_results(
+    *,
+    question: str,
+    requirement_queries: list[str],
+    child_results: list[dict[str, Any]],
+    total_ms: float,
+) -> dict[str, Any]:
+    modes = [str(result.get("mode") or "unsupported") for result in child_results]
+    clarification = "\n\n".join(
+        str(result.get("clarification") or "").strip()
+        for result in child_results
+        if str(result.get("clarification") or "").strip()
+    )
+    if "clarification" in modes:
+        mode = "clarification"
+    elif modes and all(value == "answer" for value in modes):
+        mode = "answer"
+    elif modes and all(value == "unsupported" for value in modes):
+        mode = "unsupported"
+    else:
+        mode = "partial"
+
+    claims = []
+    rejected_claims = []
+    candidates = []
+    evidence_pack = []
+    clarification_options = []
+    rendered_parts = []
+    fanout_requirements = []
+    generation_calls = []
+    usage = {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}
+    all_citations_verified = True
+    for index, (query, child) in enumerate(
+        zip(requirement_queries, child_results, strict=True),
+        1,
+    ):
+        prefix = f"F{index}"
+        remapped_claims = []
+        for claim in child.get("claims") or []:
+            remapped = copy.deepcopy(claim)
+            remapped["evidence_refs"] = [
+                _fanout_ref(prefix, value)
+                for value in claim.get("evidence_refs") or []
+            ]
+            for citation in remapped.get("citations") or []:
+                citation["evidence_ref"] = _fanout_ref(
+                    prefix,
+                    citation.get("evidence_ref"),
+                )
+            remapped_claims.append(remapped)
+        for rejection in child.get("rejected_claims") or []:
+            remapped = copy.deepcopy(rejection)
+            remapped["evidence_refs"] = [
+                _fanout_ref(prefix, value)
+                for value in rejection.get("evidence_refs") or []
+            ]
+            rejected_claims.append(remapped)
+        for candidate in child.get("candidates") or []:
+            remapped = copy.deepcopy(candidate)
+            remapped["candidate_ref"] = _fanout_ref(
+                f"{prefix}C",
+                candidate.get("candidate_ref"),
+            )
+            remapped["fanout_requirement_index"] = index
+            candidates.append(remapped)
+        for unit in child.get("evidence_pack") or []:
+            remapped = copy.deepcopy(unit)
+            evidence_ref = unit.get("evidence_ref") or unit.get("ref")
+            remapped_ref = _fanout_ref(prefix, evidence_ref)
+            remapped["ref"] = remapped_ref
+            remapped["evidence_ref"] = remapped_ref
+            if unit.get("candidate_ref") is not None:
+                remapped["candidate_ref"] = _fanout_ref(
+                    f"{prefix}C",
+                    unit.get("candidate_ref"),
+                )
+            remapped["fanout_requirement_index"] = index
+            evidence_pack.append(remapped)
+        clarification_options.extend(
+            copy.deepcopy(child.get("clarification_options") or [])
+        )
+        if mode != "clarification":
+            claims.extend(remapped_claims)
+            if child.get("mode") in {"answer", "partial"}:
+                rendered = str(child.get("rendered_answer") or "").strip()
+                if rendered:
+                    rendered_parts.append(rendered)
+        else:
+            rejected_claims.extend(
+                {
+                    "claim_index": claim_index,
+                    "text": claim.get("text") or "",
+                    "evidence_refs": claim.get("evidence_refs") or [],
+                    "reasons": ["fanout_clarification_precedence"],
+                }
+                for claim_index, claim in enumerate(remapped_claims, 1)
+            )
+        generation = child.get("generation")
+        if generation is not None:
+            generation_calls.append(copy.deepcopy(generation))
+            child_usage = generation.get("usage") or {}
+            for key in usage:
+                usage[key] += int(child_usage.get(key) or 0)
+        child_verification = child.get("verification") or {}
+        all_citations_verified = all_citations_verified and bool(
+            child_verification.get("all_exposed_citations_verified", True)
+        )
+        fanout_requirements.append(
+            {
+                "requirement_index": index,
+                "requirement_query": query,
+                "mode": child.get("mode"),
+                "claims": remapped_claims,
+                "generation_called": generation is not None,
+                "latency_ms": child.get("latency_ms"),
+            }
+        )
+
+    generation_ms = sum(
+        float((result.get("generation") or {}).get("latency_ms") or 0.0)
+        for result in child_results
+    )
+    profile = {
+        "requirement_fanout": True,
+        "requirement_count": len(requirement_queries),
+        "question_coverage_contract": False,
+    }
+    first_fingerprint = child_results[0].get("runtime_fingerprint") or {}
+    runtime_fingerprint = (
+        {**copy.deepcopy(first_fingerprint), "profile": profile}
+        if isinstance(first_fingerprint, dict)
+        else {"profile": profile}
+    )
+    rendered_answer = clarification if mode == "clarification" else "\n\n".join(
+        rendered_parts
+    )
+    return {
+        "product_free_rag_version": PRODUCT_FREE_RAG_VERSION,
+        "question": question,
+        "mode": mode,
+        "model_mode": None,
+        "claims": claims,
+        "rejected_claims": rejected_claims,
+        "clarification": clarification if mode == "clarification" else "",
+        "clarification_options": clarification_options,
+        "rendered_answer": rendered_answer,
+        "candidates": candidates,
+        "evidence_unit_count": len(evidence_pack),
+        "evidence_pack": evidence_pack,
+        "raw_model_output": {
+            "fanout": [
+                copy.deepcopy(result.get("raw_model_output"))
+                for result in child_results
+            ]
+        },
+        "generation": {
+            "fanout_call_count": len(generation_calls),
+            "calls": generation_calls,
+            "latency_ms": round(generation_ms, 3),
+            "usage": usage,
+        },
+        "verification": {
+            "all_exposed_citations_verified": all_citations_verified,
+            "qwen_called": bool(generation_calls),
+            "requirement_fanout": True,
+            "requirement_modes": modes,
+        },
+        "fanout_requirements": fanout_requirements,
+        "latency": {
+            "generation_ms": round(generation_ms, 3),
+            "child_total_ms": round(
+                sum(float(result.get("latency_ms") or 0.0) for result in child_results),
+                3,
+            ),
+            "total_ms": round(total_ms, 3),
+        },
+        "latency_ms": round(total_ms, 3),
+        "experimental_profile": profile,
+        "runtime_fingerprint": runtime_fingerprint,
+    }
+
+
 class ProductFreeRAG:
     """Independent retrieve-rerank-answer path without the research planner."""
 
@@ -1810,6 +1997,7 @@ class ProductFreeRAG:
         use_compact_evidence_pack: bool = False,
         use_atomic_evidence_reranker: bool = False,
         handoff_cuda_to_generation: bool = False,
+        use_requirement_fanout: bool = False,
     ) -> None:
         self.root = root.resolve()
         self.model = model
@@ -1823,6 +2011,7 @@ class ProductFreeRAG:
             )
         self.use_atomic_evidence_reranker = use_atomic_evidence_reranker
         self.handoff_cuda_to_generation = handoff_cuda_to_generation
+        self.use_requirement_fanout = use_requirement_fanout
         self.temporal_by_document = {
             row["document_id"]: row
             for row in read_jsonl(self.root / GLOBAL_TEMPORAL_OVERLAY)
@@ -2362,6 +2551,84 @@ class ProductFreeRAG:
         }
 
     def answer(
+        self,
+        question: str,
+        *,
+        requirement_queries: list[str] | None = None,
+        requested_subjects: list[str] | None = None,
+        metadata_as_of: str | None = None,
+        required_parent_document_id: str | None = None,
+        diagnostics_hook: Callable[[dict[str, Any]], None] | None = None,
+        use_question_coverage_contract: bool = False,
+    ) -> dict[str, Any]:
+        if (
+            not self.use_requirement_fanout
+            or use_question_coverage_contract
+        ):
+            return self._answer_single(
+                question,
+                requirement_queries=requirement_queries,
+                requested_subjects=requested_subjects,
+                metadata_as_of=metadata_as_of,
+                required_parent_document_id=required_parent_document_id,
+                diagnostics_hook=diagnostics_hook,
+                use_question_coverage_contract=use_question_coverage_contract,
+            )
+
+        normalized = normalize_product_question(question)
+        if not normalized:
+            raise RuntimeError("question must not be empty")
+        from src.v3.metadata_query import plan_metadata_query
+
+        if plan_metadata_query(
+            normalized,
+            as_of=metadata_as_of or date.today().isoformat(),
+        ) is not None:
+            return self._answer_single(
+                question,
+                requirement_queries=requirement_queries,
+                requested_subjects=requested_subjects,
+                metadata_as_of=metadata_as_of,
+                required_parent_document_id=required_parent_document_id,
+                diagnostics_hook=diagnostics_hook,
+                use_question_coverage_contract=False,
+            )
+        resolved_queries = _runtime_requirement_queries(
+            normalized,
+            requirement_queries,
+        )
+        if len(resolved_queries) < 2:
+            return self._answer_single(
+                question,
+                requirement_queries=requirement_queries,
+                requested_subjects=requested_subjects,
+                metadata_as_of=metadata_as_of,
+                required_parent_document_id=required_parent_document_id,
+                diagnostics_hook=diagnostics_hook,
+                use_question_coverage_contract=False,
+            )
+
+        started = time.perf_counter()
+        child_results = [
+            self._answer_single(
+                query,
+                requirement_queries=[query],
+                requested_subjects=None,
+                metadata_as_of=metadata_as_of,
+                required_parent_document_id=required_parent_document_id,
+                diagnostics_hook=diagnostics_hook,
+                use_question_coverage_contract=False,
+            )
+            for query in resolved_queries
+        ]
+        return _merge_requirement_fanout_results(
+            question=normalized,
+            requirement_queries=resolved_queries,
+            child_results=child_results,
+            total_ms=(time.perf_counter() - started) * 1000,
+        )
+
+    def _answer_single(
         self,
         question: str,
         *,
