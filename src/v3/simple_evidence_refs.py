@@ -10,6 +10,7 @@ SIMPLE_EVIDENCE_REF_VERSION = "dnf-simple-evidence-ref-v1"
 ATOMIC_EVIDENCE_REF_VERSION = "dnf-simple-atomic-evidence-ref-v1"
 DEFAULT_MAX_ATOMIC_UNITS = 12
 _TRAILING_PARENTHETICAL_MAX_CHARS = 30
+_TABLE_INTRODUCER_MAX_CHARS = 160
 _PREDICATE_ENDING = re.compile(
     r"(?:습니다|입니다|됩니다|합니다|했습니다|였습니다|있습니다|없습니다|"
     r"않습니다|이다|했다|된다|한다|있다|없다|않다|임|함|됨)"
@@ -239,6 +240,27 @@ def _is_table_separator(text: str) -> bool:
     )
 
 
+def _table_introducer_before(
+    lines: list[str],
+    table_index: int,
+) -> str:
+    for index in range(table_index - 1, -1, -1):
+        stripped = lines[index].strip()
+        if not stripped:
+            continue
+        if (
+            stripped == "[/TABLE]"
+            or stripped.startswith("#")
+            or (stripped.startswith("|") and stripped.endswith("|"))
+            or stripped.startswith(("※", "*"))
+        ):
+            return ""
+        if len(stripped) > _TABLE_INTRODUCER_MAX_CHARS:
+            return ""
+        return stripped
+    return ""
+
+
 def _compact_tokens(text: str) -> set[str]:
     return {
         token.casefold()
@@ -305,20 +327,25 @@ def _chunk_atomic_units(
         if str(value).strip()
     ]
     current_heading = " > ".join(heading_parts)
+    line_spans = list(_exact_line_spans(source_text))
+    lines = [line for _, _, line in line_spans]
     table_header = ""
+    table_introducer = ""
     table_subject = ""
     in_table = False
     units = []
-    for start, end, line in _exact_line_spans(source_text):
+    for line_index, (start, end, line) in enumerate(line_spans):
         stripped = line.strip()
         if stripped == "[TABLE]":
             in_table = True
             table_header = ""
+            table_introducer = _table_introducer_before(lines, line_index)
             table_subject = ""
             continue
         if stripped == "[/TABLE]":
             in_table = False
             table_header = ""
+            table_introducer = ""
             table_subject = ""
             continue
         if stripped.startswith("#"):
@@ -349,6 +376,11 @@ def _chunk_atomic_units(
                 for value in (
                     current_heading,
                     f"표 헤더: {table_header}",
+                    (
+                        f"표 도입: {table_introducer}"
+                        if table_introducer
+                        else ""
+                    ),
                     (
                         f"표 대상: {table_subject}"
                         if table_subject and table_subject != stripped

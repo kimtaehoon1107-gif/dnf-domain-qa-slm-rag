@@ -47,6 +47,19 @@ _PUBLISHED_TIMESTAMP_QUESTION = re.compile(
     r"|(?:언제|시점|시각|시간|날짜)\S*\s*"
     r"(?:게시|게재|등록|공지)"
 )
+_TABLE_INTRODUCER_MARKER = " > 표 도입: "
+_TABLE_SUBJECT_MARKER = " > 표 대상: "
+
+
+def _ranking_context_text(unit: dict[str, Any]) -> str:
+    context = str(unit.get("context_text") or "")
+    start = context.find(_TABLE_INTRODUCER_MARKER)
+    if start < 0:
+        return context
+    subject_start = context.find(_TABLE_SUBJECT_MARKER, start)
+    if subject_start < 0:
+        return context[:start]
+    return context[:start] + context[subject_start:]
 
 
 def _focus_without_explicit_date(value: str) -> str:
@@ -331,7 +344,7 @@ def _query_score(
     identity = " ".join(
         (
             title,
-            str(unit.get("context_text") or ""),
+            _ranking_context_text(unit),
         )
     )
     text_tokens = _compact_tokens(text)
@@ -384,7 +397,7 @@ def _requirement_score(
     identity = " ".join(
         (
             str(unit.get("title") or ""),
-            str(unit.get("context_text") or ""),
+            _ranking_context_text(unit),
             text,
         )
     )
@@ -978,7 +991,7 @@ def _atomic_reranker_text(unit: dict[str, Any]) -> str:
         value
         for value in (
             f"제목: {unit.get('title') or ''}",
-            f"문맥: {unit.get('context_text') or ''}",
+            f"문맥: {_ranking_context_text(unit)}",
             f"근거: {unit.get('text') or ''}",
         )
         if value.split(":", 1)[-1].strip()
