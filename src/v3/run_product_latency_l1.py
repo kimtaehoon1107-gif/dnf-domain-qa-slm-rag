@@ -3,8 +3,10 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import sys
 import time
+import urllib.request
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
@@ -44,6 +46,52 @@ LATENCY_KEYS = (
     "unattributed_ms",
     "total_ms",
 )
+
+
+def capture_system_state(label: str) -> dict[str, Any]:
+    def run_nvidia_smi(arguments: list[str]) -> dict[str, Any]:
+        try:
+            completed = subprocess.run(
+                ["nvidia-smi", *arguments],
+                check=False,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=10,
+            )
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            return {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
+        return {
+            "ok": completed.returncode == 0,
+            "returncode": completed.returncode,
+            "stdout": completed.stdout.strip(),
+            "stderr": completed.stderr.strip(),
+        }
+
+    gpu_query = run_nvidia_smi(
+        [
+            "--query-gpu=timestamp,name,utilization.gpu,memory.free,memory.used,"
+            "memory.total,temperature.gpu,pstate",
+            "--format=csv,noheader,nounits",
+        ]
+    )
+    gpu_processes = run_nvidia_smi([])
+    try:
+        with urllib.request.urlopen("http://127.0.0.1:11434/api/ps", timeout=5) as response:
+            ollama_ps: dict[str, Any] = {
+                "ok": True,
+                "payload": json.loads(response.read().decode("utf-8")),
+            }
+    except Exception as exc:
+        ollama_ps = {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
+    return {
+        "label": label,
+        "captured_at": datetime.now(TIMEZONE).isoformat(),
+        "gpu_query": gpu_query,
+        "gpu_processes": gpu_processes,
+        "ollama_ps": ollama_ps,
+    }
 
 
 def _stats(values: list[float]) -> dict[str, float | int | None]:
@@ -146,6 +194,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--repeats", type=int, default=5)
     parser.add_argument("--slots", type=int, nargs="+")
+    parser.add_argument("--capture-system-state", action="store_true")
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--timeout", type=float, default=180.0)
     args = parser.parse_args()
@@ -160,6 +209,9 @@ def main() -> None:
 
     os.environ.setdefault("OPENAI_BASE_URL", "http://localhost:11434/v1")
     os.environ.setdefault("OPENAI_API_KEY", "ollama")
+    state_snapshots = []
+    if args.capture_system_state:
+        state_snapshots.append(capture_system_state("preflight"))
     runtime = ProductFreeRAG(
         root=root,
         model=MODEL_TAG,
@@ -174,6 +226,8 @@ def main() -> None:
     run_started = time.perf_counter()
     sequence = 0
     for repeat in range(1, args.repeats + 1):
+        if args.capture_system_state:
+            state_snapshots.append(capture_system_state(f"round_{repeat}_start"))
         for item in questions:
             sequence += 1
             started_at = datetime.now(TIMEZONE).isoformat()
@@ -222,6 +276,8 @@ def main() -> None:
                 ),
                 flush=True,
             )
+        if args.capture_system_state:
+            state_snapshots.append(capture_system_state(f"round_{repeat}_end"))
 
     summary = summarize_cases(cases, repeats=args.repeats)
     summary["model"] = MODEL_TAG
@@ -229,6 +285,7 @@ def main() -> None:
         (time.perf_counter() - run_started) * 1000, 3
     )
     summary["completed_at"] = datetime.now(TIMEZONE).isoformat()
+    summary["system_state_snapshots"] = state_snapshots
     write_jsonl(output, [*cases, summary])
     print(json.dumps(summary, ensure_ascii=False, indent=2))
 

@@ -1,6 +1,13 @@
+import io
+from types import SimpleNamespace
+
 import pytest
 
-from src.v3.run_product_latency_l1 import select_questions, summarize_cases
+from src.v3.run_product_latency_l1 import (
+    capture_system_state,
+    select_questions,
+    summarize_cases,
+)
 
 
 def _case(*, repeat: int, slot: int, wall_ms: float) -> dict:
@@ -47,3 +54,25 @@ def test_select_questions_preserves_requested_slot_order() -> None:
     assert [item["slot"] for item in selected] == [6, 9, 4, 3]
     with pytest.raises(RuntimeError, match="unknown USER10 v2 slots"):
         select_questions(questions, [11])
+
+
+def test_capture_system_state_records_gpu_and_ollama(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "src.v3.run_product_latency_l1.subprocess.run",
+        lambda *args, **kwargs: SimpleNamespace(
+            returncode=0,
+            stdout="gpu-state",
+            stderr="",
+        ),
+    )
+    monkeypatch.setattr(
+        "src.v3.run_product_latency_l1.urllib.request.urlopen",
+        lambda *args, **kwargs: io.BytesIO(b'{"models": []}'),
+    )
+
+    state = capture_system_state("round_1_start")
+
+    assert state["label"] == "round_1_start"
+    assert state["gpu_query"]["ok"] is True
+    assert state["gpu_processes"]["stdout"] == "gpu-state"
+    assert state["ollama_ps"] == {"ok": True, "payload": {"models": []}}
