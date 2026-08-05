@@ -61,7 +61,7 @@ def test_table_introducer_does_not_cross_note_heading_or_length_cap() -> None:
         )
 
 
-def test_ranking_context_excludes_introducer_but_preserves_subject() -> None:
+def test_ranking_context_includes_introducer_and_subject() -> None:
     with_intro = {
         "candidate_ref": "1",
         "start_char": 10,
@@ -79,8 +79,11 @@ def test_ranking_context_excludes_introducer_but_preserves_subject() -> None:
             "표 대상: | 아이템명 | 타이드 |"
         ),
     }
-    assert _ranking_context_text(with_intro) == without_intro["context_text"]
-    assert _query_score(with_intro, "스킬 개화 옵션 쿨타임") == _query_score(
+    assert _ranking_context_text(with_intro) == with_intro["context_text"]
+    assert "표 도입: - 스킬 개화 옵션" in _atomic_reranker_text(
+        with_intro
+    )
+    assert _query_score(with_intro, "스킬 개화 옵션 쿨타임") > _query_score(
         without_intro,
         "스킬 개화 옵션 쿨타임",
     )
@@ -88,11 +91,11 @@ def test_ranking_context_excludes_introducer_but_preserves_subject() -> None:
         with_intro,
         query="스킬 개화 옵션 쿨타임",
         subject="스킬 개화 옵션",
-    ) == _requirement_score(
+    ) > _requirement_score(
         without_intro,
         query="스킬 개화 옵션 쿨타임",
         subject="스킬 개화 옵션",
     )
-    assert _atomic_reranker_text(with_intro) == _atomic_reranker_text(
+    assert _atomic_reranker_text(with_intro) != _atomic_reranker_text(
         without_intro
     )
