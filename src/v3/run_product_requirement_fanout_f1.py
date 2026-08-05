@@ -42,9 +42,13 @@ def _gate_a6_7(result: dict[str, Any]) -> bool:
         return False
     first = requirements[0].get("claims") or []
     second = requirements[1].get("claims") or []
+    first_text = " ".join(str(claim.get("text") or "") for claim in first)
+    second_text = " ".join(str(claim.get("text") or "") for claim in second)
     return (
         any(_contains_values(claim, ("20", "18")) for claim in first)
+        and not ("12" in first_text and "9" in first_text)
         and any(_contains_values(claim, ("12", "9")) for claim in second)
+        and not ("20" in second_text and "18" in second_text)
     )
 
 

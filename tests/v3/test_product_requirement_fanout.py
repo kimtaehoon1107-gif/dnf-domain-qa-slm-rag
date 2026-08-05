@@ -3,6 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from src.v3.product_free_rag import ProductFreeRAG
+from src.v3.run_product_requirement_fanout_f1 import (
+    _gate_a6_7,
+    _gate_a6_32,
+)
 
 
 def _child_result(
@@ -149,3 +153,34 @@ def test_fanout_clarification_takes_precedence() -> None:
     assert result["mode"] == "clarification"
     assert result["claims"] == []
     assert result["clarification"] == "두 번째 요구의 대상을 알려주세요."
+
+
+def test_f1_gate_rejects_an_extra_wrong_value_in_the_first_requirement() -> None:
+    result = {
+        "fanout_requirements": [
+            {
+                "claims": [
+                    {"text": "타이드 바운드 쿨타임은 12초에서 9초입니다."},
+                    {"text": "타이드 바운드 쿨타임은 20초에서 18초입니다."},
+                ]
+            },
+            {"claims": [{"text": "질풍 개화는 12초에서 9초입니다."}]},
+        ]
+    }
+
+    assert not _gate_a6_7(result)
+
+
+def test_f1_gate_requires_unsupported_for_the_missing_purchase_limit() -> None:
+    result = {
+        "claims": [{"text": "모험가 명성은 +221입니다."}],
+        "fanout_requirements": [
+            {"claims": [{"text": "모험가 명성은 +221입니다."}]},
+            {
+                "mode": "partial",
+                "claims": [{"text": "모험가 명성은 +221입니다."}],
+            },
+        ],
+    }
+
+    assert not _gate_a6_32(result)
