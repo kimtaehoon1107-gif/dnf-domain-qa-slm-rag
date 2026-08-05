@@ -14,7 +14,7 @@ from src.v3.product_free_rag import ProductFreeRAG
 from src.v3.score_product_free_rag_a5 import score_case
 
 
-RUNNER_VERSION = "product-runtime-application-targeted-live-v1"
+RUNNER_VERSION = "product-runtime-application-targeted-live-v2"
 DEFAULT_FROZEN_SET = Path(
     "data/v3/evaluation/"
     "product_free_rag_a6_frozen_"
@@ -35,6 +35,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--timeout", type=float, default=180.0)
+    parser.add_argument("--question-coverage-contract", action="store_true")
     return parser.parse_args()
 
 
@@ -81,6 +82,7 @@ def main() -> None:
         result = rag.answer(
             str(frozen["question_text"]),
             metadata_as_of=str(frozen["as_of"]),
+            use_question_coverage_contract=args.question_coverage_contract,
         )
         scored = score_case(
             frozen,
@@ -94,6 +96,7 @@ def main() -> None:
             "adaptive": True,
             "blind": False,
             "official_a6_eligible": False,
+            "question_coverage_contract": args.question_coverage_contract,
             **scored,
         }
         records.append(record)
