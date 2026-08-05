@@ -1,4 +1,6 @@
-from src.v3.run_product_latency_l1 import summarize_cases
+import pytest
+
+from src.v3.run_product_latency_l1 import select_questions, summarize_cases
 
 
 def _case(*, repeat: int, slot: int, wall_ms: float) -> dict:
@@ -35,3 +37,13 @@ def test_summary_preserves_round_slot_and_outlier_views() -> None:
     }
     assert summary["qwen_call_count"] == 4
     assert summary["diagnostics_hook_enabled"] is False
+
+
+def test_select_questions_preserves_requested_slot_order() -> None:
+    questions = [{"slot": slot, "question": f"q{slot}"} for slot in range(1, 11)]
+
+    selected = select_questions(questions, [6, 9, 4, 3, 6])
+
+    assert [item["slot"] for item in selected] == [6, 9, 4, 3]
+    with pytest.raises(RuntimeError, match="unknown USER10 v2 slots"):
+        select_questions(questions, [11])

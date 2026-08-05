@@ -56,6 +56,21 @@ def _stats(values: list[float]) -> dict[str, float | int | None]:
     }
 
 
+def select_questions(
+    questions: list[dict[str, Any]], slots: list[int] | None
+) -> list[dict[str, Any]]:
+    if len(questions) != 10:
+        raise RuntimeError("L1 source must contain exactly 10 USER10 v2 questions")
+    if slots is None:
+        return questions
+    requested = list(dict.fromkeys(slots))
+    by_slot = {int(item["slot"]): item for item in questions}
+    missing = [slot for slot in requested if slot not in by_slot]
+    if missing:
+        raise RuntimeError(f"unknown USER10 v2 slots: {missing}")
+    return [by_slot[slot] for slot in requested]
+
+
 def summarize_cases(cases: list[dict[str, Any]], *, repeats: int) -> dict[str, Any]:
     successful = [row for row in cases if row.get("error") is None]
     round_stats = []
@@ -130,6 +145,7 @@ def main() -> None:
     parser.add_argument("--questions", type=Path, default=DEFAULT_QUESTIONS)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--repeats", type=int, default=5)
+    parser.add_argument("--slots", type=int, nargs="+")
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--timeout", type=float, default=180.0)
     args = parser.parse_args()
@@ -140,9 +156,7 @@ def main() -> None:
     output = args.output if args.output.is_absolute() else root / args.output
     if output.exists():
         raise RuntimeError(f"L1 output already exists: {output}")
-    questions = read_jsonl(questions_path)
-    if len(questions) != 10:
-        raise RuntimeError("L1 requires exactly 10 USER10 v2 questions")
+    questions = select_questions(read_jsonl(questions_path), args.slots)
 
     os.environ.setdefault("OPENAI_BASE_URL", "http://localhost:11434/v1")
     os.environ.setdefault("OPENAI_API_KEY", "ollama")
