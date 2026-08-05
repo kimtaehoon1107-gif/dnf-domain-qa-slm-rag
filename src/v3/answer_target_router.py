@@ -77,11 +77,16 @@ def _segment_can_answer(tokens: list[Any]) -> bool:
     )
 
 
-def _clause_boundaries(tokens: list[Any]) -> list[int]:
+def _clause_boundaries(
+    tokens: list[Any],
+    allowed_forms: set[str] | None = None,
+) -> list[int]:
     boundaries = []
     segment_start = 0
     for index, token in enumerate(tokens):
         if _base_tag(token) != "EC":
+            continue
+        if allowed_forms and str(token.form) not in allowed_forms:
             continue
         left = tokens[segment_start:index]
         right = tokens[index + 1 :]

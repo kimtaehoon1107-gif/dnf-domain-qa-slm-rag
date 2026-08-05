@@ -165,11 +165,7 @@ def explicit_nominative_question_subjects(question: str) -> list[str]:
 def _kiwi_independent_clause_parts(question: str) -> list[str]:
     normalized = " ".join(str(question or "").split())
     tokens = list(_kiwi().tokenize(normalized))
-    boundaries = [
-        boundary
-        for boundary in _clause_boundaries(tokens)
-        if str(tokens[boundary].form) == "고"
-    ]
+    boundaries = _clause_boundaries(tokens, allowed_forms={"고"})
     if not boundaries:
         return []
     parts = []
@@ -189,11 +185,7 @@ def _kiwi_independent_clause_parts(question: str) -> list[str]:
 def _kiwi_shared_topic_anchor(question: str) -> str:
     normalized = " ".join(str(question or "").split())
     tokens = list(_kiwi().tokenize(normalized))
-    boundaries = [
-        boundary
-        for boundary in _clause_boundaries(tokens)
-        if str(tokens[boundary].form) == "고"
-    ]
+    boundaries = _clause_boundaries(tokens, allowed_forms={"고"})
     if not boundaries:
         return ""
     first_boundary = boundaries[0]

@@ -10,15 +10,26 @@ from src.v3.product_free_rag import (
 
 def test_runtime_requirement_queries_fall_back_to_explicit_clauses() -> None:
     question = (
-        "해방의 계약은 가격과 이용 기간이 어떻게 되고, "
-        "구매하면 특별 보상으로 무엇을 한 번 받아?"
+        "퀵계좌이체의 1회·1일·1개월 결제 한도와 "
+        "하루 결제 횟수 제한을 한꺼번에 알려줘."
     )
 
     assert kiwi_independent_requirement_queries(question) == []
     assert _runtime_requirement_queries(question, None) == (
         explicit_question_clauses(question)
     )
-    assert len(_runtime_requirement_queries(question, None)) == 3
+    assert len(_runtime_requirement_queries(question, None)) == 2
+
+
+def test_runtime_requirement_queries_use_recovered_shadowed_go_boundary() -> None:
+    question = (
+        "해방의 계약은 가격과 이용 기간이 어떻게 되고, "
+        "구매하면 특별 보상으로 무엇을 한 번 받아?"
+    )
+    kiwi = kiwi_independent_requirement_queries(question)
+
+    assert len(kiwi) == 2
+    assert _runtime_requirement_queries(question, None) == kiwi
 
 
 def test_runtime_requirement_queries_prefer_kiwi_when_available() -> None:
