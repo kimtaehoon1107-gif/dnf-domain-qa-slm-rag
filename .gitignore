@@ -42,3 +42,6 @@ data/v3/discovery/*.jsonl
 
 # Reproducible v3 federated per-segment score dump (>20 MiB); keep locally.
 data/v3/evidence/federated_retrieval_ab_segment_scores_*.jsonl
+
+# Local generated image scratch files; never commit.
+tmp/
