@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>아라드 기록 보관소 로딩 미리보기</title>
+    <style>
+      @font-face {
+        font-family: "DNFBitBit";
+        src: url("https://cdn.df.nexon.com/img/common/font/DNFBitBit-Regular.woff2")
+          format("woff2");
+        font-display: swap;
+      }
+
+      :root {
+        color-scheme: dark;
+        --background: #0b0d12;
+        --panel: #151922;
+        --panel-edge: #3e3427;
+        --gold: #c9a45c;
+        --gold-soft: #8c6b39;
+        --text: #f2ead8;
+        --muted: #9c978d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 50% 35%, #222938 0, transparent 34rem),
+          linear-gradient(145deg, #0b0d12, #111621 58%, #090b10);
+        font-family: Pretendard, "Noto Sans KR", sans-serif;
+      }
+
+      .loading-card {
+        width: min(92vw, 560px);
+        padding: 30px 32px 28px;
+        text-align: center;
+        background: linear-gradient(180deg, #181d27, var(--panel));
+        border: 1px solid var(--panel-edge);
+        border-radius: 14px;
+        box-shadow:
+          0 26px 70px rgb(0 0 0 / 38%),
+          inset 0 1px 0 rgb(255 255 255 / 4%);
+      }
+
+      .eyebrow,
+      .loading-title {
+        font-family: "DNFBitBit", Pretendard, sans-serif;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--gold);
+        font-size: 14px;
+        letter-spacing: 0.04em;
+      }
+
+      .loading-title {
+        margin: 0;
+        font-size: clamp(24px, 5vw, 34px);
+        font-weight: 400;
+      }
+
+      .track {
+        --searcher-x: 0px;
+        position: relative;
+        width: min(100%, 300px);
+        height: 122px;
+        margin: 22px auto 6px;
+        overflow: hidden;
+      }
+
+      .track::after {
+        content: "";
+        position: absolute;
+        right: 8px;
+        bottom: 15px;
+        left: 8px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--gold-soft), transparent);
+        opacity: 0.72;
+      }
+
+      .archive-bookshelf {
+        position: absolute;
+        z-index: 0;
+        right: 6px;
+        bottom: 16px;
+        left: 6px;
+        width: calc(100% - 12px);
+        height: auto;
+        max-height: 76px;
+        object-fit: contain;
+        image-rendering: pixelated;
+        opacity: 0.92;
+      }
+
+      .searcher-sprite {
+        position: absolute;
+        z-index: 2;
+        bottom: 15px;
+        left: 6px;
+        width: 78px;
+        height: 78px;
+        object-fit: contain;
+        image-rendering: pixelated;
+        transform: translateX(var(--searcher-x));
+        transform-origin: 50% 100%;
+        will-change: transform;
+      }
+
+      .searcher-sprite,
+      .archive-bookshelf {
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .searcher-sprite {
+        transition: filter 120ms ease;
+      }
+
+      .loading-copy {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .loading-copy::after {
+        content: "";
+        display: inline-block;
+        width: 1.4em;
+        text-align: left;
+        animation: loading-dots 1.2s steps(4, end) infinite;
+      }
+
+      @keyframes loading-dots {
+        0% {
+          content: "";
+        }
+        25% {
+          content: ".";
+        }
+        50% {
+          content: "..";
+        }
+        75%,
+        100% {
+          content: "...";
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .searcher-sprite {
+          left: 50%;
+          transform: translateX(-50%) !important;
+        }
+
+        .loading-copy::after {
+          content: "...";
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="loading-card" aria-live="polite" aria-busy="true">
+      <p class="eyebrow">아라드 기록 보관소</p>
+      <h1 class="loading-title">공식 기록을 확인하는 중</h1>
+      <div class="track" id="loadingTrack" aria-hidden="true">
+        <img
+          class="archive-bookshelf"
+          src="assets/archive_bookshelf.png?v=1"
+          alt=""
+        />
+        <img
+          id="searcherSprite"
+          class="searcher-sprite"
+          src="assets/mikaela_search_frames/mikaela_search_00.png?v=1"
+          alt=""
+        />
+      </div>
+      <p class="loading-copy" id="loadingCopy">답변과 인용 근거를 준비하고 있습니다</p>
+    </main>
+    <script>
+      const loadingTrack = document.querySelector("#loadingTrack");
+      const loadingCopy = document.querySelector("#loadingCopy");
+      const searcherSprite = document.querySelector("#searcherSprite");
+      const searchFrameSources = Array.from(
+        { length: 4 },
+        (_, index) =>
+          `assets/mikaela_search_frames/mikaela_search_${String(index).padStart(2, "0")}.png?v=1`,
+      );
+      searchFrameSources.forEach((source) => {
+        const frame = new Image();
+        frame.src = source;
+      });
+      const loadingStages = {
+        queued: { range: [0, 0.06], label: "질문을 준비하고 있습니다" },
+        retrieval: { range: [0.06, 0.32], label: "책장에서 관련 기록을 찾고 있습니다" },
+        rerank: { range: [0.32, 0.48], label: "찾은 기록을 비교하고 있습니다" },
+        evidence: { range: [0.48, 0.62], label: "인용할 페이지를 펼치고 있습니다" },
+        generation: { range: [0.62, 0.96], label: "답변을 작성하고 있습니다" },
+        complete: { range: [1, 1], label: "필요한 기록을 찾았습니다" },
+      };
+      let currentProgress = 0;
+      let targetProgress = 0;
+      let lastFrameTime = performance.now();
+      let lastSearchFrame = -1;
+
+      function renderLoader() {
+        const spriteStyle = getComputedStyle(searcherSprite);
+        const spriteLeft = Number.parseFloat(spriteStyle.left) || 0;
+        const spriteWidth = Number.parseFloat(spriteStyle.width) || 0;
+        const maxTravel = Math.max(
+          0,
+          loadingTrack.clientWidth - spriteWidth - spriteLeft * 2,
+        );
+        let positionRatio;
+        let searchFrame;
+
+        if (currentProgress < 0.34) {
+          positionRatio = 0.06 + (currentProgress / 0.34) * 0.72;
+          searchFrame = 0;
+        } else if (currentProgress < 0.56) {
+          positionRatio = 0.78 - ((currentProgress - 0.34) / 0.22) * 0.56;
+          searchFrame = 1;
+        } else if (currentProgress < 0.72) {
+          positionRatio = 0.22 + ((currentProgress - 0.56) / 0.16) * 0.36;
+          searchFrame = 0;
+        } else if (currentProgress < 0.88) {
+          positionRatio = 0.58;
+          searchFrame = 2;
+        } else {
+          positionRatio = 0.58;
+          searchFrame = 3;
+        }
+
+        loadingTrack.style.setProperty(
+          "--searcher-x",
+          `${(maxTravel * positionRatio).toFixed(2)}px`,
+        );
+        if (searchFrame !== lastSearchFrame) {
+          searcherSprite.src = searchFrameSources[searchFrame];
+          lastSearchFrame = searchFrame;
+        }
+      }
+
+      function animateLoader(now) {
+        const deltaSeconds = Math.min((now - lastFrameTime) / 1000, 0.05);
+        const gap = targetProgress - currentProgress;
+        const response = 2.2 + Math.min(4.8, Math.abs(gap) * 7);
+
+        currentProgress += gap * (1 - Math.exp(-response * deltaSeconds));
+        if (Math.abs(gap) < 0.0005) currentProgress = targetProgress;
+        renderLoader();
+        lastFrameTime = now;
+        window.requestAnimationFrame(animateLoader);
+      }
+
+      function setLoadingProgress(value) {
+        const normalized = Math.min(1, Math.max(0, Number(value) || 0));
+        targetProgress = Math.max(targetProgress, normalized);
+      }
+
+      function setLoadingStage(stage, fraction = 0) {
+        const config = loadingStages[stage];
+        if (!config) return;
+
+        const stageFraction = Math.min(1, Math.max(0, Number(fraction) || 0));
+        const [start, end] = config.range;
+        loadingCopy.textContent = config.label;
+        setLoadingProgress(start + (end - start) * stageFraction);
+      }
+
+      window.setLoadingProgress = setLoadingProgress;
+      window.setLoadingStage = setLoadingStage;
+      loadingTrack.dataset.progressApi = "ready";
+
+      function runPreviewTimeline() {
+        currentProgress = 0;
+        targetProgress = 0;
+        renderLoader();
+        const milestones = [
+          [200, "retrieval", 0.2],
+          [620, "retrieval", 0.78],
+          [1100, "rerank", 0.25],
+          [1580, "evidence", 0.4],
+          [2020, "generation", 0.12],
+          [2460, "generation", 0.58],
+          [3150, "generation", 0.94],
+          [3550, "complete", 1],
+        ];
+
+        setLoadingStage("queued");
+        milestones.forEach(([delay, stage, fraction]) => {
+          window.setTimeout(() => setLoadingStage(stage, fraction), delay);
+        });
+        window.setTimeout(runPreviewTimeline, 4300);
+      }
+
+      renderLoader();
+      window.requestAnimationFrame(animateLoader);
+      runPreviewTimeline();
+    </script>
+  </body>
+</html>
