@@ -1,0 +1,36 @@
+{
+  "evaluation_role": "claim_contract_relation_inventory_not_a_model_score",
+  "sealed_artifact_changed": false,
+  "requirement_count": 96,
+  "unique_relation_count": 73,
+  "contract_states": {
+    "explicit_alias": 22,
+    "unvalidated": 74
+  },
+  "family_counts": {
+    "boolean_state": 8,
+    "channel_location_method": 12,
+    "domain_property": 2,
+    "effect_change": 5,
+    "item_content": 4,
+    "percentage_effect": 3,
+    "policy_rule": 6,
+    "price_currency": 17,
+    "quantity_limit": 14,
+    "temporal": 18,
+    "trade_status": 7
+  },
+  "claim_target_correction_count": 1,
+  "inputs": {
+    "sealed": {
+      "path": "data/v3/evaluation/typed_evidence_ref_generalization_64_sealed_e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597.jsonl",
+      "sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597"
+    },
+    "claim_target_corrections": {
+      "path": "data/v3/evaluation/typed_evidence_ref_generalization_64_claim_target_corrections_20260727.jsonl",
+      "sha256": "02da81e2b582b5f38a9f6161ffd8e5f9fcbc1ac5da7bb84612c69029c98812da"
+    }
+  },
+  "output": "reports/v3/typed_evidence_ref_relation_inventory_96_20260727.jsonl",
+  "report": "reports/v3/typed_evidence_ref_relation_inventory_96_20260727.md"
+}
