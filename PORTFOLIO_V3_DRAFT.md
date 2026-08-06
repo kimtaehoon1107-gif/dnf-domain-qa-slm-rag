@@ -1,3 +1,5 @@
+> 최신 통합 포트폴리오는 [PORTFOLIO.md](PORTFOLIO.md)입니다. 이 문서는 typed v3 실험 기록으로 유지합니다.
+
 # 던파 공식문서 기반 RAG — Evidence Contract Engineering
 
 > 상태: 포트폴리오 초안

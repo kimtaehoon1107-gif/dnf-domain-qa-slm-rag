@@ -1,3 +1,5 @@
+> 최신 통합 포트폴리오는 [PORTFOLIO.md](PORTFOLIO.md)입니다. 이 문서는 v2 실험 기록으로 유지합니다.
+
 # DNF Domain QA SLM/RAG v2
 
 ## 평가 주도형 게임 도메인 QA 포트폴리오 보고서
