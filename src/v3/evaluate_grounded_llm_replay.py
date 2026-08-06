@@ -500,6 +500,7 @@ def run_fixed_requirement_replay(
     split_evidence_schema: bool = False,
     batch_requirements: bool = False,
     typed_evidence_refs: bool = False,
+    typed_evidence_selector_mode: str = "baseline",
     progress: Callable[[int, int], None] | None = None,
     result_callback: Callable[[dict[str, Any], int, int], None] | None = None,
     candidate_pool_rows: list[dict[str, Any]] | None = None,
@@ -613,6 +614,7 @@ def run_fixed_requirement_replay(
                         chunks_by_id=chunks_by_id,
                         documents_by_id=documents_by_id,
                         temporal_by_document=temporal_by_document,
+                        selector_mode=typed_evidence_selector_mode,
                     )
                     sufficiency_shadow = [
                         assess_requirement_evidence_sufficiency_shadow(
@@ -965,6 +967,11 @@ def run_fixed_requirement_replay(
             "frozen_requirement_semantics_available_to_generator": True,
             "batch_requirements": batch_requirements,
             "typed_evidence_refs": typed_evidence_refs,
+            "typed_evidence_selector_mode": (
+                typed_evidence_selector_mode
+                if typed_evidence_refs
+                else None
+            ),
             "model_call": _aggregate_model_calls(calls, model),
             "verified_output": verified,
             "baseline_score": baseline["arm0_score"],

@@ -56,6 +56,11 @@ DEFAULT_EQUIVALENT_EVIDENCE_ADDENDUM = Path(
     "typed_evidence_ref_generalization_64_"
     "equivalent_evidence_addendum_20260727.jsonl"
 )
+DEFAULT_CLAIM_TARGET_CORRECTIONS = Path(
+    "data/v3/evaluation/"
+    "typed_evidence_ref_generalization_64_"
+    "claim_target_corrections_20260727.jsonl"
+)
 DEFAULT_OUTPUT = Path(
     "outputs/v3/diagnostics/"
     "typed_evidence_ref_generalization_64_precision_fix_verifier_only.jsonl"
@@ -68,6 +73,186 @@ DEFAULT_SUMMARY = Path(
 
 class RecordedGenerationError(RuntimeError):
     pass
+
+
+def _validated_evidence_unit(
+    unit: dict[str, Any],
+    *,
+    chunks_by_id: dict[str, dict[str, Any]],
+    documents_by_id: dict[str, dict[str, Any]],
+    error_prefix: str,
+) -> dict[str, Any]:
+    validated = copy.deepcopy(unit)
+    chunk = chunks_by_id.get(validated["chunk_id"])
+    if chunk is None:
+        raise RuntimeError(f"{error_prefix} chunk missing")
+    start = validated["start_char"]
+    end = validated["end_char"]
+    if (
+        not isinstance(start, int)
+        or not isinstance(end, int)
+        or start < 0
+        or end <= start
+        or chunk["display_text"][start:end] != validated["text"]
+    ):
+        raise RuntimeError(f"{error_prefix} coordinates mismatch")
+    if (
+        validated["document_id"] != chunk["parent_document_id"]
+        or validated["source_id"] != chunk["source_id"]
+        or validated["document_status"] != chunk["status"]
+    ):
+        raise RuntimeError(f"{error_prefix} chunk metadata mismatch")
+    document = documents_by_id.get(validated["document_id"])
+    if document is None:
+        raise RuntimeError(f"{error_prefix} document missing")
+    for key in ("canonical_url", "source_id", "status", "title"):
+        unit_key = "document_status" if key == "status" else key
+        if validated.get(unit_key) != document.get(key):
+            raise RuntimeError(
+                f"{error_prefix} document {key} mismatch"
+            )
+    return validated
+
+
+def apply_reviewed_claim_target_corrections(
+    sealed_rows: list[dict[str, Any]],
+    correction_rows: list[dict[str, Any]],
+    *,
+    chunks_by_id: dict[str, dict[str, Any]],
+    documents_by_id: dict[str, dict[str, Any]],
+    sealed_sha256: str,
+    corpus_chunks_sha256: str,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Apply explicit reviewed target corrections to a diagnostic copy."""
+
+    corrected_rows = copy.deepcopy(sealed_rows)
+    sealed_by_id = {
+        row["candidate_id"]: row for row in corrected_rows
+    }
+    if len(sealed_by_id) != len(corrected_rows):
+        raise RuntimeError("sealed candidate IDs are not unique")
+
+    applied = []
+    seen = set()
+    for correction in correction_rows:
+        if correction.get("evaluation_role") != (
+            "reviewed_claim_target_correction_not_sealed_rewrite"
+        ):
+            raise RuntimeError("unexpected claim-target correction role")
+        if correction.get("sealed_artifact_sha256") != sealed_sha256:
+            raise RuntimeError("claim-target correction sealed SHA mismatch")
+        if correction.get("corpus_chunks_sha256") != corpus_chunks_sha256:
+            raise RuntimeError("claim-target correction corpus SHA mismatch")
+
+        candidate_id = correction["candidate_id"]
+        sealed = sealed_by_id.get(candidate_id)
+        if sealed is None:
+            raise RuntimeError("claim-target correction candidate ID missing")
+        if sealed["slot_ordinal"] != correction["slot_ordinal"]:
+            raise RuntimeError("claim-target correction slot mismatch")
+        requirement_id = correction["requirement_id"]
+        key = (candidate_id, requirement_id)
+        if key in seen:
+            raise RuntimeError("duplicate claim-target correction")
+        seen.add(key)
+        requirements = {
+            requirement["requirement_id"]: requirement
+            for requirement in sealed["requirements"]
+        }
+        requirement = requirements.get(requirement_id)
+        if requirement is None:
+            raise RuntimeError(
+                "claim-target correction requirement ID missing"
+            )
+
+        replacement = copy.deepcopy(correction["replacement_claim_target"])
+        allowed_keys = {
+            "acceptable_evidence_units",
+            "expected_status",
+            "relation",
+            "required_values",
+            "subject",
+            "value_type",
+        }
+        if set(replacement) != allowed_keys:
+            raise RuntimeError(
+                "claim-target correction replacement fields mismatch"
+            )
+        if replacement["expected_status"] not in {
+            "supported",
+            "unsupported",
+        }:
+            raise RuntimeError(
+                "claim-target correction expected status invalid"
+            )
+        if not isinstance(replacement["relation"], str) or not replacement[
+            "relation"
+        ].strip():
+            raise RuntimeError("claim-target correction relation missing")
+        if not isinstance(replacement["subject"], str) or not replacement[
+            "subject"
+        ].strip():
+            raise RuntimeError("claim-target correction subject missing")
+        if not isinstance(replacement["value_type"], str) or not replacement[
+            "value_type"
+        ].strip():
+            raise RuntimeError("claim-target correction value type missing")
+        if not isinstance(replacement["required_values"], list):
+            raise RuntimeError(
+                "claim-target correction required values invalid"
+            )
+        if not isinstance(
+            replacement["acceptable_evidence_units"],
+            list,
+        ):
+            raise RuntimeError(
+                "claim-target correction evidence units invalid"
+            )
+        if replacement["expected_status"] == "supported" and (
+            not replacement["required_values"]
+            or not replacement["acceptable_evidence_units"]
+        ):
+            raise RuntimeError(
+                "supported claim-target correction requires values and evidence"
+            )
+        if replacement["expected_status"] == "unsupported" and (
+            replacement["required_values"]
+            or replacement["acceptable_evidence_units"]
+        ):
+            raise RuntimeError(
+                "unsupported claim-target correction cannot include evidence"
+            )
+        replacement["acceptable_evidence_units"] = [
+            _validated_evidence_unit(
+                unit,
+                chunks_by_id=chunks_by_id,
+                documents_by_id=documents_by_id,
+                error_prefix="claim-target correction",
+            )
+            for unit in replacement["acceptable_evidence_units"]
+        ]
+
+        before = copy.deepcopy(requirement)
+        requirement.clear()
+        requirement.update(replacement)
+        requirement["requirement_id"] = requirement_id
+        applied.append(
+            {
+                "slot_ordinal": sealed["slot_ordinal"],
+                "candidate_id": candidate_id,
+                "requirement_id": requirement_id,
+                "before": before,
+                "after": copy.deepcopy(requirement),
+                "adjudication_basis": correction["adjudication_basis"],
+            }
+        )
+
+    return corrected_rows, {
+        "mode": "claim_target_correction_diagnostic_overlay",
+        "sealed_artifact_changed": False,
+        "applied_count": len(applied),
+        "applied": applied,
+    }
 
 
 def apply_reviewed_equivalent_evidence_overlay(
@@ -116,40 +301,12 @@ def apply_reviewed_equivalent_evidence_overlay(
         if requirement is None:
             raise RuntimeError("equivalent-evidence requirement ID missing")
 
-        unit = copy.deepcopy(addendum["acceptable_evidence_unit"])
-        chunk = chunks_by_id.get(unit["chunk_id"])
-        if chunk is None:
-            raise RuntimeError("equivalent-evidence chunk missing")
-        start = unit["start_char"]
-        end = unit["end_char"]
-        if (
-            not isinstance(start, int)
-            or not isinstance(end, int)
-            or start < 0
-            or end <= start
-            or chunk["display_text"][start:end] != unit["text"]
-        ):
-            raise RuntimeError("equivalent-evidence coordinates mismatch")
-        if (
-            unit["document_id"] != chunk["parent_document_id"]
-            or unit["source_id"] != chunk["source_id"]
-            or unit["document_status"] != chunk["status"]
-        ):
-            raise RuntimeError("equivalent-evidence chunk metadata mismatch")
-        document = documents_by_id.get(unit["document_id"])
-        if document is None:
-            raise RuntimeError("equivalent-evidence document missing")
-        for key in (
-            "canonical_url",
-            "source_id",
-            "status",
-            "title",
-        ):
-            unit_key = "document_status" if key == "status" else key
-            if unit.get(unit_key) != document.get(key):
-                raise RuntimeError(
-                    f"equivalent-evidence document {key} mismatch"
-                )
+        unit = _validated_evidence_unit(
+            addendum["acceptable_evidence_unit"],
+            chunks_by_id=chunks_by_id,
+            documents_by_id=documents_by_id,
+            error_prefix="equivalent-evidence",
+        )
 
         if requirement["expected_status"] != "supported":
             correction_required.append(
@@ -383,6 +540,11 @@ def main() -> None:
         default=DEFAULT_EQUIVALENT_EVIDENCE_ADDENDUM,
     )
     parser.add_argument(
+        "--claim-target-corrections",
+        type=Path,
+        default=DEFAULT_CLAIM_TARGET_CORRECTIONS,
+    )
+    parser.add_argument(
         "--rescore-source-only",
         action="store_true",
         help=(
@@ -407,6 +569,7 @@ def main() -> None:
     chunks_path = resolved(args.chunks)
     documents_path = resolved(args.documents)
     addendum_path = resolved(args.equivalent_evidence_addendum)
+    corrections_path = resolved(args.claim_target_corrections)
     sealed_rows = read_jsonl(sealed_path)
     source_rows = read_jsonl(resolved(args.source))
     if len(sealed_rows) != 64 or len(source_rows) != 64:
@@ -425,6 +588,18 @@ def main() -> None:
         apply_reviewed_equivalent_evidence_overlay(
             sealed_rows,
             read_jsonl(addendum_path),
+            chunks_by_id=chunks_by_id,
+            documents_by_id={
+                row["document_id"]: row for row in documents
+            },
+            sealed_sha256=file_sha256(sealed_path),
+            corpus_chunks_sha256=file_sha256(chunks_path),
+        )
+    )
+    scoring_rows, correction_summary = (
+        apply_reviewed_claim_target_corrections(
+            scoring_rows,
+            read_jsonl(corrections_path),
             chunks_by_id=chunks_by_id,
             documents_by_id={
                 row["document_id"]: row for row in documents
@@ -626,6 +801,11 @@ def main() -> None:
             **overlay_summary,
             "path": args.equivalent_evidence_addendum.as_posix(),
             "sha256": file_sha256(addendum_path),
+        },
+        "reviewed_claim_target_corrections": {
+            **correction_summary,
+            "path": args.claim_target_corrections.as_posix(),
+            "sha256": file_sha256(corrections_path),
         },
         "changes": changes,
         "inputs": {

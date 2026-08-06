@@ -8,6 +8,7 @@ from src.v3.evaluate_grounded_llm_replay import run_fixed_requirement_replay
 from src.v3.typed_evidence_ref import (
     _local_ollama_request_chars,
     _value_supported,
+    assess_parent_relation_semantic_shadow,
     assess_requirement_evidence_sufficiency_shadow,
     build_evidence_units,
     build_typed_evidence_prompt,
@@ -431,6 +432,95 @@ class TypedEvidenceRefTest(unittest.TestCase):
                 text[unit["start_char"] : unit["end_char"]],
                 unit["text"],
             )
+
+    def test_typed_prompt_exposes_only_minimum_claim_spec_fields(self) -> None:
+        chunks, documents, temporal = _artifacts(
+            "업데이트는 2026년 6월 4일 적용됩니다.",
+            title="업데이트 안내",
+        )
+
+        prompt, _ = build_typed_evidence_prompt(
+            question="업데이트는 언제 적용됐어?",
+            requirements=[
+                {
+                    "requirement_id": "effective_at",
+                    "subject": "업데이트",
+                    "subject_group": "업데이트 일정",
+                    "relation": "effective_at",
+                    "surface": "적용 시점",
+                    "relation_surface": "적용일",
+                    "value_type": "date",
+                    "temporal_role": "effective_at",
+                    "cardinality": "single",
+                }
+            ],
+            question_time_scope="current",
+            as_of="2026-07-22",
+            candidate_chunk_ids=["c1"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+
+        public_requirements = prompt.split(
+            "고정 요구사항 목록:\n", 1
+        )[1].split("\n\n후보 evidence units", 1)[0]
+        self.assertEqual(
+            json.loads(public_requirements),
+            [
+                {
+                    "requirement_id": "effective_at",
+                    "subject": "업데이트",
+                    "relation": "effective_at",
+                    "value_type": "date",
+                }
+            ],
+        )
+
+    def test_typed_prompt_keeps_only_non_default_claim_constraints(self) -> None:
+        chunks, documents, temporal = _artifacts(
+            "5주차 보상 장소는 상점과 우편함입니다.",
+            title="5주차 보상 안내",
+        )
+
+        prompt, _ = build_typed_evidence_prompt(
+            question="5주차 보상 장소 두 곳을 모두 알려줘.",
+            requirements=[
+                {
+                    "requirement_id": "reward_locations",
+                    "subject": "5주차 보상",
+                    "relation": "usable_locations",
+                    "value_type": "entity_list",
+                    "qualifiers": {"week_index": 5},
+                    "cardinality": "all",
+                    "expected_count": 2,
+                }
+            ],
+            question_time_scope="current",
+            as_of="2026-07-22",
+            candidate_chunk_ids=["c1"],
+            chunks_by_id=chunks,
+            documents_by_id=documents,
+            temporal_by_document=temporal,
+        )
+
+        public_requirements = prompt.split(
+            "고정 요구사항 목록:\n", 1
+        )[1].split("\n\n후보 evidence units", 1)[0]
+        self.assertEqual(
+            json.loads(public_requirements),
+            [
+                {
+                    "requirement_id": "reward_locations",
+                    "subject": "5주차 보상",
+                    "relation": "usable_locations",
+                    "value_type": "entity_list",
+                    "qualifiers": {"week_index": 5},
+                    "cardinality": "all",
+                    "expected_count": 2,
+                }
+            ],
+        )
 
     def test_policy_prompt_binds_the_requested_policy_identity_before_generation(
         self,
@@ -1169,6 +1259,143 @@ class TypedEvidenceRefTest(unittest.TestCase):
             question="운영정책이 변경될 때 어떤 방식으로 알려줘?",
             as_of="2026-07-22",
             maximum_units=1,
+        )
+
+        self.assertEqual(
+            [unit["evidence_ref"] for unit in selected],
+            ["E2"],
+        )
+
+    def test_relation_semantic_selector_prefers_relation_and_value_unit(
+        self,
+    ) -> None:
+        common = {
+            "parent_document_id": "d1",
+            "source_id": "dnf_notice",
+            "source_kind": "notice",
+            "published_at": None,
+            "valid_from": None,
+            "valid_to": None,
+            "context_text": "",
+            "context_refs": [],
+        }
+        units = [
+            {
+                **common,
+                "evidence_ref": "E1",
+                "candidate_ref": "1",
+                "chunk_id": "c1",
+                "title": "4/2(목) 정기점검 안내",
+                "start_char": 0,
+                "end_char": 17,
+                "text": "| 시간 | 04:30 ~ 10:00 |",
+            },
+            {
+                **common,
+                "evidence_ref": "E2",
+                "candidate_ref": "2",
+                "chunk_id": "c2",
+                "title": "일반 안내",
+                "start_char": 0,
+                "end_char": 32,
+                "text": (
+                    "2026년 4월 2일 정기점검은 몇 시부터 "
+                    "몇 시까지였는지 안내합니다."
+                ),
+            },
+        ]
+        requirement = {
+            "requirement_id": "maintenance_time",
+            "subject": "2026년 4월 2일 정기점검",
+            "relation": "maintenance_time",
+            "value_type": "time_range",
+        }
+
+        baseline = select_prompt_evidence_units(
+            units,
+            requirements=[requirement],
+            question="2026년 4월 2일 정기점검은 몇 시부터 몇 시까지였어?",
+            as_of="2026-07-22",
+            maximum_units=1,
+        )
+        semantic = select_prompt_evidence_units(
+            units,
+            requirements=[requirement],
+            question="2026년 4월 2일 정기점검은 몇 시부터 몇 시까지였어?",
+            as_of="2026-07-22",
+            maximum_units=1,
+            selector_mode="relation_semantic",
+        )
+
+        self.assertEqual(
+            [unit["evidence_ref"] for unit in baseline],
+            ["E2"],
+        )
+        self.assertEqual(
+            [unit["evidence_ref"] for unit in semantic],
+            ["E1"],
+        )
+
+    def test_prompt_selector_rejects_unknown_mode(self) -> None:
+        with self.assertRaisesRegex(
+            RuntimeError,
+            "unknown evidence selector mode",
+        ):
+            select_prompt_evidence_units(
+                [],
+                requirements=[],
+                question="질문",
+                as_of="2026-07-22",
+                selector_mode="unknown",
+            )
+
+    def test_relation_semantic_duration_ignores_clause_numbers(self) -> None:
+        common = {
+            "parent_document_id": "d1",
+            "source_id": "dnf_faq",
+            "source_kind": "faq",
+            "published_at": None,
+            "valid_from": None,
+            "valid_to": None,
+            "context_text": "",
+            "context_refs": [],
+            "title": "[게임이용제한] 이용 제한 해제",
+        }
+        units = [
+            {
+                **common,
+                "evidence_ref": "E1",
+                "candidate_ref": "1",
+                "chunk_id": "c1",
+                "start_char": 0,
+                "end_char": 28,
+                "text": "[1-3] 일반적인 통념에 기초해 처리됩니다.",
+            },
+            {
+                **common,
+                "evidence_ref": "E2",
+                "candidate_ref": "2",
+                "chunk_id": "c2",
+                "start_char": 0,
+                "end_char": 35,
+                "text": "유형에 따라 3~5일 정도 소요될 수 있습니다.",
+            },
+        ]
+
+        selected = select_prompt_evidence_units(
+            units,
+            requirements=[
+                {
+                    "requirement_id": "processing_days",
+                    "subject": "게임 이용제한 이의신청",
+                    "relation": "processing_days",
+                    "value_type": "number",
+                }
+            ],
+            question="게임 이용제한 이의신청 처리 기한은 며칠이야?",
+            as_of="2026-07-22",
+            maximum_units=1,
+            selector_mode="relation_semantic",
         )
 
         self.assertEqual(
@@ -2667,6 +2894,18 @@ class TypedEvidenceRefTest(unittest.TestCase):
             with self.subTest(evidence=evidence):
                 self.assertEqual(boolean_evidence(evidence), expected)
 
+    def test_boolean_evidence_supports_plain_and_past_tense_answers(
+        self,
+    ) -> None:
+        cases = {
+            "성장 가속 모드 상태에서는 결투장을 이용할 수 없다.": {False},
+            "비정상 재화는 고의 여부와 무관하게 회수할 수 있었다.": {True},
+            "삭제 기한이 정해져 있지 않았다.": {False},
+        }
+        for evidence, expected in cases.items():
+            with self.subTest(evidence=evidence):
+                self.assertEqual(boolean_evidence(evidence), expected)
+
     def test_boolean_ignores_negative_evidence_for_another_subject_relation(
         self,
     ) -> None:
@@ -2920,10 +3159,15 @@ class TypedEvidenceRefTest(unittest.TestCase):
             split_evidence_schema=True,
             batch_requirements=True,
             typed_evidence_refs=True,
+            typed_evidence_selector_mode="relation_semantic",
         )
 
         self.assertEqual(len(calls), 1)
         self.assertEqual(rows[0]["model_call"]["call_count"], 1)
+        self.assertEqual(
+            rows[0]["typed_evidence_selector_mode"],
+            "relation_semantic",
+        )
         self.assertNotIn(
             "requirement_id_normalization",
             rows[0]["model_call"]["calls"][0],
@@ -3195,6 +3439,119 @@ class TypedEvidenceRefTest(unittest.TestCase):
         self.assertIn(
             "qualifier_identity_unproven",
             unproven_audit["failure_reasons"],
+        )
+
+    def test_relation_family_contract_is_recorded_and_type_checked(
+        self,
+    ) -> None:
+        text = "해당 상품의 가격은 100 세라입니다."
+        chunks, units, _, _ = _units(text, title="상품 가격")
+        evidence_ref = _ref_containing(units, text)
+
+        decision, audit = verify_typed_requirement_selection(
+            {
+                "requirement_id": "price",
+                "status": "supported",
+                "value_type": "boolean",
+                "value": True,
+                "evidence_refs": [evidence_ref],
+            },
+            requirement={
+                "requirement_id": "price",
+                "subject": "해당 상품",
+                "relation": "price",
+                "value_type": "boolean",
+            },
+            question_time_scope="current",
+            evidence_units_by_ref=units,
+            chunks_by_id=chunks,
+            as_of="2026-07-22",
+        )
+
+        self.assertEqual(decision["status"], "unsupported")
+        self.assertIn(
+            "relation_family_value_type_mismatch",
+            audit["failure_reasons"],
+        )
+        self.assertEqual(audit["relation_family"], "price_currency")
+        self.assertEqual(audit["parent_relation"], "price")
+        self.assertEqual(
+            audit["relation_family_validation_state"],
+            "type_mismatch",
+        )
+
+    def test_parent_relation_shadow_distinguishes_slot_30_relations(
+        self,
+    ) -> None:
+        correct = (
+            "115레벨 이상 장비, 융합석을 검색 및 착용이 가능합니다."
+        )
+        wrong_relation = (
+            "110레벨 또는 115레벨 장비를 모두 장착하면 "
+            "예상 공격력을 확인할 수 있습니다."
+        )
+        requirement = {
+            "requirement_id": "supported_levels",
+            "subject": "장비 시뮬레이터",
+            "relation": "searchable_and_equippable_equipment_level",
+            "value_type": "entity_list",
+        }
+
+        _, correct_units, _, _ = _units(
+            correct,
+            title="장비 시뮬레이터",
+        )
+        supported = assess_parent_relation_semantic_shadow(
+            requirement,
+            evidence_units_by_ref=correct_units,
+            as_of="2026-07-22",
+        )
+        self.assertTrue(supported["assessable"])
+        self.assertFalse(supported["would_trigger"])
+        self.assertEqual(
+            supported["reason"],
+            "child_relation_support_found",
+        )
+
+        _, wrong_units, _, _ = _units(
+            wrong_relation,
+            title="장비 시뮬레이터",
+        )
+        rejected = assess_parent_relation_semantic_shadow(
+            requirement,
+            evidence_units_by_ref=wrong_units,
+            as_of="2026-07-22",
+        )
+        self.assertTrue(rejected["assessable"])
+        self.assertTrue(rejected["would_trigger"])
+        self.assertEqual(
+            rejected["reason"],
+            "child_relation_support_missing",
+        )
+
+    def test_parent_relation_shadow_excludes_audit_only_parent(
+        self,
+    ) -> None:
+        _, units, _, _ = _units(
+            "회사는 고객센터 공지로 안내합니다.",
+            title="운영정책",
+        )
+
+        assessment = assess_parent_relation_semantic_shadow(
+            {
+                "requirement_id": "notice",
+                "subject": "운영정책",
+                "relation": "notice_method",
+                "value_type": "text",
+            },
+            evidence_units_by_ref=units,
+            as_of="2026-07-22",
+        )
+
+        self.assertFalse(assessment["assessable"])
+        self.assertEqual(
+            assessment["reason"],
+            "parent_relation_excluded",
         )
 
 

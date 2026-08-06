@@ -17,7 +17,8 @@ from src.v3.build_corpus import file_sha256
 from src.v3.collect_details import _canonical_json_bytes, _serialize_jsonl, write_immutable
 
 
-PARSER_VERSION = "dnf-table-row-atomic-facts-v3.2-arm1.2"
+PARSER_VERSION = "dnf-table-row-atomic-facts-v3.2-arm1.3"
+TABLE_IDENTITY_VERSION = "dnf-table-row-atomic-facts-v3.2-arm1.2"
 FACT_SCHEMA_VERSION = "dnf-table-row-atomic-fact-v3.2-arm1.1"
 MANIFEST_SCHEMA_VERSION = "dnf-table-row-atomic-facts-manifest-v3.2-arm1.1"
 
@@ -34,10 +35,14 @@ DEFAULT_CONTRACT = Path("docs/v3/table_atomic_facts_arm1.md")
 
 TARGET_SOURCE_IDS = frozenset(
     {
-        "dnf_game_guide",
-        "dnf_seria_shop",
-        "dnf_monthly_item",
         "dnf_account_policy",
+        "dnf_event",
+        "dnf_faq",
+        "dnf_game_guide",
+        "dnf_monthly_item",
+        "dnf_notice",
+        "dnf_seria_shop",
+        "dnf_update",
     }
 )
 SCOPE_TERMS = (
@@ -54,6 +59,28 @@ SCOPE_TERMS = (
     "시행일",
     "시행 일",
     "기간",
+)
+STRUCTURED_SCOPE_TERMS = (
+    "명성",
+    "입장 조건",
+    "입장 레벨",
+    "인원 제한",
+    "피로도",
+    "제한 횟수",
+    "보상 횟수",
+    "성공 확률",
+    "보정치",
+    "소모 재료",
+    "필요 재료",
+    "거래타입",
+    "거래 타입",
+    "거래유형",
+    "거래 유형",
+    "구매 제한",
+    "구매제한",
+    "수량",
+    "상태",
+    "구성품",
 )
 SUPPRESSED_IDENTITY_HEADERS = frozenset(
     {
@@ -223,10 +250,17 @@ def _owner_chunk(
 
 
 def _is_target_table(
-    *, caption: str, heading_path: list[str], header_cells: list[str]
+    *,
+    caption: str,
+    heading_path: list[str],
+    header_cells: list[str],
+    data_cells: list[str],
 ) -> bool:
     scope_text = " ".join([caption, *heading_path, *header_cells])
-    return any(term in scope_text for term in SCOPE_TERMS)
+    if any(term in scope_text for term in SCOPE_TERMS):
+        return True
+    structured_text = " ".join([*header_cells, *data_cells])
+    return any(term in structured_text for term in STRUCTURED_SCOPE_TERMS)
 
 
 def _row_orientation(header_cells: list[str]) -> str:
@@ -383,6 +417,12 @@ def build_table_atomic_facts(
                 caption=caption,
                 heading_path=heading_path,
                 header_cells=header_labels,
+                data_cells=[
+                    _normalized_label(cell["text"])
+                    for row_match in row_matches[1:]
+                    for cell in _pipe_cells(row_match.group(0))
+                    if cell["text"]
+                ],
             ):
                 audit["tables_outside_arm1_scope"] += 1
                 continue
@@ -394,7 +434,7 @@ def build_table_atomic_facts(
                     "parent_document_id": parent_id,
                     "start": table_match.start(),
                     "end": table_match.end(),
-                    "parser_version": PARSER_VERSION,
+                    "parser_version": TABLE_IDENTITY_VERSION,
                 },
             )
             orientation = _row_orientation(header_labels)
@@ -599,6 +639,7 @@ def freeze_table_atomic_facts(
         "status": "development_only_not_promoted",
         "arm": "arm1_table_row_atomic_facts_additive",
         "parser_version": PARSER_VERSION,
+        "table_identity_version": TABLE_IDENTITY_VERSION,
         "inputs": {
             "dirty_canonical_chunks": {
                 "path": chunks_path.relative_to(root).as_posix(),
@@ -622,6 +663,7 @@ def freeze_table_atomic_facts(
         "scope": {
             "source_ids": sorted(TARGET_SOURCE_IDS),
             "scope_terms": list(SCOPE_TERMS),
+            "structured_scope_terms": list(STRUCTURED_SCOPE_TERMS),
             "complete_dom_tables_only": True,
             "additive_parent_preservation": True,
         },

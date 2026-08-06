@@ -17,6 +17,7 @@ def _fact(
     row_start: int,
     value_start: int,
     caption: str,
+    heading_path: list[str] | None = None,
 ) -> dict:
     return {
         "fact_id": f"{table_id}:{row_id}:{attribute}",
@@ -36,6 +37,7 @@ def _fact(
         "row_text": row_text,
         "table_caption": caption,
         "title": "초월",
+        "heading_path": list(heading_path or []),
         "canonical_url": "https://example.test/guide",
     }
 
@@ -87,6 +89,18 @@ def test_complete_view_keeps_all_rarities_and_attributes() -> None:
     assert view["exact_offset_mismatch_count"] == 0
     assert "| 유니크 | 25개 | 125,000골드 |" in view["rendered_markdown"]
     assert "| 태초 | 500개 | 15,000,000골드 |" in view["rendered_markdown"]
+
+
+def test_complete_view_preserves_heading_scope() -> None:
+    facts, chunks = _fixture()
+    for fact in facts:
+        fact["title"] = "강화"
+        fact["heading_path"] = ["안전 강화"]
+
+    view = build_complete_table_view(facts, chunks_by_id=chunks)
+
+    assert view["heading_path"] == ["안전 강화"]
+    assert view["scope_title"] == "강화 > 안전 강화"
 
 
 def test_query_selects_best_matching_table_without_dropping_rows() -> None:

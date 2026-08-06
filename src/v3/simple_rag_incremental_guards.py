@@ -17,12 +17,26 @@ _HIGH_RISK_RELATION_MARKERS = ("누적", "최대", "최소")
 
 _TEMPORAL_ROLE_MARKERS = {
     "published_at": ("게시", "등록일", "작성일"),
-    "effective_at": ("적용", "시행일"),
+    "effective_at": (
+        "적용",
+        "시행일",
+        "점검 중 업데이트",
+        "업데이트 되는",
+    ),
     "deletion_at": ("삭제",),
     "sale_period": ("판매 기간", "판매기간"),
     "event_period": ("이벤트 기간", "진행 기간"),
     "maintenance_time": ("정기점검", "점검 시간"),
 }
+_CALENDAR_DATE = re.compile(
+    r"(?P<year>20\d{2})\s*(?:년|[-./])\s*"
+    r"(?P<month>\d{1,2})\s*(?:월|[-./])\s*"
+    r"(?P<day>\d{1,2})\s*(?:일)?"
+)
+_MONTH_DAY = re.compile(
+    r"(?<![\d.])(?P<month>\d{1,2})\s*[./월-]\s*"
+    r"(?P<day>\d{1,2})(?:\s*일)?"
+)
 
 
 def _compact(value: Any) -> str:
@@ -240,6 +254,119 @@ def _evidence_temporal_roles(text: str) -> set[str]:
     }
 
 
+def _calendar_dates(text: str) -> set[tuple[int, int, int]]:
+    return {
+        (
+            int(match.group("year")),
+            int(match.group("month")),
+            int(match.group("day")),
+        )
+        for match in _CALENDAR_DATE.finditer(str(text or ""))
+    }
+
+
+def _month_days(text: str) -> set[tuple[int, int]]:
+    values = {
+        (int(match.group("month")), int(match.group("day")))
+        for match in _MONTH_DAY.finditer(str(text or ""))
+    }
+    values.update(
+        (month, day)
+        for _, month, day in _calendar_dates(text)
+    )
+    return {
+        (month, day)
+        for month, day in values
+        if 1 <= month <= 12 and 1 <= day <= 31
+    }
+
+
+def _answer_date_context(
+    citation: dict[str, Any],
+    *,
+    answer: str,
+) -> str:
+    answer_month_days = _month_days(answer)
+    if not answer_month_days:
+        return ""
+    matching_lines = [
+        line
+        for line in str(citation.get("text") or "").splitlines()
+        if _month_days(line) & answer_month_days
+    ]
+    return "\n".join(matching_lines)
+
+
+def _citation_local_context(
+    citation: dict[str, Any],
+    *,
+    chunks_by_id: dict[str, dict[str, Any]],
+) -> str:
+    chunk = chunks_by_id.get(str(citation.get("chunk_id") or ""), {})
+    display_text = str(chunk.get("display_text") or "")
+    citation_text = str(citation.get("text") or "")
+    if not display_text or not citation_text:
+        return citation_text
+    start = display_text.find(citation_text)
+    if start < 0:
+        return citation_text
+    end = start + len(citation_text)
+    line_start = display_text.rfind("\n", 0, start)
+    previous_start = display_text.rfind("\n", 0, max(line_start, 0))
+    line_end = display_text.find("\n", end)
+    if line_end < 0:
+        line_end = len(display_text)
+    next_end = display_text.find("\n", line_end + 1)
+    if next_end < 0:
+        next_end = len(display_text)
+    return display_text[
+        0 if previous_start < 0 else previous_start + 1 : next_end
+    ]
+
+
+def _citation_temporal_roles(
+    citation: dict[str, Any],
+    *,
+    answer: str,
+    chunks_by_id: dict[str, dict[str, Any]],
+    documents_by_id: dict[str, dict[str, Any]],
+) -> set[str]:
+    answer_context = _answer_date_context(
+        citation,
+        answer=answer,
+    )
+    if answer_context:
+        roles = _evidence_temporal_roles(answer_context)
+    else:
+        roles = _evidence_temporal_roles(
+            str(citation.get("text") or "")
+        )
+        roles.update(
+            _evidence_temporal_roles(
+                _citation_local_context(
+                    citation,
+                    chunks_by_id=chunks_by_id,
+                )
+            )
+        )
+    chunk = chunks_by_id.get(str(citation.get("chunk_id") or ""), {})
+    document_id = str(
+        citation.get("parent_document_id")
+        or chunk.get("parent_document_id")
+        or ""
+    )
+    published_at = str(
+        documents_by_id.get(document_id, {}).get("published_at") or ""
+    )
+    published_month_days = _month_days(published_at)
+    compared_text = answer_context or str(citation.get("text") or "")
+    if published_month_days and (
+        _month_days(compared_text) & published_month_days
+    ):
+        roles.add("published_at")
+    return roles
+
+
 def apply_temporal_role_guard(
     result: dict[str, Any],
     *,
@@ -261,24 +388,15 @@ def apply_temporal_role_guard(
         citations = requirement.get("citations") or []
         roles = set().union(
             *(
-                _evidence_temporal_roles(
-                    str(citation.get("text") or "")
-                )
-                for citation in citations
-            )
-        )
-        if not roles:
-            contexts = [
-                _citation_context(
+                _citation_temporal_roles(
                     citation,
+                    answer=str(requirement.get("answer") or ""),
                     chunks_by_id=chunks_by_id,
                     documents_by_id=documents_by_id,
                 )
                 for citation in citations
-            ]
-            roles = set().union(
-                *(_evidence_temporal_roles(context) for context in contexts)
             )
+        )
         if not roles or expected in roles:
             continue
         _block_requirement(

@@ -1,0 +1,82 @@
+{
+  "built_at": "2026-07-18T01:51:13+09:00",
+  "dense_pilot_version": "dnf_bge_m3_dense_pilot_v3.1",
+  "embeddings": {
+    "dimension": 1024,
+    "dtype": "little_endian_float32",
+    "normalized": true,
+    "path": "data/v3/indexes/dense_pilot_embeddings_3d75d86d51c5f7ff4a00c09526932d4ada5eac88ed1b9505b6e55c9259d48a15.f32",
+    "row_count": 467,
+    "sha256": "3d75d86d51c5f7ff4a00c09526932d4ada5eac88ed1b9505b6e55c9259d48a15"
+  },
+  "inputs": [
+    {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "role": "chunk_v3",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    {
+      "path": "data/v3/chunks/chunk_corpus_manifest_87fb0fc3477088cf6245e8bd3fd7719374a7dbf778094d5e36fa43458dd54c00.json",
+      "role": "chunk_corpus_manifest",
+      "sha256": "87fb0fc3477088cf6245e8bd3fd7719374a7dbf778094d5e36fa43458dd54c00"
+    },
+    {
+      "path": "data/v3/chunks/chunk_pilot_selection_af717de4e375b7c6f74a4a6da41640280c1ea2c4c5550278c1811c2954553b2b.jsonl",
+      "role": "approved_chunk_pilot_selection",
+      "sha256": "af717de4e375b7c6f74a4a6da41640280c1ea2c4c5550278c1811c2954553b2b"
+    },
+    {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "role": "document_v3",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    {
+      "path": "data/v3/indexes/bm25_manifest_f963e4e6a8bd64540ec030cdd3a4e881cd4034d833655dc624b838cafae8dbea.json",
+      "role": "bm25_manifest",
+      "sha256": "f963e4e6a8bd64540ec030cdd3a4e881cd4034d833655dc624b838cafae8dbea"
+    }
+  ],
+  "manifest_schema_version": "dnf_dense_pilot_manifest_v3.1",
+  "metadata": {
+    "path": "data/v3/indexes/dense_pilot_metadata_948948873ff42c11abd194f6d13a2b2dc3abde06db199ab5e98afcd9b7337c89.jsonl",
+    "row_count": 467,
+    "sha256": "948948873ff42c11abd194f6d13a2b2dc3abde06db199ab5e98afcd9b7337c89"
+  },
+  "model": {
+    "batch_size": 2,
+    "device": "cuda",
+    "device_name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "embedding_dimension": 1024,
+    "embedding_dtype": "float32",
+    "max_sequence_length": 2048,
+    "model_name": "BAAI/bge-m3",
+    "model_revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "normalize_embeddings": true,
+    "numpy_version": "2.4.4",
+    "repeat_encode_max_abs_diff": 1.7695128917694092e-07,
+    "repeat_encode_rows": 16,
+    "sentence_transformers_version": "5.5.1",
+    "similarity": "cosine_via_normalized_dot_product",
+    "torch_version": "2.11.0+cu128"
+  },
+  "selection": {
+    "path": "data/v3/indexes/dense_pilot_selection_fdfdde3e765a5e68a093127f235f6d5e41168ea9c8e0d54f60ea74fe121c1e8e.jsonl",
+    "row_count": 467,
+    "sha256": "fdfdde3e765a5e68a093127f235f6d5e41168ea9c8e0d54f60ea74fe121c1e8e"
+  },
+  "token_measurement": {
+    "over_requested_max": 0,
+    "requested_max_sequence_length": 2048,
+    "row_count": 467,
+    "token_length": {
+      "max": 1113,
+      "mean": 368.14,
+      "min": 54,
+      "p50": 225,
+      "p90": 856,
+      "p95": 902,
+      "p99": 1032
+    },
+    "truncation_detected": false
+  }
+}

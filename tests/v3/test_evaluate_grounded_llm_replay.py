@@ -147,7 +147,7 @@ class GroundedLlmReplayTest(unittest.TestCase):
         self.assertRegex(metadata["sha256"], r"^[0-9a-f]{64}$")
         self.assertEqual(
             metadata["claim_contract_version"],
-            "typed-evidence-ref-claim-contract-v7",
+            "typed-evidence-ref-claim-contract-v8",
         )
 
     def test_table_rows_are_exact_deduplicated_candidate_slices(self) -> None:

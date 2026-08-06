@@ -1,0 +1,118 @@
+{
+  "builder_version": "product-free-rag-a6-candidate-builder-v3",
+  "packet_schema_version": "product-free-rag-a6-candidate-v3",
+  "status": "candidate_pending_human_review_execution_locked",
+  "as_of": "2026-08-04",
+  "validation": {
+    "row_count": 32,
+    "requirement_count": 61,
+    "supported_evidence_unit_count": 62,
+    "source_counts": {
+      "dnf_account_policy": 4,
+      "dnf_event": 4,
+      "dnf_faq": 4,
+      "dnf_game_guide": 4,
+      "dnf_monthly_item": 4,
+      "dnf_notice": 4,
+      "dnf_seria_shop": 4,
+      "dnf_update": 4
+    },
+    "response_mode_counts": {
+      "full_answer": 28,
+      "partial_answer": 4
+    },
+    "kiwi_stress_tagged_rows": 30,
+    "parent_overlap_slots": [
+      6,
+      8,
+      9,
+      11,
+      12,
+      21,
+      22,
+      23,
+      24,
+      28,
+      30
+    ],
+    "prior_set_row_count": 160,
+    "exact_prior_question_overlap_slots": [],
+    "exact_prior_evidence_overlaps": [],
+    "coordinate_failure_slots": [],
+    "unsupported_requirement_count": 4,
+    "gates": {
+      "rows_32": true,
+      "sources_8_by_4": true,
+      "questions_unique": true,
+      "candidate_ids_unique": true,
+      "exact_prior_question_overlap_zero": true,
+      "exact_prior_evidence_overlap_zero": true,
+      "citation_coordinates_exact": true,
+      "execution_locked": true,
+      "training_locked": true,
+      "partial_case_present": true,
+      "unsupported_requirements_4": true
+    },
+    "gate_pass": true
+  },
+  "inputs": {
+    "specs": {
+      "path": "data\\v3\\evaluation\\product_free_rag_a6_specs_v3_20260805.jsonl",
+      "sha256": "50621c6a5212e965bbcf961aae44a21c84f7630955653f5809250bddf41ad70c"
+    },
+    "documents": {
+      "path": "data\\v3\\normalized\\documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    "chunks": {
+      "path": "data\\v3\\chunks\\chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "prior_sets": [
+      {
+        "path": "data\\v3\\evaluation\\typed_evidence_ref_generalization_64_sealed_e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597.jsonl",
+        "sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597"
+      },
+      {
+        "path": "data\\v3\\evaluation\\simple_rag_untouched32_sealed_6b2bc67087d255af1b4cfdc9076b8dfd8d0cce2b2194e2e2210af08eb8a95198.jsonl",
+        "sha256": "6b2bc67087d255af1b4cfdc9076b8dfd8d0cce2b2194e2e2210af08eb8a95198"
+      },
+      {
+        "path": "data\\v3\\evaluation\\typed_evidence_ref_new_claim32_sealed_b8e9f67bc3cb927168f312d3cb5dfaca154c2dffd14c7fabd8c6efb5a98ee83a.jsonl",
+        "sha256": "b8e9f67bc3cb927168f312d3cb5dfaca154c2dffd14c7fabd8c6efb5a98ee83a"
+      },
+      {
+        "path": "data\\v3\\evaluation\\product_free_rag_a5_frozen_99122be1d851c2de0bac56be6c93a37bd8e30c71c311be2ee5424cf27b487fcc.jsonl",
+        "sha256": "99122be1d851c2de0bac56be6c93a37bd8e30c71c311be2ee5424cf27b487fcc"
+      }
+    ]
+  },
+  "outputs": {
+    "candidate": {
+      "path": "data\\v3\\evaluation\\product_free_rag_a6_candidate_v3_20260805.jsonl",
+      "sha256": "a6795df92e58c62eaa82161e3f56bddda3f53aa014a11722fe4862cf2c764ef1"
+    },
+    "review_csv": {
+      "path": "reports\\v3\\product_free_rag_a6_review_v3_20260805.csv",
+      "sha256": "caf0b345b0fb60555b3cc4756fa888c74ffb68c6fddff33c103e4ac203ada318"
+    },
+    "review_packet": {
+      "path": "reports\\v3\\product_free_rag_a6_review_packet_v3_20260805.md",
+      "sha256": "7b457a02f722f393a1c3fa508ccb18204e02bc55a627f672991b74a0e8977748"
+    }
+  },
+  "runs": {
+    "kiwi_run_performed": false,
+    "retrieval_run_performed": false,
+    "metadata_query_run_performed": false,
+    "reranker_run_performed": false,
+    "generation_run_performed": false,
+    "verifier_run_performed": false,
+    "evaluation_run_performed": false
+  },
+  "permissions": {
+    "execution_allowed": false,
+    "training_allowed": false,
+    "human_review_required_before_freeze": true
+  }
+}

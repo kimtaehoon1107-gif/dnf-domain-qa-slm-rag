@@ -52,6 +52,82 @@ class TypedEvidenceRefGeneralizationScorerTest(unittest.TestCase):
             NORMALIZATION_CONTRACT["rules"],
         )
 
+    def test_registered_location_equivalence_is_relation_scoped(self) -> None:
+        self.assertTrue(
+            value_present(
+                "게임 내",
+                "enum",
+                "게임 내 보안 메뉴",
+                as_of="2026-07-17",
+                relation="registration_location",
+            )
+        )
+        self.assertTrue(
+            value_present(
+                "게임",
+                "entity_list",
+                "게임 내 보안 메뉴, 홈페이지",
+                as_of="2026-07-17",
+                relation="deletion_location",
+            )
+        )
+        self.assertTrue(
+            value_present(
+                "웹",
+                "entity_list",
+                "게임 내 보안 메뉴, 홈페이지",
+                as_of="2026-07-17",
+                relation="deletion_location",
+            )
+        )
+        self.assertFalse(
+            value_present(
+                "고객센터",
+                "text",
+                "게임 홈페이지",
+                as_of="2026-07-17",
+                relation="processing_channel",
+            )
+        )
+        self.assertTrue(
+            value_present(
+                "고객센터",
+                "text",
+                "이용제한 재조사를 위해 1:1문의를 접수",
+                as_of="2026-07-17",
+                relation="appeal_channel",
+            )
+        )
+        self.assertFalse(
+            value_present(
+                "고객센터",
+                "text",
+                "게임 홈페이지",
+                as_of="2026-07-17",
+                relation="appeal_channel",
+            )
+        )
+
+    def test_duration_range_does_not_collapse_to_one_endpoint(self) -> None:
+        self.assertTrue(
+            value_present(
+                "3일/5일",
+                "duration_range",
+                "유형에 따라 3~5일 정도 소요될 수 있습니다.",
+                as_of="2026-07-17",
+                relation="processing_days",
+            )
+        )
+        self.assertFalse(
+            value_present(
+                5,
+                "number",
+                "유형에 따라 3~5일 정도 소요될 수 있습니다.",
+                as_of="2026-07-17",
+                relation="processing_days",
+            )
+        )
+
     def test_partial_overlap_does_not_count_as_citing_the_approved_unit(
         self,
     ) -> None:

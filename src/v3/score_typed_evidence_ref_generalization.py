@@ -7,7 +7,9 @@ from typing import Any
 from src.v3.value_normalization import (
     CURRENCY_UNITS,
     boolean_value,
+    canonical_categorical_values,
     currency_values,
+    duration_range_values,
     number_values,
     time_sequence,
     time_values,
@@ -22,6 +24,7 @@ NORMALIZATION_CONTRACT = {
         "Korean and ISO dates are compared as YYYY-MM-DD; month/day-only forms use the frozen as_of year.",
         "06시, 6시, and 06:00 are compared as 06:00; 오전/오후 are converted to 24-hour time.",
         "time and time_range values use the same ordered clock normalization in the verifier and scorer.",
+        "duration_range values require both endpoints and the same normalized duration unit.",
         "Plain numbers normalize commas and Korean 만/억 scales in both the verifier and scorer.",
         "Currency commas, Korean 만/억 scales, domain currency units, and unit-first count forms are normalized to integer amount plus unit.",
         "Percentages and plain numbers are compared numerically.",
@@ -82,7 +85,14 @@ def _expected_currency(value: Any) -> tuple[int, str] | None:
     return int(amount), CURRENCY_UNITS[unit]
 
 
-def value_present(expected: Any, value_type: str, observed: Any, *, as_of: str) -> bool:
+def value_present(
+    expected: Any,
+    value_type: str,
+    observed: Any,
+    *,
+    as_of: str,
+    relation: str | None = None,
+) -> bool:
     if value_type == "boolean" or isinstance(expected, bool):
         return boolean_value(expected) is not None and boolean_value(expected) == boolean_value(
             observed
@@ -119,6 +129,11 @@ def value_present(expected: Any, value_type: str, observed: Any, *, as_of: str) 
                 len(observed_times) - len(expected_times) + 1
             )
         )
+    if value_type == "duration_range":
+        expected_ranges = duration_range_values(expected)
+        return bool(expected_ranges) and expected_ranges <= duration_range_values(
+            observed
+        )
 
     expected_text = str(expected)
     if re.fullmatch(r"20\d{2}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?(?:[+-]\d{2}:\d{2})?", expected_text):
@@ -131,6 +146,16 @@ def value_present(expected: Any, value_type: str, observed: Any, *, as_of: str) 
         return expected_text in _date_values(observed, as_of=as_of)
     if re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", expected_text):
         return expected_text in time_values(observed)
+
+    canonical_expected = canonical_categorical_values(
+        expected,
+        relation=relation,
+    )
+    if canonical_expected:
+        return canonical_expected <= canonical_categorical_values(
+            observed,
+            relation=relation,
+        )
 
     compact_expected = _compact(expected_text)
     if (
@@ -211,6 +236,7 @@ _STRICT_VALUE_TYPES = {
     "date",
     "date_range",
     "datetime",
+    "duration_range",
     "number",
     "percentage",
     "price",
@@ -239,6 +265,7 @@ def _approved_evidence_groups(
                 requirement["value_type"],
                 unit["text"],
                 as_of=as_of,
+                relation=requirement.get("relation"),
             )
         ]
         if (
@@ -325,6 +352,7 @@ def score_generalization_cases(
                         requirement["value_type"],
                         answer,
                         as_of=sealed["as_of"],
+                        relation=requirement.get("relation"),
                     )
                     for value in values
                 )

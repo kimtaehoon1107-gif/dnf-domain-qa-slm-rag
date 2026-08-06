@@ -203,6 +203,92 @@ def test_temporal_guard_uses_requirement_role_in_multi_role_question() -> None:
     ] == ["temporal_role_conflict"]
 
 
+def test_temporal_guard_rejects_bare_published_date_in_multi_role_chunk() -> None:
+    chunks, documents = _artifacts(
+        "시즌 11 Act 2\n"
+        "2026.06.02 15:00\n"
+        "128\n"
+        "6/4(목) 점검 중 업데이트 되는 내용 안내 드립니다.",
+        title="시즌 11 Act 2",
+    )
+    documents["doc-1"]["published_at"] = "2026-06-02"
+    guarded = apply_temporal_role_guard(
+        _result(
+            answer="2026.06.02 15:00",
+            citation_texts=["2026.06.02 15:00"],
+            question_part="언제 적용됐어?",
+        ),
+        question="업데이트는 언제 적용됐어?",
+        chunks_by_id=chunks,
+        documents_by_id=documents,
+    )
+
+    assert guarded["response_mode"] == "abstain"
+    assert guarded["verification"]["requirements"][0][
+        "guard_details"
+    ]["temporal_role_conflict"] == {
+        "expected_role": "effective_at",
+        "evidence_roles": ["published_at"],
+    }
+
+
+def test_temporal_guard_uses_answer_date_when_quote_spans_both_roles() -> None:
+    full_chunk = (
+        "시즌 11 Act 2\n"
+        "2026.06.02 15:00\n"
+        "128\n"
+        "6/4(목) 점검 중 업데이트 되는 내용 안내 드립니다."
+    )
+    chunks, documents = _artifacts(
+        full_chunk,
+        title="시즌 11 Act 2",
+    )
+    documents["doc-1"]["published_at"] = "2026-06-02"
+    guarded = apply_temporal_role_guard(
+        _result(
+            answer="2026.06.02 15:00",
+            citation_texts=[full_chunk],
+            question_part="언제 적용됐어?",
+        ),
+        question="업데이트는 언제 적용됐어?",
+        chunks_by_id=chunks,
+        documents_by_id=documents,
+    )
+
+    assert guarded["response_mode"] == "abstain"
+    assert guarded["verification"]["requirements"][0][
+        "guard_details"
+    ]["temporal_role_conflict"] == {
+        "expected_role": "effective_at",
+        "evidence_roles": ["published_at"],
+    }
+
+
+def test_temporal_guard_accepts_effective_line_in_multi_role_chunk() -> None:
+    chunks, documents = _artifacts(
+        "시즌 11 Act 2\n"
+        "2026.06.02 15:00\n"
+        "128\n"
+        "6/4(목) 점검 중 업데이트 되는 내용 안내 드립니다.",
+        title="시즌 11 Act 2",
+    )
+    documents["doc-1"]["published_at"] = "2026-06-02"
+    guarded = apply_temporal_role_guard(
+        _result(
+            answer="6/4(목)",
+            citation_texts=[
+                "6/4(목) 점검 중 업데이트 되는 내용 안내 드립니다."
+            ],
+            question_part="언제 적용됐어?",
+        ),
+        question="업데이트는 언제 적용됐어?",
+        chunks_by_id=chunks,
+        documents_by_id=documents,
+    )
+
+    assert guarded["response_mode"] == "full_answer"
+
+
 def test_relation_value_guard_rejects_value_and_maximum_in_separate_quotes() -> None:
     guarded = apply_relation_value_colocation_guard(
         _result(

@@ -200,6 +200,17 @@ def test_normalized_factual_support_rejects_different_currency_value() -> None:
     )
 
 
+def test_normalized_factual_support_treats_count_words_as_equivalent() -> None:
+    assert factual_values_supported(
+        "지정 던전을 하루 10번 클리어해야 합니다.",
+        "지정 던전 클리어 10회 완료 시 참여할 수 있습니다.",
+    )
+    assert not factual_values_supported(
+        "지정 던전을 하루 9번 클리어해야 합니다.",
+        "지정 던전 클리어 10회 완료 시 참여할 수 있습니다.",
+    )
+
+
 def test_normalized_factual_support_uses_context_for_year_only() -> None:
     assert factual_values_supported(
         "2026-06-04",

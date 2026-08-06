@@ -36,9 +36,15 @@ _CURRENCY_REVERSE_COUNT = re.compile(
 _AMOUNT = re.compile(
     r"(?<![\d,])(?P<amount>\d[\d,]*(?:\.\d+)?)\s*(?P<scale>만|억)?"
 )
+_DURATION_DAY_RANGE = re.compile(
+    r"(?<!\d)(?P<start>\d+)\s*일?\s*"
+    r"(?:~|～|–|—|-|/|에서)\s*"
+    r"(?P<end>\d+)\s*일"
+)
 _NON_PLAIN_NUMBER_PATTERNS = (
     _CURRENCY_FORWARD,
     _CURRENCY_REVERSE_COUNT,
+    _DURATION_DAY_RANGE,
     re.compile(
         r"(?<!\d)20\d{2}\s*(?:년|[./-])\s*\d{1,2}"
         r"\s*(?:월|[./-])\s*\d{1,2}\s*일?"
@@ -70,8 +76,12 @@ _BOOLEAN_POSITIVE_MARKERS = (
     "가능",
 )
 _BOOLEAN_NEGATIVE_ACTION = re.compile(
-    r"(?:되지\s*않|하지\s*않|지\s*않습니다|불가능|미적용|"
-    r"제외됩니다|계산되지|없습니다|없음)"
+    r"(?:되지\s*않|하지\s*않|지\s*않(?:습니다|았다|는다|음)?|"
+    r"불가능|미적용|제외됩니다|계산되지|"
+    r"없(?:습니다|었다|다|음)|어렵(?:습니다|었다|다))"
+)
+_BOOLEAN_POSITIVE_ACTION = re.compile(
+    r"(?:할|될)\s*수\s*있(?:습니다|었습니다|다|었다)"
 )
 _BOOLEAN_STATE_NOUN = re.compile(
     r"(?:교환|거래|환불|사용|합성)\s*불가"
@@ -139,6 +149,16 @@ def number_values(value: Any) -> set[float]:
     return values
 
 
+def duration_range_values(value: Any) -> set[tuple[int, int, str]]:
+    values = set()
+    for match in _DURATION_DAY_RANGE.finditer(str(value or "")):
+        start = int(match.group("start"))
+        end = int(match.group("end"))
+        if start <= end:
+            values.add((start, end, "day"))
+    return values
+
+
 def time_sequence(value: Any) -> list[str]:
     text = str(value or "")
     occurrences: list[tuple[int, int, str]] = []
@@ -194,7 +214,10 @@ def boolean_evidence(value: Any) -> set[bool]:
     masked = _BOOLEAN_STATE_NOUN.sub("___", text)
     if _BOOLEAN_NEGATIVE_ACTION.search(masked):
         return {False}
-    if any(marker in text for marker in _BOOLEAN_POSITIVE_MARKERS):
+    if (
+        any(marker in text for marker in _BOOLEAN_POSITIVE_MARKERS)
+        or _BOOLEAN_POSITIVE_ACTION.search(text)
+    ):
         return {True}
     return set()
 
@@ -209,3 +232,40 @@ def boolean_value(value: Any) -> bool | None:
         return False
     evidence_values = boolean_evidence(value)
     return next(iter(evidence_values)) if len(evidence_values) == 1 else None
+
+
+_LOCATION_RELATIONS = {
+    "deletion_location",
+    "lookup_location",
+    "redeem_location",
+    "registration_location",
+    "usable_locations",
+}
+
+
+def canonical_categorical_values(
+    value: Any,
+    *,
+    relation: str | None,
+) -> set[str]:
+    text = str(value or "").casefold()
+    if relation == "appeal_channel":
+        if "고객센터" in text or re.search(
+            r"1\s*:\s*1\s*문의",
+            text,
+        ):
+            return {"customer_support_inquiry"}
+        return set()
+
+    if relation not in _LOCATION_RELATIONS:
+        return set()
+
+    values = set()
+    if re.search(r"게임\s*내", text) or re.search(
+        r"게임(?!\s*홈페이지)",
+        text,
+    ):
+        values.add("in_game")
+    if "웹" in text or "홈페이지" in text:
+        values.add("web")
+    return values

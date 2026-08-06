@@ -11,12 +11,20 @@ from urllib.request import Request, urlopen
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
+from src.v3.claim_contract_relation_registry import (
+    SHADOW_SEMANTIC_PARENT_RELATIONS,
+    canonical_value_type as relation_canonical_value_type,
+    family_type_validation_state,
+    relation_contract,
+    semantic_anchor_groups,
+)
 from src.v3.value_normalization import (
     CURRENCY_UNITS,
     amount_of,
     boolean_evidence,
     boolean_value,
     currency_values,
+    duration_range_values,
     number_values,
     time_sequence,
     time_values,
@@ -38,6 +46,7 @@ requirement에 qualifiers가 있으면 같은 종류와 값의 주차·회차·�
 date 값은 YYYY-MM-DD, datetime 값은 YYYY-MM-DDTHH:MM 형식을 사용하세요.
 date_range 값은 YYYY-MM-DD/YYYY-MM-DD 형식을 사용하세요.
 time 값은 HH:MM, time_range 값은 HH:MM/HH:MM 형식을 사용하세요.
+duration_range 값은 3일/5일처럼 시작과 끝의 단위를 모두 적으세요.
 boolean 값은 true 또는 false를 사용하세요.
 value_type이 entity_list이면 반드시 ["값1","값2"] 형태의 JSON 문자열 배열을 사용하세요. 각 원소에는 근거의 개별 값을 가능한 한 그대로 쓰고, 배열을 따옴표로 감싸 하나의 문자열로 만들지 마세요.
 cardinality가 all이면 근거가 직접 지지하는 전체 목록을 반환하고, 전체임을 판단할 수 없으면 unsupported로 두세요.
@@ -46,13 +55,14 @@ cardinality가 all이면 근거가 직접 지지하는 전체 목록을 반환�
 
 
 TypedValue = str | bool | int | float | list[str] | None
-TYPED_EVIDENCE_CONTRACT_VERSION = "typed-evidence-ref-claim-contract-v7"
+TYPED_EVIDENCE_CONTRACT_VERSION = "typed-evidence-ref-claim-contract-v8"
 STRUCTURED_VALUE_TYPES = {
     "boolean",
     "currency",
     "date",
     "date_range",
     "datetime",
+    "duration_range",
     "number",
     "percentage",
     "price",
@@ -64,6 +74,7 @@ LOCAL_OLLAMA_OUTPUT_TOKENS = 512
 LOCAL_OLLAMA_REQUEST_CHAR_LIMIT = 12_000
 MAX_PROMPT_EVIDENCE_UNITS = 48
 MAX_PROMPT_EVIDENCE_TEXT_CHARS = 6_500
+EVIDENCE_SELECTOR_MODES = frozenset({"baseline", "relation_semantic"})
 PROMPT_RELATION_TOKEN_ALIASES = {
     "action": ("조치", "설정", "허용"),
     "channel": ("채널", "송출", "라이브"),
@@ -78,10 +89,6 @@ PROMPT_RELATION_TOKEN_ALIASES = {
     "reset": ("갱신", "초기화", "기준"),
     "rule": ("원칙", "정책"),
     "weekly": ("매주", "주간", "1주"),
-}
-RELATION_CANONICAL_VALUE_TYPES = {
-    "dailyresettime": "time",
-    "maintenancetime": "time_range",
 }
 _ORDINAL_QUALIFIER_BOUNDARY = (
     r"(?=$|[\s\]\[(){}.,?!:;\"'·/~-]|"
@@ -101,6 +108,29 @@ _ORDINAL_QUALIFIER_PATTERNS = {
         rf"{_ORDINAL_QUALIFIER_BOUNDARY}"
     ),
 }
+_ENTITY_COUNT_WORDS = {
+    "한": 1,
+    "두": 2,
+    "세": 3,
+    "네": 4,
+}
+_ENTITY_COUNT_NOUNS = (
+    "개",
+    "가지",
+    "종",
+    "항목",
+    "상자",
+    "아이템",
+    "채널",
+    "장소",
+    "방법",
+    "이름",
+)
+_ENTITY_COUNT_PATTERN = re.compile(
+    rf"(?<![0-9A-Za-z가-힣])"
+    rf"(?P<count>\d{{1,2}}|{'|'.join(_ENTITY_COUNT_WORDS)})"
+    rf"\s*(?:{'|'.join(_ENTITY_COUNT_NOUNS)})"
+)
 
 
 def _ordinal_qualifiers_in_text(text: Any) -> dict[str, set[int]]:
@@ -114,6 +144,20 @@ def _ordinal_qualifiers_in_text(text: Any) -> dict[str, set[int]]:
         if matches:
             values[qualifier_kind] = matches
     return values
+
+
+def _explicit_entity_count_in_text(text: Any) -> int | None:
+    counts = set()
+    for match in _ENTITY_COUNT_PATTERN.finditer(str(text or "")):
+        raw_count = match.group("count")
+        count = (
+            _ENTITY_COUNT_WORDS[raw_count]
+            if raw_count in _ENTITY_COUNT_WORDS
+            else int(raw_count)
+        )
+        if count > 0:
+            counts.add(count)
+    return next(iter(counts)) if len(counts) == 1 else None
 
 
 def _normalized_ordinal_qualifiers(
@@ -161,16 +205,23 @@ def resolve_requirement_claim_contract(
             str(resolved["_claim_contract_qualifier_source"]),
             bool(resolved["_claim_contract_question_consistent"]),
         )
-    relation_key = re.sub(
-        r"[^0-9a-z가-힣]+",
-        "",
-        str(requirement.get("relation") or "").casefold(),
-    )
-    canonical_value_type = RELATION_CANONICAL_VALUE_TYPES.get(
-        relation_key
-    )
+    canonical_value_type = relation_canonical_value_type(requirement)
     if canonical_value_type is not None:
         resolved["value_type"] = canonical_value_type
+    if (
+        resolved.get("value_type") == "entity_list"
+        and resolved.get("expected_count") is None
+    ):
+        explicit_count = _explicit_entity_count_in_text(question_text)
+        if explicit_count is not None:
+            resolved["expected_count"] = explicit_count
+    family_contract = relation_contract(requirement)
+    if family_contract is not None:
+        resolved["_relation_family"] = family_contract.family
+        resolved["_parent_relation"] = family_contract.parent_relation
+        resolved["_relation_family_validation_mode"] = (
+            family_contract.validation_mode
+        )
     raw_qualifiers = requirement.get("qualifiers")
     if raw_qualifiers is None or raw_qualifiers == "":
         qualifiers: dict[str, Any] = {}
@@ -464,24 +515,43 @@ def build_evidence_units(
             ]
             for context_start, context_end in unit.pop("_context_spans")
         ]
+        unit["continuation_refs"] = []
+    for unit, next_unit in zip(units, units[1:]):
+        if (
+            unit["chunk_id"] == next_unit["chunk_id"]
+            and next_unit["start_char"] - unit["end_char"] <= 2
+            and re.search(
+                r"(?:하면|한다면)\s*[,.:;]?\s*$",
+                unit["text"],
+            )
+        ):
+            unit["continuation_refs"].append(
+                next_unit["evidence_ref"]
+            )
     return units
 
 
 def _public_requirement(requirement: dict[str, Any]) -> dict[str, Any]:
-    allowed = (
-        "requirement_id",
-        "subject",
-        "subject_group",
-        "relation",
-        "surface",
-        "value_type",
-        "qualifiers",
-        "temporal_role",
-        "cardinality",
-        "expected_count",
-        "relation_surface",
-    )
-    return {key: requirement[key] for key in allowed if key in requirement}
+    public = {
+        key: requirement[key]
+        for key in (
+            "requirement_id",
+            "subject",
+            "relation",
+            "value_type",
+        )
+        if key in requirement
+    }
+    qualifiers = requirement.get("qualifiers")
+    if qualifiers:
+        public["qualifiers"] = qualifiers
+    cardinality = requirement.get("cardinality")
+    if cardinality not in {None, "", "single"}:
+        public["cardinality"] = cardinality
+    expected_count = requirement.get("expected_count")
+    if expected_count is not None:
+        public["expected_count"] = expected_count
+    return public
 
 
 def _prompt_value_shape_score(
@@ -498,6 +568,8 @@ def _prompt_value_shape_score(
             score += 3 if _date_values(text, as_of) else 0
         elif value_type in {"time", "time_range"}:
             score += 3 if time_values(text) else 0
+        elif value_type == "duration_range":
+            score += 3 if duration_range_values(text) else 0
         elif value_type in {"price", "currency"}:
             score += 3 if currency_values(text) else 0
         elif value_type == "percentage":
@@ -509,12 +581,41 @@ def _prompt_value_shape_score(
     return score
 
 
+def _prompt_relation_semantic_value_shape(
+    requirement: dict[str, Any],
+    semantic_text: str,
+    *,
+    as_of: str,
+) -> bool:
+    contract = relation_contract(requirement)
+    if (
+        contract is not None
+        and contract.parent_relation == "duration"
+        and requirement.get("value_type")
+        in {"number", "duration_range"}
+    ):
+        if requirement.get("value_type") == "duration_range":
+            return bool(duration_range_values(semantic_text))
+        return bool(
+            re.search(
+                r"(?<!\d)\d+\s*(?:영업일|일|시간|분|주|개월)",
+                semantic_text,
+            )
+        )
+    return _group_has_value_shape(
+        [{"text": semantic_text}],
+        value_type=str(requirement.get("value_type") or ""),
+        as_of=as_of,
+    )
+
+
 def _prompt_unit_relevance_score(
     unit: dict[str, Any],
     requirements: list[dict[str, Any]],
     *,
     question: str,
     as_of: str,
+    selector_mode: str = "baseline",
 ) -> int:
     unit_semantic_text = " ".join(
         filter(
@@ -568,6 +669,30 @@ def _prompt_unit_relevance_score(
             aliases = PROMPT_RELATION_TOKEN_ALIASES.get(relation_token, ())
             if any(_compact(alias) in compact_text for alias in aliases):
                 score += 4
+        if selector_mode == "relation_semantic":
+            anchor_groups = semantic_anchor_groups(requirement)
+            relation_compact_text = _compact(
+                unit_semantic_text + " " + unit["title"]
+            )
+            if anchor_groups and all(
+                any(
+                    _compact(anchor) in relation_compact_text
+                    for anchor in anchors
+                )
+                for anchors in anchor_groups
+            ):
+                if _prompt_relation_semantic_value_shape(
+                    requirement,
+                    unit_semantic_text,
+                    as_of=as_of,
+                ):
+                    score += 32 + 4 * len(anchor_groups)
+                    required_role = _required_temporal_role(requirement)
+                    if required_role and _temporal_role_matches(
+                        required_role,
+                        _unit_temporal_roles(unit, as_of=as_of),
+                    ):
+                        score += 8
     query_terms = {
         _compact(token)
         for token in re.findall(r"[0-9A-Za-z가-힣]+", question)
@@ -593,7 +718,10 @@ def _units_with_context(
         ):
             selected_by_ref[evidence_ref] = unit
     for unit in list(selected_units):
-        for evidence_ref in unit.get("context_refs", []):
+        for evidence_ref in [
+            *unit.get("context_refs", []),
+            *unit.get("continuation_refs", []),
+        ]:
             if evidence_ref in by_ref:
                 selected_by_ref.setdefault(
                     evidence_ref,
@@ -967,11 +1095,14 @@ def select_prompt_evidence_units(
     as_of: str,
     maximum_units: int = MAX_PROMPT_EVIDENCE_UNITS,
     maximum_text_chars: int = MAX_PROMPT_EVIDENCE_TEXT_CHARS,
+    selector_mode: str = "baseline",
 ) -> list[dict[str, Any]]:
     """Keep exact evidence coordinates while reducing model-visible noise."""
 
     if maximum_units < 1 or maximum_text_chars < 1:
         raise RuntimeError("prompt evidence limits must be positive")
+    if selector_mode not in EVIDENCE_SELECTOR_MODES:
+        raise RuntimeError(f"unknown evidence selector mode: {selector_mode}")
     units = bind_prompt_evidence_units(
         units,
         requirements=requirements,
@@ -983,6 +1114,21 @@ def select_prompt_evidence_units(
         and sum(len(unit["text"]) for unit in units) <= maximum_text_chars
     ):
         return list(units)
+    if selector_mode == "relation_semantic":
+        baseline_units = select_prompt_evidence_units(
+            units,
+            requirements=requirements,
+            question=question,
+            as_of=as_of,
+            maximum_units=maximum_units,
+            maximum_text_chars=maximum_text_chars,
+            selector_mode="baseline",
+        )
+        maximum_units = min(maximum_units, len(baseline_units))
+        maximum_text_chars = min(
+            maximum_text_chars,
+            sum(len(unit["text"]) for unit in baseline_units),
+        )
 
     by_ref = {unit["evidence_ref"]: unit for unit in units}
     by_candidate: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -1040,6 +1186,19 @@ def select_prompt_evidence_units(
             )
             for unit in units
         }
+        semantic_requirement_scores = {
+            unit["evidence_ref"]: (
+                _prompt_unit_relevance_score(
+                    unit,
+                    [requirement],
+                    question=question,
+                    as_of=as_of,
+                    selector_mode="relation_semantic",
+                )
+                - requirement_scores[unit["evidence_ref"]]
+            )
+            for unit in units
+        }
         maximum_requirement_score = max(
             requirement_scores.values(),
             default=0,
@@ -1048,11 +1207,22 @@ def select_prompt_evidence_units(
             3,
             (maximum_requirement_score + 1) // 2,
         )
-        if maximum_requirement_score < 3:
+        if (
+            maximum_requirement_score < 3
+            and (
+                selector_mode == "baseline"
+                or not any(semantic_requirement_scores.values())
+            )
+        ):
             continue
         ranked_for_requirement = sorted(
             units,
             key=lambda unit: (
+                -(
+                    semantic_requirement_scores[unit["evidence_ref"]]
+                    if selector_mode == "relation_semantic"
+                    else 0
+                ),
                 -requirement_scores[unit["evidence_ref"]],
                 int(unit["candidate_ref"]),
                 unit["start_char"],
@@ -1066,7 +1236,13 @@ def select_prompt_evidence_units(
         ]
         for unit in candidate_ranked[:2]:
             if (
-                requirement_scores[unit["evidence_ref"]]
+                (
+                    selector_mode == "baseline"
+                    or not semantic_requirement_scores[
+                        unit["evidence_ref"]
+                    ]
+                )
+                and requirement_scores[unit["evidence_ref"]]
                 < minimum_requirement_score
             ):
                 continue
@@ -1124,6 +1300,7 @@ def build_typed_evidence_prompt_with_candidate_units(
     chunks_by_id: dict[str, dict[str, Any]],
     documents_by_id: dict[str, dict[str, Any]],
     temporal_by_document: dict[str, dict[str, Any]],
+    selector_mode: str = "baseline",
 ) -> tuple[
     str,
     dict[str, dict[str, Any]],
@@ -1144,6 +1321,7 @@ def build_typed_evidence_prompt_with_candidate_units(
         requirements=requirements,
         question=question,
         as_of=as_of,
+        selector_mode=selector_mode,
     )
     public_evidence_blocks = []
     units_by_candidate_ref: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -1232,6 +1410,7 @@ def build_typed_evidence_prompt(
     chunks_by_id: dict[str, dict[str, Any]],
     documents_by_id: dict[str, dict[str, Any]],
     temporal_by_document: dict[str, dict[str, Any]],
+    selector_mode: str = "baseline",
 ) -> tuple[str, dict[str, dict[str, Any]]]:
     prompt, visible_units, _ = (
         build_typed_evidence_prompt_with_candidate_units(
@@ -1243,6 +1422,7 @@ def build_typed_evidence_prompt(
             chunks_by_id=chunks_by_id,
             documents_by_id=documents_by_id,
             temporal_by_document=temporal_by_document,
+            selector_mode=selector_mode,
         )
     )
     return prompt, visible_units
@@ -1695,6 +1875,11 @@ def _value_supported(
                 len(evidence_sequence) - len(model_sequence) + 1
             )
         )
+    if value_type == "duration_range":
+        model_values = duration_range_values(value)
+        return bool(model_values) and model_values <= duration_range_values(
+            evidence_text
+        )
     if value_type == "percentage":
         model_values = _percentage_values(str(value))
         return bool(model_values) and model_values <= _percentage_values(
@@ -2070,6 +2255,8 @@ def _subject_supported(
     requirement: dict[str, Any],
     evidence_text: str,
     titles: str,
+    *,
+    as_of: str | None = None,
 ) -> bool:
     haystack = _compact(evidence_text + " " + titles)
     subjects = [
@@ -2078,6 +2265,41 @@ def _subject_supported(
     ]
     if any(subject and subject in haystack for subject in subjects):
         return True
+    requested_subject = _compact(
+        " ".join(
+            str(requirement.get(key, ""))
+            for key in ("subject", "subject_group")
+        )
+    )
+    if (
+        "모바일otp" in requested_subject
+        and "네오플otp" in haystack
+    ):
+        return True
+    if as_of is not None:
+        raw_subject = " ".join(
+            str(requirement.get(key, ""))
+            for key in ("subject", "subject_group")
+        )
+        requested_dates = _date_values(raw_subject, as_of)
+        evidence_dates = _date_values(
+            evidence_text + " " + titles,
+            as_of,
+        )
+        non_date_terms = {
+            _compact(term)
+            for term in _content_tokens(raw_subject)
+            if not re.search(r"\d", term)
+        }
+        if (
+            requested_dates
+            and requested_dates <= evidence_dates
+            and any(
+                term and term in haystack
+                for term in non_date_terms
+            )
+        ):
+            return True
     for key in ("subject", "subject_group"):
         raw_subject = str(requirement.get(key, ""))
         terms = [
@@ -2479,6 +2701,8 @@ def _group_has_value_shape(
         return bool(_date_values(text, as_of))
     if value_type in {"time", "time_range"}:
         return bool(time_values(text))
+    if value_type == "duration_range":
+        return bool(duration_range_values(text))
     if value_type in {"price", "currency"}:
         return bool(currency_values(text))
     if value_type == "percentage":
@@ -2521,7 +2745,12 @@ def assess_requirement_evidence_sufficiency_shadow(
             for unit in group
         )
         titles = " ".join(unit["title"] for unit in group)
-        if not _subject_supported(requirement, semantic_text, titles):
+        if not _subject_supported(
+            requirement,
+            semantic_text,
+            titles,
+            as_of=as_of,
+        ):
             continue
         if not _relation_supported(requirement, semantic_text, titles):
             continue
@@ -2559,10 +2788,124 @@ def assess_requirement_evidence_sufficiency_shadow(
     }
 
 
+def assess_parent_relation_semantic_shadow(
+    requirement: dict[str, Any],
+    *,
+    evidence_units_by_ref: dict[str, dict[str, Any]],
+    as_of: str,
+) -> dict[str, Any]:
+    """Audit child-relation proof under a reviewed reusable parent."""
+
+    contract = relation_contract(requirement)
+    base = {
+        "requirement_id": requirement["requirement_id"],
+        "relation": requirement.get("relation"),
+        "relation_family": (
+            contract.family if contract is not None else None
+        ),
+        "parent_relation": (
+            contract.parent_relation if contract is not None else None
+        ),
+        "scope": "model_visible_evidence",
+        "supporting_group_refs": [],
+    }
+    if (
+        contract is None
+        or contract.parent_relation not in SHADOW_SEMANTIC_PARENT_RELATIONS
+    ):
+        return {
+            **base,
+            "assessable": False,
+            "would_trigger": False,
+            "reason": "parent_relation_excluded",
+        }
+    anchor_groups = semantic_anchor_groups(requirement)
+    if not anchor_groups:
+        return {
+            **base,
+            "assessable": False,
+            "would_trigger": False,
+            "reason": "child_contract_missing",
+        }
+
+    required_role = _required_temporal_role(requirement)
+    failure_counts = {
+        "subject": 0,
+        "child_anchor": 0,
+        "temporal_role": 0,
+        "value_shape": 0,
+    }
+    inspected_group_count = 0
+    for group in _selected_evidence_groups(
+        list(evidence_units_by_ref.values())
+    ):
+        inspected_group_count += 1
+        semantic_text = "\n".join(
+            "\n".join(
+                filter(
+                    None,
+                    (unit.get("context_text", ""), unit["text"]),
+                )
+            )
+            for unit in group
+        )
+        titles = " ".join(unit["title"] for unit in group)
+        if not _subject_supported(
+            requirement,
+            semantic_text,
+            titles,
+            as_of=as_of,
+        ):
+            failure_counts["subject"] += 1
+            continue
+        compact_text = _compact(semantic_text + " " + titles)
+        if not all(
+            any(_compact(anchor) in compact_text for anchor in anchors)
+            for anchors in anchor_groups
+        ):
+            failure_counts["child_anchor"] += 1
+            continue
+        if required_role is not None and not any(
+            _temporal_role_matches(
+                required_role,
+                _unit_temporal_roles(unit, as_of=as_of),
+            )
+            for unit in group
+        ):
+            failure_counts["temporal_role"] += 1
+            continue
+        if not _group_has_value_shape(
+            group,
+            value_type=str(requirement.get("value_type") or ""),
+            as_of=as_of,
+        ):
+            failure_counts["value_shape"] += 1
+            continue
+        return {
+            **base,
+            "assessable": True,
+            "would_trigger": False,
+            "reason": "child_relation_support_found",
+            "supporting_group_refs": [
+                unit["evidence_ref"] for unit in group
+            ],
+        }
+    return {
+        **base,
+        "assessable": True,
+        "would_trigger": True,
+        "reason": "child_relation_support_missing",
+        "inspected_group_count": inspected_group_count,
+        "group_failure_counts": failure_counts,
+    }
+
+
 def _boolean_supported_by_relation_group(
     requirement: dict[str, Any],
     value: TypedValue,
     units: list[dict[str, Any]],
+    *,
+    as_of: str,
 ) -> tuple[bool, set[str]]:
     expected = boolean_value(value)
     if expected is None:
@@ -2583,7 +2926,12 @@ def _boolean_supported_by_relation_group(
         )
         titles = " ".join(unit["title"] for unit in group)
         if not (
-            _subject_supported(requirement, semantic_text, titles)
+            _subject_supported(
+                requirement,
+                semantic_text,
+                titles,
+                as_of=as_of,
+            )
             and _relation_supported(requirement, semantic_text, titles)
         ):
             continue
@@ -2770,7 +3118,11 @@ def _unit_temporal_roles(
             " ".join(
                 filter(
                     None,
-                    (unit.get("context_text", ""), unit["text"]),
+                    (
+                        unit.get("context_text", ""),
+                        unit["text"],
+                        unit.get("title", ""),
+                    ),
                 )
             )
         )
@@ -2917,6 +3269,12 @@ def _render_value(value_type: str, value: TypedValue) -> str:
     ):
         start, end = text.split("/")
         return f"{_render_value('time', start)} ~ {_render_value('time', end)}"
+    if value_type == "duration_range":
+        ranges = duration_range_values(text)
+        if len(ranges) == 1:
+            start, end, unit = next(iter(ranges))
+            if unit == "day":
+                return f"{start}~{end}일"
     return text
 
 
@@ -2947,6 +3305,10 @@ def verify_typed_requirement_selection(
         question_text=question_text,
     )
     failures = []
+    family_contract = relation_contract(requirement)
+    family_validation_state = family_type_validation_state(requirement)
+    if family_validation_state == "type_mismatch":
+        failures.append("relation_family_value_type_mismatch")
     raw_evidence_refs = list(parsed.evidence_refs)
     evidence_refs = []
     for evidence_ref in raw_evidence_refs:
@@ -2990,16 +3352,26 @@ def verify_typed_requirement_selection(
         ):
             normalized_value = decoded_list
             value_shape_repair = "json_array_string"
-    relation_key = re.sub(
-        r"[^0-9a-z가-힣]+",
-        "",
-        str(requirement.get("relation") or "").casefold(),
-    )
-    relation_canonical_value_type = (
-        RELATION_CANONICAL_VALUE_TYPES.get(relation_key)
+        elif isinstance(requirement.get("expected_count"), int):
+            delimited_list = [
+                item.strip()
+                for item in re.split(
+                    r"\s*(?:\|\||[,;\n])\s*",
+                    normalized_value,
+                )
+                if item.strip()
+            ]
+            if (
+                len(delimited_list) == requirement["expected_count"]
+                and len(set(delimited_list)) == len(delimited_list)
+            ):
+                normalized_value = delimited_list
+                value_shape_repair = "explicit_count_delimited_string"
+    canonical_relation_value_type = relation_canonical_value_type(
+        requirement
     )
     if (
-        relation_canonical_value_type == "time"
+        canonical_relation_value_type == "time"
         and normalized_value_type in {"enum", "str", "string", "text"}
     ):
         normalized_times = time_sequence(normalized_value)
@@ -3008,7 +3380,7 @@ def verify_typed_requirement_selection(
             normalized_value = normalized_times[0]
             value_shape_repair = "legacy_relation_time"
     elif (
-        relation_canonical_value_type == "time_range"
+        canonical_relation_value_type == "time_range"
         and normalized_value_type
         in {"date_range", "enum", "str", "string", "text"}
     ):
@@ -3035,7 +3407,16 @@ def verify_typed_requirement_selection(
         and re.fullmatch(r"\d+(?:\.\d+)?", str(parsed.value).strip())
     ):
         normalized_value = f"{str(parsed.value).strip()}%"
+    elif (
+        normalized_value_type == "boolean"
+        and not isinstance(normalized_value, bool)
+    ):
+        canonical_boolean = boolean_value(normalized_value)
+        if canonical_boolean is not None:
+            normalized_value = canonical_boolean
+            value_shape_repair = "legacy_boolean_string"
     selected_units = []
+    selected_unit_refs = set()
     citations = []
     citation_refs = set()
     unresolved_currency_values: set[tuple[int, str]] = set()
@@ -3096,7 +3477,15 @@ def verify_typed_requirement_selection(
                 failures.append("current_temporal_or_revision_policy_failed")
                 continue
             selected_units.append(unit)
-            for citation_ref in [*unit.get("context_refs", []), evidence_ref]:
+            selected_unit_refs.add(evidence_ref)
+            continuation_refs = set(
+                unit.get("continuation_refs", [])
+            )
+            for citation_ref in [
+                *unit.get("context_refs", []),
+                *unit.get("continuation_refs", []),
+                evidence_ref,
+            ]:
                 if citation_ref in citation_refs:
                     continue
                 citation_unit = evidence_units_by_ref.get(citation_ref)
@@ -3124,6 +3513,12 @@ def verify_typed_requirement_selection(
                         "context_current_temporal_or_revision_policy_failed"
                     )
                     continue
+                if (
+                    citation_ref in continuation_refs
+                    and citation_ref not in selected_unit_refs
+                ):
+                    selected_units.append(citation_unit)
+                    selected_unit_refs.add(citation_ref)
                 citations.append(
                     {
                         "chunk_id": citation_unit["chunk_id"],
@@ -3160,7 +3555,10 @@ def verify_typed_requirement_selection(
             selected_units,
         )
         subject_supported = _subject_supported(
-            requirement, combined_semantic_text, combined_titles
+            requirement,
+            combined_semantic_text,
+            combined_titles,
+            as_of=as_of,
         )
         relation_supported = _relation_supported(
             requirement, combined_semantic_text, combined_titles
@@ -3250,6 +3648,7 @@ def verify_typed_requirement_selection(
                     requirement,
                     normalized_value,
                     selected_units,
+                    as_of=as_of,
                 )
             )
             citations = [
@@ -3376,7 +3775,12 @@ def verify_typed_requirement_selection(
                     )
                 if (
                     colocated_value_supported
-                    and _subject_supported(requirement, semantic_text, titles)
+                    and _subject_supported(
+                        requirement,
+                        semantic_text,
+                        titles,
+                        as_of=as_of,
+                    )
                     and _relation_supported(requirement, semantic_text, titles)
                     and _temporal_role_supported(
                         requirement, normalized_value, units, as_of=as_of
@@ -3426,6 +3830,20 @@ def verify_typed_requirement_selection(
         "relation_validation_state": relation_contract_state(
             requirement
         ),
+        "relation_family": (
+            family_contract.family if family_contract is not None else None
+        ),
+        "parent_relation": (
+            family_contract.parent_relation
+            if family_contract is not None
+            else None
+        ),
+        "relation_family_validation_mode": (
+            family_contract.validation_mode
+            if family_contract is not None
+            else None
+        ),
+        "relation_family_validation_state": family_validation_state,
         "would_reject_if_relation_fail_closed": bool(
             parsed.status == "supported"
             and relation_contract_state(requirement)

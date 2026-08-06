@@ -292,6 +292,55 @@ class GroundedLlmAnswerTest(unittest.TestCase):
         self.assertNotIn("evidence_span", prompt)
         self.assertNotIn("gold_answer", prompt)
 
+    def test_temporal_role_annotations_are_opt_in_and_occurrence_scoped(
+        self,
+    ) -> None:
+        chunks = {
+            "c1": {
+                "chunk_id": "c1",
+                "parent_document_id": "d1",
+                "display_text": (
+                    "2026.06.02 15:00\n"
+                    "6/4(목) 점검 중 업데이트 되는 내용 안내 드립니다."
+                ),
+            }
+        }
+        documents = {
+            "d1": {
+                "document_id": "d1",
+                "source_id": "dnf_update",
+                "title": "시즌 업데이트",
+                "published_at": "2026-06-02",
+            }
+        }
+        kwargs = {
+            "question": "업데이트는 언제 적용됐어?",
+            "as_of": "2026-07-22",
+            "candidate_chunk_ids": ["c1"],
+            "chunks_by_id": chunks,
+            "documents_by_id": documents,
+            "temporal_by_document": {},
+        }
+
+        baseline = build_grounded_prompt(**kwargs)
+        annotated = build_grounded_prompt(
+            **kwargs,
+            include_temporal_role_annotations=True,
+        )
+
+        self.assertNotIn('"temporal_evidence"', baseline)
+        self.assertIn('"role": "published_at"', annotated)
+        self.assertIn('"text": "2026.06.02 15:00"', annotated)
+        self.assertIn('"role": "effective_at"', annotated)
+        self.assertIn(
+            '"text": "6/4(목) 점검 중 업데이트 되는 내용 안내 드립니다."',
+            annotated,
+        )
+        self.assertIn(
+            "published_at을 답으로 쓰지 마세요",
+            annotated,
+        )
+
     def test_exact_current_quote_is_exposed(self) -> None:
         chunks, documents, temporal = _fixtures()
         raw = GroundedAnswerOutput.model_validate(

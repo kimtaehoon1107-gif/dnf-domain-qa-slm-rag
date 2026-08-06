@@ -488,6 +488,8 @@ def _number_unit_values(value: Any) -> set[tuple[float, str]]:
         unit = match.group("unit").casefold()
         if unit == "퍼센트":
             unit = "%"
+        elif unit == "번":
+            unit = "회"
         values.add((number, unit))
     return values
 

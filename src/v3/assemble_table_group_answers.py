@@ -5,7 +5,7 @@ from collections import defaultdict
 from typing import Any
 
 
-ASSEMBLER_VERSION = "dnf-table-group-completeness-v3.2-arm1.1"
+ASSEMBLER_VERSION = "dnf-table-group-completeness-v3.2-arm1.2"
 TOKEN_PATTERN = re.compile(r"[0-9A-Za-z가-힣]+")
 
 
@@ -46,6 +46,14 @@ def build_complete_table_view(
 
     caption = table_facts[0]["table_caption"]
     table_subject = _table_subject(caption)
+    heading_path = list(table_facts[0].get("heading_path") or [])
+    scope_parts = list(
+        dict.fromkeys(
+            value
+            for value in [table_facts[0]["title"], *heading_path]
+            if value
+        )
+    )
     by_row: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for fact in table_facts:
         by_row[fact["row_id"]].append(fact)
@@ -127,6 +135,8 @@ def build_complete_table_view(
         "caption": caption,
         "table_subject": table_subject,
         "title": table_facts[0]["title"],
+        "heading_path": heading_path,
+        "scope_title": " > ".join(scope_parts),
         "canonical_url": table_facts[0]["canonical_url"],
         "attributes": attributes,
         "rows": rows,
@@ -165,6 +175,7 @@ def assemble_table_group_answers(
             [
                 facts[0]["table_caption"],
                 facts[0]["title"],
+                *list(facts[0].get("heading_path") or []),
                 *[row["subject"] for row in facts],
                 *[row["attribute"] for row in facts],
             ]
