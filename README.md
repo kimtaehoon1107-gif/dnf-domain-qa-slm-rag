@@ -1,59 +1,52 @@
-# DNF Domain QA SLM/RAG
+# DNF 공식 문서 QA/RAG
 
-DNF Domain QA SLM/RAG is a portfolio project for document-grounded Dungeon & Fighter Q&A. It uses the earlier `dnf-llm-eval` project as the v1 baseline, then expands the workflow into data design, labeling, RAG retrieval, answerability evaluation, RAFT-style SLM data, LoRA/QLoRA scaffolding, and a Gradio demo.
+던전앤파이터 공식 문서에서 답을 찾고 근거 좌표까지 복원하며, 봉인 평가와 사람 감수로 실패를 추적한 로컬 QA/RAG 프로젝트입니다.
 
-The goal is not to present a generic chatbot. The goal is to show a reproducible QA/RAG/SLM pipeline where unsupported questions can be refused and evidence quality can be measured.
+> **포트폴리오 본문: [PORTFOLIO.md](PORTFOLIO.md)**
 
-For a concise Korean portfolio narrative, architecture, final comparison, and honest release verdict, see [`PORTFOLIO_REPORT.md`](PORTFOLIO_REPORT.md).
+## 현재 상태
 
-## Latest v3 research track (2026-07-27)
+| 무엇을 만들었나 | 현재 구성 | 범위 |
+|---|---|---|
+| 공식 문서 QA/RAG | BM25 + BGE-M3 → BGE reranker → atomic evidence pack → Qwen3 8B 1회 → 최소 검증 → 서버 인용·표 복원 | 무료·로컬 실행 |
+| 평가 체계 | 봉인 세트, SHA 동결, 1회 실행, 사람 근거 검수, adaptive 진단 분리 | 성능보다 측정 정직성 우선 |
 
-The current v3 track combines subject-anchored retrieval, Qwen3 8B typed
-`value + evidence_ref` generation, temporal/revision binding, and a
-typed claim verifier with fail-closed guards for registered contracts.
+| 시스템·평가 | 최종 숫자 | 해석 |
+|---|---:|---|
+| v3 typed, **sealed** | **37/64** | 타입 계약 시스템의 공식 봉인 결과 |
+| Product Free RAG A6, **sealed 자동 채점** | **7/32 (21.9%)** | 표면값 중심 자동 채점 결과 |
+| Product Free RAG A6, **sealed 사람 감수** | **20/32 (62.5%)** | 봉인 출력을 근거와 대조해 확정한 공식 결과 |
+| 숫자 해석 제한 | 비교 금지 | 64문항과 32문항은 서로 겹치지 않는 다른 벤치마크이며 난이도도 통제되지 않았습니다. 어느 시스템이 더 낫다는 비교에는 사용할 수 없습니다. |
 
-- Official sealed one-shot: **37/64**. This remains the only generalization
-  headline.
-- Adaptive policy/month generation diagnostic: **55/64**. It is not promoted
-  because the inspected set had already influenced development.
-- Namespace-safe, addendum-aware score-only analysis of the historical
-  adaptive output reports **55/64 value-complete**, **48/64 typed-value
-  complete**, and **43/64 typed claim + approved direct evidence**. It does
-  not rebuild prompts or rerun the verifier, and is not a new model result.
-- Human review of its 14 automatic semantic flags found 3 real product
-  false-full cases (slots 3, 30, 51) and 11 narrow-gold/equivalent-evidence
-  false positives. A fresh claim-contract v7 smoke fixed slot 3, answered
-  slots 25 and 30 correctly, and safely blocked slot 51.
-- Reviewed-equivalent candidate coverage is **64/64**, but only **22/96**
-  requirements have an explicit relation contract; candidate presence is not
-  the same as claim-bound evidence sufficiency.
-- Fresh Qwen3 8B checks over slots 3, 25, 30, and 51 were correct on **3/4**;
-  the remaining wrong model selection was fail-closed, with no false-full or
-  generation error.
-- Full repository verification: **853 passed**, plus **64 subtests**.
-- Current verdict: portfolio case study **GO**; production default **NO-GO**.
+| 판정 대상 | 판정 | 이유 |
+|---|---|---|
+| 포트폴리오 공개 | **GO** | 성공뿐 아니라 실패, 측정 오류, 기각한 개선안까지 재현 가능하게 남겼습니다. |
+| Product Free RAG 제품 기본 경로 승격 | **NO-GO** | A6 사람 감수 정확도가 목표 80%에 미달하고 한 건의 unsupported overclaim이 남았습니다. |
 
-The main finding is that retrieval is no longer the only bottleneck. Evidence
-reduction, subject/relation/value/revision binding, list completeness, and
-evaluator adjudication dominate the remaining failures. The next untouched
-evaluation set stays deferred until the relation and cardinality contracts are
-frozen.
+## 코퍼스 스냅샷
 
-See the [Korean v3 portfolio draft](PORTFOLIO_V3_DRAFT.md) and the
-[claim-contract round report](reports/v3/typed_evidence_ref_claim_contract_round_20260727.md).
+```text
+코퍼스 스냅샷   2026-07-17 수집 · 07-18 정규화 · 07-21 검색용 청크 확정
+규모            문서 980 · 청크 3,599
+갱신 절차       discover_sources → collect_details → 정규화 → 청킹
+                → BM25 재빌드 → dense 재임베딩
+```
 
-## Latest Verified Status (2026-07-13)
+## 문서 안내
 
-- Canonical retrieval is frozen at BGE-M3 + hybrid, `top_k=3`, `candidate_k=100`, chunk-only 900-character context, without reranker, parent window, or contextual prefix.
-- The final random-control RAFT has 576 rows and passes parent/chunk/question/context leakage checks against every dev set and the frozen blind. Gold visibility is `369/369`; 1,359 distractors contain no exact or high-overlap answer evidence.
-- One final Qwen2.5-0.5B LoRA run completed `264/264` steps. The frozen checkpoint rule selects step 250 over step 264 on citation and Partial metrics.
-- No checkpoint passed the blind-opening gates. Step 250 scored fresh false joint `5/8` and explicit unsupported abstention `8/21`, below the required `7/8` and `14/21`. The frozen blind was not queried.
-- The final dev-only comparison now includes RAG-only, base Qwen + RAG, and clean tuned Qwen + RAG under the same retrieval and prompt configuration. Tuned Qwen improves structured Partial/citation behavior, but is not a blind-validated release model.
-- Gradio defaults to RAG-only. Tuned mode uses the clean blind-safe step-250 development baseline; base Qwen + RAG is exposed as a comparison mode.
+| 문서 | 언제 |
+|---|---|
+| [PORTFOLIO.md](PORTFOLIO.md) | 프로젝트 전체와 Product Free RAG 재현 방법을 보고 싶을 때 |
+| [PORTFOLIO_V3_DRAFT.md](PORTFOLIO_V3_DRAFT.md) | v3 typed 파이프라인 상세를 보고 싶을 때 |
+| [PORTFOLIO_REPORT.md](PORTFOLIO_REPORT.md) | v1/v2 SLM 파인튜닝 기록을 보고 싶을 때 |
+| [docs/v3/](docs/v3/) | 라운드별 지시서·계약을 확인할 때 |
+| [reports/v3/](reports/v3/) | 실행 결과 artifact를 확인할 때 |
 
-See `docs/final_release_results.md` and `reports/final_dev_system_comparison.json` for the final evidence and verdict.
+## v1/v2 재현 (레거시)
 
-## Current Scope
+아래 절은 기존 v1/v2 실험의 재현 기록입니다. 현재 Product Free RAG의 실행 방법은 [PORTFOLIO.md §8](PORTFOLIO.md#8-기술-스택과-재현)을 참고하세요.
+
+### Current Scope
 
 - v1 baseline analysis: `docs/v1_baseline_failure_analysis.md`
 - data schema: `docs/data_schema.md`
@@ -72,7 +65,7 @@ See `docs/final_release_results.md` and `reports/final_dev_system_comparison.jso
 - roadmap status: `docs/end_to_end_roadmap_status.md`
 - Gradio demo: `app/gradio_app.py`
 
-## Data
+### Data
 
 | File | Rows | Purpose |
 |---|---:|---|
@@ -104,7 +97,7 @@ See `docs/final_release_results.md` and `reports/final_dev_system_comparison.jso
 
 The official eval set now uses `gold_answer`, `evidence_span`, `expected_doc_id`, `expected_chunk_id`, and `expected_chunk_ids`. This avoids the previous title-derived placeholder eval.
 
-## Setup
+### Setup
 
 ```powershell
 python -m venv .venv
@@ -118,7 +111,7 @@ Install training dependencies only when needed:
 pip install -r requirements-train.txt
 ```
 
-## Build Indexes
+### Build Indexes
 
 ```powershell
 python src/build_index.py --docs data/raw/docs.jsonl --persist-dir outputs/chroma --model-name BAAI/bge-m3 --reset
@@ -130,7 +123,7 @@ python src/build_index.py --docs data/processed/domain_doc_chunks.jsonl --persis
 
 MiniLM ablation indexes are kept separately as `outputs/chroma_minilm` and `outputs/chroma_official_chunks_minilm`.
 
-## Regenerate Official Eval and Train QA
+### Regenerate Official Eval and Train QA
 
 ```powershell
 python src/make_official_eval_set.py `
@@ -143,7 +136,7 @@ python src/make_official_eval_set.py `
 
 This creates a held-out official eval set and a separate train QA file from different parent documents.
 
-## Regenerate RAFT Data
+### Regenerate RAFT Data
 
 Synthetic:
 
@@ -168,7 +161,7 @@ python src/make_raft_dataset.py `
 
 The official RAFT command excludes held-out eval parent docs/chunks to prevent train/eval leakage.
 
-## Evaluate Retrieval
+### Evaluate Retrieval
 
 ```powershell
 python src/evaluate.py --eval-set data/processed/eval_set.jsonl --persist-dir outputs/chroma --model-name BAAI/bge-m3 --rank-mode hybrid --top-k 5 --output outputs/eval_report.json
@@ -204,7 +197,7 @@ Header-clean/RRF A/B:
 
 The no-header variant removes board boilerplate from chunks and answers. It was promoted because the hit@5 drop was traced to one top-5 boundary row, while hit@1, MRR, citation, and answer cleanliness improved. RRF is kept as an ablation baseline, not promoted.
 
-## Evaluate Answers
+### Evaluate Answers
 
 ```powershell
 python src/evaluate_answers.py --eval-set data/processed/eval_set.jsonl --persist-dir outputs/chroma --model-name BAAI/bge-m3 --rank-mode hybrid --top-k 5 --output outputs/answer_eval_report.json
@@ -221,7 +214,7 @@ Current verified answer-level summary:
 
 The answerability gate now refuses prompt-injection, exploit, OOD, realtime, and personal-account questions before copied retrieval context can turn them into unsupported answers.
 
-## Label Classifier Baseline
+### Label Classifier Baseline
 
 ```powershell
 python src/train_label_classifiers.py --qa data/processed/qa_dataset.jsonl --output outputs/label_classifier_report.json
@@ -229,7 +222,7 @@ python src/train_label_classifiers.py --qa data/processed/qa_dataset.jsonl --out
 
 The script uses train/dev/test splits when present.
 
-## Label Studio
+### Label Studio
 
 ```powershell
 python src/label_studio_io.py export-tasks `
@@ -247,7 +240,7 @@ python src/label_studio_io.py convert-export `
   --output data/processed/labeled_qa_from_label_studio.jsonl
 ```
 
-## LoRA/QLoRA Scaffold
+### LoRA/QLoRA Scaffold
 
 Dry-run:
 
@@ -440,7 +433,7 @@ Interpretation: v2 is the clean candidate after official/fresh held-out leakage 
 
 Important metric caveat: `answerability_acc` is only the parsed `answerability:` field accuracy. Exact citation on answerable rows is much lower (`domain=0.2556`, `official=0.3333`, `fresh=0.2273`), and `docs/tuned_slm_failure_diagnosis.md` shows that the model mostly cites retrieved rank 1 instead of selecting among retrieved chunks.
 
-## Run Demo
+### Run Demo
 
 ```powershell
 python app/gradio_app.py
@@ -463,7 +456,7 @@ $env:TUNED_SLM_ADAPTER_DIR="outputs/slm_lora_random_control_blind_safe_final/che
 The tuned default is a clean development baseline. It failed the frozen
 blind-opening gates, so the demo does not imply final held-out performance.
 
-## Smoke Tests
+### Smoke Tests
 
 ```powershell
 python -m compileall -q src app
@@ -478,7 +471,7 @@ Expected:
 }
 ```
 
-## Final Limitations
+### Final Limitations
 
 - The frozen blind was intentionally not opened because no clean checkpoint passed every development gate.
 - The selected clean step-250 baseline still under-refuses unsupported slots and wholly unsupported fresh questions.

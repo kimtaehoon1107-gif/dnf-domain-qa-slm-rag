@@ -1,0 +1,57 @@
+diff --git a/README.md b/README.md
+index 22a4302..f6a8fab 100644
+--- a/README.md
++++ b/README.md
+@@ -16,21 +16,31 @@ typed claim verifier with fail-closed guards for registered contracts.
+   headline.
+ - Adaptive policy/month generation diagnostic: **55/64**. It is not promoted
+   because the inspected set had already influenced development.
+-- Namespace-safe, addendum-aware score-only analysis of the historical
+-  adaptive output reports **55/64 value-complete**, **48/64 typed-value
+-  complete**, and **43/64 typed claim + approved direct evidence**. It does
+-  not rebuild prompts or rerun the verifier, and is not a new model result.
+-- Human review of its 14 automatic semantic flags found 3 real product
+-  false-full cases (slots 3, 30, 51) and 11 narrow-gold/equivalent-evidence
+-  false positives. A fresh claim-contract v7 smoke fixed slot 3, answered
+-  slots 25 and 30 correctly, and safely blocked slot 51.
++- A reviewed claim-target correction separates slot 30's search/equip answer
++  (`115레벨 이상`) from the different `110/115` simulation-condition fact.
++  The resulting score-only diagnostic reports **56/64 value-complete**,
++  **49/64 typed-value complete**, and **44/64 typed claim + approved direct
++  evidence**. It does not rebuild prompts or rerun the verifier, and is not a
++  new model result.
++- Human review after that correction found 2 real historical product
++  false-full cases (slots 3 and 51), 11 narrow-gold/equivalent-evidence false
++  positives, and one corrected claim target (slot 30).
+ - Reviewed-equivalent candidate coverage is **64/64**, but only **22/96**
+   requirements have an explicit relation contract; candidate presence is not
+   the same as claim-bound evidence sufficiency.
+-- Fresh Qwen3 8B checks over slots 3, 25, 30, and 51 were correct on **3/4**;
+-  the remaining wrong model selection was fail-closed, with no false-full or
+-  generation error.
+-- Full repository verification: **853 passed**, plus **64 subtests**.
++- Claim-contract v8 now registers all **96/96** requirements as **73** child
++  relations under **29** reusable parent relations and **11** families.
++  Structured type contracts cover 71 requirements; 25 natural-language
++  requirements remain audit-only. This registry does not upgrade the
++  **22/96** exact child-relation proof count or any model score.
++- A parent-relation semantic shadow can assess **60/96** requirements. It
++  finds child-bound support for 54 and flags six prompt evidence-reduction
++  misses (slots 5, 7, 15, 23, 47, 55), with zero currently exposed supported
++  requirement regressions. It remains shadow-only and changes no score.
++- Fresh Qwen3 8B checks over slots 3, 25, 30, and 51 were automatically
++  **3/4** but human-semantically **2/4**: slot 30 over-answered with the
++  different `110` condition. Generation errors were `0`.
++- Full repository verification: **875 passed**, plus **64 subtests**.
+ - Current verdict: portfolio case study **GO**; production default **NO-GO**.
+ 
+ The main finding is that retrieval is no longer the only bottleneck. Evidence
+@@ -41,6 +51,8 @@ frozen.
+ 
+ See the [Korean v3 portfolio draft](PORTFOLIO_V3_DRAFT.md) and the
+ [claim-contract round report](reports/v3/typed_evidence_ref_claim_contract_round_20260727.md).
++The new family boundary is documented in the
++[claim-contract v8 report](reports/v3/typed_evidence_ref_relation_family_contract_v8_20260727.md).
+ 
+ ## Latest Verified Status (2026-07-13)
+ 
