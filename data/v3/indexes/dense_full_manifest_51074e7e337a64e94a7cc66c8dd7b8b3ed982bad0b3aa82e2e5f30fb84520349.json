@@ -1,0 +1,98 @@
+{
+  "audit": {
+    "bm25_chunk_id_set_mismatch": 0,
+    "bm25_entry_count_mismatch": 0,
+    "bm25_filter_parity_mismatches": 0,
+    "bm25_filter_policy_count": 16,
+    "bm25_metadata_field_mismatches": 0
+  },
+  "built_at": "2026-07-18T11:58:00+09:00",
+  "default_filter": {
+    "allowed_statuses": [
+      "current",
+      "upcoming"
+    ],
+    "default_exposure_only": true,
+    "include_review_required": false
+  },
+  "dense_full_version": "dnf_bge_m3_dense_full_v3.1",
+  "embeddings": {
+    "dimension": 1024,
+    "dtype": "little_endian_float32",
+    "normalized": true,
+    "path": "data/v3/indexes/dense_full_embeddings_2c294cde018eefa354971029c240dd6fd5f2a30ead757441f6dadacea110b10d.f32",
+    "row_count": 3599,
+    "sha256": "2c294cde018eefa354971029c240dd6fd5f2a30ead757441f6dadacea110b10d"
+  },
+  "indexed_text_field": "retrieval_text",
+  "inputs": [
+    {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "role": "chunk_v3",
+      "row_count": 3599,
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    {
+      "path": "data/v3/chunks/chunk_corpus_manifest_87fb0fc3477088cf6245e8bd3fd7719374a7dbf778094d5e36fa43458dd54c00.json",
+      "role": "chunk_corpus_manifest",
+      "row_count": null,
+      "sha256": "87fb0fc3477088cf6245e8bd3fd7719374a7dbf778094d5e36fa43458dd54c00"
+    },
+    {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "role": "document_v3",
+      "row_count": 980,
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    {
+      "path": "data/v3/indexes/bm25_manifest_f963e4e6a8bd64540ec030cdd3a4e881cd4034d833655dc624b838cafae8dbea.json",
+      "role": "bm25_manifest",
+      "row_count": null,
+      "sha256": "f963e4e6a8bd64540ec030cdd3a4e881cd4034d833655dc624b838cafae8dbea"
+    },
+    {
+      "path": "data/v3/indexes/bm25_index_af7de9bbf691aabaee464a2fe02facdf1f4b11de70d029967508357cab4948a2.json",
+      "role": "bm25_index",
+      "row_count": 3599,
+      "sha256": "af7de9bbf691aabaee464a2fe02facdf1f4b11de70d029967508357cab4948a2"
+    }
+  ],
+  "manifest_schema_version": "dnf_dense_full_manifest_v3.1",
+  "metadata": {
+    "path": "data/v3/indexes/dense_full_metadata_0343e23130322d2db046eeb5212f8fe6ca3178456036e1873ca3401634998a46.jsonl",
+    "row_count": 3599,
+    "sha256": "0343e23130322d2db046eeb5212f8fe6ca3178456036e1873ca3401634998a46"
+  },
+  "model": {
+    "batch_size": 2,
+    "device": "cuda",
+    "device_name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "embedding_dimension": 1024,
+    "embedding_dtype": "float32",
+    "max_sequence_length": 2048,
+    "model_name": "BAAI/bge-m3",
+    "model_revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "normalize_embeddings": true,
+    "numpy_version": "2.4.4",
+    "repeat_encode_max_abs_diff": 1.862645149230957e-07,
+    "repeat_encode_rows": 16,
+    "sentence_transformers_version": "5.5.1",
+    "similarity": "cosine_via_normalized_dot_product",
+    "torch_version": "2.11.0+cu128"
+  },
+  "token_measurement": {
+    "over_requested_max": 0,
+    "requested_max_sequence_length": 2048,
+    "row_count": 3599,
+    "token_length": {
+      "max": 1187,
+      "mean": 398.53,
+      "min": 44,
+      "p50": 252,
+      "p90": 879,
+      "p95": 953,
+      "p99": 1068
+    },
+    "truncation_detected": false
+  }
+}

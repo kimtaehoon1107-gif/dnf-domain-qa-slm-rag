@@ -1,0 +1,86 @@
+{
+  "built_at": "2026-07-18T00:30:00+09:00",
+  "by_source": {
+    "dnf_account_policy": {
+      "documents": 5,
+      "dom_chunks": 60,
+      "max_dom_chunk_chars": 1799,
+      "visual_ocr_chunks": 0
+    },
+    "dnf_event": {
+      "documents": 6,
+      "dom_chunks": 31,
+      "max_dom_chunk_chars": 758,
+      "visual_ocr_chunks": 8
+    },
+    "dnf_faq": {
+      "documents": 16,
+      "dom_chunks": 16,
+      "max_dom_chunk_chars": 703,
+      "visual_ocr_chunks": 13
+    },
+    "dnf_game_guide": {
+      "documents": 8,
+      "dom_chunks": 127,
+      "max_dom_chunk_chars": 1397,
+      "visual_ocr_chunks": 1
+    },
+    "dnf_monthly_item": {
+      "documents": 4,
+      "dom_chunks": 14,
+      "max_dom_chunk_chars": 1400,
+      "visual_ocr_chunks": 0
+    },
+    "dnf_notice": {
+      "documents": 12,
+      "dom_chunks": 28,
+      "max_dom_chunk_chars": 1181,
+      "visual_ocr_chunks": 0
+    },
+    "dnf_seria_shop": {
+      "documents": 6,
+      "dom_chunks": 22,
+      "max_dom_chunk_chars": 1398,
+      "visual_ocr_chunks": 0
+    },
+    "dnf_update": {
+      "documents": 6,
+      "dom_chunks": 147,
+      "max_dom_chunk_chars": 1395,
+      "visual_ocr_chunks": 0
+    }
+  },
+  "chunker_version": "dnf_offset_chunk_pilot_v3.1",
+  "full_chunking_decision": "GO",
+  "gates": {
+    "all_18_visual_documents_represented": true,
+    "all_eight_sources_represented": true,
+    "all_four_statuses_represented": true,
+    "default_exposure_policy_violations": 0,
+    "duplicate_chunk_ids": 0,
+    "empty_display_or_retrieval_text": 0,
+    "offset_mismatches": 0,
+    "orphan_multi_document_chunks": 0,
+    "oversized_atomic_chunks": 0,
+    "selected_document_without_dom_chunk": 0,
+    "selection_count_is_63": true,
+    "visual_ocr_default_exposure_violations": 0
+  },
+  "manifest_path": "data/v3/chunks/chunk_pilot_manifest_ba5e1d5a9b8a237df9a99e5fb698bbb8e0a4b6dc1668b3cabece9e971e0154e6.json",
+  "manifest_sha256": "ba5e1d5a9b8a237df9a99e5fb698bbb8e0a4b6dc1668b3cabece9e971e0154e6",
+  "report_schema_version": "dnf_chunk_pilot_report_v3.1",
+  "summary": {
+    "default_exposure_chunks": 272,
+    "dom_chunks": 445,
+    "heading_path_chunks": 427,
+    "selected_documents": 63,
+    "status": {
+      "current": 49,
+      "expired": 6,
+      "superseded": 5,
+      "unknown": 3
+    },
+    "table_or_mixed_chunks": 182,
+    "visual_ocr_chunks": 22
+  }
+}

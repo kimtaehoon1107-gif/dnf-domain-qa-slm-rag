@@ -1,0 +1,467 @@
+{
+  "collector_version": "dnf_detail_pilot_v3.0",
+  "fetched_at": "2026-07-17T21:11:46.2438189+09:00",
+  "guide_baseline_path": "data/raw/guide_docs.jsonl",
+  "guide_baseline_sha256": "c1049eb0d8c1910d99abe6ad345af21b7820e5f3a483a6836342ad332daeb613",
+  "ledger_path": "data/v3/collections/detail_collection_ledger_6cd39a7473272b78a0581ae739610ce73f8f7a9fa2134d5afaef919dfa18a3b7.jsonl",
+  "ledger_row_count": 64,
+  "ledger_sha256": "6cd39a7473272b78a0581ae739610ce73f8f7a9fa2134d5afaef919dfa18a3b7",
+  "manifest_schema_version": "dnf_detail_collection_manifest_v3.0",
+  "preview_path": "data/v3/collections/detail_extraction_preview_0a1a450075579dd3569ecde66fc813bf65b7660c5390f68bb995a9fd3839233a.jsonl",
+  "preview_row_count": 64,
+  "preview_sha256": "0a1a450075579dd3569ecde66fc813bf65b7660c5390f68bb995a9fd3839233a",
+  "raw_snapshot_count": 60,
+  "raw_snapshots": [
+    {
+      "byte_count": 251614,
+      "content_hash": "3687f189c22d5de0d6855ae4519c5b248660acf3542807b5b6cbd7338d5e0507",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_account_policy/raw_detail_3687f189c22d5de0d6855ae4519c5b248660acf3542807b5b6cbd7338d5e0507.html",
+      "source_id": "dnf_account_policy"
+    },
+    {
+      "byte_count": 251499,
+      "content_hash": "6cf62a5447cab366163245ac2b408c3d4ea98f5c84dd17fe6bb7f271fd8f24c4",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_account_policy/raw_detail_6cf62a5447cab366163245ac2b408c3d4ea98f5c84dd17fe6bb7f271fd8f24c4.html",
+      "source_id": "dnf_account_policy"
+    },
+    {
+      "byte_count": 72225,
+      "content_hash": "ebe632a6b79281fcba496e6bef9c4ade8d04872ec0468cf6f428916a741e2fdf",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_account_policy/raw_detail_ebe632a6b79281fcba496e6bef9c4ade8d04872ec0468cf6f428916a741e2fdf.html",
+      "source_id": "dnf_account_policy"
+    },
+    {
+      "byte_count": 155387,
+      "content_hash": "ef41ed1bb4150a1ca426cd00a8de03b6f7554485cb1c7db40e34c677f292448b",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_account_policy/raw_detail_ef41ed1bb4150a1ca426cd00a8de03b6f7554485cb1c7db40e34c677f292448b.html",
+      "source_id": "dnf_account_policy"
+    },
+    {
+      "byte_count": 174561,
+      "content_hash": "f60347f4ef7ec20338a4ec7ac21c83da2419ead8c7c881f57aa3a765de2025b6",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_account_policy/raw_detail_f60347f4ef7ec20338a4ec7ac21c83da2419ead8c7c881f57aa3a765de2025b6.html",
+      "source_id": "dnf_account_policy"
+    },
+    {
+      "byte_count": 78254,
+      "content_hash": "39a00d1930643d03dd79e4bc674ebd96e44fef77c5778f9c0d3837ad92700ba8",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_event/raw_detail_39a00d1930643d03dd79e4bc674ebd96e44fef77c5778f9c0d3837ad92700ba8.html",
+      "source_id": "dnf_event"
+    },
+    {
+      "byte_count": 78279,
+      "content_hash": "5c92e20d751198aca77c810ba3a6e00739aa3ca5612c8e3e74de1834950f3463",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_event/raw_detail_5c92e20d751198aca77c810ba3a6e00739aa3ca5612c8e3e74de1834950f3463.html",
+      "source_id": "dnf_event"
+    },
+    {
+      "byte_count": 32901,
+      "content_hash": "77696f8b06b14f11c9bca9a0b0017d59a227cc5f47bd50fd8d207e44657ac1d4",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_event/raw_detail_77696f8b06b14f11c9bca9a0b0017d59a227cc5f47bd50fd8d207e44657ac1d4.html",
+      "source_id": "dnf_event"
+    },
+    {
+      "byte_count": 35331,
+      "content_hash": "899c5e99b8ea3c533d4f337a2748a906b7beee96ce00f61e5435098518deb845",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_event/raw_detail_899c5e99b8ea3c533d4f337a2748a906b7beee96ce00f61e5435098518deb845.html",
+      "source_id": "dnf_event"
+    },
+    {
+      "byte_count": 46953,
+      "content_hash": "94a3347c0855c9537b4f61307b42e1cf88d3e7f0a646b1c86d2bfe49f6fc38ce",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_event/raw_detail_94a3347c0855c9537b4f61307b42e1cf88d3e7f0a646b1c86d2bfe49f6fc38ce.html",
+      "source_id": "dnf_event"
+    },
+    {
+      "byte_count": 78191,
+      "content_hash": "999ad6668d68b693fff65cf9b8595fd89ceadb30124340b2720919c6f40e4d28",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_event/raw_detail_999ad6668d68b693fff65cf9b8595fd89ceadb30124340b2720919c6f40e4d28.html",
+      "source_id": "dnf_event"
+    },
+    {
+      "byte_count": 76168,
+      "content_hash": "0fbd6406633f2ec835b468b1e0ca4607039b0eb7ab087c2ad67865cc02f908ad",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_faq/raw_detail_0fbd6406633f2ec835b468b1e0ca4607039b0eb7ab087c2ad67865cc02f908ad.html",
+      "source_id": "dnf_faq"
+    },
+    {
+      "byte_count": 107437,
+      "content_hash": "286d9fad5c83549ff1e3acfe6db8f071eac2a87857e84151ed437ad20b7a6078",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_faq/raw_detail_286d9fad5c83549ff1e3acfe6db8f071eac2a87857e84151ed437ad20b7a6078.html",
+      "source_id": "dnf_faq"
+    },
+    {
+      "byte_count": 156709,
+      "content_hash": "2e38898c1737f528617586bcb9e59e42c7184ab6fd1365e703316efc2782364c",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_faq/raw_detail_2e38898c1737f528617586bcb9e59e42c7184ab6fd1365e703316efc2782364c.html",
+      "source_id": "dnf_faq"
+    },
+    {
+      "byte_count": 42382,
+      "content_hash": "529ef6b94817513a113754c996ae61edc6d0227ad2b3ac34ae9754bb485cf401",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_faq/raw_detail_529ef6b94817513a113754c996ae61edc6d0227ad2b3ac34ae9754bb485cf401.html",
+      "source_id": "dnf_faq"
+    },
+    {
+      "byte_count": 62521,
+      "content_hash": "55c4d5641b5d47be29846b47f182b06cd4bfd6b1113c769ba563ea2dba179a7a",
+      "ledger_reference_count": 2,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_faq/raw_detail_55c4d5641b5d47be29846b47f182b06cd4bfd6b1113c769ba563ea2dba179a7a.html",
+      "source_id": "dnf_faq"
+    },
+    {
+      "byte_count": 41687,
+      "content_hash": "62c4a236a895c154a4d1edb74dd79f28828583b805ad86a2eb36694bda5c479e",
+      "ledger_reference_count": 2,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_faq/raw_detail_62c4a236a895c154a4d1edb74dd79f28828583b805ad86a2eb36694bda5c479e.html",
+      "source_id": "dnf_faq"
+    },
+    {
+      "byte_count": 107622,
+      "content_hash": "74e97df1b1f4fde9c02955c90a1d24ae78369357a4f3b00e4823106d5559afaf",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_faq/raw_detail_74e97df1b1f4fde9c02955c90a1d24ae78369357a4f3b00e4823106d5559afaf.html",
+      "source_id": "dnf_faq"
+    },
+    {
+      "byte_count": 74596,
+      "content_hash": "962f3d4ec5e6e69c0c802d3e32e2dcaab2561dd1274869fea61eab8586e13c83",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_faq/raw_detail_962f3d4ec5e6e69c0c802d3e32e2dcaab2561dd1274869fea61eab8586e13c83.html",
+      "source_id": "dnf_faq"
+    },
+    {
+      "byte_count": 77927,
+      "content_hash": "e1c67b4cef662e7ce526d976c6b94753254e5dd991ca93d43795f374d06a0c72",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_faq/raw_detail_e1c67b4cef662e7ce526d976c6b94753254e5dd991ca93d43795f374d06a0c72.html",
+      "source_id": "dnf_faq"
+    },
+    {
+      "byte_count": 85919,
+      "content_hash": "edfa7a22166fe97a113adcc6bdc61bd10b3fdd75fb9928d17ae273d48459c824",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_faq/raw_detail_edfa7a22166fe97a113adcc6bdc61bd10b3fdd75fb9928d17ae273d48459c824.html",
+      "source_id": "dnf_faq"
+    },
+    {
+      "byte_count": 95816,
+      "content_hash": "f25ce17d0d943434fc1397a2bdc27c24c7ab5048ae6a911dc9464c3880418226",
+      "ledger_reference_count": 2,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_faq/raw_detail_f25ce17d0d943434fc1397a2bdc27c24c7ab5048ae6a911dc9464c3880418226.html",
+      "source_id": "dnf_faq"
+    },
+    {
+      "byte_count": 118069,
+      "content_hash": "f50a8978b2f74b391aeefa90886264cc3238d19dd405591728720383c31ea1ea",
+      "ledger_reference_count": 2,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_faq/raw_detail_f50a8978b2f74b391aeefa90886264cc3238d19dd405591728720383c31ea1ea.html",
+      "source_id": "dnf_faq"
+    },
+    {
+      "byte_count": 42911,
+      "content_hash": "2df71e071cc7bb3e06bb4942749a89ca5907032129a0210c02218a782344cfe5",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_game_guide/raw_detail_2df71e071cc7bb3e06bb4942749a89ca5907032129a0210c02218a782344cfe5.html",
+      "source_id": "dnf_game_guide"
+    },
+    {
+      "byte_count": 39844,
+      "content_hash": "3119a9766c5ac895a86528e9eb3fec363432e49acf9661139865f363419f2dae",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_game_guide/raw_detail_3119a9766c5ac895a86528e9eb3fec363432e49acf9661139865f363419f2dae.html",
+      "source_id": "dnf_game_guide"
+    },
+    {
+      "byte_count": 97700,
+      "content_hash": "6ecc140696e09436c54bde6d5898f00755137aea82677ec2c3701f26148eab53",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_game_guide/raw_detail_6ecc140696e09436c54bde6d5898f00755137aea82677ec2c3701f26148eab53.html",
+      "source_id": "dnf_game_guide"
+    },
+    {
+      "byte_count": 78744,
+      "content_hash": "79593b72bc0103008c83884d9d3b564d78b7b9cdd3ff115b7e46cd1b891c1811",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_game_guide/raw_detail_79593b72bc0103008c83884d9d3b564d78b7b9cdd3ff115b7e46cd1b891c1811.html",
+      "source_id": "dnf_game_guide"
+    },
+    {
+      "byte_count": 68561,
+      "content_hash": "ac5a853cc357b13eb76c6f3079aee77a5fbe1ea3432d4c510b02495cd087b9eb",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_game_guide/raw_detail_ac5a853cc357b13eb76c6f3079aee77a5fbe1ea3432d4c510b02495cd087b9eb.html",
+      "source_id": "dnf_game_guide"
+    },
+    {
+      "byte_count": 54179,
+      "content_hash": "b254f33f4532240e1e85ef20b1b252d3ee1aa5f46816eb5c5760104f57028ef5",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_game_guide/raw_detail_b254f33f4532240e1e85ef20b1b252d3ee1aa5f46816eb5c5760104f57028ef5.html",
+      "source_id": "dnf_game_guide"
+    },
+    {
+      "byte_count": 26220,
+      "content_hash": "0c3959d56d498a3b4dd124b19f3dfd9e6ead90cc02553bb2e7c1e74641699b6b",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_monthly_item/raw_detail_0c3959d56d498a3b4dd124b19f3dfd9e6ead90cc02553bb2e7c1e74641699b6b.html",
+      "source_id": "dnf_monthly_item"
+    },
+    {
+      "byte_count": 48772,
+      "content_hash": "16bd0decb2b3a49906cfc0745e5394bce11691d2c69260a070979d9503c4b64f",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_monthly_item/raw_detail_16bd0decb2b3a49906cfc0745e5394bce11691d2c69260a070979d9503c4b64f.html",
+      "source_id": "dnf_monthly_item"
+    },
+    {
+      "byte_count": 60403,
+      "content_hash": "30369966fbfb3a7cc04c37a95b2c7cc443b82097e369101a73de2d1c3839b0ba",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_monthly_item/raw_detail_30369966fbfb3a7cc04c37a95b2c7cc443b82097e369101a73de2d1c3839b0ba.html",
+      "source_id": "dnf_monthly_item"
+    },
+    {
+      "byte_count": 79973,
+      "content_hash": "4e321606ac1deae8c00b9c689336860b871f0e85da14af923b22be37dbb758c7",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_monthly_item/raw_detail_4e321606ac1deae8c00b9c689336860b871f0e85da14af923b22be37dbb758c7.html",
+      "source_id": "dnf_monthly_item"
+    },
+    {
+      "byte_count": 63670,
+      "content_hash": "ab76faf92d3666efbaa1d3723f295470d1f2765ddd4f2966fc4370038ade6f22",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_monthly_item/raw_detail_ab76faf92d3666efbaa1d3723f295470d1f2765ddd4f2966fc4370038ade6f22.html",
+      "source_id": "dnf_monthly_item"
+    },
+    {
+      "byte_count": 45513,
+      "content_hash": "34fd5b531dd03d095eb4d09115872963506b99b5b10bbd1905b48bcb86b62dd2",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_notice/raw_detail_34fd5b531dd03d095eb4d09115872963506b99b5b10bbd1905b48bcb86b62dd2.html",
+      "source_id": "dnf_notice"
+    },
+    {
+      "byte_count": 42766,
+      "content_hash": "3ee45c046fe49095b8e00f087067d9f26dd41d8d47ecd1e632c2d17fd9cae2fa",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_notice/raw_detail_3ee45c046fe49095b8e00f087067d9f26dd41d8d47ecd1e632c2d17fd9cae2fa.html",
+      "source_id": "dnf_notice"
+    },
+    {
+      "byte_count": 59259,
+      "content_hash": "5d9f7d6988c010a6eb1a94a5cba94d4e058d2267a4917a2c68261267720a0599",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_notice/raw_detail_5d9f7d6988c010a6eb1a94a5cba94d4e058d2267a4917a2c68261267720a0599.html",
+      "source_id": "dnf_notice"
+    },
+    {
+      "byte_count": 45878,
+      "content_hash": "6cef1b8677486f2e091ca1fd05f1e83dc17ae6bd22f60419eefeb6c4f6fd7b69",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_notice/raw_detail_6cef1b8677486f2e091ca1fd05f1e83dc17ae6bd22f60419eefeb6c4f6fd7b69.html",
+      "source_id": "dnf_notice"
+    },
+    {
+      "byte_count": 43877,
+      "content_hash": "6e6fd07f27637a5fe672d78d9126b139949f6d3b852a92a0845f4e903718e21f",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_notice/raw_detail_6e6fd07f27637a5fe672d78d9126b139949f6d3b852a92a0845f4e903718e21f.html",
+      "source_id": "dnf_notice"
+    },
+    {
+      "byte_count": 46347,
+      "content_hash": "75f96b34b4ac631bc227bd732cfbc498a0395e99123eed51b371a9d75c7e4768",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_notice/raw_detail_75f96b34b4ac631bc227bd732cfbc498a0395e99123eed51b371a9d75c7e4768.html",
+      "source_id": "dnf_notice"
+    },
+    {
+      "byte_count": 43154,
+      "content_hash": "8bc54117447e4d1ba25674a3e1718edb25fe4f268828d0a00f607a19fa852651",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_notice/raw_detail_8bc54117447e4d1ba25674a3e1718edb25fe4f268828d0a00f607a19fa852651.html",
+      "source_id": "dnf_notice"
+    },
+    {
+      "byte_count": 43638,
+      "content_hash": "8c1fd53308c1b97c574c8a2f0fc6e56e9a7c5016867a5e4928618f069c0206d6",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_notice/raw_detail_8c1fd53308c1b97c574c8a2f0fc6e56e9a7c5016867a5e4928618f069c0206d6.html",
+      "source_id": "dnf_notice"
+    },
+    {
+      "byte_count": 43745,
+      "content_hash": "8d6b2090f78f846c864bd800d1dd255d51be29530d73142d4fba7383024f03d7",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_notice/raw_detail_8d6b2090f78f846c864bd800d1dd255d51be29530d73142d4fba7383024f03d7.html",
+      "source_id": "dnf_notice"
+    },
+    {
+      "byte_count": 43870,
+      "content_hash": "b75f4b077c0b0c5b1942cf1613100b3fbef1ba5955e30f5badac0cb975709385",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_notice/raw_detail_b75f4b077c0b0c5b1942cf1613100b3fbef1ba5955e30f5badac0cb975709385.html",
+      "source_id": "dnf_notice"
+    },
+    {
+      "byte_count": 43685,
+      "content_hash": "c37e8141f3e217240e5541866214424ce3e1002dc66f14f063ed64f7b9eb4bba",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_notice/raw_detail_c37e8141f3e217240e5541866214424ce3e1002dc66f14f063ed64f7b9eb4bba.html",
+      "source_id": "dnf_notice"
+    },
+    {
+      "byte_count": 70445,
+      "content_hash": "cab33e3c466108feccaa9b1cabd09fb51bb6efe385cfc74a255cdb897b586a91",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_notice/raw_detail_cab33e3c466108feccaa9b1cabd09fb51bb6efe385cfc74a255cdb897b586a91.html",
+      "source_id": "dnf_notice"
+    },
+    {
+      "byte_count": 54448,
+      "content_hash": "182af5aeba1a05b8d710d17e07ceb081e3543d284f762f6023cc9678e131f0e5",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_seria_shop/raw_detail_182af5aeba1a05b8d710d17e07ceb081e3543d284f762f6023cc9678e131f0e5.html",
+      "source_id": "dnf_seria_shop"
+    },
+    {
+      "byte_count": 47755,
+      "content_hash": "1d6f77524295bc8943f2b2736f7a7f8db6b5cfc56adbaf650a2393b3a035a79f",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_seria_shop/raw_detail_1d6f77524295bc8943f2b2736f7a7f8db6b5cfc56adbaf650a2393b3a035a79f.html",
+      "source_id": "dnf_seria_shop"
+    },
+    {
+      "byte_count": 47470,
+      "content_hash": "2e30278d32cdaeeff7bca341b4140f3494e934f6169fc546e0a0969a216b10e6",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_seria_shop/raw_detail_2e30278d32cdaeeff7bca341b4140f3494e934f6169fc546e0a0969a216b10e6.html",
+      "source_id": "dnf_seria_shop"
+    },
+    {
+      "byte_count": 40788,
+      "content_hash": "53489b383e4b40c198f0964d40a0396539a6e26af8734dbe2877f9ffc794d1a1",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_seria_shop/raw_detail_53489b383e4b40c198f0964d40a0396539a6e26af8734dbe2877f9ffc794d1a1.html",
+      "source_id": "dnf_seria_shop"
+    },
+    {
+      "byte_count": 51807,
+      "content_hash": "66df8ad8bf1df34749e4fa404bdb05b39bef71e7cbeb3e3f9e8085befa3742d8",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_seria_shop/raw_detail_66df8ad8bf1df34749e4fa404bdb05b39bef71e7cbeb3e3f9e8085befa3742d8.html",
+      "source_id": "dnf_seria_shop"
+    },
+    {
+      "byte_count": 53351,
+      "content_hash": "7e312b102a5ec192ee5cd9eabb0cb8cccf9ae7e318077f5d93d273db5d7dc7d8",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_seria_shop/raw_detail_7e312b102a5ec192ee5cd9eabb0cb8cccf9ae7e318077f5d93d273db5d7dc7d8.html",
+      "source_id": "dnf_seria_shop"
+    },
+    {
+      "byte_count": 55641,
+      "content_hash": "7e4c5f634efa4800327243788366b55046f30d4dce93530f63b608120683a649",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_seria_shop/raw_detail_7e4c5f634efa4800327243788366b55046f30d4dce93530f63b608120683a649.html",
+      "source_id": "dnf_seria_shop"
+    },
+    {
+      "byte_count": 381325,
+      "content_hash": "c464b811a4875f61156300a7ea5805e081f7fa696a42afa7265ef20f58020110",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_seria_shop/raw_detail_c464b811a4875f61156300a7ea5805e081f7fa696a42afa7265ef20f58020110.html",
+      "source_id": "dnf_seria_shop"
+    },
+    {
+      "byte_count": 47907,
+      "content_hash": "2562fc4b2d86f4c78353e966432847276bc2a532d85fc1139e8a29492db4ec02",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_update/raw_detail_2562fc4b2d86f4c78353e966432847276bc2a532d85fc1139e8a29492db4ec02.html",
+      "source_id": "dnf_update"
+    },
+    {
+      "byte_count": 58719,
+      "content_hash": "44b8a9a6511f8d611004f846364a2459d184c9741ce8c09c483dcaa7967066c4",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_update/raw_detail_44b8a9a6511f8d611004f846364a2459d184c9741ce8c09c483dcaa7967066c4.html",
+      "source_id": "dnf_update"
+    },
+    {
+      "byte_count": 74737,
+      "content_hash": "61a43c1b6fb06a592d03dd77a9b21a0585979e181484b2f2d223b8fb2a7e70e8",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_update/raw_detail_61a43c1b6fb06a592d03dd77a9b21a0585979e181484b2f2d223b8fb2a7e70e8.html",
+      "source_id": "dnf_update"
+    },
+    {
+      "byte_count": 46493,
+      "content_hash": "64593c59c2ca09fd7a5d96cff4a9e35cb934d4e08a1d96f72023a5154c78f2f0",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_update/raw_detail_64593c59c2ca09fd7a5d96cff4a9e35cb934d4e08a1d96f72023a5154c78f2f0.html",
+      "source_id": "dnf_update"
+    },
+    {
+      "byte_count": 120540,
+      "content_hash": "86a1f2b51bd8acdc0831e11cbf99f9349ac5670e796fe3b8772796a09e12a197",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_update/raw_detail_86a1f2b51bd8acdc0831e11cbf99f9349ac5670e796fe3b8772796a09e12a197.html",
+      "source_id": "dnf_update"
+    },
+    {
+      "byte_count": 38107,
+      "content_hash": "d42b1906a09f690293da2b07c6d187df2ad7a5adab5c365386dd2641c2657f7f",
+      "ledger_reference_count": 1,
+      "raw_snapshot_path": "data/v3/detail_snapshots/dnf_update/raw_detail_d42b1906a09f690293da2b07c6d187df2ad7a5adab5c365386dd2641c2657f7f.html",
+      "source_id": "dnf_update"
+    }
+  ],
+  "registry_manifest_path": "data/v3/discovery/source_registry_manifest_4cbd8c441fd694ec16ad30b6b42c4c6f28326dc9a768d883399419ef87ee9ea2.json",
+  "registry_manifest_sha256": "4cbd8c441fd694ec16ad30b6b42c4c6f28326dc9a768d883399419ef87ee9ea2",
+  "registry_path": "data/v3/discovery/source_registry_04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a.jsonl",
+  "registry_sha256": "04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a",
+  "selection": {
+    "adjustments": [
+      "event: no upcoming rows in frozen registry; allocated sample to current/expired"
+    ],
+    "requested_by_source": {
+      "dnf_account_policy": 5,
+      "dnf_event": 6,
+      "dnf_faq": 16,
+      "dnf_game_guide": 6,
+      "dnf_monthly_item": 5,
+      "dnf_notice": 12,
+      "dnf_seria_shop": 8,
+      "dnf_update": 6
+    },
+    "selected_by_source": {
+      "dnf_account_policy": 5,
+      "dnf_event": 6,
+      "dnf_faq": 16,
+      "dnf_game_guide": 6,
+      "dnf_monthly_item": 5,
+      "dnf_notice": 12,
+      "dnf_seria_shop": 8,
+      "dnf_update": 6
+    },
+    "selected_total": 64,
+    "selection_version": "dnf_detail_pilot_v3.0"
+  }
+}

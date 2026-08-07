@@ -1,0 +1,170 @@
+{
+  "report_schema_version": "table-row-label-binding-round-report-v1",
+  "evaluation_role": "development_only_preregistered_f1_no_go_reverted",
+  "round": {
+    "name": "table_row_label_binding_f1",
+    "change": "table_value_spans row matching, numeric qualifiers, and displayed table value subject used row.label",
+    "excluded_changes": [
+      "F2 caption normalization",
+      "F3 Kiwi particle removal",
+      "surface matcher thresholds or logic",
+      "search",
+      "routing",
+      "planner",
+      "assembler"
+    ],
+    "decision": "NO_GO",
+    "runtime_change_reverted": true
+  },
+  "preregistered_gate": {
+    "gold_value_complete_when_scoreable": {
+      "minimum_successes": 24,
+      "minimum_rate": 0.52,
+      "denominator": 44
+    },
+    "docs_only_false_full": {
+      "maximum": 7
+    },
+    "docs_only_overreject": {
+      "maximum": 5
+    },
+    "docs_only_grounded_equals_span_strict": {
+      "required": true
+    },
+    "target_zero_selection_requirements_with_table_values": {
+      "minimum": 8,
+      "denominator": 33
+    },
+    "all_conditions_required": true,
+    "ties_fail_when_below_the_registered_minimum": true
+  },
+  "baseline": {
+    "gold_value_complete_when_scoreable": {
+      "successes": 22,
+      "total": 44,
+      "rate": 0.5
+    },
+    "docs_only_false_full": 7,
+    "docs_only_overreject": 3,
+    "docs_only_grounded": 58,
+    "docs_only_grounded_span_strict": 58,
+    "target_zero_selection_requirements_with_table_values": {
+      "successes": 0,
+      "total": 33
+    }
+  },
+  "f1_result": {
+    "gold_value_complete_when_scoreable": {
+      "successes": 22,
+      "total": 44,
+      "rate": 0.5,
+      "passed": false
+    },
+    "docs_only_false_full": {
+      "value": 7,
+      "passed": true
+    },
+    "docs_only_overreject": {
+      "value": 3,
+      "passed": true
+    },
+    "docs_only_grounded_equals_span_strict": {
+      "grounded": 58,
+      "span_strict": 58,
+      "passed": true
+    },
+    "target_zero_selection_requirements_with_table_values": {
+      "successes": 0,
+      "total": 33,
+      "passed": false
+    },
+    "generation_errors": 0,
+    "all_conditions_passed": false
+  },
+  "diagnostic_delta": {
+    "before": {
+      "S1": 4,
+      "S2": 25,
+      "S3": 0,
+      "S4": 4,
+      "passed_but_empty": 0,
+      "passed_with_values": 0
+    },
+    "after_f1": {
+      "S1": 4,
+      "S2": 26,
+      "S3": 0,
+      "S4": 3,
+      "passed_but_empty": 0,
+      "passed_with_values": 0
+    },
+    "interpretation": "F1 moved one requirement from S4 to S2 and selected no table values."
+  },
+  "decision_reasons": [
+    "Gold value accuracy remained 22/44 (50.0%), below both registered thresholds.",
+    "The direct target metric remained 0/33, below the registered minimum of 8.",
+    "Safety metrics did not regress, but zero direct benefit is a preregistered failure."
+  ],
+  "reversion": {
+    "f1_generator_source_sha256": "aa80085b4439be8af77c7e1bc97074257bb4811e778dd3f73d6188cff001c121",
+    "restored_generator_source_sha256": "387a79e4befb4cd4ed16b26b9a751e6461a1c1e857f2ee3617cb1e8ad11126d2",
+    "restored_generator_matches_pre_f1": true,
+    "restored_investigation_source_sha256": "008c40d3ac09119a3482893efad924f5388a6357a9554352f8351bfe47a37eee",
+    "restored_investigation_matches_pre_f1": true,
+    "post_reversion_test_result": "36 passed, 2 dependency deprecation warnings",
+    "post_reversion_py_compile": "passed"
+  },
+  "inputs": {
+    "round_instruction": {
+      "path": "docs/v3/table_row_label_binding_round.md",
+      "sha256": "0b7ebb868a9242f0432ad8021807a1845903d8a442ff876af33227861f16a5ed"
+    },
+    "baseline_generation_ab_report": {
+      "path": "reports/v3/router_backbone_generation_ab_d539f68c436594ba8231509747b490d75f229d32afa05a605fe3fe655510b5bc.json",
+      "sha256": "d539f68c436594ba8231509747b490d75f229d32afa05a605fe3fe655510b5bc"
+    },
+    "frozen_reference_assembler": {
+      "path": "data/v3/evidence/extractive_assembler_v3_chunk_diverse_cases_06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c.jsonl",
+      "sha256": "06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c"
+    },
+    "value_first_assembler": {
+      "path": "data/v3/evidence/extractive_assembler_v3_chunk_diverse_value_first_cases_e2991cc1237e706c3ff02dfb74f9c3a93e107fbee9a4ad9c0ac4e928c9e4ff88.jsonl",
+      "sha256": "e2991cc1237e706c3ff02dfb74f9c3a93e107fbee9a4ad9c0ac4e928c9e4ff88"
+    },
+    "pre_f1_diagnostic_report": {
+      "path": "reports/v3/table_binding_zero_selection_investigation_4d53a6ad2a20ab51385963834664e0943aac3a1aaf116417d87bbe55a308d7bc.json",
+      "sha256": "4d53a6ad2a20ab51385963834664e0943aac3a1aaf116417d87bbe55a308d7bc"
+    }
+  },
+  "negative_result_artifacts": {
+    "post_f1_requirement_diagnostic": {
+      "path": "data/v3/evidence/table_binding_zero_selection_audit_478b602f061b9ca0bb0d30b2fbda9a9712dbe8dcaca5801f9c5df572fb416f2f.jsonl",
+      "sha256": "478b602f061b9ca0bb0d30b2fbda9a9712dbe8dcaca5801f9c5df572fb416f2f",
+      "row_count": 33
+    },
+    "post_f1_diagnostic_report": {
+      "path": "reports/v3/table_binding_zero_selection_investigation_f597132f6995b426dbc4f6cff5948db424be752da4fcf79f86efd32c50ef1cf2.json",
+      "sha256": "f597132f6995b426dbc4f6cff5948db424be752da4fcf79f86efd32c50ef1cf2"
+    },
+    "post_f1_generation_cases": {
+      "path": "outputs/v3/router_backbone_generation_ab_cases_c77de9d7a8231491e15473ef65156d7754a0c47bc9e579e7a5365e5c13e6c273.jsonl",
+      "sha256": "c77de9d7a8231491e15473ef65156d7754a0c47bc9e579e7a5365e5c13e6c273",
+      "row_count": 95
+    },
+    "post_f1_generation_report": {
+      "path": "reports/v3/router_backbone_generation_ab_3ad060058f40e67d2c83b8414fe3949a69beb2eb8dd57a11520572bc096820d3.json",
+      "sha256": "3ad060058f40e67d2c83b8414fe3949a69beb2eb8dd57a11520572bc096820d3"
+    }
+  },
+  "constraints": {
+    "search_changed": false,
+    "routing_changed": false,
+    "planner_changed": false,
+    "assembler_changed": false,
+    "frozen_artifact_regenerated": false,
+    "generator_model": "qwen3:8b",
+    "generation_calls": 79,
+    "runtime_or_canonical_promoted": false,
+    "failed_experiment_preserved": true
+  }
+}

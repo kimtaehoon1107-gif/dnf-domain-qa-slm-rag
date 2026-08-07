@@ -1,0 +1,263 @@
+{
+  "constraints": {
+    "authored_set_is_adaptive_not_sealed": true,
+    "frozen_blind_accessed": false,
+    "gold_available_to_decision": false,
+    "gold_or_labels_changed": false,
+    "guide_sibling_applied": false,
+    "guide_sibling_provisional_requires_literal_spans": true,
+    "new_domain_keyword_rules": 0,
+    "planner_or_retrieval_changed": false,
+    "runtime_or_canonical_promoted": false,
+    "training_or_reindex": false
+  },
+  "evaluation_role": "development_only_requirement_surface_query_ab",
+  "evaluator_version": "requirement-surface-query-ab-v3.3.1",
+  "execution": {
+    "applied_case_ids": [
+      "authored_validation_v3_2_sha256_c0c2d4091eda6655d6e8f0bdbc01a155e39e637642f903e8da2d288fd6cac599"
+    ],
+    "assembler_k": 3,
+    "assembler_threshold": 0.001,
+    "reranker_max_length": 512,
+    "reranker_model": "BAAI/bge-reranker-v2-m3",
+    "reranker_model_revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e"
+  },
+  "inputs": {
+    "arm0_cases": {
+      "path": "data/v3/evidence/requirement_entity_anchor_ab_cases_dc30eeee3145d25cc0e1321285e631374afe05fce94ea0d687a976af32b40146.jsonl",
+      "sha256": "dc30eeee3145d25cc0e1321285e631374afe05fce94ea0d687a976af32b40146"
+    },
+    "arm0_manifest": {
+      "path": "data/v3/evidence/requirement_entity_anchor_ab_manifest_7913a8f6a9ed816fe30ff0f80311f78c63aa1c071251f6fc0d528079202274ae.json",
+      "sha256": "7913a8f6a9ed816fe30ff0f80311f78c63aa1c071251f6fc0d528079202274ae"
+    },
+    "arm0_report": {
+      "path": "reports/v3/requirement_entity_anchor_ab_2f1d0f390fc0840fb8ceaae46e672c4898d04804ed6acc4d760217a9241d1f87.json",
+      "sha256": "2f1d0f390fc0840fb8ceaae46e672c4898d04804ed6acc4d760217a9241d1f87"
+    },
+    "authored_results": {
+      "path": "data/v3/evaluation/authored_validation_v3_2_results_7825374fd4fbf72d426d68dc3f401803de5036a3753f9d92f267f36c03062415.jsonl",
+      "sha256": "7825374fd4fbf72d426d68dc3f401803de5036a3753f9d92f267f36c03062415"
+    },
+    "authored_set": {
+      "path": "data/v3/evaluation/authored_validation_v3_2_52c1b84ef7ab0f9bee29931c46f9febf0970492216b6742e8f5337282af4181e.jsonl",
+      "sha256": "52c1b84ef7ab0f9bee29931c46f9febf0970492216b6742e8f5337282af4181e"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "contract": {
+      "path": "docs/v3/requirement_surface_query_ab.md",
+      "sha256": "421fe9b46319c5104c109f3de9cc8afcdfddb683a1dce253e06660d813baf158"
+    },
+    "documents": {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    "entity_anchor_source": {
+      "path": "src/v3/requirement_entity_anchor.py",
+      "sha256": "f58eef0a954656afe3e170aaf7eb13484d254daa8664871c93bd67bee6a4d2b3"
+    },
+    "evaluator_source": {
+      "path": "src/v3/evaluate_requirement_surface_query_ab.py",
+      "sha256": "418e77c3975ed5ecd7e2e7c78254ac3649e93edef35814200283c1d0ad64804b"
+    },
+    "reranker_source": {
+      "path": "src/v3/score_evidence_reranker.py",
+      "sha256": "ba101231b2beed583a5a6077bf82f4979336195c14ab4a2c77f9750f7c73ac04"
+    },
+    "surface_query_source": {
+      "path": "src/v3/requirement_surface_query.py",
+      "sha256": "b344ac0b3c9b6c2eb89e36cb1cddd3e0619aaaa121af0b61c72b5922b5466e26"
+    },
+    "temporal": {
+      "path": "data/v3/temporal/global_temporal_overlay_v3.2_f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317.jsonl",
+      "sha256": "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317"
+    }
+  },
+  "report_schema_version": "requirement-surface-query-ab-report-v3.3",
+  "result": {
+    "authored_adaptive_24": {
+      "arm0_all_evidence_spans": {
+        "rate": 0.375,
+        "successes": 9,
+        "total": 24
+      },
+      "arm0_all_groups": {
+        "rate": 0.875,
+        "successes": 21,
+        "total": 24
+      },
+      "arm0_false_full_evidence_span": {
+        "rate": 0.54166667,
+        "successes": 13,
+        "total": 24
+      },
+      "arm1_all_evidence_spans": {
+        "rate": 0.41666667,
+        "successes": 10,
+        "total": 24
+      },
+      "arm1_all_groups": {
+        "rate": 0.875,
+        "successes": 21,
+        "total": 24
+      },
+      "arm1_false_full_evidence_span": {
+        "rate": 0.5,
+        "successes": 12,
+        "total": 24
+      },
+      "literal_improvement_case_ids": [
+        "authored_validation_v3_2_sha256_c0c2d4091eda6655d6e8f0bdbc01a155e39e637642f903e8da2d288fd6cac599"
+      ],
+      "literal_regression_case_ids": [],
+      "new_false_full_case_ids": [],
+      "strict_improvement_case_ids": [],
+      "strict_regression_case_ids": []
+    },
+    "decision": "DEVELOPMENT_GO_NEW_REVIEWED_CANARY_REQUIRED",
+    "frozen_docs_69": {
+      "arm0_all_evidence_spans": {
+        "rate": 0.28985507,
+        "successes": 20,
+        "total": 69
+      },
+      "arm0_all_groups": {
+        "rate": 0.91304348,
+        "successes": 63,
+        "total": 69
+      },
+      "arm0_false_full_evidence_span": {
+        "rate": 0.71014493,
+        "successes": 49,
+        "total": 69
+      },
+      "arm1_all_evidence_spans": {
+        "rate": 0.28985507,
+        "successes": 20,
+        "total": 69
+      },
+      "arm1_all_groups": {
+        "rate": 0.91304348,
+        "successes": 63,
+        "total": 69
+      },
+      "arm1_false_full_evidence_span": {
+        "rate": 0.71014493,
+        "successes": 49,
+        "total": 69
+      },
+      "literal_improvement_case_ids": [],
+      "literal_regression_case_ids": [],
+      "new_false_full_case_ids": [],
+      "strict_improvement_case_ids": [],
+      "strict_regression_case_ids": []
+    },
+    "gate_checks": {
+      "authored_literal_improves": true,
+      "authored_literal_regression_zero": true,
+      "authored_strict_regression_zero": true,
+      "exact_all": true,
+      "frozen_literal_regression_zero": true,
+      "frozen_strict_regression_zero": true,
+      "new_false_full_zero": true,
+      "target_both_literal_spans_cited": true,
+      "target_provisional_sibling_requires_literals": true,
+      "temporal_violation_zero": true
+    },
+    "gate_passed": true,
+    "surface_query_applied_case_ids": [
+      "authored_validation_v3_2_sha256_c0c2d4091eda6655d6e8f0bdbc01a155e39e637642f903e8da2d288fd6cac599"
+    ],
+    "surface_query_version": "entity-coordinated-surface-query-v3.3.1",
+    "target": {
+      "arm0_score": {
+        "all_evidence_spans_hit": false,
+        "all_groups_hit": false,
+        "cited_chunk_ids": [
+          "chunk_sha256_2b7e2be886cc25012688fcf26a45a4db94e8610ed2f3f00e3c7035537970a3a1",
+          "chunk_sha256_96aad618428b25d25835e640f79d23f936d4d5404ccaf27781d1b619456cd270",
+          "chunk_sha256_bbe5746885a2c648d3773775423566941d7592885e26d6d1f56124af130a8810"
+        ],
+        "earliest_failure_stage": "RETRIEVAL",
+        "evidence_group_count": 2,
+        "evidence_span_hits": {
+          "evidence_1": false,
+          "evidence_2": false
+        },
+        "exact_citations": true,
+        "false_full": true,
+        "false_full_evidence_span": true,
+        "group_hit_count": 0,
+        "group_hits": {
+          "evidence_1": false,
+          "evidence_2": false
+        },
+        "honest_partial_or_abstain": false,
+        "response_mode": "full_answer",
+        "temporal_violation_chunk_ids": []
+      },
+      "arm1_citations": [
+        "- 명성 58,950 이상의 캐릭터로 탐사를 진행할 수 있습니다.",
+        "- 탐사는 계정 단위로 진행되며, 한 번에 하나의 탐사만 진행할 수 있습니다.",
+        "| 기억의 숲 탐사 | 평소 진입이 금지되었던 기억의 숲을 지나는 위험한 교역로. | 4시간 | 순례의 인장 120개 빛의 출정령 : 단기 1개 |",
+        "| 종말의 계시 1개를 획득할 수 있습니다. |"
+      ],
+      "arm1_score": {
+        "all_evidence_spans_hit": true,
+        "all_groups_hit": false,
+        "cited_chunk_ids": [
+          "chunk_sha256_2b7e2be886cc25012688fcf26a45a4db94e8610ed2f3f00e3c7035537970a3a1",
+          "chunk_sha256_96aad618428b25d25835e640f79d23f936d4d5404ccaf27781d1b619456cd270",
+          "chunk_sha256_bbe5746885a2c648d3773775423566941d7592885e26d6d1f56124af130a8810"
+        ],
+        "earliest_failure_stage": "RETRIEVAL",
+        "evidence_group_count": 2,
+        "evidence_span_hits": {
+          "evidence_1": true,
+          "evidence_2": true
+        },
+        "exact_citations": true,
+        "false_full": true,
+        "false_full_evidence_span": false,
+        "group_hit_count": 0,
+        "group_hits": {
+          "evidence_1": false,
+          "evidence_2": false
+        },
+        "honest_partial_or_abstain": false,
+        "response_mode": "full_answer",
+        "temporal_violation_chunk_ids": []
+      },
+      "case_id": "authored_validation_v3_2_sha256_c0c2d4091eda6655d6e8f0bdbc01a155e39e637642f903e8da2d288fd6cac599",
+      "original_strict_all_groups": false,
+      "provisional_equivalent_official_all_groups": true,
+      "question": "광휘의 행로 탐사에 필요한 최소 명성과 동시에 진행할 수 있는 탐사 수는 어떻게 돼?",
+      "sibling_proposal_applied": false,
+      "surface_query_audit": {
+        "coordinator": "과",
+        "coordinator_tag": "JKB",
+        "domain_keyword_rule_count": 0,
+        "entity_phrase": "광휘의 행로",
+        "mapping": "planner_question_order_to_surface_order",
+        "requirement_surfaces": [
+          {
+            "exact_question_substring": true,
+            "requirement_id": "requirement_1",
+            "surface": "탐사에 필요한 최소 명성"
+          },
+          {
+            "exact_question_substring": true,
+            "requirement_id": "requirement_2",
+            "surface": "동시에 진행할 수 있는 탐사 수"
+          }
+        ],
+        "version": "entity-coordinated-surface-query-v3.3.1"
+      }
+    }
+  },
+  "source_commit": "5cdc150df4de68096445c4d97824d4d159a94250"
+}

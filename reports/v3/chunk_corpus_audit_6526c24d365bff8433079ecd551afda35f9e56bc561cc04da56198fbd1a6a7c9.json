@@ -1,0 +1,313 @@
+{
+  "built_at": "2026-07-18T01:10:47+09:00",
+  "by_source": {
+    "dnf_account_policy": {
+      "char_length": {
+        "max": 1800,
+        "mean": 1684.83,
+        "min": 223,
+        "p50": 1759,
+        "p90": 1793,
+        "p95": 1797,
+        "p99": 1799
+      },
+      "default_exposure_chunks": 17,
+      "default_exposure_documents": 1,
+      "documents": 51,
+      "dom_chunks": 607,
+      "lexical_token_count": {
+        "max": 628,
+        "mean": 506.3,
+        "min": 66,
+        "p50": 525,
+        "p90": 563,
+        "p95": 579,
+        "p99": 594
+      },
+      "visual_ocr_chunks": 0
+    },
+    "dnf_event": {
+      "char_length": {
+        "max": 1400,
+        "mean": 519.05,
+        "min": 80,
+        "p50": 339,
+        "p90": 1297,
+        "p95": 1387,
+        "p99": 1399
+      },
+      "default_exposure_chunks": 150,
+      "default_exposure_documents": 24,
+      "documents": 24,
+      "dom_chunks": 150,
+      "lexical_token_count": {
+        "max": 512,
+        "mean": 164.96,
+        "min": 23,
+        "p50": 107,
+        "p90": 383,
+        "p95": 432,
+        "p99": 496
+      },
+      "visual_ocr_chunks": 8
+    },
+    "dnf_faq": {
+      "char_length": {
+        "max": 1197,
+        "mean": 331.81,
+        "min": 96,
+        "p50": 254,
+        "p90": 649,
+        "p95": 785,
+        "p99": 1026
+      },
+      "default_exposure_chunks": 282,
+      "default_exposure_documents": 279,
+      "documents": 279,
+      "dom_chunks": 282,
+      "lexical_token_count": {
+        "max": 472,
+        "mean": 108.18,
+        "min": 28,
+        "p50": 78,
+        "p90": 219,
+        "p95": 291,
+        "p99": 426
+      },
+      "visual_ocr_chunks": 13
+    },
+    "dnf_game_guide": {
+      "char_length": {
+        "max": 1400,
+        "mean": 425.26,
+        "min": 80,
+        "p50": 274,
+        "p90": 1089,
+        "p95": 1348,
+        "p99": 1390
+      },
+      "default_exposure_chunks": 973,
+      "default_exposure_documents": 125,
+      "documents": 126,
+      "dom_chunks": 974,
+      "lexical_token_count": {
+        "max": 576,
+        "mean": 139.64,
+        "min": 22,
+        "p50": 86,
+        "p90": 367,
+        "p95": 435,
+        "p99": 511
+      },
+      "visual_ocr_chunks": 1
+    },
+    "dnf_monthly_item": {
+      "char_length": {
+        "max": 1400,
+        "mean": 711.45,
+        "min": 103,
+        "p50": 536,
+        "p90": 1270,
+        "p95": 1282,
+        "p99": 1400
+      },
+      "default_exposure_chunks": 1,
+      "default_exposure_documents": 1,
+      "documents": 14,
+      "dom_chunks": 49,
+      "lexical_token_count": {
+        "max": 495,
+        "mean": 233.0,
+        "min": 35,
+        "p50": 181,
+        "p90": 408,
+        "p95": 408,
+        "p99": 495
+      },
+      "visual_ocr_chunks": 0
+    },
+    "dnf_notice": {
+      "char_length": {
+        "max": 1200,
+        "mean": 460.99,
+        "min": 80,
+        "p50": 353,
+        "p90": 1165,
+        "p95": 1186,
+        "p99": 1198
+      },
+      "default_exposure_chunks": 786,
+      "default_exposure_documents": 396,
+      "documents": 396,
+      "dom_chunks": 786,
+      "lexical_token_count": {
+        "max": 706,
+        "mean": 160.34,
+        "min": 27,
+        "p50": 109,
+        "p90": 402,
+        "p95": 437,
+        "p99": 513
+      },
+      "visual_ocr_chunks": 0
+    },
+    "dnf_seria_shop": {
+      "char_length": {
+        "max": 1400,
+        "mean": 732.63,
+        "min": 107,
+        "p50": 564,
+        "p90": 1386,
+        "p95": 1396,
+        "p99": 1399
+      },
+      "default_exposure_chunks": 170,
+      "default_exposure_documents": 30,
+      "documents": 72,
+      "dom_chunks": 476,
+      "lexical_token_count": {
+        "max": 679,
+        "mean": 250.33,
+        "min": 42,
+        "p50": 200,
+        "p90": 486,
+        "p95": 528,
+        "p99": 667
+      },
+      "visual_ocr_chunks": 0
+    },
+    "dnf_update": {
+      "char_length": {
+        "max": 1400,
+        "mean": 483.96,
+        "min": 81,
+        "p50": 303,
+        "p90": 1273,
+        "p95": 1360,
+        "p99": 1395
+      },
+      "default_exposure_chunks": 148,
+      "default_exposure_documents": 15,
+      "documents": 18,
+      "dom_chunks": 253,
+      "lexical_token_count": {
+        "max": 508,
+        "mean": 153.82,
+        "min": 25,
+        "p50": 95,
+        "p90": 385,
+        "p95": 437,
+        "p99": 508
+      },
+      "visual_ocr_chunks": 0
+    }
+  },
+  "by_status": {
+    "current": {
+      "default_exposure_chunks": 2527,
+      "documents": 871,
+      "dom_chunks": 2527,
+      "visual_ocr_chunks": 22
+    },
+    "expired": {
+      "default_exposure_chunks": 0,
+      "documents": 55,
+      "dom_chunks": 354,
+      "visual_ocr_chunks": 0
+    },
+    "superseded": {
+      "default_exposure_chunks": 0,
+      "documents": 51,
+      "dom_chunks": 591,
+      "visual_ocr_chunks": 0
+    },
+    "unknown": {
+      "default_exposure_chunks": 0,
+      "documents": 3,
+      "dom_chunks": 105,
+      "visual_ocr_chunks": 0
+    }
+  },
+  "chunker_version": "dnf_offset_chunk_v3.1",
+  "gates": {
+    "all_expected_sources_represented": true,
+    "chunk_id_mismatches": 0,
+    "chunk_index_sequence_mismatches": 0,
+    "chunker_version_mismatches": 0,
+    "default_exposure_policy_violations": 0,
+    "document_content_id_set_mismatch": 0,
+    "document_count_matches_expected": true,
+    "document_without_dom_chunk": 0,
+    "duplicate_chunk_ids": 0,
+    "duplicate_content_ids": 0,
+    "duplicate_document_ids": 0,
+    "empty_display_or_retrieval_text": 0,
+    "evidence_policy_mismatches": 0,
+    "invalid_offset_source": 0,
+    "invalid_offsets": 0,
+    "non_whitespace_coverage_gaps": 0,
+    "normalized_text_hash_mismatches": 0,
+    "offset_mismatches": 0,
+    "orphan_multi_document_chunks": 0,
+    "oversized_chunks": 0,
+    "parent_content_hash_mismatches": 0,
+    "parent_default_exposure_mismatches": 0,
+    "parent_metadata_mismatches": 0,
+    "retrieval_text_mismatches": 0,
+    "schema_missing_required_fields": 0,
+    "schema_version_mismatches": 0,
+    "source_config_mismatches": 0,
+    "token_count_method_mismatches": 0,
+    "token_count_mismatches": 0,
+    "unexpected_visual_chunk_parent": 0,
+    "unknown_parent_document": 0,
+    "visual_document_without_visual_chunk": 0
+  },
+  "indexing_decision": "GO",
+  "manifest_path": "data/v3/chunks/chunk_corpus_manifest_87fb0fc3477088cf6245e8bd3fd7719374a7dbf778094d5e36fa43458dd54c00.json",
+  "manifest_sha256": "87fb0fc3477088cf6245e8bd3fd7719374a7dbf778094d5e36fa43458dd54c00",
+  "report_schema_version": "dnf_chunk_corpus_audit_v3.1",
+  "summary": {
+    "char_length": {
+      "max": 1800,
+      "mean": 692.4,
+      "min": 80,
+      "p50": 419,
+      "p90": 1739,
+      "p95": 1777,
+      "p99": 1796
+    },
+    "chunk_type": {
+      "mixed": 1304,
+      "section": 1561,
+      "table": 173,
+      "text": 539,
+      "visual_ocr": 22
+    },
+    "chunks": 3599,
+    "contents": 980,
+    "default_exposure_chunks": 2527,
+    "default_exposure_documents": 871,
+    "document_status": {
+      "current": 871,
+      "expired": 55,
+      "superseded": 51,
+      "unknown": 3
+    },
+    "documents": 980,
+    "dom_chunks": 3577,
+    "heading_path_dom_chunks": 3287,
+    "lexical_token_count": {
+      "max": 706,
+      "mean": 222.0,
+      "min": 22,
+      "p50": 135,
+      "p90": 521,
+      "p95": 543,
+      "p99": 582
+    },
+    "table_or_mixed_dom_chunks": 1477,
+    "visual_evidence_documents": 18,
+    "visual_ocr_chunks": 22
+  }
+}

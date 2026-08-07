@@ -1,0 +1,69 @@
+{
+  "built_at": "2026-07-18T00:30:00+09:00",
+  "chunker_version": "dnf_offset_chunk_pilot_v3.1",
+  "chunks": {
+    "path": "data/v3/chunks/chunks_pilot_fe9460fb4182983aaeceda2def6c41129c86f9004689a19ef969f3cc6b5517d7.jsonl",
+    "row_count": 583,
+    "sha256": "fe9460fb4182983aaeceda2def6c41129c86f9004689a19ef969f3cc6b5517d7"
+  },
+  "inputs": [
+    {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "role": "normalized_documents",
+      "row_count": 980,
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    {
+      "path": "data/v3/normalized/document_contents_dnf_official_detail_v3.1_5fe50f7fcbd7adbf415bbb1f1ebb8ef3684f7b2c61ac2b2ace9d0e4365b3080e.jsonl",
+      "role": "normalized_contents",
+      "row_count": 980,
+      "sha256": "5fe50f7fcbd7adbf415bbb1f1ebb8ef3684f7b2c61ac2b2ace9d0e4365b3080e"
+    },
+    {
+      "path": "data/v3/normalized/normalized_corpus_manifest_3ba1afc14def8d2da1f7297679f02df6ff690e6fd18298931d3b108dcd064ebf.json",
+      "role": "normalized_manifest",
+      "row_count": null,
+      "sha256": "3ba1afc14def8d2da1f7297679f02df6ff690e6fd18298931d3b108dcd064ebf"
+    }
+  ],
+  "manifest_schema_version": "dnf_chunk_pilot_manifest_v3.1",
+  "selection": {
+    "path": "data/v3/chunks/chunk_pilot_selection_af717de4e375b7c6f74a4a6da41640280c1ea2c4c5550278c1811c2954553b2b.jsonl",
+    "row_count": 63,
+    "sha256": "af717de4e375b7c6f74a4a6da41640280c1ea2c4c5550278c1811c2954553b2b"
+  },
+  "source_config": {
+    "dnf_account_policy": {
+      "max_chars": 1800,
+      "overlap_chars": 200
+    },
+    "dnf_event": {
+      "max_chars": 1400,
+      "overlap_chars": 160
+    },
+    "dnf_faq": {
+      "max_chars": 1200,
+      "overlap_chars": 120
+    },
+    "dnf_game_guide": {
+      "max_chars": 1400,
+      "overlap_chars": 160
+    },
+    "dnf_monthly_item": {
+      "max_chars": 1400,
+      "overlap_chars": 160
+    },
+    "dnf_notice": {
+      "max_chars": 1200,
+      "overlap_chars": 120
+    },
+    "dnf_seria_shop": {
+      "max_chars": 1400,
+      "overlap_chars": 160
+    },
+    "dnf_update": {
+      "max_chars": 1400,
+      "overlap_chars": 160
+    }
+  }
+}

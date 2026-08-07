@@ -1,0 +1,98 @@
+{
+  "built_at": "2026-07-18T01:51:13+09:00",
+  "dense_pilot_version": "dnf_bge_m3_dense_pilot_v3.1",
+  "diagnostic": {
+    "bm25_control_hit_at_5": 4,
+    "bm25_default_title_hit_at_5": 8,
+    "default_title_lookup_cases": 8,
+    "dense_control_hit_at_5": 4,
+    "dense_default_policy_violations": 0,
+    "dense_default_title_hit_at_5": 8,
+    "diagnostic_decision": "GO",
+    "historical_and_visual_control_cases": 4,
+    "mean_top5_chunk_overlap": 0.516667
+  },
+  "diagnostics_path": "data/v3/retrieval/dense_pilot_diagnostics_0f79f78369115feeed1773573b2f771039761929db2bec0cf158321df43dacea.jsonl",
+  "diagnostics_sha256": "0f79f78369115feeed1773573b2f771039761929db2bec0cf158321df43dacea",
+  "full_dense_index_decision": "GO",
+  "gates": {
+    "all_eight_sources_represented": true,
+    "all_four_statuses_represented": true,
+    "chunk_count_is_467": true,
+    "default_chunk_count_is_272": true,
+    "default_filter_parity_mismatches": 0,
+    "diagnostic_decision_is_go": true,
+    "document_count_is_63": true,
+    "duplicate_chunk_ids": 0,
+    "metadata_ordinal_mismatches": 0,
+    "non_finite_embedding_values": 0,
+    "non_unit_embedding_rows": 0,
+    "repeat_encode_nondeterminism": 0,
+    "tokenizer_rows_mismatch": 0,
+    "tokens_over_2048": 0,
+    "visual_chunk_count_is_22": true
+  },
+  "manifest_path": "data/v3/indexes/dense_pilot_manifest_3494f45113fe2f0e077becc3c905893d07869e4c1cb922511872676aec6d4438.json",
+  "manifest_sha256": "3494f45113fe2f0e077becc3c905893d07869e4c1cb922511872676aec6d4438",
+  "model": {
+    "batch_size": 2,
+    "device": "cuda",
+    "device_name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "embedding_dimension": 1024,
+    "embedding_dtype": "float32",
+    "max_sequence_length": 2048,
+    "model_name": "BAAI/bge-m3",
+    "model_revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "normalize_embeddings": true,
+    "numpy_version": "2.4.4",
+    "repeat_encode_max_abs_diff": 1.7695128917694092e-07,
+    "repeat_encode_rows": 16,
+    "sentence_transformers_version": "5.5.1",
+    "similarity": "cosine_via_normalized_dot_product",
+    "torch_version": "2.11.0+cu128"
+  },
+  "report_schema_version": "dnf_dense_pilot_report_v3.1",
+  "summary": {
+    "chunks": 467,
+    "default_exposure_chunks": 272,
+    "documents": 63,
+    "embedding_norm_max": 1.0000001192092896,
+    "embedding_norm_min": 0.9999999403953552,
+    "embedding_shape": [
+      467,
+      1024
+    ],
+    "source": {
+      "dnf_account_policy": 60,
+      "dnf_event": 39,
+      "dnf_faq": 29,
+      "dnf_game_guide": 128,
+      "dnf_monthly_item": 14,
+      "dnf_notice": 28,
+      "dnf_seria_shop": 22,
+      "dnf_update": 147
+    },
+    "status": {
+      "current": 294,
+      "expired": 24,
+      "superseded": 44,
+      "unknown": 105
+    },
+    "visual_ocr_chunks": 22
+  },
+  "token_measurement": {
+    "over_requested_max": 0,
+    "requested_max_sequence_length": 2048,
+    "row_count": 467,
+    "token_length": {
+      "max": 1113,
+      "mean": 368.14,
+      "min": 54,
+      "p50": 225,
+      "p90": 856,
+      "p95": 902,
+      "p99": 1032
+    },
+    "truncation_detected": false
+  }
+}

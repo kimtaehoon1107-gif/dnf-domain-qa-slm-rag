@@ -1,0 +1,583 @@
+{
+  "by_source": {
+    "dnf_account_policy": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "policy:current": 1,
+        "policy:middle_old": 1,
+        "policy:middle_recent": 1,
+        "policy:oldest": 1,
+        "policy:recent": 1
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 5,
+      "status_distribution": {
+        "current": 1,
+        "superseded": 4
+      },
+      "success": 5
+    },
+    "dnf_event": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "event:current": 3,
+        "event:expired": 3
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 6,
+      "status_distribution": {
+        "current": 3,
+        "expired": 3
+      },
+      "success": 6
+    },
+    "dnf_faq": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "faq:PC방": 2,
+        "faq:게임문의": 2,
+        "faq:결제": 2,
+        "faq:던파ON": 2,
+        "faq:복구": 2,
+        "faq:설치/실행": 2,
+        "faq:아이디정보/보안": 2,
+        "faq:이벤트": 2
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 16,
+      "status_distribution": {
+        "current": 14,
+        "unknown": 2
+      },
+      "success": 16
+    },
+    "dnf_game_guide": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "guide:(구) 콘텐츠": 1,
+        "guide:115레벨 주요 시스템": 1,
+        "guide:기타": 1,
+        "guide:길드": 1,
+        "guide:레기온": 1,
+        "guide:레이드": 1
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 6,
+      "status_distribution": {
+        "current": 6
+      },
+      "success": 6
+    },
+    "dnf_monthly_item": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "monthly:current": 1,
+        "monthly:expired_control": 2,
+        "monthly:expired_eligible": 2
+      },
+      "failed": 1,
+      "parser_failed": 0,
+      "selected": 5,
+      "status_distribution": {
+        "current": 1,
+        "expired": 4
+      },
+      "success": 4
+    },
+    "dnf_notice": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "notice:account_policy": 2,
+        "notice:enforcement_notice": 2,
+        "notice:general_notice": 2,
+        "notice:hotfix": 2,
+        "notice:known_issue": 2,
+        "notice:maintenance": 2
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 12,
+      "status_distribution": {
+        "current": 12
+      },
+      "success": 12
+    },
+    "dnf_seria_shop": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "shop:active_has_end": 2,
+        "shop:active_no_end": 2,
+        "shop:expired_control": 2,
+        "shop:expired_eligible": 2
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 8,
+      "status_distribution": {
+        "current": 4,
+        "expired": 4
+      },
+      "success": 8
+    },
+    "dnf_update": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "update:live_patch": 4,
+        "update:preview_control": 2
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 6,
+      "status_distribution": {
+        "current": 4,
+        "unknown": 2
+      },
+      "success": 6
+    }
+  },
+  "collector_version": "dnf_detail_pilot_v3.0",
+  "decision_reason": "모든 출처의 실제 성공 표본과 95% 이상 fetch success, 특수 locator·raw hash·노출 정책 게이트를 충족했다.",
+  "extraction": {
+    "date_metadata_rows": 39,
+    "date_signal_rows": 44,
+    "guide_refresh_exact_match_rows": 0,
+    "guide_refresh_rows": 6,
+    "heading_rows": 47,
+    "image_count": 657,
+    "image_rows": 41,
+    "price_signal_rows": 24,
+    "table_count": 142,
+    "table_rows": 29
+  },
+  "failure_rows": [
+    {
+      "canonical_url": "https://df.nexon.com/community/news/monthlyitem",
+      "error": "HTTP 404 or empty response",
+      "fetch_status": "failed",
+      "http_status": 404,
+      "source_id": "dnf_monthly_item"
+    }
+  ],
+  "fetched_at": "2026-07-17T21:10:15.3758126+09:00",
+  "full_collection_decision": "GO",
+  "gate_details": {
+    "default_exposure_violation_urls": [],
+    "faq_resolution_error_urls": [],
+    "policy_revision_error_urls": [],
+    "raw_hash_mismatch_paths": [],
+    "text_empty_urls": [],
+    "title_empty_urls": []
+  },
+  "ledger_path": "data/v3/collections/detail_collection_ledger_7af4b91d44a8ad56dc29c766c781e681bf7f36aa27f8c83874d5693daa23dec1.jsonl",
+  "ledger_sha256": "7af4b91d44a8ad56dc29c766c781e681bf7f36aa27f8c83874d5693daa23dec1",
+  "manifest_path": "data/v3/collections/detail_collection_manifest_38a8d618c4164c9e37c1cfcd8cd13e560644505370ea74529b39b51a21b0bbdd.json",
+  "manifest_sha256": "38a8d618c4164c9e37c1cfcd8cd13e560644505370ea74529b39b51a21b0bbdd",
+  "preview_path": "data/v3/collections/detail_extraction_preview_a9a5c9cf6abad26bcc0ad305fe3269d7d30f764ad9988981dc53b8ff5c7eed24.jsonl",
+  "preview_sha256": "a9a5c9cf6abad26bcc0ad305fe3269d7d30f764ad9988981dc53b8ff5c7eed24",
+  "registry_path": "data/v3/discovery/source_registry_04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a.jsonl",
+  "registry_sha256": "04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a",
+  "report_schema_version": "dnf_detail_collection_pilot_v3.0",
+  "selection": {
+    "adjustments": [
+      "event: no upcoming rows in frozen registry; allocated sample to current/expired"
+    ],
+    "requested_by_source": {
+      "dnf_account_policy": 5,
+      "dnf_event": 6,
+      "dnf_faq": 16,
+      "dnf_game_guide": 6,
+      "dnf_monthly_item": 5,
+      "dnf_notice": 12,
+      "dnf_seria_shop": 8,
+      "dnf_update": 6
+    },
+    "selected_by_source": {
+      "dnf_account_policy": 5,
+      "dnf_event": 6,
+      "dnf_faq": 16,
+      "dnf_game_guide": 6,
+      "dnf_monthly_item": 5,
+      "dnf_notice": 12,
+      "dnf_seria_shop": 8,
+      "dnf_update": 6
+    },
+    "selected_total": 64,
+    "selection_version": "dnf_detail_pilot_v3.0"
+  },
+  "summary": {
+    "blocked": 0,
+    "default_exposure_violations": 0,
+    "failed": 1,
+    "faq_resolution_errors": 0,
+    "missing_source_success": [],
+    "parser_failed": 0,
+    "parser_warnings_and_failures_recorded": true,
+    "policy_revision_errors": 0,
+    "raw_hash_mismatches": 0,
+    "selected_total": 64,
+    "success": 63,
+    "success_rate": 0.984375,
+    "success_text_empty": 0,
+    "success_title_empty": 0
+  },
+  "warning_rows": [
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2026-03-15&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2016-09-18&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2021-01-21&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2011-09-17&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2025-11-01&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/2026newchargift",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "navigation_or_footer_signal",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/summerboostup26",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "navigation_or_footer_signal",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pr/newfacewithnxp",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/df/pg/realize",
+      "source_id": "dnf_event",
+      "warnings": [
+        "registry_title_not_found_in_selected_content",
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/arcana",
+      "source_id": "dnf_event",
+      "warnings": [
+        "registry_title_not_found_in_selected_content",
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/crystalball",
+      "source_id": "dnf_event",
+      "warnings": [
+        "registry_title_not_found_in_selected_content",
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4847",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4810",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4987",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5967",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "short_extracted_text"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1206",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1494",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "registry_title_not_found_in_selected_content",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1269",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1391",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1512",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/monthlyitem",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "fetch_failed"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/337",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "registry_title_not_found_in_selected_content",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/425",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "registry_title_not_found_in_selected_content",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/593",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "registry_title_not_found_in_selected_content",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/619",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "registry_title_not_found_in_selected_content",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923190",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923322",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926636",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927550",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923515",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927232",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922724",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925343",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922984",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927771",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922896",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924930",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/597",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/629",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/423",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/640",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/550",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/552",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/566",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/600",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/update/2927810",
+      "source_id": "dnf_update",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/update/2927233",
+      "source_id": "dnf_update",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/update/2927399",
+      "source_id": "dnf_update",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    }
+  ]
+}

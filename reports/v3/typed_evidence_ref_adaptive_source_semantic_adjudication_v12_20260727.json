@@ -1,0 +1,98 @@
+{
+  "evaluation_role": "human_product_semantic_adjudication_of_post_hoc_source_rescore",
+  "headline_replacement_allowed": false,
+  "source_report": "reports/v3/typed_evidence_ref_adaptive_source_addendum_rescore_v12_20260727.json",
+  "source_output": "outputs/v3/diagnostics/typed_evidence_ref_adaptive_source_addendum_rescore_v12_20260727.jsonl",
+  "official_sealed_one_shot_preserved": {
+    "successes": 37,
+    "total": 64
+  },
+  "automatic_semantic_false_full": {
+    "count": 14,
+    "slots": [3, 4, 6, 29, 30, 31, 33, 36, 43, 44, 46, 51, 62, 64]
+  },
+  "human_product_semantic_false_full": {
+    "count": 3,
+    "slots": [3, 30, 51]
+  },
+  "evaluation_or_equivalent_evidence_false_positive": {
+    "count": 11,
+    "slots": [4, 6, 29, 31, 33, 36, 43, 44, 46, 62, 64]
+  },
+  "citation_coordinates_exact": {
+    "successes": 14,
+    "total": 14
+  },
+  "adjudications": [
+    {
+      "slot_ordinal": 3,
+      "verdict": "real_product_semantic_false_full",
+      "reason": "질문은 5주차지만 저장 실행은 값이 우연히 같은 1주차 문서를 인용했다. 값 4·12만 맞고 주차 identity 근거가 틀렸다."
+    },
+    {
+      "slot_ordinal": 4,
+      "verdict": "evaluation_false_positive",
+      "reason": "공식 영향 문장을 직접 인용했으며 골드 요약과 표현만 다르다."
+    },
+    {
+      "slot_ordinal": 6,
+      "verdict": "evaluation_false_positive",
+      "reason": "같은 공식 문서의 적용 일자 문장이 직접 근거다."
+    },
+    {
+      "slot_ordinal": 29,
+      "verdict": "evaluation_false_positive",
+      "reason": "공식 표의 완전한 행을 답했고 골드가 행 앞부분만 기록했다."
+    },
+    {
+      "slot_ordinal": 30,
+      "verdict": "real_product_semantic_false_full",
+      "reason": "전체 지원 레벨 110·115 중 115만 답하고 full로 노출했다."
+    },
+    {
+      "slot_ordinal": 31,
+      "verdict": "evaluation_false_positive",
+      "reason": "캐릭터당 최대 10개라는 공식 직접 근거가 있으며 addendum에서 승인됐다."
+    },
+    {
+      "slot_ordinal": 33,
+      "verdict": "evaluation_false_positive",
+      "reason": "7일 경과 시 철회 불가는 구매 후 7일 이내라는 공식 조건과 직접 동등하다."
+    },
+    {
+      "slot_ordinal": 36,
+      "verdict": "evaluation_false_positive",
+      "reason": "게임 내 보안 메뉴 또는 홈페이지라는 공식 FAQ 직접 근거가 addendum에서 승인됐다."
+    },
+    {
+      "slot_ordinal": 43,
+      "verdict": "evaluation_false_positive",
+      "reason": "공식 정책의 예외 세 가지를 모두 답했으며 골드가 일부만 기록했다."
+    },
+    {
+      "slot_ordinal": 44,
+      "verdict": "evaluation_false_positive",
+      "reason": "ID 보호 의무 두 항목을 공식 정책 문장 그대로 답했다."
+    },
+    {
+      "slot_ordinal": 46,
+      "verdict": "evaluation_false_positive",
+      "reason": "넥슨 및 게임 홈페이지 공지를 통한 안내라는 공식 직접 근거다."
+    },
+    {
+      "slot_ordinal": 51,
+      "verdict": "real_product_semantic_false_full",
+      "reason": "현재 공식 표에 상의 클론 가격이 6,500 세라·2,600 세라·15 골드 코인으로 여러 행 존재하는데, 거래 타입이나 구매 방식 한정 없이 15 골드 코인만 유일한 가격처럼 full로 노출했다. 봉인 골드의 2,600 세라 단일값도 과도하게 좁아 ambiguity 또는 전체 가격 응답이 필요하다."
+    },
+    {
+      "slot_ordinal": 62,
+      "verdict": "evaluation_false_positive",
+      "reason": "같은 6월 상품 레코드 안의 동등한 삭제 시각 근거다."
+    },
+    {
+      "slot_ordinal": 64,
+      "verdict": "evaluation_false_positive",
+      "reason": "답변과 공식 인용문이 사실상 동일하다."
+    }
+  ]
+}

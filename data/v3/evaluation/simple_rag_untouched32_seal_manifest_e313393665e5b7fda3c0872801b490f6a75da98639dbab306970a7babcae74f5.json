@@ -1,0 +1,118 @@
+{
+  "audit": {
+    "coordinate_failures": [],
+    "dimension_counts": {
+      "boolean_direction": 4,
+      "direct_fact": 4,
+      "multi_requirement": 4,
+      "revision_selection": 4,
+      "sibling_relation": 4,
+      "table_attribute": 4,
+      "temporal_role": 4,
+      "unsupported_or_partial": 4
+    },
+    "evidence_coordinate_count": 49,
+    "gate_pass": true,
+    "gates": {
+      "all_human_approved": true,
+      "as_of_2026_07_28": true,
+      "dimension_matrix_8_by_4": true,
+      "evidence_coordinate_count_49": true,
+      "evidence_coordinates_exact": true,
+      "execution_open": true,
+      "honest_unsupported_slots_exact": true,
+      "question_duplicates_zero": true,
+      "requirement_count_53": true,
+      "row_count_32": true,
+      "source_matrix_8_by_4": true,
+      "training_locked": true
+    },
+    "honest_unsupported_slots": [
+      4,
+      16,
+      24,
+      32
+    ],
+    "requirement_count": 53,
+    "source_counts": {
+      "dnf_account_policy": 4,
+      "dnf_event": 4,
+      "dnf_faq": 4,
+      "dnf_game_guide": 4,
+      "dnf_monthly_item": 4,
+      "dnf_notice": 4,
+      "dnf_seria_shop": 4,
+      "dnf_update": 4
+    }
+  },
+  "candidate_input": {
+    "path": "data/review/typed_evidence_ref_untouched32_candidate_20260728.jsonl",
+    "sha256": "2a131c3425e2c8d7affc848ab5b335d31173aa6fd01f73f985b5e851157a718a"
+  },
+  "evaluation_role": "human_reviewed_untouched32_first_one_shot_not_parent_blind",
+  "freezer_version": "simple-rag-untouched32-freezer-20260728-v1",
+  "inputs": {
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "components": [
+      {
+        "path": "src/v3/simple_rag_incremental_guards.py",
+        "sha256": "f0949da6df1a6d5a97806496fd5ebff8006ba9ac4b83f53aee1650f2e6147aad"
+      },
+      {
+        "path": "src/v3/simple_rag_minimal_verifier.py",
+        "sha256": "1cafa70624864f4bf7608c15d49fd062c626bab184c8491fba7fc6abffe56a98"
+      },
+      {
+        "path": "src/v3/run_simple_rag_minimal_verifier_new_claim32_ab.py",
+        "sha256": "e5e7f4da6ae5a68eafd78f34e843407dc079aff070669732135c500ed7a5d7c7"
+      }
+    ],
+    "legacy_simple_rag": {
+      "path": "C:/t/dnfv2/src/v3/simple_domain_rag.py",
+      "sha256": "b7714a3e4c0cf52c7480f8d777ec73dff138b6c58ea11b4ecfb33edc0880145b"
+    }
+  },
+  "manifest_version": "simple-rag-untouched32-seal-v1",
+  "model": {
+    "blob_sha256": "a3de86cd1c132c822487ededd47a324c50491393e6565cd14bafa40d0b8e686f",
+    "digest": "e737aff7b8d457961517eb4895c0c1c597867d943a7f8dc82965eb826de324b8",
+    "num_ctx": 8192,
+    "tag": "qwen3-8b:ctx8192"
+  },
+  "permissions": {
+    "execution_allowed": true,
+    "maximum_execution_attempts": 1,
+    "rerun_after_results_opened": false,
+    "training_allowed": false
+  },
+  "pipeline": {
+    "included_stages": [
+      "A1_subject_period_identity",
+      "A2_relation_value_colocation",
+      "A3_explicit_temporal_conflict",
+      "B1_v2_table_subject_attribute_value_guard",
+      "B3_unique_whitespace_quote_recovery",
+      "B4_v2_normalized_factual_value_verifier"
+    ],
+    "legacy_source_commit": "f34eec002196fb008b411da76d9d8f4772a6dc3c",
+    "name": "simple-rag-v2-plus-b1-b3-b4",
+    "rerank_depth": 5,
+    "retrieval_depth": 20
+  },
+  "review": {
+    "decision": "approve_32_of_32",
+    "post_run_gold_mutation_allowed": false,
+    "reviewed_at": "2026-07-28T17:36:49.530727+09:00",
+    "reviewer_id": "kimdh"
+  },
+  "sealed_at": "2026-07-28T17:36:49.834790+09:00",
+  "sealed_set": {
+    "path": "data/v3/evaluation/simple_rag_untouched32_sealed_6b2bc67087d255af1b4cfdc9076b8dfd8d0cce2b2194e2e2210af08eb8a95198.jsonl",
+    "row_count": 32,
+    "sha256": "6b2bc67087d255af1b4cfdc9076b8dfd8d0cce2b2194e2e2210af08eb8a95198"
+  },
+  "status": "sealed_human_reviewed_ready_for_exactly_one_execution"
+}

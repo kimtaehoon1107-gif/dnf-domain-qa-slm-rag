@@ -1,0 +1,27 @@
+{
+  "evaluator_version": "simple-subject-anchored-retrieval-ab-v1",
+  "case_count": 32,
+  "applied_case_count": 14,
+  "baseline_candidate_covered": 28,
+  "arm_candidate_covered": 31,
+  "newly_covered_slots": [
+    21,
+    22,
+    24
+  ],
+  "candidate_regression_slots": [],
+  "maximum_candidate_count": 8,
+  "blocked_citation_count": 5,
+  "blocked_slots": [
+    21,
+    22,
+    24
+  ],
+  "strict_success_blocked_slots": [],
+  "false_full_blocked_slots": [
+    21,
+    22
+  ],
+  "wall_clock_ms": 266843.89,
+  "output": "outputs/v3/simple_subject_anchored_retrieval_ab_cases.jsonl"
+}

@@ -1,0 +1,21 @@
+{
+  "evaluator_version": "simple-subject-anchored-retrieval-ab-v1",
+  "case_count": 1,
+  "applied_case_count": 1,
+  "baseline_candidate_covered": 0,
+  "arm_candidate_covered": 1,
+  "newly_covered_slots": [
+    24
+  ],
+  "candidate_regression_slots": [],
+  "maximum_candidate_count": 8,
+  "blocked_citation_count": 2,
+  "blocked_slots": [
+    24
+  ],
+  "strict_success_blocked_slots": [],
+  "false_full_blocked_slots": [],
+  "query_source": "planner-relation",
+  "wall_clock_ms": 29076.911,
+  "output": "outputs/v3/simple_subject_planner_relation_retrieval_ab_slot24.jsonl"
+}

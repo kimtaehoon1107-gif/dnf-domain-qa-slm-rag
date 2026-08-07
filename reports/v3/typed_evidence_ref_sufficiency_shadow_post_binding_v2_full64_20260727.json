@@ -1,0 +1,21 @@
+{
+  "evaluation_role": "adaptive_sufficiency_shadow_not_generalization_or_promotion",
+  "fallback_retrieval_calls": 0,
+  "generation_calls": 0,
+  "question_count": 64,
+  "requirement_count": 96,
+  "assessable_requirement_count": 21,
+  "would_trigger_requirement_count": 2,
+  "would_trigger_slots": [
+    5,
+    7
+  ],
+  "excluded_table_requirement_count": 1,
+  "excluded_unregistered_requirement_count": 74,
+  "inputs": {
+    "sealed_sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597",
+    "candidates_sha256": "31427d24a83a23f74adbd276204166f74514e0fc77931cfff5c7660d478229a5",
+    "results_sha256": "515ca70fa0893898faafd189493a0a0c61bbbfa8a35b9e8444681ee10d31ab69"
+  },
+  "output": "outputs/v3/diagnostics/typed_evidence_ref_sufficiency_shadow_post_binding_v2_full64_20260727.jsonl"
+}

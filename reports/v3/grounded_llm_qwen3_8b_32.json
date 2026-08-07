@@ -1,0 +1,98 @@
+{
+  "evaluation_role": "adaptive_32_replay_not_independent_holdout",
+  "metrics": {
+    "evaluated_questions": 32,
+    "candidate_all_required_coverage": {
+      "successes": 22,
+      "total": 32,
+      "rate": 0.6875
+    },
+    "baseline_all_required_evidence": {
+      "successes": 22,
+      "total": 32,
+      "rate": 0.6875
+    },
+    "baseline_all_literal_spans": {
+      "successes": 12,
+      "total": 32,
+      "rate": 0.375
+    },
+    "llm_all_required_evidence": {
+      "successes": 12,
+      "total": 32,
+      "rate": 0.375
+    },
+    "llm_all_literal_spans": {
+      "successes": 8,
+      "total": 32,
+      "rate": 0.25
+    },
+    "llm_literal_given_candidate_coverage": {
+      "successes": 8,
+      "total": 22,
+      "rate": 0.363636
+    },
+    "literal_regression_case_ids": [
+      "requirement_surface_candidate_sha256_553c196f8da91fd8dbf08178d2da875462c26128b56ef98b8123fcb68dfafd28",
+      "requirement_surface_candidate_sha256_83dcf8ced602f9ae274f77ea68d36828a157d8fc034dcc181737fc27c17fc777",
+      "requirement_surface_candidate_sha256_88cecb6cff7b75731ba14a50ce1d6b16147717b2264b4ced868b050e6ae6f4bf",
+      "requirement_surface_candidate_sha256_bffd09b0d6cbc1b0e463b550b4dce161c5932702ff64c9c034077a19ce4ef7d2",
+      "requirement_surface_candidate_sha256_da34024d628cd0553b126b87b985eada52662bc3d60290ca65aed5d437ffff8e",
+      "requirement_surface_candidate_sha256_e8212afeba089b414f4194819781bd01dc4045e7dba8733c64d976e8adf9d2f9",
+      "requirement_surface_candidate_sha256_f4b77d71e9d961e95d0c3d7c4abec535a01ee1b8851ae3f64f5d497b4f9446b4"
+    ],
+    "literal_improvement_case_ids": [
+      "requirement_surface_candidate_sha256_45d5706c0c00a3ec860c61b32fddd04e38674990890997a76d2a2da2769eb3ec",
+      "requirement_surface_candidate_sha256_742c69ce29b7658147009007fc9c896efb8159ec787a50061a5b6867e84fde44",
+      "requirement_surface_candidate_sha256_cb93bb0841af063dd0b288fc0da91f10bd57417b05b038bfbbc4c6e0b1e1e799"
+    ],
+    "false_full_case_ids": [
+      "requirement_surface_candidate_sha256_0a62e79e96b1440b850cadcad99e64b55842f212627b33feca10857bcd12f535",
+      "requirement_surface_candidate_sha256_6a5ce49471fd0673dd30984827da55bf8d409bfd472488b3078531dfa7fadfc1",
+      "requirement_surface_candidate_sha256_7a2ad69fb34564ab712e4db2edc88986f2f2dcd7cf301966c595c86335741182",
+      "requirement_surface_candidate_sha256_88cecb6cff7b75731ba14a50ce1d6b16147717b2264b4ced868b050e6ae6f4bf",
+      "requirement_surface_candidate_sha256_bffd09b0d6cbc1b0e463b550b4dce161c5932702ff64c9c034077a19ce4ef7d2",
+      "requirement_surface_candidate_sha256_e8f87d821752c91ec25ea2b6a690e1c9ce6b829900ed8800248832dfd568e08a",
+      "requirement_surface_candidate_sha256_f4b77d71e9d961e95d0c3d7c4abec535a01ee1b8851ae3f64f5d497b4f9446b4"
+    ],
+    "requirement_count_mismatch_case_ids": [
+      "requirement_surface_candidate_sha256_14ed162c4801fa8dd51b4134b76b131f1dbde72a4d4dfd44d88a5bd5108bae8d",
+      "requirement_surface_candidate_sha256_74115673061401bdfca2f5a1ae353f8f4397ad6f8dfd7af16b94b391d01abeb3",
+      "requirement_surface_candidate_sha256_aa3a885060d826a599e2642c10c3ad991a66261cc7a198965803055fe944f8fc",
+      "requirement_surface_candidate_sha256_cd13b27adc78476265447e8d9a00f7b5b24ba5529077e08c88e8ea98cb6f56ab"
+    ],
+    "time_scope_mismatch_case_ids": [
+      "requirement_surface_candidate_sha256_98f285310105dd7aebfa523b71e544d827bcf43f20604e329deb2bb2827243bc"
+    ],
+    "generation_error_case_ids": [],
+    "surplus_citation_case_ids": [],
+    "all_exact_citation_slices": true,
+    "all_outputs_safe_to_expose": true,
+    "baseline_citation_precision": 0.185629,
+    "llm_citation_precision": 0.647059,
+    "total_latency_ms": 551153.908,
+    "total_tokens": 80262
+  },
+  "gates": {
+    "full_32_question_run": true,
+    "candidate_coverage_22_of_32": true,
+    "llm_literal_at_least_18_of_22_covered": false,
+    "literal_regression_zero": false,
+    "false_full_zero": false,
+    "requirement_count_mismatch_zero": false,
+    "time_scope_mismatch_zero": false,
+    "generation_error_zero": true,
+    "surplus_citation_zero": true,
+    "exact_citation_slices_100_percent": true,
+    "all_outputs_safe_to_expose": true,
+    "citation_precision_non_decreasing": true
+  },
+  "decision": "NO_GO",
+  "automatic_runtime_or_canonical_promotion": false,
+  "run_config": {
+    "model": "qwen3:8b",
+    "as_of": "2026-07-22",
+    "reasoning_effort": "high",
+    "base_url": "http://127.0.0.1:11434/v1"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "schema_version": "dnf_free_minimal_runtime_snapshot_v1",
+  "built_at": "2026-07-31T02:48:45+09:00",
+  "artifacts": [
+    {
+      "role": "documents",
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    {
+      "role": "chunks",
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    {
+      "role": "bm25_manifest",
+      "path": "data/v3/indexes/bm25_manifest_f963e4e6a8bd64540ec030cdd3a4e881cd4034d833655dc624b838cafae8dbea.json",
+      "sha256": "f963e4e6a8bd64540ec030cdd3a4e881cd4034d833655dc624b838cafae8dbea"
+    },
+    {
+      "role": "dense_manifest",
+      "path": "data/v3/indexes/dense_full_manifest_51074e7e337a64e94a7cc66c8dd7b8b3ed982bad0b3aa82e2e5f30fb84520349.json",
+      "sha256": "51074e7e337a64e94a7cc66c8dd7b8b3ed982bad0b3aa82e2e5f30fb84520349"
+    },
+    {
+      "role": "source_registry_manifest",
+      "path": "data/v3/discovery/source_registry_manifest_4cbd8c441fd694ec16ad30b6b42c4c6f28326dc9a768d883399419ef87ee9ea2.json",
+      "sha256": "4cbd8c441fd694ec16ad30b6b42c4c6f28326dc9a768d883399419ef87ee9ea2"
+    },
+    {
+      "role": "source_registry",
+      "path": "data/v3/discovery/source_registry_04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a.jsonl",
+      "sha256": "04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a"
+    },
+    {
+      "role": "normalized_manifest",
+      "path": "data/v3/normalized/normalized_corpus_manifest_3ba1afc14def8d2da1f7297679f02df6ff690e6fd18298931d3b108dcd064ebf.json",
+      "sha256": "3ba1afc14def8d2da1f7297679f02df6ff690e6fd18298931d3b108dcd064ebf"
+    },
+    {
+      "role": "chunk_corpus_manifest",
+      "path": "data/v3/chunks/chunk_corpus_manifest_87fb0fc3477088cf6245e8bd3fd7719374a7dbf778094d5e36fa43458dd54c00.json",
+      "sha256": "87fb0fc3477088cf6245e8bd3fd7719374a7dbf778094d5e36fa43458dd54c00"
+    }
+  ],
+  "source_coverage": {
+    "dnf_event": {
+      "coverage_as_of": "2026-07-17",
+      "status": "complete"
+    },
+    "dnf_notice": {
+      "coverage_as_of": "2026-07-17",
+      "status": "complete"
+    },
+    "dnf_update": {
+      "coverage_as_of": "2026-07-17",
+      "status": "complete"
+    }
+  }
+}

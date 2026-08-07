@@ -1,0 +1,162 @@
+{
+  "probe_role": "isolated_recorded_table_view_plumbing_probe_not_benchmark",
+  "question": "서약 결정 초월 유니크 가격",
+  "table_view_source": "reports\\v3\\table_atomic_facts_arm1_ab_05ffd0f81486700a6e561ac4f35f21c15865e47315107a0d56cdf581cf47fcd8.json",
+  "table_view_exact_offset_mismatch_count": 0,
+  "generation_requests": [
+    {
+      "system": "당신은 공식 문서에서 이미 선별된 인용문만으로 한국어 답변을 작성합니다.\n규칙:\n1. 제공된 인용문에 없는 사실, 숫자, 날짜, 이름을 절대 추가하지 마세요.\n2. 인용문의 수치와 날짜는 표기를 바꾸지 말고 그대로 사용하세요.\n3. 추측하거나 일반 상식으로 보충하지 마세요.\n4. 각 요구사항에 대해 한두 문장으로 간결하게 답하세요.\n5. 인용문이 요구사항에 답하지 못하면 그 요구는 답하지 마세요.",
+      "user": "질문: 서약 결정 초월 유니크 가격\n\n아래 인용문만 사용해 답하세요.\n\n[요구 1] 서약_결정 · 유니크_가격\n- 서약\n- - 115레벨 달성 상자(부스트 업 전용) 구성품: 115레벨 유니크 서약 결정 항아리 1개, 미광의 서약 결정 10개, 종말의 계시(기간 무제한) 700개, 체력 증강제 100개, 마력 증강제 100개\n- 세트별로 가지고 있는 고유 효과로 서약 포인트 1200pt (유니크 I) 이상부터 적용\n- 서약 결정 초월 유니크 · 광휘의 소울 = 25개\n- 서약 결정 초월 유니크 · 상급 원소 결정 = 36개\n- 서약 결정 초월 유니크 · 순례의 인장 / 골드 = 순례의 인장 25개 or 125,000골드\n- 서약 결정 초월 유니크 · 솔리드 소울 = 1개",
+      "requirement_indices": [
+        1
+      ]
+    }
+  ],
+  "raw_model_outputs": [
+    "서약 결정 초월 유니크의 가격은 제공된 인용문에 명시되지 않았습니다. 해당 유니크는 구성품의 수량(예: 광휘의 소울 25개, 상급 원소 결정 36개 등)을 나타내지만, 구매 또는 획득에 필요한 비용은 언급되지 않았습니다."
+  ],
+  "composed": {
+    "generator_contract_version": "grounded-answer-generator-v1.0.0",
+    "generatable": [
+      {
+        "requirement_index": 1,
+        "requirement_id": "requirement_1",
+        "subject": "서약_결정",
+        "relation": "유니크_가격",
+        "expected_kind": "cost_value",
+        "spans": [
+          {
+            "span_id": "span_2abc6fd77edd9d9677425fa3",
+            "chunk_id": "chunk_sha256_3fb7af028e0a5a922a3aa93a48d161b27081e91f953a1f5002e7d4b68829ee9e",
+            "start_char": 33,
+            "end_char": 35,
+            "text": "서약",
+            "reranker_score": 0.67431009,
+            "parent_document_id": "document_sha256_8bd9627d33bce13e12b15db92d66283c87a98363aaddc7a95233d27be159e36e",
+            "source_id": "dnf_event",
+            "title": "천해천 업데이트 프리뷰",
+            "canonical_url": "https://df.nexon.com/pg/skyofathousandseaspreview",
+            "published_at": "2026-03-07",
+            "updated_at": null,
+            "revision_id": "revision_sha256_8bd9627d33bce13e12b15db92d66283c87a98363aaddc7a95233d27be159e36e",
+            "status": "current",
+            "is_current_revision": null,
+            "validity_state": "active_window",
+            "validity_reason": "as-of is inside explicit official validity window",
+            "retrieval_action_current": "allow",
+            "last_verified_at": "2026-07-17T21:53:16.6990081+09:00",
+            "temporal_warning": null
+          },
+          {
+            "span_id": "span_eadad79ef9fb7d668a46d60d",
+            "chunk_id": "chunk_sha256_2cec835f4b2081330a42690d3858a1d0c072591064755d537945f58c21fd544a",
+            "start_char": 381,
+            "end_char": 494,
+            "text": "- 115레벨 달성 상자(부스트 업 전용) 구성품: 115레벨 유니크 서약 결정 항아리 1개, 미광의 서약 결정 10개, 종말의 계시(기간 무제한) 700개, 체력 증강제 100개, 마력 증강제 100개",
+            "reranker_score": 0.19949766,
+            "parent_document_id": "document_sha256_9b4e13a16260f7423f22bc2d18b9337b98eb906da3ad49865a5531bca845d3f1",
+            "source_id": "dnf_event",
+            "title": "썸머 부스트 업 with 인파이터(여)&브레이커",
+            "canonical_url": "https://df.nexon.com/pg/summerboostup26",
+            "published_at": "2026-06-04",
+            "updated_at": null,
+            "revision_id": "revision_sha256_9b4e13a16260f7423f22bc2d18b9337b98eb906da3ad49865a5531bca845d3f1",
+            "status": "current",
+            "is_current_revision": null,
+            "validity_state": "active_window",
+            "validity_reason": "as-of is inside explicit official validity window",
+            "retrieval_action_current": "allow",
+            "last_verified_at": "2026-07-17T21:53:16.6990081+09:00",
+            "temporal_warning": null
+          },
+          {
+            "span_id": "span_1113d6a44f72c33b09f0511c",
+            "chunk_id": "chunk_sha256_6f4b0116b6689881a50377fbafbcb53c522b12193fb141d945c11a97e9ed0146",
+            "start_char": 47,
+            "end_char": 95,
+            "text": "세트별로 가지고 있는 고유 효과로 서약 포인트 1200pt (유니크 I) 이상부터 적용",
+            "reranker_score": 0.05849506,
+            "parent_document_id": "document_sha256_8bd9627d33bce13e12b15db92d66283c87a98363aaddc7a95233d27be159e36e",
+            "source_id": "dnf_event",
+            "title": "천해천 업데이트 프리뷰",
+            "canonical_url": "https://df.nexon.com/pg/skyofathousandseaspreview",
+            "published_at": "2026-03-07",
+            "updated_at": null,
+            "revision_id": "revision_sha256_8bd9627d33bce13e12b15db92d66283c87a98363aaddc7a95233d27be159e36e",
+            "status": "current",
+            "is_current_revision": null,
+            "validity_state": "active_window",
+            "validity_reason": "as-of is inside explicit official validity window",
+            "retrieval_action_current": "allow",
+            "last_verified_at": "2026-07-17T21:53:16.6990081+09:00",
+            "temporal_warning": null
+          },
+          {
+            "span_id": "table_value:table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c:table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310:1",
+            "chunk_id": "chunk_sha256_72b83b77fa143997b8639babb8522b1f5133f91da23811116f65814c8685d969",
+            "start_char": 192,
+            "end_char": 242,
+            "text": "서약 결정 초월 유니크 · 광휘의 소울 = 25개",
+            "evidence_kind": "table_attribute_value",
+            "table_id": "table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c",
+            "row_id": "table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310",
+            "attribute": "광휘의 소울",
+            "value": "25개",
+            "exact_row_text": "| 유니크 | 25개 | 36개 | 순례의 인장 25개 or 125,000골드 | 1개 |"
+          },
+          {
+            "span_id": "table_value:table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c:table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310:2",
+            "chunk_id": "chunk_sha256_72b83b77fa143997b8639babb8522b1f5133f91da23811116f65814c8685d969",
+            "start_char": 192,
+            "end_char": 242,
+            "text": "서약 결정 초월 유니크 · 상급 원소 결정 = 36개",
+            "evidence_kind": "table_attribute_value",
+            "table_id": "table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c",
+            "row_id": "table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310",
+            "attribute": "상급 원소 결정",
+            "value": "36개",
+            "exact_row_text": "| 유니크 | 25개 | 36개 | 순례의 인장 25개 or 125,000골드 | 1개 |"
+          },
+          {
+            "span_id": "table_value:table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c:table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310:3",
+            "chunk_id": "chunk_sha256_72b83b77fa143997b8639babb8522b1f5133f91da23811116f65814c8685d969",
+            "start_char": 192,
+            "end_char": 242,
+            "text": "서약 결정 초월 유니크 · 순례의 인장 / 골드 = 순례의 인장 25개 or 125,000골드",
+            "evidence_kind": "table_attribute_value",
+            "table_id": "table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c",
+            "row_id": "table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310",
+            "attribute": "순례의 인장 / 골드",
+            "value": "순례의 인장 25개 or 125,000골드",
+            "exact_row_text": "| 유니크 | 25개 | 36개 | 순례의 인장 25개 or 125,000골드 | 1개 |"
+          },
+          {
+            "span_id": "table_value:table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c:table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310:4",
+            "chunk_id": "chunk_sha256_72b83b77fa143997b8639babb8522b1f5133f91da23811116f65814c8685d969",
+            "start_char": 192,
+            "end_char": 242,
+            "text": "서약 결정 초월 유니크 · 솔리드 소울 = 1개",
+            "evidence_kind": "table_attribute_value",
+            "table_id": "table_sha256_f1cc1d3c40da2c4049e63e0ca348020b36697194d70f2c64c18f0894e1ef941c",
+            "row_id": "table_row_sha256_02e4d0cde79a6d189b229cf4f68a9213ec471f4360da921605cbe17ae32d6310",
+            "attribute": "솔리드 소울",
+            "value": "1개",
+            "exact_row_text": "| 유니크 | 25개 | 36개 | 순례의 인장 25개 or 125,000골드 | 1개 |"
+          }
+        ],
+        "table_value_span_count": 4
+      }
+    ],
+    "unconfirmable": [],
+    "model_sees_gold": false,
+    "mode": "generated",
+    "answer_text": "서약 결정 초월 유니크의 가격은 제공된 인용문에 명시되지 않았습니다. 해당 유니크는 구성품의 수량(예: 광휘의 소울 25개, 상급 원소 결정 36개 등)을 나타내지만, 구매 또는 획득에 필요한 비용은 언급되지 않았습니다.",
+    "verification": {
+      "verified": true,
+      "checked_token_count": 2,
+      "unsupported_tokens": [],
+      "verifier_contract_version": "grounded-answer-generator-v1.0.0"
+    },
+    "used_generated_text": true
+  }
+}

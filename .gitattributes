@@ -1,0 +1,14 @@
+# Content-addressed text artifacts and their builders must hash identically on Windows.
+*.py text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+*.md text eol=lf
+*.csv text eol=lf
+
+# Frozen artifacts are byte-addressed; preserve their exact recorded bytes.
+data/** -text
+reports/** -text
+outputs/** -text
+
+# Preserve the historical Windows source bytes bound by the two exempt manifests.
+src/v3/question_router.py text eol=crlf

@@ -1,0 +1,15 @@
+{
+  "pointer_schema_version": "v3-canonical-runtime-pointer-v1",
+  "status": "canonical_v3_2_development_default_promoted",
+  "manifest": {
+    "path": "data/v3/runtime/canonical_runtime_v3_2_manifest_71b3fa85b79a7d218332cf56d6c9b5620b2abc5b2ab37564cee0261ca51a8a96.json",
+    "sha256": "71b3fa85b79a7d218332cf56d6c9b5620b2abc5b2ab37564cee0261ca51a8a96"
+  },
+  "promotion_scope": "default_v3_development_runtime_and_canonical_retrieval_view",
+  "v3_2_additive_features_default_enabled": true,
+  "production_ready": false,
+  "final_benchmark_complete": false,
+  "known_false_full": "9/82",
+  "sealed_canary_executed": false,
+  "authorization": "explicit_user_request"
+}

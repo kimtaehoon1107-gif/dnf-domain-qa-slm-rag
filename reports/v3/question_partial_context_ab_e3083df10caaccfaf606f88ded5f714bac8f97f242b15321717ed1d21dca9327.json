@@ -1,0 +1,169 @@
+{
+  "audit": {
+    "failure_type_counts": {
+      "SAME_CHUNK_CONTEXT_TRUNCATION": 3,
+      "SOURCE_SCOPE_PLUS_PARTIAL_SIGNAL_MISS": 1
+    },
+    "fixed_count": 3,
+    "row_count": 4
+  },
+  "constraints": {
+    "gold_or_labels_changed": false,
+    "model_inference_calls": 0,
+    "new_keyword_rules": 0,
+    "runtime_or_canonical_promoted": false,
+    "sealed_or_frozen_blind_accessed": false,
+    "training_run": false
+  },
+  "evaluation_role": "development_only_same_chunk_context_ab",
+  "evaluator_version": "question-partial-context-ab-v3.2.0",
+  "inputs": {
+    "adaptive_dev": {
+      "path": "data/v3/evaluation/retrieval_dev_v3.1_b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978.jsonl",
+      "sha256": "b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978"
+    },
+    "answerability_ground_truth": {
+      "path": "data/v3/evaluation/semantic_answerability_ground_truth_53cd8ae72ad4ee2f7c9b1d4370991ad74b5044d154e3657fd2008f45f71fe609.jsonl",
+      "sha256": "53cd8ae72ad4ee2f7c9b1d4370991ad74b5044d154e3657fd2008f45f71fe609"
+    },
+    "authored_canary_runtime": {
+      "path": "data/v3/evaluation/authored_canary_first_run_cases_a326d9fd96a4cfcaf9b2d38d74f27fffe26b62dfc1364063c8258891546beecd.jsonl",
+      "sha256": "a326d9fd96a4cfcaf9b2d38d74f27fffe26b62dfc1364063c8258891546beecd"
+    },
+    "canonical_claim_reranker": {
+      "path": "data/v3/evidence/claim_reranker_cases_e1f2cedb533a9af62051dcf60fca1bdf8489c39e28a3b7724459aa97dbf9fe3a.jsonl",
+      "sha256": "e1f2cedb533a9af62051dcf60fca1bdf8489c39e28a3b7724459aa97dbf9fe3a"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "contract": {
+      "path": "docs/v3/question_partial_context_ab.md",
+      "sha256": "ac52654f9c6d91fa3ce9828dbeb2d82803820da4b761e5c442ddd88794a64c93"
+    },
+    "downgraded_canary": {
+      "path": "data/v3/evaluation/early_generalization_authored_canary_28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d.jsonl",
+      "sha256": "28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d"
+    },
+    "evaluator_source": {
+      "path": "src/v3/evaluate_question_partial_context_ab.py",
+      "sha256": "0ceffaa764cb0c21b72ee44c20721a63353cdd1f37d417891157d5a1f4cacf7b"
+    },
+    "federated_candidates": {
+      "path": "data/v3/retrieval/federated_retrieval_ab_candidates_fc5d64c1c201ccbc37711dc9aba5268c276e6aedc05c57537cea7f227af689bd.jsonl",
+      "sha256": "fc5d64c1c201ccbc37711dc9aba5268c276e6aedc05c57537cea7f227af689bd"
+    },
+    "federated_cases": {
+      "path": "data/v3/evidence/federated_retrieval_ab_cases_c9921d0e7570ba77a40e7be94d85951f9419a2fe8847fc81c49891780f51f28f.jsonl",
+      "sha256": "c9921d0e7570ba77a40e7be94d85951f9419a2fe8847fc81c49891780f51f28f"
+    },
+    "q2_cases": {
+      "path": "data/v3/evidence/question_partial_hybrid_ab_cases_01f88a41218238a5e9474cd3901ff88a1a11ce7bc0a267dfac7986dcebc7af37.jsonl",
+      "sha256": "01f88a41218238a5e9474cd3901ff88a1a11ce7bc0a267dfac7986dcebc7af37"
+    }
+  },
+  "report_schema_version": "question-partial-context-ab-report-v3.2",
+  "result": {
+    "arm_q2_mixed": {
+      "correct_mixed_partial": {
+        "rate": 0.92307692,
+        "small_sample_limit": false,
+        "successes": 12,
+        "total": 13
+      },
+      "correct_mixed_partial_span_strict": {
+        "rate": 0.69230769,
+        "small_sample_limit": false,
+        "successes": 9,
+        "total": 13
+      },
+      "mixed_missing_evidence": {
+        "rate": 0.07692308,
+        "small_sample_limit": false,
+        "successes": 1,
+        "total": 13
+      },
+      "mixed_overclaim": {
+        "rate": 0.0,
+        "small_sample_limit": false,
+        "successes": 0,
+        "total": 13
+      },
+      "primary_label_counts": {
+        "correct_mixed_partial": 12,
+        "mixed_missing_evidence": 1
+      }
+    },
+    "arm_q3_mixed": {
+      "correct_mixed_partial": {
+        "rate": 0.92307692,
+        "small_sample_limit": false,
+        "successes": 12,
+        "total": 13
+      },
+      "correct_mixed_partial_span_strict": {
+        "rate": 0.92307692,
+        "small_sample_limit": false,
+        "successes": 12,
+        "total": 13
+      },
+      "mixed_missing_evidence": {
+        "rate": 0.07692308,
+        "small_sample_limit": false,
+        "successes": 1,
+        "total": 13
+      },
+      "mixed_overclaim": {
+        "rate": 0.0,
+        "small_sample_limit": false,
+        "successes": 0,
+        "total": 13
+      },
+      "primary_label_counts": {
+        "correct_mixed_partial": 12,
+        "mixed_missing_evidence": 1
+      }
+    },
+    "context_applied_count": 3,
+    "context_character_count": {
+      "max": 1125,
+      "median": 899,
+      "values": [
+        312,
+        899,
+        1125
+      ]
+    },
+    "decision": "DEVELOPMENT_GO_CONTEXT_ARM_RUNTIME_NOT_PROMOTED",
+    "docs_only_unchanged": {
+      "chunk_grounded": {
+        "rate": 0.88405797,
+        "small_sample_limit": false,
+        "successes": 61,
+        "total": 69
+      },
+      "span_value_grounded": {
+        "rate": 0.65217391,
+        "small_sample_limit": false,
+        "successes": 45,
+        "total": 69
+      }
+    },
+    "existing_correct_regression_case_ids": [],
+    "remaining_error_count": 1,
+    "strict_gate_checks": {
+      "chunk_correct_partial_12_of_13_maintained": true,
+      "context_exact_all": true,
+      "context_partial_safety_all": true,
+      "docs_chunk_61_of_69_unchanged": true,
+      "docs_span_value_45_of_69_unchanged": true,
+      "existing_correct_regression_zero": true,
+      "mixed_overclaim_zero": true,
+      "realtime_2_of_2_unchanged": true,
+      "reject_11_of_11_unchanged": true,
+      "strict_span_improved_over_9_of_13": true
+    },
+    "strict_gate_passed": true
+  }
+}

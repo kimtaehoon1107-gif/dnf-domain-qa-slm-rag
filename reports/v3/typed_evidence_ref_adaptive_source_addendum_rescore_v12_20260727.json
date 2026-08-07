@@ -1,0 +1,811 @@
+{
+  "evaluation_role": "post_hoc_addendum_rescore_only_not_a_generalization_score",
+  "headline_replacement_allowed": false,
+  "source_result_preserved": {
+    "gold_value_complete": {
+      "successes": 55,
+      "total": 64
+    },
+    "source_path": "outputs/v3/diagnostics/typed_evidence_ref_policy_month_binding_qwen3_8b_adaptive_full64_20260727.jsonl",
+    "source_sha256": "782e1ed25e23a79e3cc2c106363c6752985e0e572e30f60b3c771a4aef0e798f",
+    "note": "This is the stored source run, not the official sealed one-shot headline."
+  },
+  "official_sealed_artifact_preserved": {
+    "path": "data/v3/evaluation/typed_evidence_ref_generalization_64_sealed_e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597.jsonl",
+    "sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597",
+    "score_recomputed_or_replaced": false
+  },
+  "diagnostic_replay": {
+    "new_model_calls": 0,
+    "retrieval_reexecuted": false,
+    "verifier_reexecuted": false,
+    "stored_verified_output_reused": true,
+    "stored_candidates_reused": true,
+    "stored_model_outputs_reused": true,
+    "scorer_version": "typed-evidence-ref-generalization-scorer-v7",
+    "normalization_contract": {
+      "version": "typed-evidence-ref-generalization-normalization-v7",
+      "rules": [
+        "Whitespace, punctuation, and Korean zero-padded month/day variants are normalized.",
+        "Korean and ISO dates are compared as YYYY-MM-DD; month/day-only forms use the frozen as_of year.",
+        "06시, 6시, and 06:00 are compared as 06:00; 오전/오후 are converted to 24-hour time.",
+        "time and time_range values use the same ordered clock normalization in the verifier and scorer.",
+        "Plain numbers normalize commas and Korean 만/억 scales in both the verifier and scorer.",
+        "Currency commas, Korean 만/억 scales, domain currency units, and unit-first count forms are normalized to integer amount plus unit.",
+        "Percentages and plain numbers are compared numerically.",
+        "Boolean answers normalize explicit true/false and Korean positive/negative actions while protecting 불가 state nouns.",
+        "Strict typed evidence must contain the expected normalized value inside its overlap with a pre-approved evidence unit; boundary-only overlap and same-chunk fallback are not allowed.",
+        "Entity values that begin or end with digits use numeric boundaries, so 110 does not match 1100.",
+        "For text, enum, entity, and entity_list values, a citation must fully cover a pre-approved evidence unit to use that unit as canonical gold when required_values is a human-authored summary.",
+        "No semantic paraphrase credit is added beyond the typed normalizations above.",
+        "Automatic semantic false-full is reported separately from unsupported-question false-full and still requires human evidence adjudication.",
+        "A blocked model claim is labeled verifier_rejected_model_claim; overreject versus correct reject is a separate human adjudication."
+      ]
+    },
+    "gold_value_complete": {
+      "successes": 55,
+      "total": 64
+    },
+    "score_delta": 0,
+    "recovered_slots": [],
+    "regressed_slots": [],
+    "changed_slot_count": 19,
+    "score_summary": {
+      "scorer_version": "typed-evidence-ref-generalization-scorer-v7",
+      "normalization_contract": {
+        "version": "typed-evidence-ref-generalization-normalization-v7",
+        "rules": [
+          "Whitespace, punctuation, and Korean zero-padded month/day variants are normalized.",
+          "Korean and ISO dates are compared as YYYY-MM-DD; month/day-only forms use the frozen as_of year.",
+          "06시, 6시, and 06:00 are compared as 06:00; 오전/오후 are converted to 24-hour time.",
+          "time and time_range values use the same ordered clock normalization in the verifier and scorer.",
+          "Plain numbers normalize commas and Korean 만/억 scales in both the verifier and scorer.",
+          "Currency commas, Korean 만/억 scales, domain currency units, and unit-first count forms are normalized to integer amount plus unit.",
+          "Percentages and plain numbers are compared numerically.",
+          "Boolean answers normalize explicit true/false and Korean positive/negative actions while protecting 불가 state nouns.",
+          "Strict typed evidence must contain the expected normalized value inside its overlap with a pre-approved evidence unit; boundary-only overlap and same-chunk fallback are not allowed.",
+          "Entity values that begin or end with digits use numeric boundaries, so 110 does not match 1100.",
+          "For text, enum, entity, and entity_list values, a citation must fully cover a pre-approved evidence unit to use that unit as canonical gold when required_values is a human-authored summary.",
+          "No semantic paraphrase credit is added beyond the typed normalizations above.",
+          "Automatic semantic false-full is reported separately from unsupported-question false-full and still requires human evidence adjudication.",
+          "A blocked model claim is labeled verifier_rejected_model_claim; overreject versus correct reject is a separate human adjudication."
+        ]
+      },
+      "fixed_denominator": 64,
+      "gold_value_complete": {
+        "successes": 55,
+        "total": 64
+      },
+      "typed_answer_value_complete": {
+        "successes": 48,
+        "total": 64
+      },
+      "typed_claim_complete": {
+        "successes": 43,
+        "total": 64
+      },
+      "outcomes": {
+        "correct": 55,
+        "incorrect": 6,
+        "no_response": 3
+      },
+      "typed_outcomes": {
+        "correct": 43,
+        "incorrect": 18,
+        "no_response": 3
+      },
+      "all_evidence_spans_hit": {
+        "successes": 51,
+        "total": 64
+      },
+      "candidate_all_gold_covered": {
+        "successes": 64,
+        "total": 64
+      },
+      "honest_unsupported": {
+        "slots": [
+          7,
+          15,
+          23,
+          31,
+          39,
+          47,
+          55,
+          63
+        ],
+        "correct_abstentions": 7,
+        "false_full": 1,
+        "total": 8
+      },
+      "automatic_semantic_false_full": {
+        "count": 14,
+        "slots": [
+          3,
+          4,
+          6,
+          29,
+          30,
+          31,
+          33,
+          36,
+          43,
+          44,
+          46,
+          51,
+          62,
+          64
+        ]
+      },
+      "relation_validation": {
+        "explicit_alias": 0,
+        "surface_fallback": 0,
+        "unvalidated": 0,
+        "total": 0,
+        "exposed_unvalidated_slots": []
+      },
+      "verifier_rejection_reasons": {
+        "subject_not_supported_by_evidence": 2,
+        "subject_relation_value_not_colocated": 6,
+        "temporal_role_mismatch": 1,
+        "typed_value_not_supported_by_evidence": 6
+      },
+      "generation_error_count": 0,
+      "all_citation_slices_exact": true,
+      "latency_ms": {
+        "total": 364148.43,
+        "mean": 5689.819,
+        "p50": 5312.941,
+        "p95": 7651.147
+      },
+      "usage": {
+        "input_tokens": 121864,
+        "output_tokens": 5716,
+        "total_tokens": 127580
+      },
+      "failure_slots": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        12,
+        20,
+        25,
+        29,
+        30,
+        31,
+        33,
+        34,
+        36,
+        43,
+        44,
+        46,
+        47,
+        51,
+        62,
+        64
+      ],
+      "failure_breakdown": {
+        "automatic_semantic_false_full": 13,
+        "generator_value_selection": 3,
+        "unsupported_false_full": 1,
+        "verifier_rejected_model_claim": 4
+      },
+      "failure_cases": [
+        {
+          "slot_ordinal": 2,
+          "failure_stage": "verifier_rejected_model_claim",
+          "outcome": "no_response",
+          "typed_outcome": "no_response",
+          "false_full": false,
+          "automatic_semantic_false_full": false
+        },
+        {
+          "slot_ordinal": 3,
+          "failure_stage": "automatic_semantic_false_full",
+          "outcome": "correct",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": true
+        },
+        {
+          "slot_ordinal": 4,
+          "failure_stage": "automatic_semantic_false_full",
+          "outcome": "correct",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": true
+        },
+        {
+          "slot_ordinal": 5,
+          "failure_stage": "verifier_rejected_model_claim",
+          "outcome": "no_response",
+          "typed_outcome": "no_response",
+          "false_full": false,
+          "automatic_semantic_false_full": false
+        },
+        {
+          "slot_ordinal": 6,
+          "failure_stage": "automatic_semantic_false_full",
+          "outcome": "correct",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": true
+        },
+        {
+          "slot_ordinal": 12,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": false
+        },
+        {
+          "slot_ordinal": 20,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": false
+        },
+        {
+          "slot_ordinal": 25,
+          "failure_stage": "verifier_rejected_model_claim",
+          "outcome": "incorrect",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": false
+        },
+        {
+          "slot_ordinal": 29,
+          "failure_stage": "automatic_semantic_false_full",
+          "outcome": "correct",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": true
+        },
+        {
+          "slot_ordinal": 30,
+          "failure_stage": "automatic_semantic_false_full",
+          "outcome": "incorrect",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": true
+        },
+        {
+          "slot_ordinal": 31,
+          "failure_stage": "unsupported_false_full",
+          "outcome": "correct",
+          "typed_outcome": "incorrect",
+          "false_full": true,
+          "automatic_semantic_false_full": true
+        },
+        {
+          "slot_ordinal": 33,
+          "failure_stage": "automatic_semantic_false_full",
+          "outcome": "correct",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": true
+        },
+        {
+          "slot_ordinal": 34,
+          "failure_stage": "verifier_rejected_model_claim",
+          "outcome": "no_response",
+          "typed_outcome": "no_response",
+          "false_full": false,
+          "automatic_semantic_false_full": false
+        },
+        {
+          "slot_ordinal": 36,
+          "failure_stage": "automatic_semantic_false_full",
+          "outcome": "correct",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": true
+        },
+        {
+          "slot_ordinal": 43,
+          "failure_stage": "automatic_semantic_false_full",
+          "outcome": "correct",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": true
+        },
+        {
+          "slot_ordinal": 44,
+          "failure_stage": "automatic_semantic_false_full",
+          "outcome": "correct",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": true
+        },
+        {
+          "slot_ordinal": 46,
+          "failure_stage": "automatic_semantic_false_full",
+          "outcome": "correct",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": true
+        },
+        {
+          "slot_ordinal": 47,
+          "failure_stage": "generator_value_selection",
+          "outcome": "incorrect",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": false
+        },
+        {
+          "slot_ordinal": 51,
+          "failure_stage": "automatic_semantic_false_full",
+          "outcome": "incorrect",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": true
+        },
+        {
+          "slot_ordinal": 62,
+          "failure_stage": "automatic_semantic_false_full",
+          "outcome": "correct",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": true
+        },
+        {
+          "slot_ordinal": 64,
+          "failure_stage": "automatic_semantic_false_full",
+          "outcome": "correct",
+          "typed_outcome": "incorrect",
+          "false_full": false,
+          "automatic_semantic_false_full": true
+        }
+      ],
+      "gates": {
+        "generation_error_zero": true,
+        "honest_unsupported_false_full_zero": false,
+        "automatic_semantic_false_full_zero": false
+      }
+    }
+  },
+  "reviewed_equivalent_evidence_overlay": {
+    "mode": "evidence_only_diagnostic_overlay",
+    "sealed_claim_targets_changed": false,
+    "applied_count": 6,
+    "duplicate_count": 0,
+    "claim_target_correction_required_count": 2,
+    "applied": [
+      {
+        "slot_ordinal": 8,
+        "candidate_id": "typed_generalization_candidate_sha256_fd8ca0f4bce1cd7a587795f4122521418cf89c962729a5d8da1160079b32dbf0",
+        "requirement_id": "shop_location",
+        "chunk_id": "chunk_sha256_d406057ac6bbc41e8f9c75db8272abe93b95a60f0f0c50a50c75249cf6eda0fd",
+        "start_char": 16,
+        "end_char": 58
+      },
+      {
+        "slot_ordinal": 24,
+        "candidate_id": "typed_generalization_candidate_sha256_48b2eeba4b626a2611fde12ee0fcd1aea78122292bdfce0a3368ee676560735f",
+        "requirement_id": "coupon_limit",
+        "chunk_id": "chunk_sha256_b27d9a3c6ecf31f13d63d9f6af6ddcdc942e798cfb36d82296ae18fde415e8b8",
+        "start_char": 779,
+        "end_char": 812
+      },
+      {
+        "slot_ordinal": 36,
+        "candidate_id": "typed_generalization_candidate_sha256_d92381e4b1e2526ef9a4ecfff8ef88377ebf7e1f471db40dd0ac7225335f1972",
+        "requirement_id": "registration_location",
+        "chunk_id": "chunk_sha256_d335f2be042a5545d8a90819c8b001363c4c212b1672da1d17bacbf7fae15f68",
+        "start_char": 43,
+        "end_char": 85
+      },
+      {
+        "slot_ordinal": 36,
+        "candidate_id": "typed_generalization_candidate_sha256_d92381e4b1e2526ef9a4ecfff8ef88377ebf7e1f471db40dd0ac7225335f1972",
+        "requirement_id": "deletion_location",
+        "chunk_id": "chunk_sha256_d335f2be042a5545d8a90819c8b001363c4c212b1672da1d17bacbf7fae15f68",
+        "start_char": 166,
+        "end_char": 214
+      },
+      {
+        "slot_ordinal": 40,
+        "candidate_id": "typed_generalization_candidate_sha256_a6b277170c2937bf18ef3b060584d21024624d8c738d18a91a19df0b7fb7acd0",
+        "requirement_id": "redeem_location",
+        "chunk_id": "chunk_sha256_5927e937cb18a4ac2b79b1cbe8a9b5dc05eadf7efc18d9d0efab501cb37832dd",
+        "start_char": 94,
+        "end_char": 125
+      },
+      {
+        "slot_ordinal": 41,
+        "candidate_id": "typed_generalization_candidate_sha256_3e6481f87d563bb41213e3818a1934445228daf73de1fa04b9451f1431d8194e",
+        "requirement_id": "effective_date",
+        "chunk_id": "chunk_sha256_9fef8454ca5da401a3eb86ef4919448898883b1f891861c4670207059eaf3c33",
+        "start_char": 9,
+        "end_char": 27
+      }
+    ],
+    "claim_target_correction_required": [
+      {
+        "slot_ordinal": 31,
+        "candidate_id": "typed_generalization_candidate_sha256_871aba6cdc27989038076e738e43bf0992b8c62339b8d271a3b2fbd37f340944",
+        "requirement_id": "preset_limit",
+        "reason": "sealed_claim_target_is_unsupported"
+      },
+      {
+        "slot_ordinal": 47,
+        "candidate_id": "typed_generalization_candidate_sha256_693dbf1b8b65878364427dea29e9f618fe7f32a6316daaf878bf184861787dce",
+        "requirement_id": "processing_days",
+        "reason": "sealed_claim_target_is_unsupported"
+      }
+    ],
+    "path": "data/v3/evaluation/typed_evidence_ref_generalization_64_equivalent_evidence_addendum_20260727.jsonl",
+    "sha256": "239c15eaace634f19a1b2152df5fb9a4249a55bc85519b2b2f4d968881f3ccbe"
+  },
+  "changes": [
+    {
+      "slot_ordinal": 2,
+      "candidate_id": "typed_generalization_candidate_sha256_a1e406ce2163c631c442b9fc3820566f1948d7ce57700f0e975503b89d9e2756",
+      "question_text": "4월 2일 확인된 오류 기준으로 조율의 경계에서 광휘의 의지를 열면 연출이 정상 출력됐어?",
+      "before": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_rejected_model_claim"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 3,
+      "candidate_id": "typed_generalization_candidate_sha256_c90b427a544abb5f4aed5a9529a932cce101c13098b994a953e11e2f6291cfea",
+      "question_text": "세리아와 함께한 20주년 선물 5주차 추첨에서 그래픽카드와 키보드·장패드는 각각 몇 개였어?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "automatic_semantic_false_full"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 4,
+      "candidate_id": "typed_generalization_candidate_sha256_a4183b7359a0dc7b8d021c18fbf9861c527f5f1c8a9f99b864a1cc2cf1384562",
+      "question_text": "Chrome 141 업데이트로 ISP 결제에 어떤 영향이 있었고, 권한 알림이 뜨면 어떻게 해야 했어?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "automatic_semantic_false_full"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 5,
+      "candidate_id": "typed_generalization_candidate_sha256_5c176e5a886a695bd9ed7b1346c261d900afadccc4327f4ab21be3b0e83f4a5e",
+      "question_text": "2026년 4월 2일 정기점검은 몇 시부터 몇 시까지였어?",
+      "before": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_rejected_model_claim"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 6,
+      "candidate_id": "typed_generalization_candidate_sha256_52cf0807234a1e5f8df280126bbe6d0e504b749029294e0b91e16fb0addf7efb",
+      "question_text": "2025년에 공지된 던전앤파이터 운영정책 변경은 언제 시행될 예정이었어?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "automatic_semantic_false_full"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 8,
+      "candidate_id": "typed_generalization_candidate_sha256_fd8ca0f4bce1cd7a587795f4122521418cf89c962729a5d8da1160079b32dbf0",
+      "question_text": "세리아의 특별 상점은 게임 안에서 어디서 찾을 수 있어?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "retrieval_missing_gold"
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 25,
+      "candidate_id": "typed_generalization_candidate_sha256_238d75475de1545648bb1d7bf2ae6ca9bd28895957409a041732ccb7c4ef60f1",
+      "question_text": "던파ON 출석체크는 매일 몇 시에 갱신되고, 보상 교환의 1주 기준은 언제야?",
+      "before": {
+        "outcome": "incorrect",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "incorrect",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_rejected_model_claim"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 29,
+      "candidate_id": "typed_generalization_candidate_sha256_23ed0ddf4a502ea327fa9048848e57d17da209e3ea70245c60b26dfd65736151",
+      "question_text": "화면 설명의 ② 항목은 무엇을 보여주고 어떤 키로 조작해?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "automatic_semantic_false_full"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 30,
+      "candidate_id": "typed_generalization_candidate_sha256_b76da873e842c7fe4f601ab8f6cc2d72b4665b1bda12a1590b5aef5f0f5c98e2",
+      "question_text": "현재 장비 시뮬레이터 가이드에서 지원하는 장비 레벨은 무엇이야?",
+      "before": {
+        "outcome": "incorrect",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "generator_value_selection"
+      },
+      "after": {
+        "outcome": "incorrect",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "automatic_semantic_false_full"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 33,
+      "candidate_id": "typed_generalization_candidate_sha256_5b3301075a36f3e7c5489fae81e66864a6b0f19f6221e6bf9236076f743f53e1",
+      "question_text": "세라 아이템은 구매 후 며칠 이내에 청약철회할 수 있어?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "automatic_semantic_false_full"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 34,
+      "candidate_id": "typed_generalization_candidate_sha256_704d9bc58bb3c551e037d6c0211ac28d2b78dfe935a3dcb714a8502175b26ade",
+      "question_text": "휴대폰이 정지되기 전에 모바일 OTP를 설치해 사용 중이었다면 정지 후에도 OTP를 쓸 수 있어?",
+      "before": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_overreject"
+      },
+      "after": {
+        "outcome": "no_response",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "verifier_rejected_model_claim"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 36,
+      "candidate_id": "typed_generalization_candidate_sha256_d92381e4b1e2526ef9a4ecfff8ef88377ebf7e1f471db40dd0ac7225335f1972",
+      "question_text": "지정PC 등록과 삭제는 각각 어디에서 할 수 있어?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "automatic_semantic_false_full"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 41,
+      "candidate_id": "typed_generalization_candidate_sha256_3e6481f87d563bb41213e3818a1934445228daf73de1fa04b9451f1431d8194e",
+      "question_text": "현재 던전앤파이터 운영정책은 언제부터 시행됐어?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "retrieval_missing_gold"
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 43,
+      "candidate_id": "typed_generalization_candidate_sha256_cc83a3279905a0b337869272d8a0cb770af0481812c2c4364e2be172d90b5ecb",
+      "question_text": "고객 간 사적 분쟁에 회사가 개입하는 원칙과 예외는 무엇이야?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "automatic_semantic_false_full"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 44,
+      "candidate_id": "typed_generalization_candidate_sha256_13885dff8f194aebf922102c84371da8a9b0b302ed400ce38d33ea433a775855",
+      "question_text": "운영정책에서 고객이 ID를 보호하기 위해 해야 하는 두 가지 의무는 뭐야?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "automatic_semantic_false_full"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 46,
+      "candidate_id": "typed_generalization_candidate_sha256_18f28b9db3c8630977648c7454361c1eb117ff5c6500446c656787c602869420",
+      "question_text": "현재 운영정책이 변경될 때 회사는 고객에게 어떤 방식으로 알려줘?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "automatic_semantic_false_full"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 51,
+      "candidate_id": "typed_generalization_candidate_sha256_b83fafe137a4dcc3e9487968153b0fee4492c4a5e743e6243cb88be899aede5c",
+      "question_text": "일반 상의 아바타와 상의 클론 아바타의 가격은 각각 얼마야?",
+      "before": {
+        "outcome": "incorrect",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "generator_value_selection"
+      },
+      "after": {
+        "outcome": "incorrect",
+        "gold_value_complete": false,
+        "false_full": false,
+        "failure_stage": "automatic_semantic_false_full"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 62,
+      "candidate_id": "typed_generalization_candidate_sha256_d5e9278ef4bf9e8657eef9e210d53f5e14a291b50260ba4b62ace0b30323de87",
+      "question_text": "6월 이달의 아이템은 언제 일괄 삭제됐어?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "automatic_semantic_false_full"
+      },
+      "requirements": []
+    },
+    {
+      "slot_ordinal": 64,
+      "candidate_id": "typed_generalization_candidate_sha256_36f20fc16dd4d509b493414745d1159607b80ffa0e784d379f0b4e331406debc",
+      "question_text": "이달의 아이템은 세라샵에서 어떤 방식으로 획득해?",
+      "before": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": null
+      },
+      "after": {
+        "outcome": "correct",
+        "gold_value_complete": true,
+        "false_full": false,
+        "failure_stage": "automatic_semantic_false_full"
+      },
+      "requirements": []
+    }
+  ],
+  "inputs": {
+    "sealed": {
+      "path": "data/v3/evaluation/typed_evidence_ref_generalization_64_sealed_e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597.jsonl",
+      "sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "documents": {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    "temporal": {
+      "path": "data/v3/temporal/global_temporal_overlay_v3.2_f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317.jsonl",
+      "sha256": "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317"
+    },
+    "table_facts": {
+      "path": "data/v3/structured/table_atomic_facts_v3.2_1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a.jsonl",
+      "sha256": "1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a"
+    }
+  },
+  "output": "outputs/v3/diagnostics/typed_evidence_ref_adaptive_source_addendum_rescore_v12_20260727.jsonl"
+}

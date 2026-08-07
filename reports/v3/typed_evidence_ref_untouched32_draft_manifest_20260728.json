@@ -1,0 +1,58 @@
+{
+  "builder_version": "typed-evidence-ref-untouched32-draft-builder-20260728-v2",
+  "status": "draft_pending_human_review_execution_locked",
+  "plan_sha256": "12267d2cd6aa5b9b2242a0c2eb96d44c6ffbc807408c97a97f733d6aa315ef24",
+  "row_count": 32,
+  "requirement_count": 53,
+  "pending_review_count": 32,
+  "execution_allowed_rows": 0,
+  "training_allowed_rows": 0,
+  "source_counts": {
+    "dnf_account_policy": 4,
+    "dnf_event": 4,
+    "dnf_faq": 4,
+    "dnf_game_guide": 4,
+    "dnf_monthly_item": 4,
+    "dnf_notice": 4,
+    "dnf_seria_shop": 4,
+    "dnf_update": 4
+  },
+  "dimension_counts": {
+    "boolean_direction": 4,
+    "direct_fact": 4,
+    "multi_requirement": 4,
+    "revision_selection": 4,
+    "sibling_relation": 4,
+    "table_attribute": 4,
+    "temporal_role": 4,
+    "unsupported_or_partial": 4
+  },
+  "inputs": {
+    "documents": {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    }
+  },
+  "outputs": {
+    "slots": {
+      "path": "data/review/typed_evidence_ref_untouched32_design_slots_20260728.jsonl",
+      "sha256": "83dc46738d28979f7b65a1420e2da42186ea1c156a8dd3a159ad16132b8c25ec"
+    },
+    "jsonl": {
+      "path": "data/review/typed_evidence_ref_untouched32_candidate_20260728.jsonl",
+      "sha256": "2a131c3425e2c8d7affc848ab5b335d31173aa6fd01f73f985b5e851157a718a"
+    },
+    "csv": {
+      "path": "data/review/typed_evidence_ref_untouched32_human_review_20260728.csv",
+      "sha256": "f3f914fdf90e39ae45ee2561ade01b42491d3756ad247a591b099d9e0c0d1f21"
+    }
+  },
+  "retrieval_run_performed": false,
+  "generation_run_performed": false,
+  "evaluation_run_performed": false,
+  "human_review_required_before_freeze": true
+}

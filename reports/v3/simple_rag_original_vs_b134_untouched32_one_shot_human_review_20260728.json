@@ -1,0 +1,245 @@
+{
+  "review_version": "simple-rag-untouched32-human-source-review-v1",
+  "reviewed_at": "2026-07-28T18:08:26.4128814+09:00",
+  "reviewer_id": "codex_source_review",
+  "evaluation_role": "human_reviewed_untouched32_first_one_shot_paired_ab_not_parent_blind",
+  "candidate_input": {
+    "path": "data/review/typed_evidence_ref_untouched32_candidate_20260728.jsonl",
+    "sha256": "2a131c3425e2c8d7affc848ab5b335d31173aa6fd01f73f985b5e851157a718a"
+  },
+  "sealed_set": {
+    "path": "data/v3/evaluation/simple_rag_untouched32_sealed_6b2bc67087d255af1b4cfdc9076b8dfd8d0cce2b2194e2e2210af08eb8a95198.jsonl",
+    "sha256": "6b2bc67087d255af1b4cfdc9076b8dfd8d0cce2b2194e2e2210af08eb8a95198"
+  },
+  "raw_cases": {
+    "path": "outputs/v3/untouched/simple_rag_original_vs_b134_untouched32_one_shot_20260728.jsonl",
+    "sha256": "491c575468072f65581d47ae89f29f55ff54f5f70a266244a9167ad319ec3c06"
+  },
+  "automatic_summary": {
+    "path": "reports/v3/simple_rag_original_vs_b134_untouched32_one_shot_20260728.json",
+    "sha256": "57c737e7b85c761ad40144a44be618f0119e4538d422b2010d748ae0b3647fa4"
+  },
+  "model": {
+    "tag": "qwen3-8b:ctx8192",
+    "digest": "e737aff7b8d457961517eb4895c0c1c597867d943a7f8dc82965eb826de324b8"
+  },
+  "shared_run": {
+    "retrieval_calls": 32,
+    "generation_calls": 31,
+    "generation_error_slots": [
+      1
+    ],
+    "generation_error_count": 1,
+    "exact_citation_coordinate_cases": 32,
+    "input_tokens": 113377,
+    "output_tokens": 8092,
+    "generation_latency_ms": {
+      "mean": 30972.995,
+      "p50": 27660.45,
+      "p95": 46619.021
+    },
+    "pipeline_latency_ms": {
+      "mean": 46860.389,
+      "p95": 74664.996
+    },
+    "wall_clock_ms": 1499698.875
+  },
+  "automatic_scoring": {
+    "a1_a3_baseline": {
+      "gold_value_complete": 11,
+      "typed_claim_complete": 9,
+      "automatic_semantic_false_full": 5
+    },
+    "frozen_b134": {
+      "gold_value_complete": 12,
+      "typed_claim_complete": 9,
+      "automatic_semantic_false_full": 6
+    }
+  },
+  "human_source_review": {
+    "semantically_adequate_candidate_slots": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      24,
+      29,
+      30,
+      31,
+      32
+    ],
+    "semantically_adequate_candidate_count": 25,
+    "retrieval_or_identity_miss_slots": [
+      3,
+      7,
+      23,
+      25,
+      26,
+      27,
+      28
+    ],
+    "a1_a3_baseline": {
+      "meaning_complete_correct_slots": [
+        4,
+        5,
+        6,
+        8,
+        9,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        29,
+        30
+      ],
+      "meaning_complete_correct": 15,
+      "meaning_complete_rate": 0.46875,
+      "actual_false_full_slots": [],
+      "actual_false_full": 0,
+      "unsafe_partial_grounding_slots": [
+        27
+      ],
+      "safe_incomplete_slots": [
+        1,
+        2,
+        3,
+        7,
+        10,
+        11,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        28,
+        31,
+        32
+      ]
+    },
+    "frozen_b134": {
+      "meaning_complete_correct_slots": [
+        4,
+        5,
+        6,
+        8,
+        9,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        24,
+        29,
+        30
+      ],
+      "meaning_complete_correct": 16,
+      "meaning_complete_rate": 0.5,
+      "actual_false_full_slots": [
+        27
+      ],
+      "actual_false_full": 1,
+      "safe_incomplete_slots": [
+        1,
+        2,
+        3,
+        7,
+        10,
+        11,
+        20,
+        21,
+        22,
+        23,
+        25,
+        26,
+        28,
+        31,
+        32
+      ]
+    }
+  },
+  "key_cases": [
+    {
+      "slot_ordinal": 1,
+      "classification": "generation_error_safe_abstention",
+      "detail": "정답 후보는 있었지만 Qwen이 구조화 답변 대신 4,000 출력 토큰을 소진해 length 오류가 발생했다."
+    },
+    {
+      "slot_ordinal": 10,
+      "classification": "verifier_overreject",
+      "detail": "모델은 2026-07-02~2026-07-23 기간을 맞게 골랐지만 인용문을 원문과 완전히 동일하게 복사하지 않아 두 Arm 모두 차단했다."
+    },
+    {
+      "slot_ordinal": 11,
+      "classification": "generator_value_selection_safe_partial",
+      "detail": "우편 보관 기간 15일은 맞았지만 하루 기준을 1일로 잘못 선택했다. verifier가 잘못된 요구를 차단해 partial로 남겼다."
+    },
+    {
+      "slot_ordinal": 20,
+      "classification": "verifier_overreject",
+      "detail": "두 칼레이도 박스의 값은 맞게 생성했지만 요약 인용이 exact contiguous 원문이 아니어서 모두 차단됐다."
+    },
+    {
+      "slot_ordinal": 21,
+      "classification": "generator_requirement_drift_blocked",
+      "detail": "휴면ID 12개월 질문 대신 현재 운영정책 버전과 시행일을 답했다. verifier가 비실재 인용을 차단했다."
+    },
+    {
+      "slot_ordinal": 22,
+      "classification": "generator_requirement_drift_blocked",
+      "detail": "비정상 재화 회수 여부 질문을 비인가 프로그램 이용제한 질문으로 바꿔 답했다. verifier가 전부 차단했다."
+    },
+    {
+      "slot_ordinal": 24,
+      "classification": "frozen_recovery_correct_partial",
+      "detail": "B3 공백 정규화 인용 복구로 길드장 위임 조건을 공식 동등 근거에서 복구했고, 문서에 없는 처리 기간은 unsupported로 유지했다."
+    },
+    {
+      "slot_ordinal": 27,
+      "classification": "actual_false_full",
+      "detail": "DNF 폴리스 상품의 정답 청크가 후보에 없는데, 가격이 같은 나비 무도회와 아라드 패스 웨딩 상품을 골랐다. B3가 형제 상품 인용을 복구하면서 두 잘못된 구성품 목록을 full answer로 노출했다."
+    },
+    {
+      "slot_ordinal": 31,
+      "classification": "generator_and_verifier_failure",
+      "detail": "후보 1위에 6월 상자와 4개 직접 근거가 있었지만 모델이 불필요한 날짜 요구를 추가했고 말줄임표가 든 비연속 인용을 만들어 전체 차단됐다."
+    },
+    {
+      "slot_ordinal": 32,
+      "classification": "temporal_verifier_overreject",
+      "detail": "모델은 거래 타입 교환가능과 구매 제한 unsupported를 정확히 생성했지만, 과거 5월 상품을 current temporal 정책으로 검사해 올바른 거래 타입까지 차단했다."
+    }
+  ],
+  "verdict": {
+    "promotion": "NO-GO",
+    "reason": "Frozen B1+B3+B4는 의미 완전 정답을 1건 늘렸지만 새로운 실제 false-full 1건과 생성 오류 1건이 발생했다.",
+    "adaptive_score_replaced": false,
+    "rerun_allowed": false,
+    "post_result_slot_specific_tuning_allowed": false
+  },
+  "provenance_note": "케이스 JSONL의 행별 evaluation_role은 기존 runner 상수로 남아 있지만, 봉인 manifest와 자동 summary의 untouched one-shot role이 권위 있는 실행 역할이다. 결과 행은 one-shot 이후 수정하지 않았다."
+}

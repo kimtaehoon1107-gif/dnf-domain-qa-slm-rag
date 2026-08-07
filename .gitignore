@@ -1,7 +1,12 @@
 .venv/
+.env
+.env.*
+!.env.example
 __pycache__/
 *.py[cod]
 .pytest_cache/
+# Node 의존성 — package.json 으로 재설치 가능, 커밋 제외
+node_modules/
 outputs/chroma/
 outputs/chroma*/
 outputs/slm_lora*/
@@ -13,3 +18,30 @@ outputs/*.md
 outputs/*.log
 outputs/*.err
 outputs/*.pid
+# 프로세스 콘솔 출력 — 하위 폴더 포함 (결과는 .json/.jsonl 에 있음)
+outputs/**/*.log
+outputs/**/*.err
+outputs/**/*.pid
+outputs/**/*.stdout.log
+outputs/**/*.stderr.log
+
+# --- v3 raw / 대용량 / 재생성 가능 (option 1: gitignore, 별도 백업) ---
+# raw 크롤 원본(immutable 스냅샷·이미지) — 사용자가 별도 백업, 절대 삭제 금지
+data/v3/detail_snapshots/
+data/v3/raw_snapshots/
+data/v3/visual_assets/
+# corpus+code로 재생성 가능
+data/v3/indexes/
+data/v3/collections/
+*.f32
+# 대용량 discovery 레지스트리(별도 백업, json 매니페스트는 유지)
+data/v3/discovery/*.jsonl
+
+# 잘못 배치된 로컬 Chroma 산출물 — 삭제·이동 없이 커밋에서 제외
+/src/outputs/
+
+# Reproducible v3 federated per-segment score dump (>20 MiB); keep locally.
+data/v3/evidence/federated_retrieval_ab_segment_scores_*.jsonl
+
+# Local generated image scratch files; never commit.
+tmp/

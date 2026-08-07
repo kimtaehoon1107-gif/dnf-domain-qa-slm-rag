@@ -1,0 +1,97 @@
+{
+  "report_schema_version": "product-free-rag-a6-human-adjudication-correction-v1",
+  "correction_id": "product-free-rag-a6-slot6-readjudication-20260806",
+  "effective_date": "2026-08-06",
+  "status": "final_no_go",
+  "go": false,
+  "correction_kind": "append_only_human_adjudication_layer",
+  "reviewer_authority": "project_owner_user",
+  "source_artifacts": {
+    "prior_adjudication_document": {
+      "path": "docs/v3/product_free_rag_a6_final_adjudication.md",
+      "sha256_before_append": "26a664dd51ee11c3461f3e964addd099693559e2c3e7c40067bcb5811216b698"
+    },
+    "one_shot_output": {
+      "path": "reports/v3/product_free_rag_a6_one_shot_4d47ef5d760fdb589fd1a81217d52908a77bd76a78b875384cd2315880c78499.jsonl",
+      "sha256": "1252ecda7546659b93c0253914541c045dbfadbac22477d0ed6e8d90db37c9c9"
+    },
+    "frozen_set": {
+      "path": "data/v3/evaluation/product_free_rag_a6_frozen_9405401d76c87b28418b795716938a3d62578644f33f2e853ddf18fc689b65dc.jsonl",
+      "sha256_before": "9405401d76c87b28418b795716938a3d62578644f33f2e853ddf18fc689b65dc",
+      "sha256_after": "9405401d76c87b28418b795716938a3d62578644f33f2e853ddf18fc689b65dc",
+      "modified": false
+    }
+  },
+  "slot_correction": {
+    "slot_ordinal": 6,
+    "question": "켈돈 자비 상점의 태초 광휘의 의지는 광휘의 잔영이 몇 개 필요하고 계정당 몇 번 살 수 있어? 각 태초 서약의 정확한 획득 확률도 알려줘.",
+    "evidence": "사용 시 무기고에 등록된 태초 서약을 제외한 태초 서약 중 1종을 균등한 확률로 획득할 수 있습니다.",
+    "model_answer": "태초 서약의 획득 확률은 균등한 확률로 1종을 획득할 수 있다.",
+    "before": {
+      "human_semantic_correct": false,
+      "human_false_full": true,
+      "human_unsupported_overclaim": false,
+      "rationale": "정확한 수치 확률이 없다는 frozen gold를 따라 근거 없는 확률 단정으로 판정"
+    },
+    "after": {
+      "human_semantic_correct": true,
+      "human_false_full": false,
+      "human_unsupported_overclaim": false,
+      "rationale": "프로젝트 오너 도메인 판정: 균등한 확률로 1종 획득한다는 답은 원문에 충실하며 질문에 대한 유효한 답"
+    },
+    "gold_error_found": true,
+    "gold_error": "primal_oath_exact_probability를 unsupported로 둔 평가 gold가 공식 원문의 균등 획득 정보를 정답으로 인정하지 못함"
+  },
+  "aggregate_before": {
+    "semantic_correct": 19,
+    "case_count": 32,
+    "semantic_accuracy": 0.59375,
+    "false_full_slots": [
+      6
+    ],
+    "unsupported_overclaim_slots": [
+      22
+    ],
+    "gold_error_count": 0
+  },
+  "aggregate_after": {
+    "semantic_correct": 20,
+    "case_count": 32,
+    "semantic_accuracy": 0.625,
+    "false_full_slots": [],
+    "unsupported_overclaim_slots": [
+      22
+    ],
+    "gold_error_count": 1
+  },
+  "remaining_failed_slots": [
+    1,
+    2,
+    4,
+    7,
+    10,
+    11,
+    13,
+    14,
+    22,
+    26,
+    28,
+    32
+  ],
+  "verification": {
+    "targeted_tests_passed": 3,
+    "v3_tests_passed": 1257,
+    "v3_subtests_passed": 67,
+    "exempt_existing_failures": [
+      "test_retrieve_decomposed::test_actual_adaptive_pilot_refreezes_from_frozen_child_embeddings",
+      "test_run_unified_runtime::test_full_replay_is_content_addressed_and_reproducible"
+    ],
+    "new_regressions": 0
+  },
+  "notes": [
+    "This correction changes only the human adjudication layer.",
+    "The frozen A6 set, one-shot output, runtime, evidence pack, and verifier are unchanged.",
+    "The 62.5% semantic accuracy remains below the 80% GO threshold.",
+    "Slot 22 remains the single human-confirmed unsupported overclaim."
+  ]
+}

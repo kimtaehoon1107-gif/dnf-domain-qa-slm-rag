@@ -1,0 +1,27 @@
+{
+  "incident_schema_version": "typed-evidence-ref-generalization-technical-abort-v1",
+  "recorded_at": "2026-07-24T21:20:21.0050759+09:00",
+  "cause": "The outer shell_command was configured with timeout_ms=10000 and terminated the Python runner with exit code 124.",
+  "scope": "Process-management failure outside the frozen evaluation code.",
+  "sealed_set_sha256": "e56780c88fcf74d339833d3bc31d125a46d6144839eb10e513d2edf32b85a597",
+  "seal_manifest_sha256": "bbfffbe39aa401c7d9c317c31ace393e6c78b250d1acd13ec139a5187d776cdd",
+  "original_attempt_marker": {
+    "original_relative_path": "outputs/v3/typed_evidence_ref_generalization_64_one_shot_e56780c88fcf74d3/attempt_started_a91b3d14e37e443bfe996489901a0cfafe30e0fcc1e8b0ab7614d6d8ce987ab3.json",
+    "sha256": "a91b3d14e37e443bfe996489901a0cfafe30e0fcc1e8b0ab7614d6d8ce987ab3"
+  },
+  "state_after_abort": {
+    "generation_checkpoint_count": 0,
+    "case_artifact_count": 0,
+    "summary_artifact_count": 0,
+    "python_process_count": 0,
+    "llm_generation_started": false,
+    "evaluation_results_exposed": false
+  },
+  "retry_policy": {
+    "authorized_by_user": true,
+    "frozen_code_or_configuration_changes_allowed": false,
+    "report_process_launches": 2,
+    "report_completed_generation_runs": 1,
+    "claim_exact_one_process_run": false
+  }
+}

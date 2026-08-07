@@ -1,0 +1,90 @@
+{
+  "canonical_ab": {
+    "manifest_path": "data/v3/retrieval/requirement_retrieval_ab_manifest_40fc2122cb462f97ac930f201e817e7784c4c17a5be07485e2b244d926597788.json",
+    "manifest_sha256": "40fc2122cb462f97ac930f201e817e7784c4c17a5be07485e2b244d926597788",
+    "report_path": "reports/v3/requirement_retrieval_ab_ff945c4b87b691b248ced8a3541ba53cd025f41183dd03de5dddf00ae8b45cd9.json",
+    "report_sha256": "ff945c4b87b691b248ced8a3541ba53cd025f41183dd03de5dddf00ae8b45cd9",
+    "route_policy_source": "actual frozen runtime route"
+  },
+  "decision": "NO_GO_REQUIREMENT_RETRIEVAL",
+  "interpretation_schema_version": "requirement-retrieval-ab-interpretation-v3.1",
+  "metrics": {
+    "arm_a": {
+      "candidate_recovery": "0/7",
+      "exact_span_validity": 1.0,
+      "false_full": "9/82",
+      "false_full_to_grounded": "0/7",
+      "grounded": "73/82",
+      "new_false_full": 0,
+      "nonacceptable_citation_proxy": 174,
+      "same_parent": "7/7"
+    },
+    "question_union_requirement": {
+      "candidate_recovery": "0/7",
+      "evidence_group_candidate_recovery": "0/13",
+      "exact_span_validity": 1.0,
+      "false_full": "18/82",
+      "false_full_to_grounded": "0/7",
+      "grounded": "64/82",
+      "grounded_regressions": 11,
+      "mean_spans_per_supported_requirement": 2.94244604,
+      "new_false_full": 11,
+      "nonacceptable_citation_proxy": 250,
+      "same_parent": "7/7"
+    },
+    "requirement_only": {
+      "candidate_recovery": "0/7",
+      "evidence_group_candidate_recovery": "0/13",
+      "exact_span_validity": 1.0,
+      "false_full": "19/82",
+      "false_full_to_grounded": "0/7",
+      "grounded": "63/82",
+      "grounded_regressions": 12,
+      "mean_spans_per_supported_requirement": 2.85611511,
+      "new_false_full": 12,
+      "nonacceptable_citation_proxy": 250,
+      "same_parent": "7/7"
+    }
+  },
+  "cost": {
+    "question_union_requirement": {
+      "pair_count": 29233,
+      "question_median_ms": 1387.805,
+      "question_p95_ms": 4405.664
+    },
+    "requirement_only": {
+      "pair_count": 24549,
+      "question_median_ms": 1293.922,
+      "question_p95_ms": 3996.616
+    },
+    "requirement_search": {
+      "call_count": 139,
+      "median_ms": 2.126,
+      "p95_ms": 4.697
+    }
+  },
+  "earliest_stage_attribution": {
+    "frozen_route_excludes_gold_source": "6/7",
+    "frozen_route_includes_gold_source": "1/7",
+    "route_aligned_but_requirement_top10_miss": "1/1",
+    "interpretation": "Six cases are upstream route/source-envelope failures; one is a requirement-query or index-recall miss."
+  },
+  "cross_parent": {
+    "candidate_recovery": "0/1 target",
+    "grounded": "0/2 taxonomy controls",
+    "trigger": "1/2 taxonomy controls"
+  },
+  "preliminary_superseded": {
+    "manifest_sha256": "b88fd25b4472eb886d96bda0a94517d1a9bdd2540bd1a427bd11f17ea7725013",
+    "reason": "It inferred route source policy from returned candidates instead of using the actual frozen runtime route.",
+    "report_sha256": "1e0f4610787355e08342725d4fcc98f0a4eb9cb7ed9d28dcc061e6146d258cff"
+  },
+  "scope": {
+    "canonical_or_runtime_promotion": false,
+    "frozen_blind_accessed": false,
+    "gold_label_question_changed": false,
+    "gold_source_or_chunk_ids_used_before_scoring": false,
+    "index_changed": false,
+    "training": false
+  }
+}

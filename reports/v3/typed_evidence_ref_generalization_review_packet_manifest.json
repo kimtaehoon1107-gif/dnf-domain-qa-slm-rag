@@ -1,0 +1,62 @@
+{
+  "manifest_schema_version": "typed-evidence-ref-generalization-review-packet-manifest-v1",
+  "created_at": "2026-07-24",
+  "status": "pending_authoring_and_human_review",
+  "evaluation_execution_allowed": false,
+  "row_count": 64,
+  "approved_row_count": 0,
+  "pending_row_count": 64,
+  "source_counts": {
+    "dnf_notice": 8,
+    "dnf_update": 8,
+    "dnf_event": 8,
+    "dnf_game_guide": 8,
+    "dnf_faq": 8,
+    "dnf_account_policy": 8,
+    "dnf_seria_shop": 8,
+    "dnf_monthly_item": 8
+  },
+  "primary_dimension_counts": {
+    "temporal_role": 8,
+    "boolean_direction": 8,
+    "sibling_relation": 8,
+    "multi_requirement": 8,
+    "table_attribute": 8,
+    "revision_selection": 8,
+    "unsupported_or_partial": 8,
+    "direct_fact": 8
+  },
+  "inputs": [
+    {
+      "role": "preregistered_plan",
+      "path": "data/v3/evaluation/typed_evidence_ref_generalization_plan_v1.json",
+      "sha256": "3f76d1416d5e4ac4f450de84ab42b6ece2963c2aca873e14e45948fa0b3dcfbd"
+    },
+    {
+      "role": "packet_builder",
+      "path": "src/v3/build_typed_evidence_ref_generalization_review_packet.py",
+      "sha256": "bbc09d2255d6ff501c68c42c71fc9bf5e2b1274bd70211cc856757871eccee6b"
+    }
+  ],
+  "outputs": [
+    {
+      "role": "machine_authoring_slots",
+      "path": "data/review/typed_evidence_ref_generalization_review_slots_64.jsonl",
+      "sha256": "3bea58c0d5ceca5184cd77d667ea31e1d12ff8ee4d35570eb552ae1588e8ed17"
+    },
+    {
+      "role": "human_editable_review_sheet",
+      "path": "data/review/typed_evidence_ref_generalization_review_slots_64.csv",
+      "sha256": "7da01ed104479000a3d14b34a3d384de5f6e46f26f8135cb4f32e30a5f9a6bda"
+    }
+  ],
+  "locks": {
+    "questions_written": false,
+    "gold_written": false,
+    "human_review_complete": false,
+    "frozen_evaluation_set_exists": false,
+    "retrieval_run_allowed": false,
+    "generation_run_allowed": false,
+    "ab_run_allowed": false
+  }
+}

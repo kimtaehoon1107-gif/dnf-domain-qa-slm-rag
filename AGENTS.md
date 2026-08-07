@@ -6,7 +6,7 @@
 
 > **이 파일 업데이트 원칙**: 여기는 "코드만 봐서는 알 수 없는, 반복되면 안 되는 교훈"만 적는다. 어댑터 이름·수치·이번 주 진행상황처럼 매번 바뀌는 건 여기 넣지 말고 [docs/project_progress_report.md](docs/project_progress_report.md)에만 기록할 것. 새로운 durable 교훈이 생겼을 때만 아래 목록에 한두 줄 추가.
 >
-> **지금 진행 중인 작업**은 [docs/agent_handoff.md](docs/agent_handoff.md)를 확인 — Current Goal/State/Do Not Do/Next Actions가 매 사이클 최신으로 덮어써져 있음.
+> **진행 기록과 인계 상태**는 [docs/agent_handoff.md](docs/agent_handoff.md)를 참고한다. 다만 새 리뉴얼/연구 브랜치에서는 해당 문서의 과거 릴리즈 잠금 규칙을 그대로 현재 목표로 간주하지 말고, 새 목표에 맞게 별도 handoff를 갱신할 것.
 
 ## ⚠️ 가장 중요한 함정들
 
@@ -16,7 +16,7 @@
 4. **`answerability_accuracy` 단독으로 성능 판단 금지.** true/false/partial 라벨만 맞는지 보는 지표라, `exact_citation`/`retrieval_expected_hit_rate` 없이 보면 과대평가됨(실측: domain answerability_accuracy=1.0인데 exact_citation=0.2556). 세 지표를 항상 같이 리포트.
 5. **Oracle eval(`run_tuned_slm_oracle_eval.py`)은 `evidence_span`(정답 문장만 오려낸 짧은 텍스트)을 넣어줌, 청크 전체가 아님.** oracle=1.0은 "SLM이 완벽하다"가 아니라 "노이즈 없는 정답 문장이 주어지면 형식을 잘 지킨다"는 뜻. `chunk_oracle`과 `span_oracle`을 구분해서 해석할 것.
 6. **RAFT 학습 데이터에서 gold 문서 위치가 항상 1번이면 모델이 "1등만 베끼는" 습관을 학습함.** 실측: `domain_raft_sample_expanded_gate_balanced.jsonl`의 citations 보유 279행 전부 gold가 documents[0]. 새 RAFT를 만들 때는 gold 위치를 반드시 랜덤화하고 gold 앞에도 distractor를 배치할 것.
-7. **`fresh_paraphrase_eval_set.jsonl`은 adaptive dev이며 학습에는 계속 금지.** 개별 실패가 반복적으로 모델/데이터 변경을 이끌었으므로 최종 blind 성능으로 부르지 말 것. `data/review/blind_test_v1_candidate.jsonl`은 사람 검수·freeze 전에는 검색/생성 평가도 금지하며 모든 학습 컨텍스트에서 제외할 것.
+7. **`fresh_paraphrase_eval_set.jsonl`은 adaptive dev이며 학습에는 계속 금지.** 개별 실패가 반복적으로 모델/데이터 변경을 이끌었으므로 최종 blind 성능으로 부르지 말 것. 새 blind 후보는 검수·freeze 전에는 검색/생성 평가도 금지하며 모든 학습 컨텍스트에서 제외할 것.
 8. **Hard negative는 answer-aware 필터가 필수.** gold/same-parent 제외만으로는 부족하다. 다른 부모 문서가 같은 사실을 반복해 valid evidence가 distractor로 들어갈 수 있으므로 exact `evidence_span` 및 높은 evidence-token overlap을 제거해야 한다. 미필터 arm은 실측상 거절은 좋아졌지만 exact citation을 크게 망쳤다.
 9. **blind 문서 누수는 gold/train QA만이 아니라 RAFT의 모든 context에서 검사.** 정답 문서가 distractor로 한 번이라도 학습에 들어가면 parent-document held-out가 깨진다. frozen blind를 평가할 모델은 base에서 새로 시작하고, gold+distractor 전체 기준 blind parent/chunk overlap `0`인 RAFT만 사용해야 한다.
 10. **계획한 마지막 step을 채웠다고 더 좋은 모델이 되는 것은 아니다.** clean step-264는 checkpoint-250보다 dev loss가 낮았지만 fresh/human Partial citation과 joint가 악화됐다. 완료 여부가 아니라 고정된 end-task dev gate로 checkpoint를 선택할 것.
@@ -33,11 +33,6 @@
 - SLM 진단: **run_tuned_slm_oracle_eval.py**(gold-only 컨텍스트로 상한선 측정) · **analyze_tuned_slm_diagnostics.py**(rank별 인용 성공률, 과잉거절 사례 등 실패 패턴 집계)
 - 기타: **train_label_classifiers.py** · **label_studio_io.py** · **make_review_samples.py** · **run_smoke_tests.py**
 
-## 현재 데이터/모델 상태
-
-바뀌는 정보(최신 어댑터/RAFT 파일명/수치)는 여기 두지 않음 — 볼 때마다 낡아서 오히려 위험함.
-**최신 상태는 항상 [docs/project_progress_report.md](docs/project_progress_report.md)의 "4. 현재 상태 스냅샷" 절을 확인.** `ls outputs/`, `ls data/processed/`로 실물도 같이 확인할 것.
-
 ## Commands (PowerShell, cwd = repo root)
 
 ```powershell
@@ -51,11 +46,6 @@ python src/build_index.py --docs data/processed/domain_doc_chunks.jsonl --persis
 python src/validate_domain_dataset.py   # 리키지 검증, 배포 전 필수
 python src/run_smoke_tests.py
 python app/gradio_app.py
-
-# SLM 평가 3종 + 진단 (<adapter-dir>은 outputs/ 안의 실제 최신 어댑터 경로로 치환)
-python src/run_tuned_slm_smoke.py --adapter-dir <adapter-dir> --eval-set data/processed/domain_eval_set_expanded.jsonl --persist-dir outputs/chroma_domain_chunks --output outputs/_domain.json
-python src/run_tuned_slm_oracle_eval.py --adapter-dir <adapter-dir> --eval-set data/processed/domain_eval_set_expanded.jsonl --chunks data/processed/domain_doc_chunks.jsonl --output outputs/_domain_oracle.json
-python src/analyze_tuned_slm_diagnostics.py --report domain=outputs/_domain.json
 ```
 
 ## 규칙
@@ -66,13 +56,5 @@ python src/analyze_tuned_slm_diagnostics.py --report domain=outputs/_domain.json
 - 새 학습/평가 데이터를 만들면 **`validate_domain_dataset.py`를 반드시 통과**시킬 것(parent/chunk/question 3종 누수 0 확인).
 - 지표명은 recall이 아니라 **hit_rate@k**(retrieval), `exact_citation`(인용 정확도)은 `parsed_citation_hit`가 집합 교집합(any-hit)이라 다소 관대한 지표임을 감안.
 - 라이브러리 함수는 `SystemExit` 대신 `RuntimeError`.
-
-## Known limitations / next
-
-- **검색 recall 문제**: domain eval에서 gold 근거가 top-3 후보에 없는 경우가 58/90(64%). candidate_k 확장/hybrid 튜닝 우선 필요, reranker는 그 다음.
-- **부분답변 품질 취약**: current adaptive fresh dev가 6행뿐이고 partial joint success가 낮다. 신규 blind 후보 검수와 partial 질문 확장이 다음 데이터 게이트다.
-- **Hard-negative 후속은 보류**: answer-filtered artifact까지는 생성·검증됐지만 사람 검토 전 즉시 재학습하지 않는다. 기존 미필터 arm은 비승격.
-- intent router(`shop_price/active_event/patch_note/notice/unanswerable/ood_safety`) 미구현, shop_price 구조화 데이터 소스 미해결.
-- ablation용 인덱스/데이터 파일 다수 미정리(위 표 참조).
 
 > 상세 진행 기록: [docs/guide_rag_stage1.md](docs/guide_rag_stage1.md)(Stage 1 크롤링/청킹) · [docs/tuned_slm_failure_diagnosis.md](docs/tuned_slm_failure_diagnosis.md)(SLM 실패 진단) · [docs/project_progress_report.md](docs/project_progress_report.md)(전체 진행 보고서, 초보자용)

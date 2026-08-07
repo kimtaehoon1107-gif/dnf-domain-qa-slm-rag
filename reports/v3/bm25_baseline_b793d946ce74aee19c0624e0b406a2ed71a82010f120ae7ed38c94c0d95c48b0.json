@@ -1,0 +1,58 @@
+{
+  "built_at": "2026-07-18T01:35:07+09:00",
+  "dense_token_measurement": {
+    "error": null,
+    "model_max_length": 8192,
+    "model_name": "BAAI/bge-m3",
+    "over_threshold": {
+      "1024": 80,
+      "512": 1182,
+      "8192": 0
+    },
+    "row_count": 3599,
+    "status": "measured",
+    "token_length": {
+      "max": 1187,
+      "mean": 398.53,
+      "min": 44,
+      "p50": 252,
+      "p90": 879,
+      "p95": 953,
+      "p99": 1068
+    },
+    "tokenizer_class": "XLMRobertaTokenizer"
+  },
+  "dense_tokenizer_readiness": "GO",
+  "gates": {
+    "chunk_count_matches_expected": true,
+    "default_searchable_chunk_count_matches_expected": true,
+    "deterministic_rebuild_mismatch": 0,
+    "duplicate_index_chunk_ids": 0,
+    "entry_ordinal_sequence_mismatches": 0,
+    "index_chunk_id_set_mismatch": 0,
+    "index_document_count_matches_chunks": true,
+    "invalid_postings": 0,
+    "smoke_decision_is_go": true
+  },
+  "lexical_baseline_decision": "GO",
+  "manifest_path": "data/v3/indexes/bm25_manifest_f963e4e6a8bd64540ec030cdd3a4e881cd4034d833655dc624b838cafae8dbea.json",
+  "manifest_sha256": "f963e4e6a8bd64540ec030cdd3a4e881cd4034d833655dc624b838cafae8dbea",
+  "report_schema_version": "dnf_bm25_baseline_report_v3.1",
+  "smoke": {
+    "default_policy_violations": 0,
+    "default_title_lookup_cases": 8,
+    "default_title_lookup_hit_at_5": 8,
+    "historical_and_visual_control_cases": 4,
+    "historical_and_visual_control_hit_at_5": 4,
+    "non_default_target_leaks": 0,
+    "smoke_decision": "GO"
+  },
+  "smoke_path": "data/v3/retrieval/bm25_smoke_9a6ea43369174ef761f95e7a371bf9fdcf8e0c5824732e28bea06e4b2fc487c0.jsonl",
+  "smoke_sha256": "9a6ea43369174ef761f95e7a371bf9fdcf8e0c5824732e28bea06e4b2fc487c0",
+  "summary": {
+    "average_document_length": 176.56098916365656,
+    "default_searchable_chunks": 2527,
+    "indexed_chunks": 3599,
+    "vocabulary_terms": 29980
+  }
+}

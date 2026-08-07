@@ -1,0 +1,152 @@
+{
+  "asset_fetch_distribution": {
+    "failed": 3,
+    "success": 177
+  },
+  "by_source": {
+    "dnf_event": {
+      "assets": 147,
+      "documents": 5,
+      "ocr_chars": 7319,
+      "status": {
+        "resolved": 3,
+        "resolved_with_tolerated_css_404": 2
+      }
+    },
+    "dnf_faq": {
+      "assets": 25,
+      "documents": 12,
+      "ocr_chars": 3753,
+      "status": {
+        "resolved": 12
+      }
+    },
+    "dnf_game_guide": {
+      "assets": 7,
+      "documents": 1,
+      "ocr_chars": 711,
+      "status": {
+        "resolved": 1
+      }
+    }
+  },
+  "correction_overlay": [
+    {
+      "canonical_url": "https://df.nexon.com/df/pg/13th",
+      "correction_reason": "canonical_detail_redirected_off_path",
+      "effective_default_exposure": false,
+      "effective_eligible_for_collection": false,
+      "effective_status": "unavailable_redirect",
+      "evidence_content_hash": "09136df7f35f26285ff99a5bb9efa462e786e5dbb5e3a9a6236cf826181d5715",
+      "normalization_eligible": false,
+      "observed_at": "2026-07-17T23:28:32.5730462+09:00",
+      "observed_final_url": "https://df.nexon.com/",
+      "original_default_exposure": true,
+      "original_eligible_for_collection": true,
+      "original_status": "current",
+      "overlay_schema_version": "dnf_discovery_correction_overlay_v3.1",
+      "source_id": "dnf_event",
+      "visual_version": "dnf_visual_evidence_pilot_v3.1"
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/arcana",
+      "correction_reason": "canonical_detail_redirected_off_path",
+      "effective_default_exposure": false,
+      "effective_eligible_for_collection": false,
+      "effective_status": "unavailable_redirect",
+      "evidence_content_hash": "7c7d2a9f674640f1a5e0ff871556e881767aa4cb33d5865018954c1135d334a6",
+      "normalization_eligible": false,
+      "observed_at": "2026-07-17T23:28:32.5730462+09:00",
+      "observed_final_url": "https://df.nexon.com/",
+      "original_default_exposure": false,
+      "original_eligible_for_collection": true,
+      "original_status": "expired",
+      "overlay_schema_version": "dnf_discovery_correction_overlay_v3.1",
+      "source_id": "dnf_event",
+      "visual_version": "dnf_visual_evidence_pilot_v3.1"
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/crystalball",
+      "correction_reason": "canonical_detail_redirected_off_path",
+      "effective_default_exposure": false,
+      "effective_eligible_for_collection": false,
+      "effective_status": "unavailable_redirect",
+      "evidence_content_hash": "0236384f6065f702717e21b20c0fdc9a51fbb3ed9b4c1ab22cb6f064682b89f2",
+      "normalization_eligible": false,
+      "observed_at": "2026-07-17T23:28:32.5730462+09:00",
+      "observed_final_url": "https://df.nexon.com/",
+      "original_default_exposure": false,
+      "original_eligible_for_collection": true,
+      "original_status": "expired",
+      "overlay_schema_version": "dnf_discovery_correction_overlay_v3.1",
+      "source_id": "dnf_event",
+      "visual_version": "dnf_visual_evidence_pilot_v3.1"
+    }
+  ],
+  "document_status_distribution": {
+    "resolved": 16,
+    "resolved_with_tolerated_css_404": 2
+  },
+  "document_v3_promotion_decision": "GO",
+  "failure_rows": [
+    {
+      "asset_url": "https://cdn.df.nexon.com/img/event/common/pkg/expand.png",
+      "document_url": "https://df.nexon.com/pg/2026newchargift",
+      "error": "HTTP 404 or empty response",
+      "fetch_status": "failed",
+      "ocr_status": "not_run_fetch_failed",
+      "tolerated_for_document": true
+    },
+    {
+      "asset_url": "https://bbscdn.df.nexon.com/pg/aradfishing/img/ly_info1_NPxeVge6m6neVA.png",
+      "document_url": "https://df.nexon.com/pg/aradfishing",
+      "error": "HTTP 404 or empty response",
+      "fetch_status": "failed",
+      "ocr_status": "not_run_fetch_failed",
+      "tolerated_for_document": true
+    },
+    {
+      "asset_url": "https://bbscdn.df.nexon.com/pg/aradfishing/img/ly_info1_txt_NPn0ne5fTtoVKb.png",
+      "document_url": "https://df.nexon.com/pg/aradfishing",
+      "error": "HTTP 404 or empty response",
+      "fetch_status": "failed",
+      "ocr_status": "not_run_fetch_failed",
+      "tolerated_for_document": true
+    }
+  ],
+  "fetched_at": "2026-07-17T23:28:32.5730462+09:00",
+  "manifest_path": "data/v3/visual_evidence/visual_evidence_manifest_ff585eb897627edd9bceae3f643fe5ac23904a07fcbed7b5fbe51cb59e64050b.json",
+  "manifest_sha256": "ff585eb897627edd9bceae3f643fe5ac23904a07fcbed7b5fbe51cb59e64050b",
+  "ocr_status_distribution": {
+    "not_run_fetch_failed": 3,
+    "success": 176
+  },
+  "report_schema_version": "dnf_visual_evidence_report_v3.1",
+  "summary": {
+    "asset_fetch_blocked": 0,
+    "asset_fetch_failed": 3,
+    "asset_fetch_success": 177,
+    "asset_hash_mismatches": 0,
+    "asset_rows": 180,
+    "correction_overlay_rows": 3,
+    "default_exposure_corrections": 1,
+    "image_asset_rows": 179,
+    "normalization_candidates_after_visual": 979,
+    "ocr_engine_failed": 0,
+    "ocr_nonempty_assets": 109,
+    "ocr_not_run_fetch_failed": 3,
+    "ocr_success": 176,
+    "ocr_total_chars": 11902,
+    "partial_documents": 0,
+    "resolved_documents": 18,
+    "resolved_with_tolerated_css_404": 2,
+    "stylesheet_rows": 1,
+    "target_documents": 18,
+    "tolerated_css_404_assets": 3,
+    "unresolved_default_documents": 0,
+    "unresolved_documents": 0
+  },
+  "unresolved_documents": [],
+  "visual_evidence_decision": "GO",
+  "visual_version": "dnf_visual_evidence_pilot_v3.1"
+}

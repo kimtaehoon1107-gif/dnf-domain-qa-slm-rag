@@ -1,0 +1,5859 @@
+{
+  "by_source": {
+    "dnf_account_policy": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "full:account_policy:current": 1,
+        "full:account_policy:superseded": 50
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 51,
+      "status_distribution": {
+        "current": 1,
+        "superseded": 50
+      },
+      "success": 51
+    },
+    "dnf_event": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "full:event:current": 25,
+        "full:event:expired": 2
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 27,
+      "status_distribution": {
+        "current": 25,
+        "expired": 2
+      },
+      "success": 27
+    },
+    "dnf_faq": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "full:faq:current": 279
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 279,
+      "status_distribution": {
+        "current": 279
+      },
+      "success": 279
+    },
+    "dnf_game_guide": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "full:game_guide:current": 125
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 125,
+      "status_distribution": {
+        "current": 125
+      },
+      "success": 125
+    },
+    "dnf_monthly_item": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "full:monthly_item:current": 1,
+        "full:monthly_item:expired": 13
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 14,
+      "status_distribution": {
+        "current": 1,
+        "expired": 13
+      },
+      "success": 14
+    },
+    "dnf_notice": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "full:account_policy:current": 10,
+        "full:enforcement_notice:current": 52,
+        "full:general_notice:current": 118,
+        "full:hotfix:current": 89,
+        "full:known_issue:current": 65,
+        "full:maintenance:current": 62
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 396,
+      "status_distribution": {
+        "current": 396
+      },
+      "success": 396
+    },
+    "dnf_seria_shop": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "full:shop_product:current": 30,
+        "full:shop_product:expired": 42
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 72,
+      "status_distribution": {
+        "current": 30,
+        "expired": 42
+      },
+      "success": 72
+    },
+    "dnf_update": {
+      "blocked": 0,
+      "bucket_distribution": {
+        "full:patch_note:current": 15,
+        "full:preview_patch:unknown": 3
+      },
+      "failed": 0,
+      "parser_failed": 0,
+      "selected": 18,
+      "status_distribution": {
+        "current": 15,
+        "unknown": 3
+      },
+      "success": 18
+    }
+  },
+  "collection_mode": "full",
+  "collector_version": "dnf_detail_full_v3.0",
+  "decision_reason": "전체 eligible 집합이 95% 이상 성공했고 특수 locator·raw hash·노출 정책 게이트를 충족했다.",
+  "extraction": {
+    "date_metadata_rows": 555,
+    "date_signal_rows": 671,
+    "guide_refresh_exact_match_rows": 0,
+    "guide_refresh_rows": 125,
+    "heading_rows": 703,
+    "image_count": 6521,
+    "image_rows": 741,
+    "price_signal_rows": 198,
+    "table_count": 1441,
+    "table_rows": 385
+  },
+  "failure_rows": [],
+  "fetched_at": "2026-07-17T21:53:16.6990081+09:00",
+  "full_collection_decision": "GO",
+  "gate_details": {
+    "default_exposure_violation_urls": [],
+    "faq_resolution_error_urls": [],
+    "policy_revision_error_urls": [],
+    "raw_hash_mismatch_paths": [],
+    "text_empty_urls": [],
+    "title_empty_urls": []
+  },
+  "ledger_path": "data/v3/collections/detail_full_collection_ledger_0165b356041a60ca920949b9d8c4436cb7509bdf7787fe97fee90fb9856ce12b.jsonl",
+  "ledger_sha256": "0165b356041a60ca920949b9d8c4436cb7509bdf7787fe97fee90fb9856ce12b",
+  "manifest_path": "data/v3/collections/detail_full_collection_manifest_f3003742b55a515e51c2abaee5a993cea9b1f108297f59c74a9aeaa201f87e97.json",
+  "manifest_sha256": "f3003742b55a515e51c2abaee5a993cea9b1f108297f59c74a9aeaa201f87e97",
+  "next_stage": "parser_quality_hardening",
+  "next_stage_decision": "GO",
+  "preview_path": "data/v3/collections/detail_full_extraction_preview_e48f58e205a7001e23e3286cc7df2d467bf8b549f9ce449b82a46a6accf8e1dd.jsonl",
+  "preview_sha256": "e48f58e205a7001e23e3286cc7df2d467bf8b549f9ce449b82a46a6accf8e1dd",
+  "registry_path": "data/v3/discovery/source_registry_04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a.jsonl",
+  "registry_sha256": "04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a",
+  "report_schema_version": "dnf_detail_full_collection_v3.0",
+  "selection": {
+    "adjustments": [],
+    "default_exposure_false": 110,
+    "default_exposure_true": 872,
+    "policy": "all frozen registry rows with eligible_for_collection=true",
+    "selected_by_source": {
+      "dnf_account_policy": 51,
+      "dnf_event": 27,
+      "dnf_faq": 279,
+      "dnf_game_guide": 125,
+      "dnf_monthly_item": 14,
+      "dnf_notice": 396,
+      "dnf_seria_shop": 72,
+      "dnf_update": 18
+    },
+    "selected_total": 982,
+    "selection_version": "dnf_detail_full_v3.0"
+  },
+  "summary": {
+    "blocked": 0,
+    "default_exposure_violations": 0,
+    "failed": 0,
+    "faq_resolution_errors": 0,
+    "missing_source_success": [],
+    "parser_failed": 0,
+    "parser_warnings_and_failures_recorded": true,
+    "policy_revision_errors": 0,
+    "raw_hash_mismatches": 0,
+    "selected_total": 982,
+    "success": 982,
+    "success_rate": 1.0,
+    "success_text_empty": 0,
+    "success_title_empty": 0
+  },
+  "warning_rows": [
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2011-09-17&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2013-01-25&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2013-05-23&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2013-12-12&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2013-12-19&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2014-02-27&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2014-08-07&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2014-09-15&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2015-02-05&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2015-02-10&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2015-04-07&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2015-05-19&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2015-08-13&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2015-09-20&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2015-11-05&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2016-08-25&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2016-09-18&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2017-04-27&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2017-05-26&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2017-09-21&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2017-11-24&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2017-12-28&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2018-01-04&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2018-02-05&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2018-03-11&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2018-06-29&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2018-08-10&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2018-12-02&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2019-06-20&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2019-07-23&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2020-07-18&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2020-08-02&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2020-12-04&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2021-01-21&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2022-01-01&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2022-03-17&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2022-06-26&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2022-08-04&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2023-04-06&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2023-04-08&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2023-06-01&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2023-06-10&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2023-09-21&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2023-10-07&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2024-04-27&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2024-05-18&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2024-10-10&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2024-11-16&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2025-04-26&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2025-11-01&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/policy/home?revision=2026-03-15&type=1",
+      "source_id": "dnf_account_policy",
+      "warnings": [
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/event/2927808",
+      "source_id": "dnf_event",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/event/2927983",
+      "source_id": "dnf_event",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/626",
+      "source_id": "dnf_event",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/df/pg/13th",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/df/pg/priestdoll",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/2026newchargift",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/2026summeroracle",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/aradfishing",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/aradpass26_s3",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/arcana",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/butterflycombo",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/coolsummernightpcb",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/crystalball",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/michaelapreviewlive",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/newcharacterpkg",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/newcharsupply",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/oceanmiracle",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/seriapkg_new",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "navigation_or_footer_signal",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/skyofathousandseaspreview",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/summerblossom",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/summerboostup26",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/summersevengift",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/trinity",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/tropicalpkg",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/weddingcombo",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pr/2026newchargift",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pr/newfacewithnxp",
+      "source_id": "dnf_event",
+      "warnings": [
+        "body_fallback_navigation_risk",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=2792",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=2793",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=2796",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=2808",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=2870",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=3273",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=3274",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=3275",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=3277",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4000",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4593",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4594",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4595",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4596",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4801",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4802",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4803",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4804",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4806",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4810",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4811",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4812",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4816",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4820",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4824",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4835",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4842",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4843",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4844",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4846",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4847",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4850",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4851",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4852",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4854",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4856",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4857",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4866",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4867",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4869",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4872",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4874",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4879",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4880",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4885",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4895",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4896",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4901",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4904",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4908",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4911",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4914",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4915",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4929",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4932",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4944",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4950",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4961",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4962",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4966",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4970",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4972",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4976",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4987",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=4995",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5011",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5014",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5018",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5019",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5021",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5024",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5025",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5030",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5033",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5034",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5060",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5144",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5323",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5327",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5360",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5400",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5411",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5420",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5436",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5503",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5631",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5685",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5795",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5821",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5826",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5827",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5828",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5855",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5915",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5929",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=593",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5938",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/customer/faq?faq_no=5976",
+      "source_id": "dnf_faq",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1162",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1169",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1178",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1179",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1202",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1203",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1204",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1205",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1206",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1207",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1209",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1219",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1220",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1227",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1228",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1229",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1230",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1232",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1233",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1234",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1235",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1236",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1237",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1238",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1239",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1241",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1242",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1243",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1246",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1252",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1253",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1255",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1256",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1257",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1258",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1259",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1260",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1269",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1270",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1271",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1272",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1273",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1274",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1275",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1276",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1277",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1278",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1279",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1280",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1282",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1283",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1284",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1285",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1286",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1289",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1290",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1292",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1293",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1294",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1295",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1296",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1300",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1309",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1310",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1311",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1326",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1375",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1390",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1391",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1420",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1422",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1425",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1426",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1427",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1428",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1432",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1433",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1437",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1470",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1471",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1475",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1478",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1479",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1482",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1484",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1485",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1486",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1488",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1489",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1490",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1491",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1492",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1493",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1494",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1495",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1505",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1506",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1508",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1509",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1510",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1512",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1515",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1516",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1518",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1519",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1520",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1521",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1522",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1523",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1524",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1525",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1526",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1527",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1528",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1529",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1530",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1531",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1532",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1533",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1534",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1535",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "guide_refresh_material_length_change",
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1536",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1537",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/guide?no=1538",
+      "source_id": "dnf_game_guide",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/monthlyitem",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/568",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/572",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/577",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/581",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/586",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/587",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/593",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/594",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/602",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/606",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/611",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/619",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/622",
+      "source_id": "dnf_monthly_item",
+      "warnings": [
+        "image_content_not_ocr",
+        "registry_title_not_found_in_selected_content"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2838879",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922083",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922084",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922301",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922378",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922380",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922381",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922382",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922419",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922420",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922440",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922446",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922447",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922449",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922453",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922484",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922503",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922505",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922520",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922521",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922522",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922534",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922578",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922583",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922647",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922716",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922717",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922724",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922896",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922983",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922984",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922985",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2922992",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923000",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923034",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923042",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923058",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923059",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923060",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923066",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923069",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923073",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923110",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923141",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923142",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923143",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923156",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923176",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923189",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923190",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923196",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923204",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923205",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923208",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923210",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923215",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923234",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923254",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923257",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923266",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923281",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923289",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923292",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923315",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923317",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923318",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923322",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923356",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923358",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923360",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923361",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923376",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923381",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923382",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923384",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923385",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923389",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923457",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923489",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923509",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923510",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923512",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923514",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923515",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923517",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923519",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923520",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923527",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923528",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923553",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923571",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923573",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923585",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923615",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923623",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923625",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923682",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923683",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923689",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923711",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923714",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923802",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923803",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923805",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923815",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923845",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923857",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923859",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923867",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923871",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923873",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923874",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923878",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923888",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923889",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923892",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923895",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923897",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923901",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923923",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923928",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923936",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923948",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923952",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923961",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923964",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923971",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923974",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923987",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923989",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2923996",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924032",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924035",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924036",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924056",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924104",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924238",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924239",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924243",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924247",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924257",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924303",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924308",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924313",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924374",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924529",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924534",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924570",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924572",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924584",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924650",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924673",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924676",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924677",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924678",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924684",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924697",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924699",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924701",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924703",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924743",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924748",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924778",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924779",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924782",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924792",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924797",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924814",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924828",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924830",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924841",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924855",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924858",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924890",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924891",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924894",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924900",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924930",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924931",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924932",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924952",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924953",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924958",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924959",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924960",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924982",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924992",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2924996",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925012",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925087",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925088",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925091",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925205",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925228",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925229",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925232",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925239",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925240",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925261",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925269",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925270",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925272",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925284",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925286",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925288",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925321",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925341",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925342",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925343",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925349",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925365",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925368",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925380",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925394",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925398",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925435",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925450",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925497",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925499",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925503",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925504",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925511",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925546",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925550",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925577",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925581",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925584",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925585",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925586",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925595",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925604",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925605",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925645",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925647",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925648",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925650",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925651",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925660",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925698",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925715",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925716",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925720",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925726",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925729",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925753",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925756",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925758",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925759",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925766",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925774",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925775",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925778",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925779",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925792",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925822",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925834",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925855",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925927",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2925939",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926165",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926178",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926348",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926519",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926553",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926603",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926636",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926642",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926777",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926800",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926807",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926808",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926809",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926812",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926815",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926819",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926823",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926830",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926834",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926851",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926854",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926856",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926860",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926877",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926879",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926883",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926884",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926885",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926886",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926887",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926917",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926929",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926931",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926937",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926938",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926973",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2926985",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927040",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927041",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927042",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927107",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927117",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927130",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927142",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927143",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927144",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927147",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927161",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927195",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927197",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr",
+        "navigation_or_footer_signal"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927217",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927223",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927224",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927228",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927229",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927230",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927232",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927304",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927308",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927309",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927339",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927345",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927357",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927358",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927359",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927360",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927361",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927368",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927389",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927391",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927397",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927415",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927419",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927449",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927452",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927453",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927471",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927475",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927518",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927535",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927550",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927553",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927554",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927599",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927619",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927623",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927627",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927640",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927641",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927642",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927647",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927657",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927686",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927688",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927710",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927713",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927714",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927715",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927716",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927718",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927725",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927727",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927728",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927751",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927757",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927758",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927763",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927769",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927771",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927772",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927775",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927782",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927816",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927845",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927847",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927848",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927854",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927860",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927876",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927887",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927889",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927891",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927901",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927918",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927921",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927926",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927955",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927958",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927968",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927988",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927994",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2927999",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2928000",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2928001",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2928002",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2928003",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/notice/2928005",
+      "source_id": "dnf_notice",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/226",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/261",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/295",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/357",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/378",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/386",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/423",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/444",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/472",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/487",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/514",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/539",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/556",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/559",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/560",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/562",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/563",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/564",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/565",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/566",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/567",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/570",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/571",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/573",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/574",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/575",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/578",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/579",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/580",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/582",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/583",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/584",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/585",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/588",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/589",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/590",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/591",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/592",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/595",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/596",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/597",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/598",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/600",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/601",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/603",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/605",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/607",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/613",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/614",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/615",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/616",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/618",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/620",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/621",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/623",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/625",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/627",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/628",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/629",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/630",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/631",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/634",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/636",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/637",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/638",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/639",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/640",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/641",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/642",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/644",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/647",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/seriashop/649",
+      "source_id": "dnf_seria_shop",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/update/2927208",
+      "source_id": "dnf_update",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/update/2927233",
+      "source_id": "dnf_update",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/update/2927335",
+      "source_id": "dnf_update",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/update/2927392",
+      "source_id": "dnf_update",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/update/2927399",
+      "source_id": "dnf_update",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/update/2927522",
+      "source_id": "dnf_update",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/update/2927810",
+      "source_id": "dnf_update",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/update/2927822",
+      "source_id": "dnf_update",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/update/2927911",
+      "source_id": "dnf_update",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    },
+    {
+      "canonical_url": "https://df.nexon.com/community/news/update/2927985",
+      "source_id": "dnf_update",
+      "warnings": [
+        "image_content_not_ocr"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,390 @@
+{
+  "probe_role": "adaptive_development_probe_not_benchmark",
+  "question": "서약 결정 초월 유니크 가격",
+  "planner_model": "qwen3:8b",
+  "generator_model": "qwen3:8b",
+  "backbone": {
+    "demo_version": "dnf-v3-backbone-gradio-demo-v1.2-v3.2-promoted-default",
+    "question": "서약 결정 초월 유니크 가격",
+    "route": {
+      "question_router_schema_version": "dnf_question_router_v3.1",
+      "query": "서약 결정 초월 유니크 가격",
+      "intent": "active_event",
+      "matched_intents": [
+        "active_event"
+      ],
+      "required_sources": [
+        "event_store"
+      ],
+      "source_ids": [
+        "dnf_event"
+      ],
+      "source_kinds": [
+        "event"
+      ],
+      "time_scope": "current",
+      "temporal_as_of": null,
+      "default_exposure_only": true,
+      "allowed_statuses": [
+        "current",
+        "upcoming"
+      ],
+      "needs_decomposition": false,
+      "needs_clarification": false,
+      "clarification_reason": null,
+      "route_action": "retrieve",
+      "answerability": "true",
+      "answerability_reason": "official_document_fact_request",
+      "routing_signals": {
+        "explicit": [],
+        "entity_sources": [
+          {
+            "source_id": "dnf_event",
+            "score": 4.0
+          },
+          {
+            "source_id": "dnf_game_guide",
+            "score": 4.0
+          },
+          {
+            "source_id": "dnf_update",
+            "score": 2.66666667
+          }
+        ],
+        "title_sources": [
+          {
+            "source_id": "dnf_game_guide",
+            "score": 13.39288826
+          }
+        ],
+        "candidate_sources": [
+          "dnf_game_guide",
+          "dnf_notice"
+        ]
+      },
+      "backbone_action": "retrieve"
+    },
+    "response_mode": "full_answer",
+    "message": "아래 인용은 dirty canonical 원문의 exact slice입니다. exact는 원문 복사를 뜻하며, 요구를 의미적으로 올바르게 지지한다는 검증은 아닙니다.",
+    "requirements": [
+      {
+        "requirement": {
+          "subject": "서약_결정",
+          "relation": "유니크_가격",
+          "value_type": "amount",
+          "subject_group": "서약_결정",
+          "answerable_from_docs": true,
+          "qualifiers": [],
+          "time_scope": null,
+          "coordination_scope": null,
+          "requirement_id": "requirement_1"
+        },
+        "status": "supported",
+        "message": null,
+        "citations": [
+          {
+            "span_id": "span_2abc6fd77edd9d9677425fa3",
+            "chunk_id": "chunk_sha256_3fb7af028e0a5a922a3aa93a48d161b27081e91f953a1f5002e7d4b68829ee9e",
+            "start_char": 33,
+            "end_char": 35,
+            "text": "서약",
+            "reranker_score": 0.67431009,
+            "parent_document_id": "document_sha256_8bd9627d33bce13e12b15db92d66283c87a98363aaddc7a95233d27be159e36e",
+            "source_id": "dnf_event",
+            "title": "천해천 업데이트 프리뷰",
+            "canonical_url": "https://df.nexon.com/pg/skyofathousandseaspreview",
+            "published_at": "2026-03-07",
+            "updated_at": null,
+            "revision_id": "revision_sha256_8bd9627d33bce13e12b15db92d66283c87a98363aaddc7a95233d27be159e36e",
+            "status": "current",
+            "is_current_revision": null,
+            "validity_state": "active_window",
+            "validity_reason": "as-of is inside explicit official validity window",
+            "retrieval_action_current": "allow",
+            "last_verified_at": "2026-07-17T21:53:16.6990081+09:00",
+            "temporal_warning": null
+          },
+          {
+            "span_id": "span_eadad79ef9fb7d668a46d60d",
+            "chunk_id": "chunk_sha256_2cec835f4b2081330a42690d3858a1d0c072591064755d537945f58c21fd544a",
+            "start_char": 381,
+            "end_char": 494,
+            "text": "- 115레벨 달성 상자(부스트 업 전용) 구성품: 115레벨 유니크 서약 결정 항아리 1개, 미광의 서약 결정 10개, 종말의 계시(기간 무제한) 700개, 체력 증강제 100개, 마력 증강제 100개",
+            "reranker_score": 0.19949766,
+            "parent_document_id": "document_sha256_9b4e13a16260f7423f22bc2d18b9337b98eb906da3ad49865a5531bca845d3f1",
+            "source_id": "dnf_event",
+            "title": "썸머 부스트 업 with 인파이터(여)&브레이커",
+            "canonical_url": "https://df.nexon.com/pg/summerboostup26",
+            "published_at": "2026-06-04",
+            "updated_at": null,
+            "revision_id": "revision_sha256_9b4e13a16260f7423f22bc2d18b9337b98eb906da3ad49865a5531bca845d3f1",
+            "status": "current",
+            "is_current_revision": null,
+            "validity_state": "active_window",
+            "validity_reason": "as-of is inside explicit official validity window",
+            "retrieval_action_current": "allow",
+            "last_verified_at": "2026-07-17T21:53:16.6990081+09:00",
+            "temporal_warning": null
+          },
+          {
+            "span_id": "span_1113d6a44f72c33b09f0511c",
+            "chunk_id": "chunk_sha256_6f4b0116b6689881a50377fbafbcb53c522b12193fb141d945c11a97e9ed0146",
+            "start_char": 47,
+            "end_char": 95,
+            "text": "세트별로 가지고 있는 고유 효과로 서약 포인트 1200pt (유니크 I) 이상부터 적용",
+            "reranker_score": 0.05849506,
+            "parent_document_id": "document_sha256_8bd9627d33bce13e12b15db92d66283c87a98363aaddc7a95233d27be159e36e",
+            "source_id": "dnf_event",
+            "title": "천해천 업데이트 프리뷰",
+            "canonical_url": "https://df.nexon.com/pg/skyofathousandseaspreview",
+            "published_at": "2026-03-07",
+            "updated_at": null,
+            "revision_id": "revision_sha256_8bd9627d33bce13e12b15db92d66283c87a98363aaddc7a95233d27be159e36e",
+            "status": "current",
+            "is_current_revision": null,
+            "validity_state": "active_window",
+            "validity_reason": "as-of is inside explicit official validity window",
+            "retrieval_action_current": "allow",
+            "last_verified_at": "2026-07-17T21:53:16.6990081+09:00",
+            "temporal_warning": null
+          }
+        ],
+        "table_views": [],
+        "value_shape_audit": {
+          "requirement_id": "requirement_1",
+          "expected_kind": "cost_value",
+          "normalization_reason": "planner_relation_denotes_price_or_cost",
+          "veto_enabled": true,
+          "detected_kinds": [
+            "cost_value",
+            "count_value",
+            "quantity"
+          ],
+          "baseline_status": "supported_exact",
+          "b1_status": "supported_exact",
+          "vetoed": false,
+          "support_semantics": "absence_only_veto_never_positive_entailment",
+          "table_value_span_count": 0,
+          "table_value_row_ids": []
+        }
+      }
+    ],
+    "planner": {
+      "runtime": {
+        "provider": "ollama_openai_compatible",
+        "base_url": "http://127.0.0.1:11434/v1",
+        "model_tag": "qwen3:8b",
+        "model_sha256": "500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41",
+        "model_details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen3",
+          "families": [
+            "qwen3"
+          ],
+          "parameter_size": "8.2B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 40960,
+          "embedding_length": 4096
+        },
+        "ollama_version": "0.32.1",
+        "temperature": 0
+      },
+      "call": {
+        "latency_ms": 8236.565,
+        "returned_model": "qwen3:8b",
+        "sdk_version": "ollama_native_http",
+        "prompt_tokens": 237,
+        "completion_tokens": 97
+      }
+    },
+    "retrieval": {
+      "hit_count": 10,
+      "temporal_denied_hit_count": 0,
+      "selected_chunk_ids": [
+        "chunk_sha256_2cec835f4b2081330a42690d3858a1d0c072591064755d537945f58c21fd544a",
+        "chunk_sha256_3fb7af028e0a5a922a3aa93a48d161b27081e91f953a1f5002e7d4b68829ee9e",
+        "chunk_sha256_6f4b0116b6689881a50377fbafbcb53c522b12193fb141d945c11a97e9ed0146",
+        "chunk_sha256_01a929a78fe9140f418c3ec7a1ee6d4a208b8ed9b620e4c1b9732c3180688e2c",
+        "chunk_sha256_d110823bd0147281c46c788b01c9f4bf7786b105fc7ab3ad395b4cd462bf8e67",
+        "chunk_sha256_58d0bbf599975b5a257b406fe70f94102165cd14bc61229e8e01472e24e112e2",
+        "chunk_sha256_56632f358ab6853d5f93671a0c5c88e8cc841ad51093906054d71f59dc286d9a",
+        "chunk_sha256_2b69581d6ff100d513eb6d80e6a2077fe2f8f5888ba3f4642e50e70221d534b9"
+      ],
+      "bounded_fallback": {
+        "enabled": false,
+        "triggered": false,
+        "committed": false,
+        "bounded_source_ids": [
+          "dnf_event"
+        ],
+        "baseline_shape_audit": {
+          "supported_after_veto": 1,
+          "veto_count": 0,
+          "requirements": [
+            {
+              "requirement_id": "requirement_1",
+              "expected_kind": "cost_value",
+              "normalization_reason": "planner_relation_denotes_price_or_cost",
+              "veto_enabled": true,
+              "detected_kinds": [
+                "cost_value",
+                "count_value",
+                "quantity"
+              ],
+              "baseline_status": "supported_exact",
+              "b1_status": "supported_exact",
+              "vetoed": false,
+              "support_semantics": "absence_only_veto_never_positive_entailment"
+            }
+          ]
+        },
+        "fallback_shape_audit": {
+          "supported_after_veto": 1,
+          "veto_count": 0,
+          "requirements": [
+            {
+              "requirement_id": "requirement_1",
+              "expected_kind": "cost_value",
+              "normalization_reason": "planner_relation_denotes_price_or_cost",
+              "veto_enabled": true,
+              "detected_kinds": [
+                "cost_value",
+                "count_value",
+                "quantity"
+              ],
+              "baseline_status": "supported_exact",
+              "b1_status": "supported_exact",
+              "vetoed": false,
+              "support_semantics": "absence_only_veto_never_positive_entailment"
+            }
+          ]
+        }
+      }
+    },
+    "latency_ms": 20763.463,
+    "provenance": {
+      "dirty_canonical_chunks_sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885",
+      "planner_prompt_sha256": "01ddcf34498276b4896f5c628f53fa874047e8a989b3a5df3e405bd43c87d948",
+      "assembler_manifest": "data/v3/evidence/extractive_assembler_v3_chunk_diverse_manifest_9db367b14a981bd05ba37d6029fc79a9e0e8606efc06221dd6eee117a38bc2b8.json",
+      "reranker_model": "BAAI/bge-reranker-v2-m3",
+      "reranker_revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+      "as_of": "2026-07-18",
+      "v3_2_candidates_enabled": true,
+      "bounded_fallback_enabled": false,
+      "runtime_promotion_status": "v3.2_development_canonical_promoted_by_user_authorization",
+      "canonical_runtime_pointer": "data/v3/runtime/canonical_runtime_v3_2.json",
+      "canonical_runtime_manifest": {
+        "path": "data/v3/runtime/canonical_runtime_v3_2_manifest_71b3fa85b79a7d218332cf56d6c9b5620b2abc5b2ab37564cee0261ca51a8a96.json",
+        "sha256": "71b3fa85b79a7d218332cf56d6c9b5620b2abc5b2ab37564cee0261ca51a8a96"
+      },
+      "global_temporal_overlay": "data/v3/temporal/global_temporal_overlay_v3.2_f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317.jsonl",
+      "duplicate_family_overlay": "data/v3/structured/duplicate_family_overlay_v3.2_d71e7184b95a4bbdf8a4748b24daf5ce6b2d67834507660f905ffc869faaa336.jsonl",
+      "table_facts": "data/v3/indexes/table_atomic_facts_arm1_metadata_1f29fca9252c6a23f049fe6663aac1856357d3d7341470f70cad9fdc38034f3a.jsonl"
+    }
+  },
+  "generation_requests": [
+    {
+      "system": "당신은 공식 문서에서 이미 선별된 인용문만으로 한국어 답변을 작성합니다.\n규칙:\n1. 제공된 인용문에 없는 사실, 숫자, 날짜, 이름을 절대 추가하지 마세요.\n2. 인용문의 수치와 날짜는 표기를 바꾸지 말고 그대로 사용하세요.\n3. 추측하거나 일반 상식으로 보충하지 마세요.\n4. 각 요구사항에 대해 한두 문장으로 간결하게 답하세요.\n5. 인용문이 요구사항에 답하지 못하면 그 요구는 답하지 마세요.",
+      "user": "질문: 서약 결정 초월 유니크 가격\n\n아래 인용문만 사용해 답하세요.\n\n[요구 1] 서약_결정 · 유니크_가격\n- 서약\n- - 115레벨 달성 상자(부스트 업 전용) 구성품: 115레벨 유니크 서약 결정 항아리 1개, 미광의 서약 결정 10개, 종말의 계시(기간 무제한) 700개, 체력 증강제 100개, 마력 증강제 100개\n- 세트별로 가지고 있는 고유 효과로 서약 포인트 1200pt (유니크 I) 이상부터 적용",
+      "requirement_indices": [
+        1
+      ]
+    }
+  ],
+  "raw_model_outputs": [
+    "요구사항에 해당하는 정보는 제공된 인용문에 없습니다."
+  ],
+  "composed": {
+    "generator_contract_version": "grounded-answer-generator-v1.0.0",
+    "generatable": [
+      {
+        "requirement_index": 1,
+        "requirement_id": "requirement_1",
+        "subject": "서약_결정",
+        "relation": "유니크_가격",
+        "expected_kind": "cost_value",
+        "spans": [
+          {
+            "span_id": "span_2abc6fd77edd9d9677425fa3",
+            "chunk_id": "chunk_sha256_3fb7af028e0a5a922a3aa93a48d161b27081e91f953a1f5002e7d4b68829ee9e",
+            "start_char": 33,
+            "end_char": 35,
+            "text": "서약",
+            "reranker_score": 0.67431009,
+            "parent_document_id": "document_sha256_8bd9627d33bce13e12b15db92d66283c87a98363aaddc7a95233d27be159e36e",
+            "source_id": "dnf_event",
+            "title": "천해천 업데이트 프리뷰",
+            "canonical_url": "https://df.nexon.com/pg/skyofathousandseaspreview",
+            "published_at": "2026-03-07",
+            "updated_at": null,
+            "revision_id": "revision_sha256_8bd9627d33bce13e12b15db92d66283c87a98363aaddc7a95233d27be159e36e",
+            "status": "current",
+            "is_current_revision": null,
+            "validity_state": "active_window",
+            "validity_reason": "as-of is inside explicit official validity window",
+            "retrieval_action_current": "allow",
+            "last_verified_at": "2026-07-17T21:53:16.6990081+09:00",
+            "temporal_warning": null
+          },
+          {
+            "span_id": "span_eadad79ef9fb7d668a46d60d",
+            "chunk_id": "chunk_sha256_2cec835f4b2081330a42690d3858a1d0c072591064755d537945f58c21fd544a",
+            "start_char": 381,
+            "end_char": 494,
+            "text": "- 115레벨 달성 상자(부스트 업 전용) 구성품: 115레벨 유니크 서약 결정 항아리 1개, 미광의 서약 결정 10개, 종말의 계시(기간 무제한) 700개, 체력 증강제 100개, 마력 증강제 100개",
+            "reranker_score": 0.19949766,
+            "parent_document_id": "document_sha256_9b4e13a16260f7423f22bc2d18b9337b98eb906da3ad49865a5531bca845d3f1",
+            "source_id": "dnf_event",
+            "title": "썸머 부스트 업 with 인파이터(여)&브레이커",
+            "canonical_url": "https://df.nexon.com/pg/summerboostup26",
+            "published_at": "2026-06-04",
+            "updated_at": null,
+            "revision_id": "revision_sha256_9b4e13a16260f7423f22bc2d18b9337b98eb906da3ad49865a5531bca845d3f1",
+            "status": "current",
+            "is_current_revision": null,
+            "validity_state": "active_window",
+            "validity_reason": "as-of is inside explicit official validity window",
+            "retrieval_action_current": "allow",
+            "last_verified_at": "2026-07-17T21:53:16.6990081+09:00",
+            "temporal_warning": null
+          },
+          {
+            "span_id": "span_1113d6a44f72c33b09f0511c",
+            "chunk_id": "chunk_sha256_6f4b0116b6689881a50377fbafbcb53c522b12193fb141d945c11a97e9ed0146",
+            "start_char": 47,
+            "end_char": 95,
+            "text": "세트별로 가지고 있는 고유 효과로 서약 포인트 1200pt (유니크 I) 이상부터 적용",
+            "reranker_score": 0.05849506,
+            "parent_document_id": "document_sha256_8bd9627d33bce13e12b15db92d66283c87a98363aaddc7a95233d27be159e36e",
+            "source_id": "dnf_event",
+            "title": "천해천 업데이트 프리뷰",
+            "canonical_url": "https://df.nexon.com/pg/skyofathousandseaspreview",
+            "published_at": "2026-03-07",
+            "updated_at": null,
+            "revision_id": "revision_sha256_8bd9627d33bce13e12b15db92d66283c87a98363aaddc7a95233d27be159e36e",
+            "status": "current",
+            "is_current_revision": null,
+            "validity_state": "active_window",
+            "validity_reason": "as-of is inside explicit official validity window",
+            "retrieval_action_current": "allow",
+            "last_verified_at": "2026-07-17T21:53:16.6990081+09:00",
+            "temporal_warning": null
+          }
+        ],
+        "table_value_span_count": 0
+      }
+    ],
+    "unconfirmable": [],
+    "model_sees_gold": false,
+    "mode": "generated",
+    "answer_text": "요구사항에 해당하는 정보는 제공된 인용문에 없습니다.",
+    "verification": {
+      "verified": true,
+      "checked_token_count": 0,
+      "unsupported_tokens": [],
+      "verifier_contract_version": "grounded-answer-generator-v1.0.0"
+    },
+    "used_generated_text": true
+  }
+}

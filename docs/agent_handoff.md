@@ -1,5 +1,220 @@
 # Agent Handoff - DNF Domain QA SLM/RAG
 
+## 2026-07-27 Claim-contract v7 and namespace-safe final diagnostic
+
+- Official sealed one-shot remains `37/64`. Historical adaptive generation
+  remains `55/64`; neither score was rewritten or promoted.
+- The current addendum-aware analysis is score-only. It starts from the
+  historical adaptive run's stored verified output and does not rebuild a
+  prompt or call retrieval, Qwen, or the verifier:
+  - legacy value complete: `55/64`
+  - typed answer value complete: `48/64`
+  - typed claim plus approved direct evidence: `43/64`
+  - reviewed-equivalent candidate coverage: `64/64`
+- The earlier verifier-replay v9 and its derived v10 score are invalid for
+  reporting because the source calls did not store their E-reference
+  namespaces. Recorded replay now aborts unless the namespace version, SHA,
+  and coordinates match exactly. Use score-only analysis for older calls.
+- Batch requirement IDs are accepted only when they are the exact fixed IDs
+  or the complete explicit ordinal set `1..N`; mixed, missing, or duplicate
+  IDs fail closed.
+- Question-level week/round/stage qualifiers are propagated across a batch
+  only when there is one requirement or every requirement has the same
+  relation. Mixed-relation batches retain only explicit planner qualifiers.
+- Shared typed normalization now covers clock/time ranges, currencies,
+  booleans, numeric entity boundaries, and strict value-bearing citation
+  overlap. A one-character coordinate overlap is not direct evidence.
+- Explicit `cardinality=all` now fails closed without expected-count or
+  closed-group proof. The sealed slot 30 ClaimSpec does not declare
+  cardinality, so that planner omission remains a product blocker.
+- Product evidence now rejects direct weapon/aura/title/creature sibling-type
+  conflicts for shop/monthly records. Currency ambiguity remains fail-closed.
+- Fresh Qwen3 8B generation over slots `3,25,30,51` was correct on `3/4`:
+  `3,25,30` were correct; slot `51` selected the wrong sibling price but was
+  safely reduced to a partial answer. Generation errors and new regressions
+  were both `0`.
+- Human review of 14 automatic flags in the namespace-safe historical
+  score-only view found three real semantic false-full cases:
+  - slot `3`: week-1 evidence for a week-5 claim
+  - slot `30`: incomplete list (`115` instead of `110,115`)
+  - slot `51`: one ambiguous sibling price exposed as the sole answer
+  Eleven flags were official-equivalent or narrow-gold false positives.
+- Static relation-contract coverage is still only `22/96`; `74/96` remain
+  unvalidated and currently fail open. This and missing closed-list proofs
+  keep production default and a new untouched set at **NO-GO**.
+- Semantic fallback remains disabled.
+- Full repository tests: `853 passed` plus `64` subtests.
+
+Current artifacts:
+
+- `reports/v3/typed_evidence_ref_claim_contract_round_20260727.md`
+- `reports/v3/typed_evidence_ref_adaptive_source_addendum_rescore_v12_20260727.json`
+- `reports/v3/typed_evidence_ref_adaptive_source_semantic_adjudication_v12_20260727.json`
+- `reports/v3/typed_evidence_ref_claim_contract_qwen3_8b_smoke_slots3_25_30_51_v13_20260727.json`
+
+## Superseded 2026-07-27 Claim-contract v6 diagnostic
+
+- Official sealed one-shot remains `37/64`. Historical adaptive generation
+  remains `55/64`; neither score was rewritten or promoted.
+- The latest addendum-aware post-hoc view reuses stored verified output and
+  makes no model, retrieval, or verifier call:
+  - legacy value complete: `53/64`
+  - typed answer value complete: `47/64`
+  - typed claim plus approved direct evidence: `43/64`
+  - reviewed-equivalent candidate coverage: `64/64`
+- The evidence-only addendum overlay appended six reviewed evidence units to
+  already-supported claims. Slots `31` and `47` were deliberately not changed:
+  their sealed targets are `unsupported`, so they require an explicit claim
+  correction overlay rather than silent inference from evidence text.
+- Shared value normalization covers number, currency, date, time, and ordered
+  time ranges. Relation contracts canonicalize `daily_reset_time -> time` and
+  `maintenance_time -> time_range`; date-only maintenance output remains
+  blocked.
+- A general ordinal qualifier contract binds explicit `N주차/N회차/N단계`.
+  Fresh Qwen3 8B generation passed slots `3` and `25` (`2/2`), with correct
+  five-week evidence, correct clock typing, zero generation error, and no
+  regression.
+- Typed free text is rendered from the verified model value rather than being
+  replaced by evidence text. Currency ambiguity, entity-list duplicates,
+  numeric entity boundaries, policy revision/effective date, and monthly
+  record boundaries now fail closed.
+- Every new typed call records the claim-contract version and the exact
+  `E-ref -> chunk/start/end` namespace. Old stored E references must not be
+  replayed after prompt selection changes; use score-only replay unless the
+  namespace was recorded.
+- Current relation coverage is still only `22/96` explicit and `74/96`
+  unvalidated. List `cardinality=all` also cannot be proven without a closed
+  evidence group. These remain product blockers.
+- Confirmed exposed structural error is slot `30`: it returns only `115` for
+  an all-values question whose answer is `110,115`. Slot `51` is now a safe
+  partial because conflicting current prices are detected.
+- Semantic fallback remains disabled. Do not create or open a new untouched
+  set until relation/cardinality contracts and the claim-correction policy are
+  frozen.
+- Full repository tests: `843 passed` plus `62` subtests.
+
+See:
+
+- `reports/v3/typed_evidence_ref_claim_contract_round_20260727.md`
+- The former v9/v10 verifier-replay artifacts were removed after their missing
+  E-reference namespace made them non-reproducible.
+
+## 2026-07-27 Policy/month adaptive full-64 regression
+
+- A completed 64-call Qwen3 8B run reused the stored Product Router candidates;
+  retrieval and semantic fallback were not executed.
+- Adaptive typed-value completeness improved `50/64 -> 55/64`, with recoveries
+  `1,6,60,61,62,63`, generation errors `0`, and exact citation coordinates.
+- Slot 25 is a real new overreject regression: the model selected the correct
+  `06:00` evidence, but the enum verifier did not normalize source text `06시`.
+- Automatic unsupported false-full remains slot 31; the reviewed addendum
+  confirms direct official support, so reviewed unsupported false-full is `0`.
+  Broader semantic review still finds the pre-existing incorrect full responses
+  at slots 30 and 51.
+- Verdict: **NO-GO for promotion** because the predeclared zero-regression gate
+  failed. Do not tune slot 25 on this adaptive set and do not replace the
+  official `37/64`.
+- Full tests: `789 passed` plus `54` subtests.
+
+See
+`reports/v3/typed_evidence_ref_policy_month_binding_qwen3_8b_adaptive_full64_20260727.md`.
+
+## 2026-07-27 Policy/month pre-generation binding diagnostic
+
+- The official sealed one-shot remains `37/64`; the sealed artifact was not
+  rewritten and no generalization or production promotion is claimed.
+- Policy evidence is now bound before generation by policy subject, requested
+  revision/year, and effective-date role.
+- Explicit monthly-item evidence is now bound before generation by month,
+  `dnf_monthly_item` source, item record, requested attribute, and value.
+- The separate equivalent-evidence addendum now records slots
+  `8, 31, 41, 47`. Slot 40 was not added because its frozen gold is valid.
+- Targeted Qwen3 8B regeneration over eight stored candidate pools recovered
+  slots `1,6,60,61,63`, preserved `41,57,59`, introduced no regression,
+  produced no generation error, and had false-full `0`. This `8/8` result is
+  adaptive and must not replace the official `37/64`.
+- A scorer false positive found during slot 61 review was fixed: partial
+  overlap with an approved evidence unit no longer counts, and enum/entity
+  answers must occur in selected evidence.
+- Verifier-only replay over old stored `E` references is namespace-incompatible
+  after prompt binding. Its apparent `50 -> 48` must not be reported as a
+  semantic regression.
+- Post-binding sufficiency shadow over all 64 questions now triggers only
+  slots `5,7`; the slot 62 heading false trigger is fixed. Actual fallback and
+  generation calls remain `0`, so semantic fallback stays disabled.
+- Verification: focused `51 passed` plus `7` subtests; full repository
+  `789 passed` plus `54` subtests; `git diff --check` passed.
+
+See `reports/v3/policy_month_pregeneration_binding_round_20260727.md`.
+
+## 2026-07-27 Product-router freeze and semantic-binding diagnostics
+
+- Commit `7e38005` freezes the current product router, native Ollama protocol,
+  and requirement-aware evidence reduction. Tests at freeze: v3 `702 passed`
+  plus `54` subtests; legacy `72 passed`.
+- The official sealed one-shot remains `37/64`. No artifact was rewritten and
+  no new generalization or production score is claimed.
+- Slots 8 and 41 are recorded in a separate reviewed equivalent-evidence
+  addendum. The sealed file remains byte-identical.
+- The narrow same-evidence-group sufficiency gate was measured in shadow only:
+  `21/96` requirements were assessable and only slots `5,7` would trigger.
+  Slot 7 is a correct unsupported case, so real fallback retrieval remains
+  disabled and deferred.
+- Verifier-only replay over the adaptive product-router run changed five wrong
+  supported cases (`1,6,60,61,63`) into safe abstentions, with score
+  `50/64 -> 50/64`, regressions `0`, new model calls `0`, and retrieval calls
+  `0`.
+- The new hard checks bind policy subject/revision/effective date and monthly
+  month/record/attribute/value. This is a safety diagnostic, not a promotion.
+- A replay of an older requirement-reduction artifact reports slot 47 as a
+  regression only because its stored `E19` no longer exists in the rebuilt
+  prompt namespace. Do not attribute that protocol-incompatible replay result
+  to the new binding checks.
+
+See `reports/v3/product_router_semantic_binding_round_20260727.md`.
+
+## 2026-07-25 Latest pipeline full-64 adaptive diagnostic
+
+The current temporal-role prompt, relation-group/currency verifier, table
+row-subject binding, and table-only prompt compression were run with 64 new
+Qwen3 8B calls over the stored candidate pools.
+
+- Official sealed one-shot remains `37/64`.
+- Verifier-only replay of the original outputs remains `43/64`.
+- Latest new-generation adaptive diagnostic is `45/64`.
+- Approved direct evidence is `35/64`, verifier overreject `5`, generation
+  errors `3`, mean/p95 latency `15.76s / 37.20s`.
+- Against verifier-only v2: wins `9,10,39,53,55,61`; regressions
+  `12,41,43,63`.
+- Automatic false-full flags are `31,47,63`. Slots 31 and 47 remain frozen-gold
+  omission candidates; slot 63 is a source-reviewed real semantic false-full.
+- Slot 9 is correct in this full run but varied to `unsupported` in targeted
+  retries. Slot 49 remains correct with exact row citation and 2,578 input
+  tokens.
+- Overall promotion verdict: **NO-GO**. Do not tune further on these 64 cases.
+
+See:
+`reports/v3/typed_evidence_ref_latest_pipeline_qwen3_8b_full64_20260725.md`.
+
+## 2026-07-25 Typed evidence-ref verifier addendum
+
+최신 v3 일반화-64 작업은 아래 인계 문서를 먼저 확인한다.
+
+- `reports/v3/typed_evidence_ref_relation_group_currency_handoff_20260725.md`
+
+핵심 상태:
+
+- 공식 봉인 one-shot은 계속 `37/64`이며 수정하지 않았다.
+- 동일한 저장 출력에 relation-group boolean 및 currency-unit verifier를
+  사후 적용하면 `43/64`, 직접 근거 `37/64`, overreject `8`, 회귀 `0`이다.
+- 새 LLM 호출과 검색 재실행은 없으므로 `43/64`는 공식 새 기준선이 아니라
+  verifier-only post-hoc diagnostic이다.
+- 자동 false-full flag는 split `2`, Typed `1`이었으나 공식 출처 재검수상
+  split 31번과 Typed 47번은 gold 허용 근거 누락 후보이며, 확인된 실제
+  relation/column false-full은 split 55번 1건이다.
+- 따라서 향후 보고에서는 `자동 frozen-gold false-full flag`와
+  `공식 출처 재검수상 실제 false-full`을 분리한다.
+
 ## Current Goal
 
 The final portfolio cycle is closed. Canonical retrieval is BGE-M3 hybrid

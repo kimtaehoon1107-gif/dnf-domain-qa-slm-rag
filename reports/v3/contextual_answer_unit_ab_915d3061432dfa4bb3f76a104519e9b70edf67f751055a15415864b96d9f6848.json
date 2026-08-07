@@ -1,0 +1,241 @@
+{
+  "constraints": {
+    "authored_set_is_adaptive_not_sealed": true,
+    "frozen_blind_accessed": false,
+    "gold_available_to_decision": false,
+    "gold_or_labels_changed": false,
+    "neighbor_answer_values_in_context": false,
+    "new_domain_keyword_rules": 0,
+    "runtime_or_canonical_promoted": false,
+    "training_or_reindex": false
+  },
+  "evaluation_role": "development_only_contextual_answer_unit_ab",
+  "evaluator_version": "contextual-answer-unit-ab-v3.2.4",
+  "inputs": {
+    "adaptive_dev": {
+      "path": "data/v3/evaluation/retrieval_dev_v3.1_b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978.jsonl",
+      "sha256": "b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978"
+    },
+    "assembler_cases": {
+      "path": "data/v3/evidence/extractive_assembler_v3_chunk_diverse_cases_06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c.jsonl",
+      "sha256": "06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c"
+    },
+    "authored_results": {
+      "path": "data/v3/evaluation/authored_validation_v3_2_results_7825374fd4fbf72d426d68dc3f401803de5036a3753f9d92f267f36c03062415.jsonl",
+      "sha256": "7825374fd4fbf72d426d68dc3f401803de5036a3753f9d92f267f36c03062415"
+    },
+    "authored_set": {
+      "path": "data/v3/evaluation/authored_validation_v3_2_52c1b84ef7ab0f9bee29931c46f9febf0970492216b6742e8f5337282af4181e.jsonl",
+      "sha256": "52c1b84ef7ab0f9bee29931c46f9febf0970492216b6742e8f5337282af4181e"
+    },
+    "canary_runtime": {
+      "path": "data/v3/evaluation/authored_canary_first_run_cases_a326d9fd96a4cfcaf9b2d38d74f27fffe26b62dfc1364063c8258891546beecd.jsonl",
+      "sha256": "a326d9fd96a4cfcaf9b2d38d74f27fffe26b62dfc1364063c8258891546beecd"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "contract": {
+      "path": "docs/v3/contextual_answer_unit_ab.md",
+      "sha256": "fc1c9e539185a8f5a05409f0ee90e7b447da7f79c58c603ec7b480801042ec2e"
+    },
+    "dev_runtime": {
+      "path": "data/v3/runtime/unified_runtime_cases_f28e2fbfb768c901dc4f1079f262252d645a74c7e4ee494180c2879e528f7789.jsonl",
+      "sha256": "f28e2fbfb768c901dc4f1079f262252d645a74c7e4ee494180c2879e528f7789"
+    },
+    "documents": {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+      "sha256": "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d"
+    },
+    "downgraded_canary": {
+      "path": "data/v3/evaluation/early_generalization_authored_canary_28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d.jsonl",
+      "sha256": "28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d"
+    },
+    "enumeration": {
+      "path": "data/v3/evaluation/semantic_requirement_enumeration_495caba182115c2dbec6e846dca7c0809c4cb8a4de552ee1268440d254d2ba9c.jsonl",
+      "sha256": "495caba182115c2dbec6e846dca7c0809c4cb8a4de552ee1268440d254d2ba9c"
+    },
+    "evaluator_source": {
+      "path": "src/v3/evaluate_contextual_answer_unit_ab.py",
+      "sha256": "f7ed4afdce33f0ddcaba019640832c3c7af1057477e7284a1bf96eae77f94a47"
+    },
+    "ground_truth": {
+      "path": "data/v3/evaluation/semantic_answerability_ground_truth_53cd8ae72ad4ee2f7c9b1d4370991ad74b5044d154e3657fd2008f45f71fe609.jsonl",
+      "sha256": "53cd8ae72ad4ee2f7c9b1d4370991ad74b5044d154e3657fd2008f45f71fe609"
+    },
+    "q3_cases": {
+      "path": "data/v3/evidence/question_partial_context_ab_cases_7ad2c3b70d7cba22d8e04ddc6ac0ea5f20bfa8072fc55dcde1d3d17c188a6c79.jsonl",
+      "sha256": "7ad2c3b70d7cba22d8e04ddc6ac0ea5f20bfa8072fc55dcde1d3d17c188a6c79"
+    },
+    "segment_scores": {
+      "path": "data/v3/evidence/federated_retrieval_ab_segment_scores_d06152692e3fafa04f72de4e3a87b4fffbc18b324154f4486a6c4db11f853f41.jsonl",
+      "sha256": "d06152692e3fafa04f72de4e3a87b4fffbc18b324154f4486a6c4db11f853f41"
+    },
+    "temporal": {
+      "path": "data/v3/temporal/global_temporal_overlay_v3.2_f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317.jsonl",
+      "sha256": "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317"
+    }
+  },
+  "report_schema_version": "contextual-answer-unit-ab-report-v3.2",
+  "result": {
+    "authored_adaptive_24": {
+      "arm0_all_evidence_spans": {
+        "rate": 0.29166667,
+        "small_sample_limit": false,
+        "successes": 7,
+        "total": 24
+      },
+      "arm0_all_groups": {
+        "rate": 0.83333333,
+        "small_sample_limit": false,
+        "successes": 20,
+        "total": 24
+      },
+      "arm0_false_full": {
+        "rate": 0.08333333,
+        "small_sample_limit": false,
+        "successes": 2,
+        "total": 24
+      },
+      "arm1_all_evidence_spans": {
+        "rate": 0.33333333,
+        "small_sample_limit": false,
+        "successes": 8,
+        "total": 24
+      },
+      "arm1_all_groups": {
+        "rate": 0.875,
+        "small_sample_limit": false,
+        "successes": 21,
+        "total": 24
+      },
+      "arm1_false_full": {
+        "rate": 0.04166667,
+        "small_sample_limit": false,
+        "successes": 1,
+        "total": 24
+      },
+      "evidence_span_improvement_case_ids": [
+        "authored_validation_v3_2_sha256_172b0d714eb57d2fb1b54401bcb2c501625543b183066bea2f2454a1b341afe9"
+      ],
+      "evidence_span_regression_case_ids": [],
+      "exact_all": true,
+      "improvement_case_ids": [
+        "authored_validation_v3_2_sha256_c8803a9d34cc39551e80708aa46733e0483fa27c8e5f29a75f2f85154b44874a"
+      ],
+      "new_false_full_case_ids": [],
+      "regression_case_ids": [],
+      "replacement_question_count": 5,
+      "temporal_violation_chunk_ids": []
+    },
+    "authored_source_coverage": {
+      "dnf_account_policy": {
+        "arm0": 3,
+        "arm1": 3,
+        "total": 3
+      },
+      "dnf_event": {
+        "arm0": 3,
+        "arm1": 3,
+        "total": 3
+      },
+      "dnf_faq": {
+        "arm0": 3,
+        "arm1": 3,
+        "total": 3
+      },
+      "dnf_game_guide": {
+        "arm0": 3,
+        "arm1": 3,
+        "total": 3
+      },
+      "dnf_monthly_item": {
+        "arm0": 2,
+        "arm1": 2,
+        "total": 3
+      },
+      "dnf_notice": {
+        "arm0": 2,
+        "arm1": 3,
+        "total": 3
+      },
+      "dnf_seria_shop": {
+        "arm0": 2,
+        "arm1": 2,
+        "total": 3
+      },
+      "dnf_update": {
+        "arm0": 2,
+        "arm1": 2,
+        "total": 3
+      }
+    },
+    "decision": "DEVELOPMENT_GO_NEW_REVIEWED_CANARY_REQUIRED",
+    "frozen_docs_69": {
+      "arm0_all_evidence_spans": {
+        "rate": 0.26086957,
+        "small_sample_limit": false,
+        "successes": 18,
+        "total": 69
+      },
+      "arm0_all_groups": {
+        "rate": 0.91304348,
+        "small_sample_limit": false,
+        "successes": 63,
+        "total": 69
+      },
+      "arm0_false_full": {
+        "rate": 0.08695652,
+        "small_sample_limit": false,
+        "successes": 6,
+        "total": 69
+      },
+      "arm1_all_evidence_spans": {
+        "rate": 0.28985507,
+        "small_sample_limit": false,
+        "successes": 20,
+        "total": 69
+      },
+      "arm1_all_groups": {
+        "rate": 0.91304348,
+        "small_sample_limit": false,
+        "successes": 63,
+        "total": 69
+      },
+      "arm1_false_full": {
+        "rate": 0.08695652,
+        "small_sample_limit": false,
+        "successes": 6,
+        "total": 69
+      },
+      "evidence_span_improvement_case_ids": [
+        "authored_canary_sha256_175b6c3b7164a9ef08782d08691f164a1d8fadc015c3c25efd6d92392881c3fa",
+        "retrieval_dev_sha256_53cfa4a3defceeed7b765c40317504ef2ba1cbfb46261aa66b0109552cf50753"
+      ],
+      "evidence_span_regression_case_ids": [],
+      "exact_all": true,
+      "improvement_case_ids": [],
+      "new_false_full_case_ids": [],
+      "regression_case_ids": [],
+      "replacement_question_count": 9,
+      "temporal_violation_chunk_ids": []
+    },
+    "strict_gate_checks": {
+      "authored_all_groups_at_least_20_of_24": true,
+      "authored_evidence_span_improves_beyond_7_of_24": true,
+      "authored_false_full_at_most_2_of_24": true,
+      "authored_new_false_full_zero": true,
+      "authored_regression_zero": true,
+      "authored_source_coverage_non_decreasing": true,
+      "exact_all": true,
+      "frozen_all_groups_at_least_63_of_69": true,
+      "frozen_evidence_span_regression_zero": true,
+      "frozen_new_false_full_zero": true,
+      "frozen_regression_zero": true,
+      "temporal_violation_zero": true
+    },
+    "strict_gate_passed": true
+  },
+  "source_commit": "5cdc150df4de68096445c4d97824d4d159a94250"
+}

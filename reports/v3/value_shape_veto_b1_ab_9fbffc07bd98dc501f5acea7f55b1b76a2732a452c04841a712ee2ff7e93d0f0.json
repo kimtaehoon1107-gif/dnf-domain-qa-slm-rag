@@ -1,0 +1,273 @@
+{
+  "arms": {
+    "arm0": {
+      "answerable": {
+        "false_full_answer": {
+          "rate": 0.1097561,
+          "small_sample_limit": false,
+          "successes": 9,
+          "total": 82
+        },
+        "false_partial": {
+          "rate": 0.02439024,
+          "small_sample_limit": false,
+          "successes": 2,
+          "total": 82
+        },
+        "grounded_answer": {
+          "rate": 0.8902439,
+          "small_sample_limit": false,
+          "successes": 73,
+          "total": 82
+        },
+        "honest_partial": {
+          "rate": 0.0,
+          "small_sample_limit": false,
+          "successes": 0,
+          "total": 82
+        },
+        "overreject": {
+          "rate": 0.0,
+          "small_sample_limit": false,
+          "successes": 0,
+          "total": 82
+        }
+      },
+      "question_count": 95,
+      "realtime_safe_abstain": {
+        "rate": 1.0,
+        "small_sample_limit": true,
+        "successes": 2,
+        "total": 2
+      },
+      "realtime_static_exposure": {
+        "rate": 0.0,
+        "small_sample_limit": true,
+        "successes": 0,
+        "total": 2
+      },
+      "reject_correct": {
+        "rate": 1.0,
+        "small_sample_limit": false,
+        "successes": 11,
+        "total": 11
+      }
+    },
+    "arm_b1": {
+      "answerable": {
+        "false_full_answer": {
+          "rate": 0.06097561,
+          "small_sample_limit": false,
+          "successes": 5,
+          "total": 82
+        },
+        "false_partial": {
+          "rate": 0.13414634,
+          "small_sample_limit": false,
+          "successes": 11,
+          "total": 82
+        },
+        "grounded_answer": {
+          "rate": 0.79268293,
+          "small_sample_limit": false,
+          "successes": 65,
+          "total": 82
+        },
+        "honest_partial": {
+          "rate": 0.01219512,
+          "small_sample_limit": false,
+          "successes": 1,
+          "total": 82
+        },
+        "overreject": {
+          "rate": 0.13414634,
+          "small_sample_limit": false,
+          "successes": 11,
+          "total": 82
+        }
+      },
+      "question_count": 95,
+      "realtime_safe_abstain": {
+        "rate": 1.0,
+        "small_sample_limit": true,
+        "successes": 2,
+        "total": 2
+      },
+      "realtime_static_exposure": {
+        "rate": 0.0,
+        "small_sample_limit": true,
+        "successes": 0,
+        "total": 2
+      },
+      "reject_correct": {
+        "rate": 1.0,
+        "small_sample_limit": false,
+        "successes": 11,
+        "total": 11
+      }
+    }
+  },
+  "constraints": {
+    "assembler_selection_changed": false,
+    "b2_executed": false,
+    "matching_shape_treated_as_positive_support": false,
+    "model_inference_calls": 0,
+    "planner_changed": false,
+    "question_or_gold_used_by_veto": false,
+    "router_changed": false,
+    "runtime_or_canonical_promoted": false,
+    "search_changed": false
+  },
+  "evaluation_role": "development_only_absence_veto_ab_no_promotion",
+  "evaluator_version": "value-shape-veto-b1-ab-v3.2.0",
+  "gate": {
+    "checks": {
+      "false_full_below_9": true,
+      "frozen_baseline_reproduced_73_grounded": true,
+      "frozen_baseline_reproduced_9_false_full": true,
+      "grounded_73_maintained": false,
+      "grounded_to_non_grounded_regression_zero": false,
+      "new_false_partial_zero": false,
+      "realtime_safe_abstain_2_of_2_maintained": true,
+      "realtime_static_exposure_zero": true,
+      "reject_11_of_11_maintained": true
+    },
+    "decision": "NO_GO_B1_KEEP_CURRENT_RUNTIME",
+    "grounded_regression_case_ids": [
+      "authored_canary_sha256_1d3d1079fe9a48467f4a24243ba570e6360b397f9c69115f4ea2a23dacf594e3",
+      "authored_canary_sha256_94cb64b76e424813ad2b73cface9b02ed9877f8759e3fd470883353fb7c6360a",
+      "authored_canary_sha256_d11221b62a077d078ae016430aa50b273262d5b84f9848228eed7949992238bb",
+      "retrieval_dev_sha256_294be05bdcd01a7fda4f52e927850ec45236a6aa4c47b70705ae29317f31e1b1",
+      "retrieval_dev_sha256_53cfa4a3defceeed7b765c40317504ef2ba1cbfb46261aa66b0109552cf50753",
+      "retrieval_dev_sha256_6aa9e8efd4492333b851933a90800ea02011e66e81d5a216b6846219cfbbe7e8",
+      "retrieval_dev_sha256_8c5b2427c17a8558f6798e416e7e2c70d3c5e3209b577cdc18c9fe47d5948c5f",
+      "retrieval_dev_sha256_9b2293077ca24ac8aa5779b5cf39ef32daad85740f8a3baf4bfbc5cbf8813d2a"
+    ],
+    "new_false_partial_case_ids": [
+      "authored_canary_sha256_8a4310949413526b4fbf0e6681e4757a0672373c26a1bdcc3c4afb72f1146d7a",
+      "authored_canary_sha256_d14cc891b82cf4cd20b4405a1e4c9041873c0f4bf2fbdc84a7e546774dcfcb1d",
+      "retrieval_dev_sha256_0bc1b53533d798046b073e29cbdc101d0273d1865ffdf08ed6622f2e6648cc2e",
+      "retrieval_dev_sha256_1df4130a4cf0e3cc83544a0b0058ed212f7061be5529482221d34e8d9630ca82",
+      "retrieval_dev_sha256_b30123fc74637e97dbbdfeac3fe57f4b21ff03898e8950dec0bb8f1139ff2549",
+      "retrieval_dev_sha256_ccbf1e2b4f5a71ebf3eb7af42d1511f53e028497b4f6b97db3376682510fc0a6",
+      "retrieval_dev_sha256_d946d602ed9908e07789d3782cedf36efa3d45c91631cf785c193268c47475c2",
+      "retrieval_dev_sha256_f445f9f8c954555863d745271d649b3a355eabae395f907a575dcf21fa4c6342",
+      "retrieval_dev_sha256_fef76eef68e9b167de56e7de7b7a37e44871ab638a7d9105fa2f97a966075805"
+    ],
+    "pass": false,
+    "resolved_false_full_case_ids": [
+      "authored_canary_sha256_175b6c3b7164a9ef08782d08691f164a1d8fadc015c3c25efd6d92392881c3fa",
+      "authored_canary_sha256_7138af09ff1516a92031af64d4a09b627fb23cddf7cc5a5b2f5e16c592e957b0",
+      "authored_canary_sha256_82a1ce0196fad29ac156e6a2b549185353778c833e35a46e9ed57b02501100e0",
+      "authored_canary_sha256_9e2c7f69dd204fd5229a8e21b441b7d2c07b3e4ba5eb73ee5b40f5867f4bb875"
+    ],
+    "veto_precision_against_observed_false_full": {
+      "rate": 0.19047619,
+      "small_sample_limit": false,
+      "successes": 4,
+      "total": 21
+    },
+    "vetoed_question_count": 21,
+    "vetoed_requirement_count": 29
+  },
+  "inputs": {
+    "adaptive_dev": {
+      "path": "data/v3/evaluation/retrieval_dev_v3.1_b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978.jsonl",
+      "sha256": "b98d62e1e3920f9e4a58bd602aa6cda1036827d1122f51d3478a95aa8d1a2978"
+    },
+    "assembler_cases": {
+      "path": "data/v3/evidence/extractive_assembler_v3_chunk_diverse_cases_06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c.jsonl",
+      "sha256": "06b672aa8775fc1a705005e6d88884000429b3fd0e7c773fc815db3fa1415b2c"
+    },
+    "backbone_cases": {
+      "path": "data/v3/router/router_backbone_answer_source_ab_cases_41e3e5dd351fc3a6ad01113490a835ef380d00d047df71ee39e44603d5fbed39.jsonl",
+      "sha256": "41e3e5dd351fc3a6ad01113490a835ef380d00d047df71ee39e44603d5fbed39"
+    },
+    "chunks": {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+      "sha256": "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885"
+    },
+    "contract": {
+      "path": "docs/v3/value_shape_veto_b1.md",
+      "sha256": "45edfadaba3df7c02d19bf69a71c63bff22d210b32311126767704ac4028eed0"
+    },
+    "downgraded_canary": {
+      "path": "data/v3/evaluation/early_generalization_authored_canary_28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d.jsonl",
+      "sha256": "28b0aa6c06add6ae0b81a7888d0f0c71bc46450058f6cedcb1588a5cdd83b85d"
+    },
+    "enumeration": {
+      "path": "data/v3/evaluation/semantic_requirement_enumeration_495caba182115c2dbec6e846dca7c0809c4cb8a4de552ee1268440d254d2ba9c.jsonl",
+      "sha256": "495caba182115c2dbec6e846dca7c0809c4cb8a4de552ee1268440d254d2ba9c"
+    },
+    "evaluator_source": {
+      "path": "src/v3/evaluate_value_shape_veto_b1.py",
+      "sha256": "498ca0c66f99e210107c85933a5b85eae188dccb195561a63bf921817bfff977"
+    },
+    "false_full_audit": {
+      "path": "data/v3/evidence/false_full_case_audit_c2f0bee2fbcc9e0d8941c47aaa7912429fad62b23c7bf35a3baf6fcbba0d1ec0.jsonl",
+      "sha256": "c2f0bee2fbcc9e0d8941c47aaa7912429fad62b23c7bf35a3baf6fcbba0d1ec0"
+    },
+    "value_shape_source": {
+      "path": "src/v3/requirement_value_shape.py",
+      "sha256": "ea3969a349fe8b8dbe3b5e9f099a846890bf1fcd413addd6cd8ce95b580a09c9"
+    }
+  },
+  "report_schema_version": "value-shape-veto-b1-report-v3.2",
+  "value_shape_version": "requirement-value-shape-v3.2.0",
+  "veto_kind_diagnostic": {
+    "calendar_date": {
+      "baseline_false_full_questions": 0,
+      "baseline_grounded_questions": 4,
+      "grounded_regressions": 3,
+      "new_false_partial_questions": 1,
+      "resolved_false_full_questions": 0,
+      "vetoed_questions": 4,
+      "vetoed_requirements": 4
+    },
+    "clock_or_datetime": {
+      "baseline_false_full_questions": 1,
+      "baseline_grounded_questions": 5,
+      "grounded_regressions": 4,
+      "new_false_partial_questions": 1,
+      "resolved_false_full_questions": 1,
+      "vetoed_questions": 6,
+      "vetoed_requirements": 8
+    },
+    "cost_value": {
+      "baseline_false_full_questions": 0,
+      "baseline_grounded_questions": 6,
+      "grounded_regressions": 2,
+      "new_false_partial_questions": 4,
+      "resolved_false_full_questions": 0,
+      "vetoed_questions": 6,
+      "vetoed_requirements": 7
+    },
+    "count_value": {
+      "baseline_false_full_questions": 2,
+      "baseline_grounded_questions": 1,
+      "grounded_regressions": 1,
+      "new_false_partial_questions": 0,
+      "resolved_false_full_questions": 2,
+      "vetoed_questions": 3,
+      "vetoed_requirements": 3
+    },
+    "duration": {
+      "baseline_false_full_questions": 0,
+      "baseline_grounded_questions": 4,
+      "grounded_regressions": 1,
+      "new_false_partial_questions": 3,
+      "resolved_false_full_questions": 0,
+      "vetoed_questions": 4,
+      "vetoed_requirements": 4
+    },
+    "percentage": {
+      "baseline_false_full_questions": 2,
+      "baseline_grounded_questions": 0,
+      "grounded_regressions": 0,
+      "new_false_partial_questions": 0,
+      "resolved_false_full_questions": 2,
+      "vetoed_questions": 2,
+      "vetoed_requirements": 3
+    }
+  }
+}

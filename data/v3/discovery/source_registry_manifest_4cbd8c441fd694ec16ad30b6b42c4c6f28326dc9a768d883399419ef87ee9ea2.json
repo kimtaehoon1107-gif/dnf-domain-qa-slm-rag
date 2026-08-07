@@ -1,0 +1,162 @@
+{
+  "discovered_at": "2026-07-17T19:20:31.0313737+09:00",
+  "discovery_parser_version": "dnf_source_discovery_v3.1",
+  "existing_document_count": 188,
+  "existing_documents_path": "data/v3/normalized/documents_dnf_official_v3.0_c77299d729a6.jsonl",
+  "existing_documents_sha256": "a202b31bbccf8433f7eb260ce14d449868c8e8815b42b19696468977b529daf3",
+  "manifest_schema_version": "dnf_source_registry_manifest_v3.0",
+  "policy_context": {
+    "as_of_date": "2026-07-17",
+    "duplicate_url_count": 610,
+    "event_cutoff": "2026-01-17",
+    "notice_cutoff": "2025-07-17",
+    "season_start": "2026-04-22",
+    "season_start_method": "latest_season_act_1_listing",
+    "shop_cutoff": "2025-07-17"
+  },
+  "registry_path": "data/v3/discovery/source_registry_04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a.jsonl",
+  "registry_row_count": 13214,
+  "registry_schema_version": "dnf_source_registry_v3.0",
+  "registry_sha256": "04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a",
+  "source_runs": [
+    {
+      "discovered_observation_count": 51,
+      "duplicate_url_count": 0,
+      "errors": [],
+      "listing_urls": [
+        "https://df.nexon.com/customer/policy/home?type=1"
+      ],
+      "notes": [],
+      "pages_expected": 1,
+      "pages_fetched": 1,
+      "pagination_complete": true,
+      "scope_complete": true,
+      "source_id": "dnf_account_policy",
+      "status": "complete",
+      "unique_url_count": 51
+    },
+    {
+      "discovered_observation_count": 423,
+      "duplicate_url_count": 61,
+      "errors": [],
+      "listing_urls": [
+        "https://df.nexon.com/community/news/event/list",
+        "https://df.nexon.com/community/news/event/list?categoryType=3"
+      ],
+      "notes": [
+        "Ended events were discovered through categoryType=3; URLs repeated on the current listing are deduplicated."
+      ],
+      "pages_expected": 2,
+      "pages_fetched": 2,
+      "pagination_complete": true,
+      "scope_complete": true,
+      "source_id": "dnf_event",
+      "status": "complete",
+      "unique_url_count": 362
+    },
+    {
+      "discovered_observation_count": 303,
+      "duplicate_url_count": 0,
+      "errors": [],
+      "listing_urls": [
+        "https://df.nexon.com/customer/faq"
+      ],
+      "notes": [
+        "FAQ entries are inline items; canonical_url is a deterministic synthetic locator by data-no."
+      ],
+      "pages_expected": 16,
+      "pages_fetched": 16,
+      "pagination_complete": true,
+      "scope_complete": true,
+      "source_id": "dnf_faq",
+      "status": "complete",
+      "unique_url_count": 303
+    },
+    {
+      "discovered_observation_count": 125,
+      "duplicate_url_count": 0,
+      "errors": [],
+      "listing_urls": [
+        "https://df.nexon.com/guide"
+      ],
+      "notes": [],
+      "pages_expected": 1,
+      "pages_fetched": 1,
+      "pagination_complete": true,
+      "scope_complete": true,
+      "source_id": "dnf_game_guide",
+      "status": "complete",
+      "unique_url_count": 125
+    },
+    {
+      "discovered_observation_count": 147,
+      "duplicate_url_count": 0,
+      "errors": [],
+      "listing_urls": [
+        "https://df.nexon.com/community/news/monthlyitem/",
+        "https://df.nexon.com/community/news/seriashop/list?category=2&searchKeyword=%EC%9D%B4%EB%8B%AC"
+      ],
+      "notes": [
+        "Historical monthly items were discovered through the closed Seria Shop searchKeyword route."
+      ],
+      "pages_expected": 26,
+      "pages_fetched": 26,
+      "pagination_complete": true,
+      "scope_complete": true,
+      "source_id": "dnf_monthly_item",
+      "status": "complete",
+      "unique_url_count": 147
+    },
+    {
+      "discovered_observation_count": 10874,
+      "duplicate_url_count": 518,
+      "errors": [],
+      "listing_urls": [
+        "https://df.nexon.com/community/news/notice/list"
+      ],
+      "notes": [],
+      "pages_expected": 518,
+      "pages_fetched": 518,
+      "pagination_complete": true,
+      "scope_complete": true,
+      "source_id": "dnf_notice",
+      "status": "complete",
+      "unique_url_count": 10356
+    },
+    {
+      "discovered_observation_count": 109,
+      "duplicate_url_count": 12,
+      "errors": [],
+      "listing_urls": [
+        "https://df.nexon.com/community/news/seriashop/list?category=1",
+        "https://df.nexon.com/community/news/seriashop/list?category=2"
+      ],
+      "notes": [
+        "Closed-sale pagination stopped after a full page ended before policy cutoff 2025-07-17."
+      ],
+      "pages_expected": 88,
+      "pages_fetched": 16,
+      "pagination_complete": false,
+      "scope_complete": true,
+      "source_id": "dnf_seria_shop",
+      "status": "complete_for_policy_window",
+      "unique_url_count": 97
+    },
+    {
+      "discovered_observation_count": 1792,
+      "duplicate_url_count": 1,
+      "errors": [],
+      "listing_urls": [
+        "https://df.nexon.com/community/news/update/list"
+      ],
+      "notes": [],
+      "pages_expected": 95,
+      "pages_fetched": 95,
+      "pagination_complete": true,
+      "scope_complete": true,
+      "source_id": "dnf_update",
+      "status": "complete",
+      "unique_url_count": 1791
+    }
+  ]
+}

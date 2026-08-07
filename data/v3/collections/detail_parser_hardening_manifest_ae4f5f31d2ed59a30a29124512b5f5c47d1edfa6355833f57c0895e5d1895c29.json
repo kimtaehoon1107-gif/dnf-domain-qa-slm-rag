@@ -1,0 +1,19 @@
+{
+  "collection_manifest_path": "data/v3/collections/detail_full_collection_manifest_f3003742b55a515e51c2abaee5a993cea9b1f108297f59c74a9aeaa201f87e97.json",
+  "collection_manifest_sha256": "f3003742b55a515e51c2abaee5a993cea9b1f108297f59c74a9aeaa201f87e97",
+  "guide_baseline_path": "data/raw/guide_docs.jsonl",
+  "guide_baseline_sha256": "c1049eb0d8c1910d99abe6ad345af21b7820e5f3a483a6836342ad332daeb613",
+  "ledger_path": "data/v3/collections/detail_full_collection_ledger_0165b356041a60ca920949b9d8c4436cb7509bdf7787fe97fee90fb9856ce12b.jsonl",
+  "ledger_sha256": "0165b356041a60ca920949b9d8c4436cb7509bdf7787fe97fee90fb9856ce12b",
+  "manifest_schema_version": "dnf_detail_parser_hardening_manifest_v3.2",
+  "parsed_at": "2026-07-17T22:29:29.7534422+09:00",
+  "parser_version": "dnf_detail_parser_hardened_v3.2",
+  "preview_path": "data/v3/collections/detail_hardened_extraction_preview_ac49a188c07ec22cc3265ebfa656f4849bfad3f5070779f538925e920fc4c4c8.jsonl",
+  "preview_row_count": 982,
+  "preview_sha256": "ac49a188c07ec22cc3265ebfa656f4849bfad3f5070779f538925e920fc4c4c8",
+  "previous_preview_path": "data/v3/collections/detail_full_extraction_preview_e48f58e205a7001e23e3286cc7df2d467bf8b549f9ce449b82a46a6accf8e1dd.jsonl",
+  "previous_preview_sha256": "e48f58e205a7001e23e3286cc7df2d467bf8b549f9ce449b82a46a6accf8e1dd",
+  "raw_snapshot_count": 719,
+  "registry_path": "data/v3/discovery/source_registry_04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a.jsonl",
+  "registry_sha256": "04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a"
+}
