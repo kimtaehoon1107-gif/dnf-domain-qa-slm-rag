@@ -1,7 +1,7 @@
 # v1/v2 재현 (레거시)
 
 
-아래 절은 기존 v1/v2 실험의 재현 기록입니다. 현재 Product Free RAG의 실행 방법은 [PORTFOLIO.md §8](PORTFOLIO.md#8-기술-스택과-재현)을 참고하세요.
+아래 절은 기존 v1/v2 실험의 재현 기록입니다. 현재 Product Free RAG의 실행 방법은 [PORTFOLIO.md §11](../PORTFOLIO.md#11-기술-스택과-재현)을 참고하세요.
 
 ## Current Scope
 

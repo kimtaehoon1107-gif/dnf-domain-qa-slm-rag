@@ -58,7 +58,7 @@ python -m pytest tests/v3 -q
 항목입니다. 테스트는 생성 모델을 모킹하므로 **Ollama·GPU·모델 다운로드·
 인터넷이 모두 필요 없습니다.**
 
-실제로 질문을 던져보려면 [PORTFOLIO.md §8](PORTFOLIO.md#8-기술-스택과-재현)의
+실제로 질문을 던져보려면 [PORTFOLIO.md §11](PORTFOLIO.md#11-기술-스택과-재현)의
 데모 실행 절차를 참고하세요. 이 경우에는 Ollama와 약 10 GB의 모델이 필요합니다.
 
 ## Data Source Notice
