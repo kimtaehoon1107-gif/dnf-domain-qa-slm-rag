@@ -1,0 +1,287 @@
+{
+    "report_schema_version":  "corpus-refresh-baseline-v1",
+    "round_timestamp":  "2026-08-07T19:12:13+09:00",
+    "source_commit":  "cf44493d1b1aac7ac76339cc0a444107fb714878",
+    "runtime_artifacts":  [
+                              {
+                                  "role":  "bm25_manifest",
+                                  "path":  "data/v3/indexes/bm25_manifest_f963e4e6a8bd64540ec030cdd3a4e881cd4034d833655dc624b838cafae8dbea.json",
+                                  "sha256":  "f963e4e6a8bd64540ec030cdd3a4e881cd4034d833655dc624b838cafae8dbea",
+                                  "size_bytes":  1643
+                              },
+                              {
+                                  "role":  "dense_manifest",
+                                  "path":  "data/v3/indexes/dense_full_manifest_51074e7e337a64e94a7cc66c8dd7b8b3ed982bad0b3aa82e2e5f30fb84520349.json",
+                                  "sha256":  "51074e7e337a64e94a7cc66c8dd7b8b3ed982bad0b3aa82e2e5f30fb84520349",
+                                  "size_bytes":  3479
+                              },
+                              {
+                                  "role":  "chunks",
+                                  "path":  "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+                                  "sha256":  "bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885",
+                                  "size_bytes":  14771225
+                              },
+                              {
+                                  "role":  "documents",
+                                  "path":  "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+                                  "sha256":  "d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d",
+                                  "size_bytes":  1422714
+                              }
+                          ],
+    "corpus":  {
+                   "document_count":  980,
+                   "chunk_count":  3599
+               },
+    "sealed_a6":  {
+                      "frozen_path":  "data/v3/evaluation/product_free_rag_a6_frozen_9405401d76c87b28418b795716938a3d62578644f33f2e853ddf18fc689b65dc.jsonl",
+                      "frozen_sha256":  "9405401d76c87b28418b795716938a3d62578644f33f2e853ddf18fc689b65dc",
+                      "question_count":  32,
+                      "acceptable_evidence_unit_count":  62,
+                      "referenced_chunk_id_count":  33,
+                      "referenced_document_id_count":  28,
+                      "referenced_chunks":  [
+                                                {
+                                                    "chunk_id":  "chunk_sha256_00a42c60fa1c8063b1f51b02f92437c8ac13fa33f44dbcdd35133ff9ca173874",
+                                                    "parent_document_id":  "document_sha256_1e5c7855596ddaf60e581b5adf3867076833290e896fc65652b28b99ab8d027c",
+                                                    "source_id":  "dnf_monthly_item",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_02970120b8a6d5bac826b4a935fe49fa2b61d4574242c3549356745ad3a55c1a",
+                                                    "parent_document_id":  "document_sha256_0ac4be77c2fbdbb52b5468b816dadfe873956aa900f52aa53af64e1795bae328",
+                                                    "source_id":  "dnf_faq",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_0477e57601898ca3280ab2e5517895cddd2b1015af324d229d98a90cbfcac8da",
+                                                    "parent_document_id":  "document_sha256_8fa22448be98e94095d940c55e800884aadf74ace9e0ef7a0dc8e39cfc22bafe",
+                                                    "source_id":  "dnf_seria_shop",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_06945c9d03fd78b3c8eb05d6521735692638f6055d039f4eef436478549cf79c",
+                                                    "parent_document_id":  "document_sha256_2910e12d475023598715609dbbf272a62f672c628a96098d145c80096e9e8ab2",
+                                                    "source_id":  "dnf_faq",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_0b5c98314c6c5811af11802b239987441ce3415a8619b74749b883dd4f15ab69",
+                                                    "parent_document_id":  "document_sha256_b7588ad16693be67d569c9bbccf133a0de542bc47251d4545e4f6610c784e412",
+                                                    "source_id":  "dnf_event",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_0d3460160bf2f90e0fab1d578711bfa0975da45bb5dd075fc31afae04c185753",
+                                                    "parent_document_id":  "document_sha256_18681203e21d9424898ccc73d1034530c32007fa63bbbce77323226727c94112",
+                                                    "source_id":  "dnf_notice",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_23c6c9aa09ce5bca0656412de5544b822a3bbb98a6ba48cb78c3fa29a574599a",
+                                                    "parent_document_id":  "document_sha256_75ef9e30f89c30206aa42e2b905f8e60748b5779f2e2d4f598b348dedee35f93",
+                                                    "source_id":  "dnf_event",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_3287297a1a95058d0d4f309bf8a3694a98e81619c02e340e519c17aedc6ba98a",
+                                                    "parent_document_id":  "document_sha256_fabc993eb222e7e59ee778cb2698262df69396f33654e3b6d7bdab58b4b3b004",
+                                                    "source_id":  "dnf_event",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_335e912feb7afd35d6f84f0f577b90bb62358201bedde54ff8784877dd910085",
+                                                    "parent_document_id":  "document_sha256_d87ef4a96a0ca6cf4d658f37860b6d9f57347d0fb4743f03bb34907610692c97",
+                                                    "source_id":  "dnf_update",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_340d568cfc7738ea93103ee4b3c590a0837da8e8f49f5234356f672e66dd21e3",
+                                                    "parent_document_id":  "document_sha256_42a77da0a0b6617e5d175b736f97795711900d307d3f545ef6b058839cd4f62c",
+                                                    "source_id":  "dnf_game_guide",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_49c240196412b8a85e14a28c27e423b0ac7a661293a851dbada907dea42384a9",
+                                                    "parent_document_id":  "document_sha256_834e1732394fdcb6df64a478e71bffc1760ad2cba6ae8488646f1d044583879d",
+                                                    "source_id":  "dnf_update",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_5b284aab49ae09f84883bf38acc9de2319359bd728b9c49d10ee171224679f3b",
+                                                    "parent_document_id":  "document_sha256_c647b13a7bdc33cea37f58a83827337fb410cc4cd6530cc1f24e02b0e900ccb3",
+                                                    "source_id":  "dnf_update",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_607e24fd6432c8f9075f13d3518ec90162b8f9cb505d73f77016e395832307c2",
+                                                    "parent_document_id":  "document_sha256_363e143582622717c308b7314418e96a1d15fa3136982d1769e24b0491398cda",
+                                                    "source_id":  "dnf_game_guide",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_6b9dc932e194d06fba4869682412425f032ee82b7a09197fa978ee628da351c7",
+                                                    "parent_document_id":  "document_sha256_fec2252ec1b008076c2e415c686a9f88a9acfc3f0ece3b3ea5dbc75abc6c6eea",
+                                                    "source_id":  "dnf_notice",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_6c13a1aa7d3f16f80fecb1e2efb6eabc87c39f12ea7a42abc827d56de8af6a48",
+                                                    "parent_document_id":  "document_sha256_97bad7361c508f3075a5d8944b1491181efa02474bf528eee6bb184cada4ebc4",
+                                                    "source_id":  "dnf_faq",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_6e6b9e641c88d34677c986ee9c339ed562ade2aa5061cb2c76bc9d50d8010d8c",
+                                                    "parent_document_id":  "document_sha256_af13d424beb7f34dcd9ce8da351b9fa7305efc694b136ef551fe75572ae47ec9",
+                                                    "source_id":  "dnf_seria_shop",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_794ba7192ebf7b3ed1ed537610afbeb34088b30384ec050fef986ea18357c3a0",
+                                                    "parent_document_id":  "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                                                    "source_id":  "dnf_account_policy",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_7d359ac1c7b0b74a9733bef2f4e4767dc502b3b86357928b3a853c9ef8b77e99",
+                                                    "parent_document_id":  "document_sha256_18681203e21d9424898ccc73d1034530c32007fa63bbbce77323226727c94112",
+                                                    "source_id":  "dnf_notice",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_7dd84109b96acd0baa8878a380a0b5876bf5ed72ad9abb862f9d952c67e69fef",
+                                                    "parent_document_id":  "document_sha256_01754a840bfedebcfc6a247cc490be0f47312d1c3951a0e6fbac54833fe719b1",
+                                                    "source_id":  "dnf_monthly_item",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_7f65f055dd08fe2805bae1a5ca17fccabeb0f18f3add9404302efad8518ef910",
+                                                    "parent_document_id":  "document_sha256_de961af12753a48990dac798d37f8417704b6009c3812991d23125d42ceacf77",
+                                                    "source_id":  "dnf_game_guide",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_89cd3ff19da0087bafabc531b84e42e0f9792150cc38c3797cafc3c67317f787",
+                                                    "parent_document_id":  "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                                                    "source_id":  "dnf_account_policy",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_9215d277cdf3dcb4a97c9744fdfa8639a6d5f19d2069ca52a69ec279ec48113a",
+                                                    "parent_document_id":  "document_sha256_b4bcc045a0d08343773d7de584ac4f5a904a30b916fb377339158b4b6eae4fcb",
+                                                    "source_id":  "dnf_seria_shop",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_94379e20d73b98a29c63d351a0ed78a8551675f120ad178f57a1598091933f19",
+                                                    "parent_document_id":  "document_sha256_6bc3e01a673d4f734721e1291a8f5efff8e55e90114fd57981b5b73226afe888",
+                                                    "source_id":  "dnf_event",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_9beda9e680b5bace135c96669dc3249cf5f7da5ab48f0876ea02166096065a76",
+                                                    "parent_document_id":  "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                                                    "source_id":  "dnf_account_policy",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_ad9fe6ce44df819f0d55d310a1b1b7ab60136e1fca54d9ba0434c3b960441547",
+                                                    "parent_document_id":  "document_sha256_0e2341210e077fd11e8fd7cae676bcec864ac23eeb447061457caebd1b4bb947",
+                                                    "source_id":  "dnf_notice",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_af8947ead8fd513fcfb6233efe7df54cee236dd291d7bdc8bb764f8487454619",
+                                                    "parent_document_id":  "document_sha256_9df2fdf54579c7f51f74178d045d7e5121230a053ad3b73325d5d4e5520f1425",
+                                                    "source_id":  "dnf_notice",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_b85cf9c381f143cf45072d4a3738bdb2bebdba4634eb37cd962defa2798fc3f6",
+                                                    "parent_document_id":  "document_sha256_de501545cd77078ba6afb1b2062689d04b3fbe99af7ef1a9c2ec2e3ce6bb61a1",
+                                                    "source_id":  "dnf_update",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_b9271b4a0ff249f504d38b5558db65626e758ddd77fc9ea50716f071779e3373",
+                                                    "parent_document_id":  "document_sha256_8de8ae799916006e980acbc26f485ddc224a16c3c993572037a45419a2aa3fb1",
+                                                    "source_id":  "dnf_faq",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_bb0076d106006bfa3f4602984397c33211ec5207c0db75fa977e1c39c40a4353",
+                                                    "parent_document_id":  "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                                                    "source_id":  "dnf_account_policy",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_c24d9038f3786af9a65fa2051f19c32aabf25ae944795269c98dde2486098226",
+                                                    "parent_document_id":  "document_sha256_faa39b3063e8f8908d0cde902ea3307d9ba38576160f6a3ebb6876fae0d77e77",
+                                                    "source_id":  "dnf_game_guide",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_d23a0df67a37d463f0221e3e9bfbd4fd8a65bd4b2577478c7573239523ef6043",
+                                                    "parent_document_id":  "document_sha256_e1b41518d35b1284a3a07936b23f997653287b5b25426f6aca4cb04ac6eaa98e",
+                                                    "source_id":  "dnf_monthly_item",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_f002c2893434cb114c5a48d9c4b80d195b722d24b0a5a0ad57cbea04b3ab5c7d",
+                                                    "parent_document_id":  "document_sha256_dde0974f824042704eff7e7c8f0fed589a3c70bcd1d43f7dd48f641272cbccdf",
+                                                    "source_id":  "dnf_seria_shop",
+                                                    "title":  null
+                                                },
+                                                {
+                                                    "chunk_id":  "chunk_sha256_f203c60c78615e63701bb5010736e4fe56a4eb4cac26b9bc7746ee647ee1a5ee",
+                                                    "parent_document_id":  "document_sha256_af13d424beb7f34dcd9ce8da351b9fa7305efc694b136ef551fe75572ae47ec9",
+                                                    "source_id":  "dnf_seria_shop",
+                                                    "title":  null
+                                                }
+                                            ],
+                      "referenced_document_ids":  [
+                                                      "document_sha256_01754a840bfedebcfc6a247cc490be0f47312d1c3951a0e6fbac54833fe719b1",
+                                                      "document_sha256_0ac4be77c2fbdbb52b5468b816dadfe873956aa900f52aa53af64e1795bae328",
+                                                      "document_sha256_0e2341210e077fd11e8fd7cae676bcec864ac23eeb447061457caebd1b4bb947",
+                                                      "document_sha256_18681203e21d9424898ccc73d1034530c32007fa63bbbce77323226727c94112",
+                                                      "document_sha256_1e5c7855596ddaf60e581b5adf3867076833290e896fc65652b28b99ab8d027c",
+                                                      "document_sha256_2910e12d475023598715609dbbf272a62f672c628a96098d145c80096e9e8ab2",
+                                                      "document_sha256_363e143582622717c308b7314418e96a1d15fa3136982d1769e24b0491398cda",
+                                                      "document_sha256_42a77da0a0b6617e5d175b736f97795711900d307d3f545ef6b058839cd4f62c",
+                                                      "document_sha256_6bc3e01a673d4f734721e1291a8f5efff8e55e90114fd57981b5b73226afe888",
+                                                      "document_sha256_75ef9e30f89c30206aa42e2b905f8e60748b5779f2e2d4f598b348dedee35f93",
+                                                      "document_sha256_834e1732394fdcb6df64a478e71bffc1760ad2cba6ae8488646f1d044583879d",
+                                                      "document_sha256_8de8ae799916006e980acbc26f485ddc224a16c3c993572037a45419a2aa3fb1",
+                                                      "document_sha256_8fa22448be98e94095d940c55e800884aadf74ace9e0ef7a0dc8e39cfc22bafe",
+                                                      "document_sha256_97bad7361c508f3075a5d8944b1491181efa02474bf528eee6bb184cada4ebc4",
+                                                      "document_sha256_9df2fdf54579c7f51f74178d045d7e5121230a053ad3b73325d5d4e5520f1425",
+                                                      "document_sha256_af13d424beb7f34dcd9ce8da351b9fa7305efc694b136ef551fe75572ae47ec9",
+                                                      "document_sha256_b4bcc045a0d08343773d7de584ac4f5a904a30b916fb377339158b4b6eae4fcb",
+                                                      "document_sha256_b7588ad16693be67d569c9bbccf133a0de542bc47251d4545e4f6610c784e412",
+                                                      "document_sha256_c647b13a7bdc33cea37f58a83827337fb410cc4cd6530cc1f24e02b0e900ccb3",
+                                                      "document_sha256_c7b4d4825f1bd82bfbad1db55d678070653c9c3b81e7c68c534eb4e698c32ded",
+                                                      "document_sha256_d87ef4a96a0ca6cf4d658f37860b6d9f57347d0fb4743f03bb34907610692c97",
+                                                      "document_sha256_dde0974f824042704eff7e7c8f0fed589a3c70bcd1d43f7dd48f641272cbccdf",
+                                                      "document_sha256_de501545cd77078ba6afb1b2062689d04b3fbe99af7ef1a9c2ec2e3ce6bb61a1",
+                                                      "document_sha256_de961af12753a48990dac798d37f8417704b6009c3812991d23125d42ceacf77",
+                                                      "document_sha256_e1b41518d35b1284a3a07936b23f997653287b5b25426f6aca4cb04ac6eaa98e",
+                                                      "document_sha256_faa39b3063e8f8908d0cde902ea3307d9ba38576160f6a3ebb6876fae0d77e77",
+                                                      "document_sha256_fabc993eb222e7e59ee778cb2698262df69396f33654e3b6d7bdab58b4b3b004",
+                                                      "document_sha256_fec2252ec1b008076c2e415c686a9f88a9acfc3f0ece3b3ea5dbc75abc6c6eea"
+                                                  ],
+                      "baseline_presence":  "33/33"
+                  },
+    "adaptive_comparison":  {
+                                "path":  "reports/v3/product_free_rag_a6_pending_adaptive_replay_20260806.jsonl",
+                                "sha256":  "8cd93478c63da43c45cd0b3d6faf2f042eab91e344e6724e64acae31a1d76b23"
+                            },
+    "gpu_preflight":  {
+                          "checked_at":  "2026-08-07T19:12:13+09:00",
+                          "gpu_name":  "NVIDIA GeForce RTX 5070 Laptop GPU",
+                          "utilization_percent":  0,
+                          "memory_used_mib":  1409,
+                          "memory_total_mib":  8151,
+                          "compute_job_detected":  false,
+                          "note":  "nvidia-smi PID 2528 resolved to Windows dwm; no python, pythonw, or ollama process was running."
+                      }
+}
