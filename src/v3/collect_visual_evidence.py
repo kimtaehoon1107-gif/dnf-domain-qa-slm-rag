@@ -607,6 +607,7 @@ def _build_report(
     asset_rows: list[dict[str, Any]],
     evidence: list[dict[str, Any]],
     overlay: list[dict[str, Any]],
+    normalization_candidates_before_visual: int,
     fetched_at: str,
     manifest_path: Path,
     manifest_sha256: str,
@@ -665,7 +666,7 @@ def _build_report(
             "unresolved_documents": sum(
                 row["visual_evidence_status"].startswith("unresolved") for row in evidence
             ),
-            "normalization_candidates_after_visual": 961
+            "normalization_candidates_after_visual": normalization_candidates_before_visual
             + sum(row["normalization_eligible_after_visual"] for row in evidence),
             "asset_rows": len(asset_rows),
             "image_asset_rows": len(image_rows),
@@ -771,6 +772,7 @@ def freeze_visual_artifacts(
     ledger_path: Path,
     hardened_preview_path: Path,
     hardening_manifest_path: Path,
+    normalization_candidates_before_visual: int,
     evidence_dir: Path,
     report_dir: Path,
     reused_asset_ledger_path: Path | None = None,
@@ -849,6 +851,7 @@ def freeze_visual_artifacts(
         asset_rows=asset_rows,
         evidence=evidence,
         overlay=overlay,
+        normalization_candidates_before_visual=normalization_candidates_before_visual,
         fetched_at=fetched_at,
         manifest_path=manifest_path,
         manifest_sha256=manifest_sha256,
@@ -905,8 +908,8 @@ def collect_visual_evidence(
         for row in hardened
         if row["default_exposure"] and row["image_dependency_risk"] == "high"
     ]
-    if len(targets) != 18:
-        raise RuntimeError(f"Expected 18 high-image default documents, found {len(targets)}")
+    if not targets:
+        raise RuntimeError("No high-image default documents found")
 
     asset_rows: list[dict[str, Any]] = []
     for document_index, document in enumerate(
@@ -982,6 +985,9 @@ def collect_visual_evidence(
         ledger_path=ledger_path,
         hardened_preview_path=hardened_preview_path,
         hardening_manifest_path=hardening_manifest_path,
+        normalization_candidates_before_visual=sum(
+            row["normalization_eligible"] for row in hardened
+        ),
         evidence_dir=evidence_dir,
         report_dir=report_dir,
     )
@@ -1007,8 +1013,8 @@ def finalize_visual_evidence_from_ledger(
         for row in hardened
         if row["default_exposure"] and row["image_dependency_risk"] == "high"
     ]
-    if len(targets) != 18:
-        raise RuntimeError(f"Expected 18 high-image default documents, found {len(targets)}")
+    if not targets:
+        raise RuntimeError("No high-image default documents found")
     asset_rows = []
     for source_row in read_jsonl(reused_asset_ledger_path):
         row = dict(source_row)
@@ -1031,6 +1037,9 @@ def finalize_visual_evidence_from_ledger(
         ledger_path=ledger_path,
         hardened_preview_path=hardened_preview_path,
         hardening_manifest_path=hardening_manifest_path,
+        normalization_candidates_before_visual=sum(
+            row["normalization_eligible"] for row in hardened
+        ),
         evidence_dir=evidence_dir,
         report_dir=report_dir,
         reused_asset_ledger_path=reused_asset_ledger_path,
