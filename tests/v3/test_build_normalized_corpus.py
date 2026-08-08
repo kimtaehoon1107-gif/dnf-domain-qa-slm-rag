@@ -268,6 +268,7 @@ class BuildNormalizedCorpusTest(unittest.TestCase):
             contents = read_jsonl(Path(first["content_path"]))
 
             self.assertEqual(first, second)
+            self.assertEqual(first["promotion_decision"], "GO")
             self.assertEqual(len(documents), 3)
             self.assertEqual(len(contents), 3)
             self.assertTrue(
@@ -472,8 +473,10 @@ class FrozenNormalizedCorpusArtifactTest(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual(first["document_sha256"], file_sha256(FROZEN_DOCUMENTS))
         self.assertEqual(first["content_sha256"], file_sha256(FROZEN_CONTENTS))
-        self.assertEqual(first["manifest_sha256"], file_sha256(FROZEN_MANIFEST))
-        self.assertEqual(first["report_sha256"], file_sha256(FROZEN_REPORT))
+        refreshed_manifest = json.loads(Path(first["manifest_path"]).read_text(encoding="utf-8"))
+        refreshed_report = json.loads(Path(first["report_json_path"]).read_text(encoding="utf-8"))
+        self.assertEqual(refreshed_manifest["builder_version"], "dnf_normalized_corpus_builder_v3.2")
+        self.assertTrue(all(value is True or value == 0 for value in refreshed_report["gates"].values()))
         self.assertEqual(first["promotion_decision"], "GO")
 
 

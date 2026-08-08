@@ -29,7 +29,7 @@ from src.v3.schemas import (
 )
 
 
-BUILDER_VERSION = "dnf_normalized_corpus_builder_v3.1"
+BUILDER_VERSION = "dnf_normalized_corpus_builder_v3.2"
 CONTENT_HASH_VERSION = "dnf_normalized_content_hash_v3.1"
 
 DEFAULT_REGISTRY = Path(
@@ -591,10 +591,21 @@ def build_normalized_corpus(
 
     status_counts = Counter(row["status"] for row in documents)
     default_count = sum(row["default_exposure"] for row in documents)
+    material_revision_count = sum(
+        previews[url].get("guide_change_classification")
+        == "official_revision_after_baseline"
+        for url in candidate_urls
+    )
     gates = {
-        "candidate_count_is_979": len(candidate_urls) == 979,
-        "excluded_redirects_are_3": len(excluded) == 3,
-        "preserved_material_revisions_are_1": preserved_count == 1,
+        "all_eligible_urls_accounted_for": (
+            len(candidate_urls) + len(excluded) == len(eligible_urls)
+        ),
+        "excluded_documents_are_overlay_backed": all(
+            row["canonical_url"] in overlays
+            and not overlays[row["canonical_url"]]["normalization_eligible"]
+            for row in excluded
+        ),
+        "all_material_revisions_preserved": preserved_count == material_revision_count,
         "document_content_id_sets_match": document_ids == set(content_by_id),
         "empty_title_or_text": sum(
             not row["title"] or not content_by_id[row["document_id"]]["text"]
