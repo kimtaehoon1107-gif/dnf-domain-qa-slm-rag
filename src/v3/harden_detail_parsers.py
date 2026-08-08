@@ -130,6 +130,8 @@ def structured_text_hardened(
     image_count = len(images)
     seen_alts: set[str] = set()
     for image in images:
+        if image.decomposed:
+            continue
         alt = normalize_space(image.get("alt"))
         compact = alt.lower()
         if alt and compact not in GENERIC_IMAGE_ALTS and compact not in seen_alts:
