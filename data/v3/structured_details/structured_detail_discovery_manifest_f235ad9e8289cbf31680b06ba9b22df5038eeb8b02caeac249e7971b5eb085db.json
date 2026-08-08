@@ -1,0 +1,24 @@
+{
+  "audit": {
+    "all_accepted_urls_official": true,
+    "blocked_external_reference_count": 0,
+    "event_reward_reference_count": 25,
+    "ocr_candidate_count": 1,
+    "raw_snapshot_count": 998,
+    "reference_count": 25,
+    "reference_document_count": 17,
+    "unique_detail_url_count": 25,
+    "visual_section_document_count": 7,
+    "visual_section_incomplete_count": 10
+  },
+  "discovery_path": "data/v3/structured_details/structured_detail_discovery_eace836352656a46192bf1f4321b6a9338ddeb06376aedde3a4858ad9926242e.jsonl",
+  "discovery_sha256": "eace836352656a46192bf1f4321b6a9338ddeb06376aedde3a4858ad9926242e",
+  "discovery_version": "dnf_structured_detail_discovery_v1.0",
+  "documents_path": "data/v3/normalized/documents_dnf_official_detail_v3.1_c7128b36aa972616f5f1fa3e5d047c11fac3fa9f9264f69ae73c99a2556b2e76.jsonl",
+  "documents_sha256": "c7128b36aa972616f5f1fa3e5d047c11fac3fa9f9264f69ae73c99a2556b2e76",
+  "ledger_path": "data/v3/collections/detail_full_collection_ledger_a9230fa5c2a8f70df77749db7bf37a0a307506d27fa25d588c9310accacc1a6f.jsonl",
+  "ledger_sha256": "a9230fa5c2a8f70df77749db7bf37a0a307506d27fa25d588c9310accacc1a6f",
+  "manifest_schema_version": "dnf_structured_detail_discovery_manifest_v1.0",
+  "visual_diagnostic_path": "data/v3/structured_details/visual_section_diagnostic_9939b351b19e8386ff1945f878bca6225b3cf67195742630e0b5b36859ed9f28.jsonl",
+  "visual_diagnostic_sha256": "9939b351b19e8386ff1945f878bca6225b3cf67195742630e0b5b36859ed9f28"
+}

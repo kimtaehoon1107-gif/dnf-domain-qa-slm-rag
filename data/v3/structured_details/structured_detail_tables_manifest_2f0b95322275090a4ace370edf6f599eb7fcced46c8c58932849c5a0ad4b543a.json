@@ -1,0 +1,20 @@
+{
+  "atomic_rows_path": "data/v3/structured_details/structured_detail_atomic_rows_de28e6f533a5152f76afbddb5065c30d03e52d20bb27111d815c7c6c32ea7951.jsonl",
+  "atomic_rows_sha256": "de28e6f533a5152f76afbddb5065c30d03e52d20bb27111d815c7c6c32ea7951",
+  "audit": {
+    "atomic_row_count": 466,
+    "complete_table_count": 3,
+    "false_complete_count": 0,
+    "incomplete_table_count": 22,
+    "locator_check_count": 1025,
+    "locator_restore_count": 1025,
+    "locator_restore_rate": 1.0,
+    "table_count": 25
+  },
+  "collection_path": "data/v3/structured_details/structured_detail_collection_d37f2bc08124f980accfda10109fbc00f37de7f86c8efdba0b7eb63886cc7fa9.jsonl",
+  "collection_sha256": "d37f2bc08124f980accfda10109fbc00f37de7f86c8efdba0b7eb63886cc7fa9",
+  "manifest_schema_version": "dnf_structured_detail_tables_manifest_v1.0",
+  "parser_version": "dnf_structured_detail_table_parser_v1.0",
+  "tables_path": "data/v3/structured_details/structured_detail_tables_c8a72b164e99a2256e59f7970cc2484aafca54f65f4599c52009fa8ca526513b.jsonl",
+  "tables_sha256": "c8a72b164e99a2256e59f7970cc2484aafca54f65f4599c52009fa8ca526513b"
+}

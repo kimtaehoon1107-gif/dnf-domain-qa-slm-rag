@@ -1,0 +1,20 @@
+{
+  "audit": {
+    "all_urls_official": true,
+    "deduplicated_fetch_count": 0,
+    "failed_url_count": 0,
+    "network_fetch_count": 25,
+    "parent_metadata_missing_count": 0,
+    "reference_count": 25,
+    "success_url_count": 25,
+    "unique_detail_url_count": 25
+  },
+  "collection_path": "data/v3/structured_details/structured_detail_collection_d37f2bc08124f980accfda10109fbc00f37de7f86c8efdba0b7eb63886cc7fa9.jsonl",
+  "collection_row_count": 25,
+  "collection_sha256": "d37f2bc08124f980accfda10109fbc00f37de7f86c8efdba0b7eb63886cc7fa9",
+  "collector_version": "dnf_structured_detail_collector_v1.0",
+  "discovery_path": "data/v3/structured_details/structured_detail_discovery_eace836352656a46192bf1f4321b6a9338ddeb06376aedde3a4858ad9926242e.jsonl",
+  "discovery_sha256": "eace836352656a46192bf1f4321b6a9338ddeb06376aedde3a4858ad9926242e",
+  "fetched_at": "2026-08-09T02:23:34+09:00",
+  "manifest_schema_version": "dnf_structured_detail_collection_manifest_v1.0"
+}
