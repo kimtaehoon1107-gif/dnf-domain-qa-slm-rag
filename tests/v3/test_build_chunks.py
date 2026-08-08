@@ -106,7 +106,10 @@ class BuildChunkCorpusTest(unittest.TestCase):
             contents_path.write_bytes(
                 _serialize_jsonl(self.contents, lambda row: row["document_id"])
             )
-            normalized_manifest_path.write_text("{}\n", encoding="utf-8")
+            normalized_manifest_path.write_text(
+                json.dumps({"documents": {"row_count": 2}}) + "\n",
+                encoding="utf-8",
+            )
             pilot_manifest_path.write_text("{}\n", encoding="utf-8")
             input_hashes = {
                 path: file_sha256(path)
@@ -125,7 +128,6 @@ class BuildChunkCorpusTest(unittest.TestCase):
                 "pilot_manifest_path": pilot_manifest_path,
                 "chunk_dir": root / "chunks",
                 "report_dir": root / "reports",
-                "expected_document_count": 2,
                 "expected_source_ids": {"dnf_notice"},
             }
 

@@ -38,7 +38,6 @@ from src.v3.schemas import (
 CHUNKER_VERSION = "dnf_offset_chunk_v3.1"
 MANIFEST_SCHEMA_VERSION = "dnf_chunk_corpus_manifest_v3.1"
 REPORT_SCHEMA_VERSION = "dnf_chunk_corpus_audit_v3.1"
-EXPECTED_DOCUMENT_COUNT = 980
 AUDIT_COUNTER_KEYS = (
     "chunk_id_mismatches",
     "chunk_index_sequence_mismatches",
@@ -403,7 +402,7 @@ def build_chunk_corpus(
     pilot_manifest_path: Path,
     chunk_dir: Path,
     report_dir: Path,
-    expected_document_count: int = EXPECTED_DOCUMENT_COUNT,
+    expected_document_count: int | None = None,
     expected_source_ids: set[str] | None = None,
 ) -> dict[str, Any]:
     parse_fixed_timestamp(built_at)
@@ -418,6 +417,14 @@ def build_chunk_corpus(
         if not path.is_file():
             raise RuntimeError(f"Required input does not exist: {path}")
     input_hashes = {path: file_sha256(path) for path in input_paths}
+    normalized_manifest = json.loads(normalized_manifest_path.read_text(encoding="utf-8"))
+    manifest_document_count = normalized_manifest.get("documents", {}).get("row_count")
+    if expected_document_count is None:
+        if not isinstance(manifest_document_count, int):
+            raise RuntimeError("Normalized manifest has no integer documents.row_count")
+        expected_document_count = manifest_document_count
+    elif manifest_document_count is not None and manifest_document_count != expected_document_count:
+        raise RuntimeError("Expected document count differs from normalized manifest")
     documents = read_jsonl(documents_path)
     contents = read_jsonl(contents_path)
     documents_by_id = {row["document_id"]: row for row in documents}
