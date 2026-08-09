@@ -1,0 +1,160 @@
+{
+  "report_schema_version": "dynamic_contamination_survey_v1",
+  "created_at": "2026-08-09",
+  "scope": {
+    "baseline_old_chunk_count": 3599,
+    "baseline_preserved_chunk_ids": 1330,
+    "sealed_coordinates_total": 33,
+    "sealed_coordinates_preserved_before": 8,
+    "missing_sealed_coordinates": 25,
+    "dynamic_contamination_coordinates": 21,
+    "out_of_scope_coordinates": 4,
+    "target_parent_documents": 20,
+    "dynamic_parent_documents": 16
+  },
+  "inputs": {
+    "old_documents": "data/v3/normalized/documents_dnf_official_detail_v3.1_d4d8ae1030e9d769c05b5914a908c75a233c9bc8e0af2a3cc45149d680271c9d.jsonl",
+    "new_documents": "data/v3/normalized/documents_dnf_official_detail_v3.1_c7128b36aa972616f5f1fa3e5d047c11fac3fa9f9264f69ae73c99a2556b2e76.jsonl",
+    "old_chunks": "data/v3/chunks/chunks_dnf_official_v3.1_bd0242b3f19646c22eafd2e61bf2544e670718a1c9927de288decb5657e92885.jsonl",
+    "new_chunks": "data/v3/chunks/chunks_dnf_official_v3.1_930a7d8d1581a3f234ad4d1d437a2bf6e863eabe65723e98a26c35a91c33cd40.jsonl"
+  },
+  "findings": [
+    {
+      "contamination_id": "current_monthly_item_cross_document_module",
+      "dom_selector": "ul.thismonth",
+      "dom_path": "section.content.news > section.add_boardlist.news > article.seriashop > ul.thismonth",
+      "why_not_document_content": "과거 세리아 상점 문서마다 동일하게 삽입되는 현재 판매 상품 추천 모듈이며 대상 문서의 고유 본문이 아니다.",
+      "affected_parent_documents": 7,
+      "affected_sealed_coordinates": 8,
+      "old_node_count_per_document": 3,
+      "new_node_count_per_document": 4,
+      "old_value_summary": "7월 이달의 아이템(2026.06.25~2026.07.30), 트로피컬 바캉스 패키지, 아라드 패스 2026 시즌3",
+      "new_value_summary": "8월 이달의 아이템(2026.07.30~2026.08.27), DNF X NBA 패키지, 트로피컬 바캉스 패키지, 아라드 패스 2026 시즌3",
+      "affected_documents": [
+        {
+          "url": "https://df.nexon.com/community/news/seriashop/226",
+          "sealed_chunk_ids": [
+            "chunk_sha256_6e6b9e641c88d34677c986ee9c339ed562ade2aa5061cb2c76bc9d50d8010d8c",
+            "chunk_sha256_f203c60c78615e63701bb5010736e4fe56a4eb4cac26b9bc7746ee647ee1a5ee"
+          ]
+        },
+        {
+          "url": "https://df.nexon.com/community/news/seriashop/261",
+          "sealed_chunk_ids": ["chunk_sha256_0477e57601898ca3280ab2e5517895cddd2b1015af324d229d98a90cbfcac8da"]
+        },
+        {
+          "url": "https://df.nexon.com/community/news/seriashop/357",
+          "sealed_chunk_ids": ["chunk_sha256_9215d277cdf3dcb4a97c9744fdfa8639a6d5f19d2069ca52a69ec279ec48113a"]
+        },
+        {
+          "url": "https://df.nexon.com/community/news/seriashop/378",
+          "sealed_chunk_ids": ["chunk_sha256_f002c2893434cb114c5a48d9c4b80d195b722d24b0a5a0ad57cbea04b3ab5c7d"]
+        },
+        {
+          "url": "https://df.nexon.com/community/news/seriashop/572",
+          "sealed_chunk_ids": ["chunk_sha256_00a42c60fa1c8063b1f51b02f92437c8ac13fa33f44dbcdd35133ff9ca173874"]
+        },
+        {
+          "url": "https://df.nexon.com/community/news/seriashop/581",
+          "sealed_chunk_ids": ["chunk_sha256_7dd84109b96acd0baa8878a380a0b5876bf5ed72ad9abb862f9d952c67e69fef"]
+        },
+        {
+          "url": "https://df.nexon.com/community/news/seriashop/626",
+          "sealed_chunk_ids": ["chunk_sha256_94379e20d73b98a29c63d351a0ed78a8551675f120ad178f57a1598091933f19"]
+        }
+      ]
+    },
+    {
+      "contamination_id": "view_count",
+      "dom_selector": "span.hits",
+      "dom_path": "section.content.news div.board_view.news_view dl.single dd p.sinfo span.hits",
+      "why_not_document_content": "게시 후 계속 증가하는 조회수이며 공지·업데이트·이벤트의 사실 본문이 아니다.",
+      "affected_parent_documents": 8,
+      "affected_sealed_coordinates": 9,
+      "old_to_new_values": [
+        {"url": "https://df.nexon.com/community/news/event/2927983", "old": "8,428", "new": "15,845"},
+        {"url": "https://df.nexon.com/community/news/notice/2838879", "old": "737,330", "new": "738,941"},
+        {"url": "https://df.nexon.com/community/news/notice/2922449", "old": "498,040", "new": "498,121"},
+        {"url": "https://df.nexon.com/community/news/notice/2922578", "old": "37,477", "new": "37,593"},
+        {"url": "https://df.nexon.com/community/news/update/2927196", "old": "29,439", "new": "29,639"},
+        {"url": "https://df.nexon.com/community/news/update/2927522", "old": "42,739", "new": "43,016"},
+        {"url": "https://df.nexon.com/community/news/update/2927756", "old": "26,841", "new": "27,080"},
+        {"url": "https://df.nexon.com/community/news/update/2927913", "old": "26,701", "new": "27,386"}
+      ],
+      "sealed_chunk_ids": [
+        "chunk_sha256_0b5c98314c6c5811af11802b239987441ce3415a8619b74749b883dd4f15ab69",
+        "chunk_sha256_0d3460160bf2f90e0fab1d578711bfa0975da45bb5dd075fc31afae04c185753",
+        "chunk_sha256_335e912feb7afd35d6f84f0f577b90bb62358201bedde54ff8784877dd910085",
+        "chunk_sha256_49c240196412b8a85e14a28c27e423b0ac7a661293a851dbada907dea42384a9",
+        "chunk_sha256_5b284aab49ae09f84883bf38acc9de2319359bd728b9c49d10ee171224679f3b",
+        "chunk_sha256_6b9dc932e194d06fba4869682412425f032ee82b7a09197fa978ee628da351c7",
+        "chunk_sha256_7d359ac1c7b0b74a9733bef2f4e4767dc502b3b86357928b3a853c9ef8b77e99",
+        "chunk_sha256_ad9fe6ce44df819f0d55d310a1b1b7ab60136e1fca54d9ba0434c3b960441547",
+        "chunk_sha256_b85cf9c381f143cf45072d4a3738bdb2bebdba4634eb37cd962defa2798fc3f6"
+      ]
+    },
+    {
+      "contamination_id": "rotating_phishing_banner_alt",
+      "dom_selector": "article.bdview_bnrarea",
+      "dom_path": "section.content.news > article.bdview_bnrarea > a > img[alt]",
+      "why_not_document_content": "서로 다른 공지에 공통 삽입되고 요청마다 교체되는 피싱 예방 배너이며 문서 고유 본문이 아니다.",
+      "affected_parent_documents_with_observed_change": 3,
+      "affected_sealed_coordinates_already_covered_by_view_count_group": 4,
+      "old_to_new_values": [
+        {"url": "https://df.nexon.com/community/news/notice/2838879", "old": "피싱방지4차_개인정보도용용", "new": "피싱방지4차_현금거래유도"},
+        {"url": "https://df.nexon.com/community/news/notice/2922449", "old": "피싱방지4차_간편결제유도", "new": "피싱방지4차_개인정보도용용"},
+        {"url": "https://df.nexon.com/community/news/notice/2922578", "old": "피싱방지4차_간편결제유도", "new": "피싱방지4차_현금거래유도"}
+      ]
+    },
+    {
+      "contamination_id": "policy_revision_dropdown",
+      "dom_selector": "select#revisionList",
+      "dom_path": "section.content.policy > article.enforce_date > div.select_gy > select#revisionList",
+      "why_not_document_content": "조회 중인 과거 revision 본문과 무관하게 최신 revision 선택지가 추가되는 사이트 UI이다. 문서 시행일은 URL·title·published_at·valid_from에 별도로 보존된다.",
+      "affected_parent_documents": 1,
+      "affected_sealed_coordinates": 4,
+      "url": "https://df.nexon.com/customer/policy/home?revision=2026-03-15&type=1",
+      "old_value_summary": "최상단 선택지 2026년 03월 15일",
+      "new_value_summary": "최상단에 2026년 08월 07일 선택지 추가",
+      "sealed_chunk_ids": [
+        "chunk_sha256_794ba7192ebf7b3ed1ed537610afbeb34088b30384ec050fef986ea18357c3a0",
+        "chunk_sha256_89cd3ff19da0087bafabc531b84e42e0f9792150cc38c3797cafc3c67317f787",
+        "chunk_sha256_9beda9e680b5bace135c96669dc3249cf5f7da5ab48f0876ea02166096065a76",
+        "chunk_sha256_bb0076d106006bfa3f4602984397c33211ec5207c0db75fa977e1c39c40a4353"
+      ]
+    }
+  ],
+  "new_snapshot_selector_footprint": {
+    "ul.thismonth": {"documents": 84, "nodes": 336},
+    "span.hits": {"documents": 426, "nodes": 426},
+    "article.bdview_bnrarea": {"documents": 403, "nodes": 403},
+    "select#revisionList": {"documents": 52, "nodes": 52}
+  },
+  "read_only_counterfactual": {
+    "method": "옛·새 raw HTML의 파서 content node 복제본에서 네 선택자를 제거한 뒤 structured_text_hardened 결과의 SHA-256을 비교했다. 소스·데이터 파일은 수정하지 않았다.",
+    "target_dynamic_documents": 16,
+    "old_vs_new_equal_before_removal": 0,
+    "old_vs_new_equal_after_removal": 16,
+    "cleaned_new_equal_to_old_canonical_extracted_text": 0,
+    "interpretation": "네 선택자는 동적 오염을 정확히 격리하며 향후 재수집 안정성에는 유효하다. 그러나 기존 canonical은 옛 동적 값을 포함해 해시·chunk_id를 만든 상태이므로, 제거 후 결과는 기존 canonical과 다른 제3의 해시가 된다. 따라서 새 파서에 선택자를 추가하는 것만으로 기존 봉인 chunk_id 21개가 복원되지는 않는다."
+  },
+  "d0_gate": {
+    "dynamic_coordinates_located": 21,
+    "dynamic_coordinates_expected": 21,
+    "unlocated": [],
+    "source_or_data_files_changed": 0,
+    "survey_artifact_added": true,
+    "status": "PASS_WITH_D2_CONTRACT_CONTRADICTION"
+  },
+  "blocking_contract_issue": {
+    "invalid_assumption": "동적 오염을 새 파싱 결과에서 제거하면 기존 오염 값을 포함한 봉인 chunk_id가 다시 나타난다.",
+    "evidence": "16개 대상 모두 cleaned-new hash가 old-current hash와 달랐다(0/16 일치).",
+    "consequence": "D1을 그대로 적용해도 D2의 exact sealed coordinate 목표 29/33은 달성할 수 없고, 1,330개 기존 보존 ID 중 해당 선택자를 포함한 문서 좌표는 오히려 새로 깨질 수 있다.",
+    "required_decision_before_d1": [
+      "앞으로의 안정성을 위해 오염 제거를 적용하되 새 clean 좌표를 한 번 재봉인한다.",
+      "옛 revision을 그대로 보존하고 lineage/alias로 기존 봉인 좌표를 해석한다.",
+      "D2 지표를 exact chunk_id가 아니라 동등 display_text 또는 stable evidence coordinate로 바꾼다."
+    ]
+  },
+  "round_status": "STOP_BEFORE_D1"
+}
