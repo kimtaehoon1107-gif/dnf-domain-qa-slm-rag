@@ -1,0 +1,96 @@
+{
+  "audit": {
+    "bm25_chunk_id_set_mismatch": 0,
+    "bm25_entry_count_mismatch": 0,
+    "bm25_filter_parity_mismatches": 0,
+    "bm25_filter_policy_count": 16,
+    "bm25_metadata_field_mismatches": 0
+  },
+  "built_at": "2026-08-07T19:12:13+09:00",
+  "dense_artifact_decision": "NO-GO",
+  "dense_full_version": "dnf_bge_m3_dense_full_v3.1",
+  "gates": {
+    "all_eight_sources_represented": true,
+    "all_four_statuses_represented": true,
+    "bm25_chunk_id_set_mismatch": 0,
+    "bm25_entry_count_mismatch": 0,
+    "bm25_filter_parity_mismatches": 0,
+    "bm25_metadata_field_mismatches": 0,
+    "chunk_count_is_3599": false,
+    "default_chunk_count_is_2527": false,
+    "document_count_is_980": false,
+    "duplicate_chunk_ids": 0,
+    "metadata_ordinal_mismatches": 0,
+    "non_finite_embedding_values": 0,
+    "non_unit_embedding_rows": 0,
+    "repeat_encode_nondeterminism": 0,
+    "tokenizer_rows_mismatch": 0,
+    "tokens_over_requested_max": 0,
+    "visual_chunk_count_is_22": false
+  },
+  "hybrid_promotion_decision": "NOT_MEASURED",
+  "manifest_path": "data/v3/indexes/dense_full_manifest_00070b494293e4d2dd1737753956702167589c2536ec16f256569b2535983265.json",
+  "manifest_sha256": "00070b494293e4d2dd1737753956702167589c2536ec16f256569b2535983265",
+  "model": {
+    "batch_size": 2,
+    "device": "cuda",
+    "device_name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "embedding_dimension": 1024,
+    "embedding_dtype": "float32",
+    "max_sequence_length": 2048,
+    "model_name": "BAAI/bge-m3",
+    "model_revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "normalize_embeddings": true,
+    "numpy_version": "2.4.4",
+    "repeat_encode_max_abs_diff": 1.448206603527069e-07,
+    "repeat_encode_rows": 16,
+    "sentence_transformers_version": "5.5.1",
+    "similarity": "cosine_via_normalized_dot_product",
+    "torch_version": "2.11.0+cu128"
+  },
+  "report_schema_version": "dnf_dense_full_report_v3.1",
+  "retrieval_quality_measured": false,
+  "summary": {
+    "chunks": 3925,
+    "default_exposure_chunks": 2683,
+    "documents": 996,
+    "embedding_norm_max": 1.0000001192092896,
+    "embedding_norm_min": 0.9999998807907104,
+    "embedding_shape": [
+      3925,
+      1024
+    ],
+    "source": {
+      "dnf_account_policy": 651,
+      "dnf_event": 202,
+      "dnf_faq": 297,
+      "dnf_game_guide": 1053,
+      "dnf_monthly_item": 49,
+      "dnf_notice": 796,
+      "dnf_seria_shop": 458,
+      "dnf_update": 419
+    },
+    "status": {
+      "current": 2702,
+      "expired": 329,
+      "superseded": 634,
+      "unknown": 260
+    },
+    "visual_ocr_chunks": 19
+  },
+  "token_measurement": {
+    "over_requested_max": 0,
+    "requested_max_sequence_length": 2048,
+    "row_count": 3925,
+    "token_length": {
+      "max": 1173,
+      "mean": 396.66,
+      "min": 44,
+      "p50": 248,
+      "p90": 882,
+      "p95": 956,
+      "p99": 1033
+    },
+    "truncation_detected": false
+  }
+}

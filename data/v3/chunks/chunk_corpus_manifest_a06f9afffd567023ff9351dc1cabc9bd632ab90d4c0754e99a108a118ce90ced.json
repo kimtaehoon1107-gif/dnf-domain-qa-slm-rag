@@ -1,0 +1,83 @@
+{
+  "built_at": "2026-08-07T19:12:13+09:00",
+  "chunker_version": "dnf_offset_chunk_v3.1",
+  "chunks": {
+    "path": "data/v3/chunks/chunks_dnf_official_v3.1_45030e5688ddcd3edc051ce383083248b13a0c6fcc85c3b9b1dae49d21f1dcd7.jsonl",
+    "row_count": 3925,
+    "sha256": "45030e5688ddcd3edc051ce383083248b13a0c6fcc85c3b9b1dae49d21f1dcd7"
+  },
+  "expected_document_count": 996,
+  "expected_source_ids": [
+    "dnf_account_policy",
+    "dnf_event",
+    "dnf_faq",
+    "dnf_game_guide",
+    "dnf_monthly_item",
+    "dnf_notice",
+    "dnf_seria_shop",
+    "dnf_update"
+  ],
+  "inputs": [
+    {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_4643779c84879b9f9e81e9fd483fbc6dd4535a3c5ddd84c04872851c815c5de5.jsonl",
+      "role": "normalized_documents",
+      "row_count": 996,
+      "sha256": "4643779c84879b9f9e81e9fd483fbc6dd4535a3c5ddd84c04872851c815c5de5"
+    },
+    {
+      "path": "data/v3/normalized/document_contents_dnf_official_detail_v3.1_bc73975769c1ed2ba473472cc7a1069dcbce1954966dba37a376f977062ab2c6.jsonl",
+      "role": "normalized_contents",
+      "row_count": 996,
+      "sha256": "bc73975769c1ed2ba473472cc7a1069dcbce1954966dba37a376f977062ab2c6"
+    },
+    {
+      "path": "data/v3/normalized/normalized_corpus_manifest_ebf0a8514591e88def4157aa2b97b9d3e67a53b60586a6693b54ec13c52d1003.json",
+      "role": "normalized_manifest",
+      "row_count": null,
+      "sha256": "ebf0a8514591e88def4157aa2b97b9d3e67a53b60586a6693b54ec13c52d1003"
+    },
+    {
+      "path": "data/v3/chunks/chunk_pilot_manifest_ba5e1d5a9b8a237df9a99e5fb698bbb8e0a4b6dc1668b3cabece9e971e0154e6.json",
+      "role": "approved_chunk_pilot_manifest",
+      "row_count": null,
+      "sha256": "ba5e1d5a9b8a237df9a99e5fb698bbb8e0a4b6dc1668b3cabece9e971e0154e6"
+    }
+  ],
+  "manifest_schema_version": "dnf_chunk_corpus_manifest_v3.1",
+  "minimum_multi_chunk_chars": 80,
+  "source_config": {
+    "dnf_account_policy": {
+      "max_chars": 1800,
+      "overlap_chars": 200
+    },
+    "dnf_event": {
+      "max_chars": 1400,
+      "overlap_chars": 160
+    },
+    "dnf_faq": {
+      "max_chars": 1200,
+      "overlap_chars": 120
+    },
+    "dnf_game_guide": {
+      "max_chars": 1400,
+      "overlap_chars": 160
+    },
+    "dnf_monthly_item": {
+      "max_chars": 1400,
+      "overlap_chars": 160
+    },
+    "dnf_notice": {
+      "max_chars": 1200,
+      "overlap_chars": 120
+    },
+    "dnf_seria_shop": {
+      "max_chars": 1400,
+      "overlap_chars": 160
+    },
+    "dnf_update": {
+      "max_chars": 1400,
+      "overlap_chars": 160
+    }
+  },
+  "token_count_method": "unicode_word_punct_v1"
+}

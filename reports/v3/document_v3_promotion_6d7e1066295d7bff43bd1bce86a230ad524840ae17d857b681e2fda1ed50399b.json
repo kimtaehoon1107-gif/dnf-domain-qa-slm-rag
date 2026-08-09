@@ -1,0 +1,120 @@
+{
+  "builder_version": "dnf_normalized_corpus_builder_v3.2",
+  "built_at": "2026-08-07T19:12:13+09:00",
+  "by_source": {
+    "dnf_account_policy": {
+      "default_exposure": 1,
+      "documents": 52,
+      "status": {
+        "current": 1,
+        "superseded": 51
+      }
+    },
+    "dnf_event": {
+      "default_exposure": 28,
+      "documents": 28,
+      "status": {
+        "current": 28
+      }
+    },
+    "dnf_faq": {
+      "default_exposure": 281,
+      "documents": 281,
+      "status": {
+        "current": 281
+      }
+    },
+    "dnf_game_guide": {
+      "default_exposure": 126,
+      "documents": 127,
+      "status": {
+        "current": 126,
+        "superseded": 1
+      }
+    },
+    "dnf_monthly_item": {
+      "default_exposure": 1,
+      "documents": 14,
+      "status": {
+        "current": 1,
+        "expired": 13
+      }
+    },
+    "dnf_notice": {
+      "default_exposure": 402,
+      "documents": 402,
+      "status": {
+        "current": 402
+      }
+    },
+    "dnf_seria_shop": {
+      "default_exposure": 31,
+      "documents": 70,
+      "status": {
+        "current": 31,
+        "expired": 39
+      }
+    },
+    "dnf_update": {
+      "default_exposure": 18,
+      "documents": 22,
+      "status": {
+        "current": 18,
+        "unknown": 4
+      }
+    }
+  },
+  "excluded_documents": [
+    {
+      "canonical_url": "https://df.nexon.com/df/pg/13th",
+      "effective_default_exposure": false,
+      "effective_status": "unavailable_redirect",
+      "reason": "canonical_detail_redirected_off_path",
+      "source_id": "dnf_event"
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/arcana",
+      "effective_default_exposure": false,
+      "effective_status": "unavailable_redirect",
+      "reason": "canonical_detail_redirected_off_path",
+      "source_id": "dnf_event"
+    },
+    {
+      "canonical_url": "https://df.nexon.com/pg/crystalball",
+      "effective_default_exposure": false,
+      "effective_status": "unavailable_redirect",
+      "reason": "canonical_detail_redirected_off_path",
+      "source_id": "dnf_event"
+    }
+  ],
+  "gates": {
+    "all_eligible_urls_accounted_for": true,
+    "all_material_revisions_preserved": true,
+    "default_exposure_policy_violations": 0,
+    "document_content_id_sets_match": true,
+    "empty_title_or_text": 0,
+    "excluded_documents_are_overlay_backed": true,
+    "invalid_status": 0,
+    "raw_hash_mismatches": 0,
+    "visual_ocr_has_separate_unverified_provenance": true
+  },
+  "manifest_path": "data/v3/normalized/normalized_corpus_manifest_ebf0a8514591e88def4157aa2b97b9d3e67a53b60586a6693b54ec13c52d1003.json",
+  "manifest_sha256": "ebf0a8514591e88def4157aa2b97b9d3e67a53b60586a6693b54ec13c52d1003",
+  "promotion_decision": "GO",
+  "report_schema_version": "dnf_document_v3_promotion_report_v3.1",
+  "summary": {
+    "candidate_documents": 995,
+    "content_rows": 996,
+    "default_exposure_documents": 888,
+    "document_rows": 996,
+    "excluded_documents": 3,
+    "preserved_baseline_revisions": 1,
+    "status": {
+      "current": 888,
+      "expired": 52,
+      "superseded": 52,
+      "unknown": 4
+    },
+    "visual_evidence_documents": 17
+  }
+}
