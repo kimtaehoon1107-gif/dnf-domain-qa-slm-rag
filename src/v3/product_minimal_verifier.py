@@ -429,19 +429,25 @@ def _labeled_comparison_row(
     return subjects, quantities
 
 
+def _single_target_table_subject(unit: dict[str, Any]) -> str:
+    context = str(unit.get("context_text") or "")
+    if unit.get("unit_kind") != "table_row" or "표 대상:" not in context:
+        return ""
+    target_row = context.rsplit("표 대상:", 1)[1].split(" > ", 1)[0]
+    target_cells = [
+        cell.strip()
+        for cell in target_row.strip().strip("|").split("|")
+        if cell.strip()
+    ]
+    return target_cells[1] if len(target_cells) == 2 else ""
+
+
 def _table_row_subject(unit: dict[str, Any]) -> str:
     if unit.get("unit_kind") != "table_row":
         return ""
-    context = str(unit.get("context_text") or "")
-    if "표 대상:" in context:
-        target_row = context.rsplit("표 대상:", 1)[1].split(" > ", 1)[0]
-        target_cells = [
-            cell.strip()
-            for cell in target_row.strip().strip("|").split("|")
-            if cell.strip()
-        ]
-        if len(target_cells) == 2:
-            return target_cells[1]
+    target_subject = _single_target_table_subject(unit)
+    if target_subject:
+        return target_subject
     cells = [
         cell.strip()
         for cell in str(unit.get("text") or "").strip().strip("|").split("|")
@@ -450,6 +456,28 @@ def _table_row_subject(unit: dict[str, Any]) -> str:
     if not cells or _NUMBER.search(cells[0]) is not None:
         return ""
     return cells[0]
+
+
+def _vertical_table_relations_bound(
+    claim_text: str,
+    selected_units: list[dict[str, Any]],
+) -> bool:
+    for unit in selected_units:
+        if not _single_target_table_subject(unit):
+            continue
+        cells = [
+            cell.strip()
+            for cell in str(unit.get("text") or "")
+            .strip()
+            .strip("|")
+            .split("|")
+            if cell.strip()
+        ]
+        if len(cells) < 2:
+            continue
+        if not _surface_overlap(cells[0], claim_text):
+            return False
+    return True
 
 
 def _table_row_group_key(unit: dict[str, Any]) -> tuple[str, str]:
@@ -1723,6 +1751,11 @@ def verify_product_claim_output(
             evidence_units,
         ):
             reasons.append("table_row_subject_mismatch")
+        if not reasons and not _vertical_table_relations_bound(
+            text,
+            selected_units,
+        ):
+            reasons.append("table_row_relation_mismatch")
         if not reasons and enable_availability_comparison:
             availability_reasons = _availability_comparison_reasons(
                 text,

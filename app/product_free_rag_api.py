@@ -42,6 +42,10 @@ def _runtime() -> ProductFreeRAG:
                 use_identity_shortlist=True,
                 use_compact_evidence_pack=True,
                 use_atomic_evidence_reranker=True,
+                use_table_comparison_reservation=True,
+                use_server_availability_rendering=True,
+                use_server_content_kind_rendering=True,
+                use_server_reward_kind_rendering=True,
                 handoff_cuda_to_generation=True,
             )
         return _RUNTIME

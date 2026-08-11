@@ -479,6 +479,76 @@ def test_single_target_vertical_table_does_not_treat_relation_as_subject():
     assert verified["rejected_claims"] == []
 
 
+def test_single_target_vertical_table_rejects_value_from_another_relation_row():
+    subject = "[7월]스페셜 클론 레어 아바타 풀세트 상자"
+    context = (
+        "[7월 이달의 아이템] > 표 헤더: | 구분 | 이달의 아이템 | "
+        f"> 표 대상: | 아이템명 | {subject} |"
+    )
+    price = "| 상점판매가격 | 4,000만 골드 |"
+    trade = "| 거래타입 | 교환가능 |"
+    source = f"{price}\n{trade}"
+    units = [
+        {
+            "evidence_ref": "E1",
+            "candidate_ref": "1",
+            "chunk_id": "monthly-item",
+            "parent_document_id": "july-item",
+            "title": "7월 이달의 아이템",
+            "context_text": context,
+            "start_char": 0,
+            "end_char": len(price),
+            "text": price,
+            "unit_kind": "table_row",
+        },
+        {
+            "evidence_ref": "E2",
+            "candidate_ref": "1",
+            "chunk_id": "monthly-item",
+            "parent_document_id": "july-item",
+            "title": "7월 이달의 아이템",
+            "context_text": context,
+            "start_char": len(price) + 1,
+            "end_char": len(source),
+            "text": trade,
+            "unit_kind": "table_row",
+        },
+    ]
+    output = {
+        "mode": "answer",
+        "claims": [
+            {
+                "text": f"{subject}의 상점판매가는 교환가능입니다.",
+                "evidence_refs": ["E2"],
+            },
+            {
+                "text": f"{subject}의 거래타입은 교환가능입니다.",
+                "evidence_refs": ["E2"],
+            },
+        ],
+        "clarification": "",
+    }
+
+    verified = verify_product_claim_output(
+        output,
+        question=(
+            "7월 스페셜 클론 레어 아바타 풀세트 상자의 "
+            "상점판매가와 거래 타입은?"
+        ),
+        evidence_units=units,
+        chunks_by_id={"monthly-item": {"display_text": source}},
+    )
+
+    assert [claim["evidence_refs"] for claim in verified["claims"]] == [
+        ["E2"]
+    ]
+    assert verified["rejected_claims"][0]["evidence_refs"] == ["E2"]
+    assert verified["rejected_claims"][0]["reasons"] == [
+        "table_row_relation_mismatch"
+    ]
+    assert verified["mode"] == "partial"
+
+
 def test_complete_category_row_can_verify_a_low_score_kind_answer():
     evidence = "| 난이도 | 싱글 | 매칭 | 일반 | 하드 |"
     unit = {

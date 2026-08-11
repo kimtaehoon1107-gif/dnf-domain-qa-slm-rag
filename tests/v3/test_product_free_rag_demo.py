@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import json
+from pathlib import Path
 from unittest.mock import Mock
 
 import app.product_free_rag_demo as demo
@@ -10,6 +12,9 @@ from src.v3.product_free_rag import (
     DEFAULT_PRODUCT_DENSE_MANIFEST,
     DEFAULT_PRODUCT_RUNTIME_SNAPSHOT,
 )
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_corrupted_question_is_rejected_before_runtime(monkeypatch):
@@ -50,6 +55,30 @@ def test_demo_cli_defaults_match_canonical_runtime_paths():
     assert preinitialized.preinitialize_retrieval is True
 
 
+def test_canonical_runtime_paths_match_the_verified_snapshot():
+    snapshot_path = PROJECT_ROOT / DEFAULT_PRODUCT_RUNTIME_SNAPSHOT
+    snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
+    artifacts = {
+        item["role"]: item
+        for item in snapshot["artifacts"]
+    }
+
+    assert Path(artifacts["chunks"]["path"]) == DEFAULT_PRODUCT_CHUNKS
+    assert (
+        Path(artifacts["bm25_manifest"]["path"])
+        == DEFAULT_PRODUCT_BM25_MANIFEST
+    )
+    assert (
+        Path(artifacts["dense_manifest"]["path"])
+        == DEFAULT_PRODUCT_DENSE_MANIFEST
+    )
+
+    for artifact in artifacts.values():
+        path = PROJECT_ROOT / artifact["path"]
+        assert path.is_file()
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == artifact["sha256"]
+
+
 def test_product_runtime_receives_configured_paths(monkeypatch, tmp_path):
     chunks = tmp_path / "chunks.jsonl"
     bm25 = tmp_path / "bm25.json"
@@ -80,3 +109,4 @@ def test_product_runtime_receives_configured_paths(monkeypatch, tmp_path):
     assert kwargs["use_table_comparison_reservation"] is True
     assert kwargs["use_server_availability_rendering"] is True
     assert kwargs["use_server_content_kind_rendering"] is True
+    assert kwargs["use_server_reward_kind_rendering"] is True
