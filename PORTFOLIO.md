@@ -396,14 +396,13 @@ git -C dnf-domain-qa-slm-rag config core.longpaths true
 Gradio 데모는 `legacy_experimental`과 `product_free_rag_v1`을 같은 질문으로 비교하고, 최종 답, 서버 복원 원문 인용, 검색 후보, 전체 JSON을 보여준다. 독립 재검토에서는 clean clone으로 대표 질문 9개를 실제 실행했다. 별도 미커밋 UI 트랙도 브라우저로 확인했지만 제출 재현 범위에는 포함하지 않았다. 상세 질문별 관찰은 [독립 평가자 재검토](reports/v3/independent_evaluator_review_20260811.md)에 있다.
 
 ```powershell
-& 'C:\Users\kimdh\AppData\Local\Python\pythoncore-3.14-64\python.exe' `
-  app/product_free_rag_demo.py `
+python app/product_free_rag_demo.py `
   --pipeline product_free_rag_v1 `
   --server-name 127.0.0.1 `
   --server-port 7861
 ```
 
-브라우저 주소는 `http://127.0.0.1:7861/`이다. 다른 환경에서는 첫 줄의 Python 실행 파일만 해당 설치 경로로 바꾸면 된다.
+브라우저 주소는 `http://127.0.0.1:7861/`이다. 명령은 저장소 루트에서, `requirements.txt`를 설치한 Python 환경으로 실행한다.
 
 ![Product Free RAG v1 로컬 Gradio 데모](docs/assets/product_free_rag_demo_20260806.png)
 
