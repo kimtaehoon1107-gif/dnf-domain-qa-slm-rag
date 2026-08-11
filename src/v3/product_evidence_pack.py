@@ -10,6 +10,14 @@ from src.v3.answer_target_router import (
     _is_nominal_tag,
     _kiwi,
 )
+from src.v3.product_question_semantics import (
+    content_kind_requested,
+    evidence_complete_list_requested,
+    release_date_priority_requested,
+    release_date_surface_present,
+    release_relation_evidence_present,
+    table_evidence_requested,
+)
 from src.v3.simple_evidence_refs import (
     _chunk_atomic_units,
     _compact_char_ngrams,
@@ -17,8 +25,11 @@ from src.v3.simple_evidence_refs import (
     _unit_metadata,
 )
 
-_TABLE_CUES = ("표", "전부", "전체", "목록")
-_COMPLETE_LIST_CUES = ("조건", "종류", "전부", "전체", "목록")
+_KIND_HEAD = re.compile(r"([0-9A-Za-z가-힣]+)\s*종류")
+_CONTENT_KIND_ROW_LABELS = frozenset({"난이도", "모드", "유형", "종류"})
+_CONTENT_KIND_TABLE_ROW = re.compile(
+    r"(?m)^\|\s*(?:난이도|모드|유형|종류)\s*\|"
+)
 _SURFACE_SEPARATOR = re.compile(
     r"\s*(?:[?？]|,|그리고|및|"
     r"(?<=[가-힣0-9)\]}'\"’”」』】])"
@@ -47,6 +58,21 @@ _PUBLISHED_TIMESTAMP_QUESTION = re.compile(
     r"|(?:언제|시점|시각|시간|날짜)\S*\s*"
     r"(?:게시|게재|등록|공지)"
 )
+def _release_date_unit_matches(query: str, unit: dict[str, Any]) -> bool:
+    if not release_date_priority_requested(query):
+        return False
+    direct_text = " ".join(
+        (
+            str(unit.get("context_text") or ""),
+            str(unit.get("text") or ""),
+        )
+    )
+    return bool(
+        release_date_surface_present(direct_text)
+        and release_relation_evidence_present(direct_text)
+    )
+
+
 def _ranking_context_text(unit: dict[str, Any]) -> str:
     return str(unit.get("context_text") or "")
 
@@ -371,6 +397,84 @@ def _table_query_score(
         score[5],
         score[6],
         score[7],
+    )
+
+
+def _kind_heads(value: str) -> set[str]:
+    return {
+        head[:-1] if head.endswith("의") and len(head) > 1 else head
+        for match in _KIND_HEAD.finditer(value)
+        if (head := match.group(1).casefold())
+    }
+
+
+def content_kind_table_row_present(question: str, text: str) -> bool:
+    return bool(
+        content_kind_requested(question)
+        and _CONTENT_KIND_TABLE_ROW.search(text)
+    )
+
+
+def _question_proper_nouns(value: str) -> set[str]:
+    return {
+        str(token.form).casefold()
+        for token in _kiwi().tokenize(value)
+        if _base_tag(token) == "NNP" and len(str(token.form).strip()) >= 2
+    }
+
+
+def _kind_identity_matches(question: str, unit: dict[str, Any]) -> bool:
+    anchors = _question_proper_nouns(question)
+    if not anchors:
+        return True
+    identity = " ".join(
+        (
+            str(unit.get("title") or ""),
+            str(unit.get("context_text") or ""),
+        )
+    )
+    return bool(anchors & _compact_tokens(identity))
+
+
+def _kind_table_context_matches(
+    question: str,
+    unit: dict[str, Any],
+) -> bool:
+    question_heads = _kind_heads(question)
+    if not question_heads:
+        return True
+    table_context = " ".join(
+        (
+            str(unit.get("title") or ""),
+            str(unit.get("table_label") or ""),
+            str(unit.get("context_text") or ""),
+        )
+    )
+    return bool(
+        question_heads & _kind_heads(table_context)
+        and _kind_identity_matches(question, unit)
+    )
+
+
+def _content_kind_row_matches(
+    question: str,
+    unit: dict[str, Any],
+) -> bool:
+    if not content_kind_requested(question):
+        return False
+    if unit.get("unit_kind") != "table_row":
+        return False
+    cells = [
+        cell.strip()
+        for cell in str(unit.get("text") or "").strip().strip("|").split("|")
+        if cell.strip()
+    ]
+    if not cells:
+        return False
+    label = re.sub(r"[^0-9A-Za-z가-힣]", "", cells[0]).casefold()
+    return bool(
+        label in _CONTENT_KIND_ROW_LABELS
+        and _kind_identity_matches(question, unit)
     )
 
 
@@ -777,7 +881,7 @@ def build_product_evidence_pack(
         query_subjects = [""] * len(queries)
 
     table_requested = (
-        any(cue in question for cue in _TABLE_CUES)
+        table_evidence_requested(question)
         or ("종류" in question and "한 종류" not in question)
         or sum("비용" in query for query in queries) >= 2
     )
@@ -796,7 +900,11 @@ def build_product_evidence_pack(
             strict=True,
         ):
             for unit in sorted(
-                table_units,
+                (
+                    unit
+                    for unit in table_units
+                    if _kind_table_context_matches(query, unit)
+                ),
                 key=lambda row, query=query, subject=subject: (
                     _requirement_score(
                         row,
@@ -935,6 +1043,11 @@ def build_product_evidence_pack(
         {
             **unit,
             "evidence_ref": f"E{index}",
+            **(
+                {"complete_category": True}
+                if _content_kind_row_matches(question, unit)
+                else {}
+            ),
         }
         for index, unit in enumerate(selected, 1)
     ]
@@ -1009,11 +1122,25 @@ def select_semantic_product_evidence_units(
     for query in queries:
         indexes = list(range(len(units)))
         if prefilter_per_query is not None:
-            indexes = sorted(
+            lexical_indexes = sorted(
                 indexes,
                 key=lambda index: _query_score(units[index], query),
                 reverse=True,
-            )[:prefilter_per_query]
+            )
+            content_kind_indexes = [
+                index
+                for index in indexes
+                if _content_kind_row_matches(query, units[index])
+            ]
+            reserved = set(content_kind_indexes)
+            indexes = [
+                *content_kind_indexes,
+                *(
+                    index
+                    for index in lexical_indexes
+                    if index not in reserved
+                ),
+            ][:prefilter_per_query]
         indexes_by_query[query] = indexes
         pairs.extend((query, unit_texts[index]) for index in indexes)
     scores = list(score_pairs(pairs))
@@ -1049,32 +1176,60 @@ def select_semantic_product_evidence_units(
                 int(units[index]["start_char"]),
             ),
         )
-        if not ranked or not any(
-            cue in query for cue in _COMPLETE_LIST_CUES
-        ):
-            return ranked
-        best_score = float(scores_by_query[query][ranked[0]])
-        complete_lists = [
+        release_date_rows = [
             index
             for index in ranked
-            if units[index].get("complete_list")
-            and float(scores_by_query[query][index])
-            >= best_score - 0.05
+            if _release_date_unit_matches(query, units[index])
         ]
-        if not complete_lists:
-            return ranked
-        complete_list_indexes = set(complete_lists)
-        return [
-            *complete_lists,
-            *(
+        if release_date_rows:
+            release_date_indexes = set(release_date_rows)
+            ranked = [
+                *release_date_rows,
+                *(
+                    index
+                    for index in ranked
+                    if index not in release_date_indexes
+                ),
+            ]
+        if ranked and evidence_complete_list_requested(query):
+            best_score = float(scores_by_query[query][ranked[0]])
+            complete_lists = [
                 index
                 for index in ranked
-                if index not in complete_list_indexes
-            ),
+                if units[index].get("complete_list")
+                and float(scores_by_query[query][index])
+                >= best_score - 0.05
+            ]
+            if complete_lists:
+                complete_list_indexes = set(complete_lists)
+                ranked = [
+                    *complete_lists,
+                    *(
+                        index
+                        for index in ranked
+                        if index not in complete_list_indexes
+                    ),
+                ]
+        content_kind_rows = [
+            index
+            for index in ranked
+            if _content_kind_row_matches(query, units[index])
         ]
+        if content_kind_rows:
+            content_kind_indexes = set(content_kind_rows)
+            ranked = [
+                *content_kind_rows,
+                *(
+                    index
+                    for index in ranked
+                    if index not in content_kind_indexes
+                ),
+            ]
+        return ranked
 
     for query in selection_queries:
-        for index in ranked_indexes(query)[:reserve_per_query]:
+        reserved_for_query = 0
+        for index in ranked_indexes(query):
             unit = units[index]
             key = _dedupe_key(unit)
             if not key or key in selected_keys:
@@ -1082,7 +1237,11 @@ def select_semantic_product_evidence_units(
             selected.append(unit)
             selected_keys.add(key)
             question_focus_by_unit[id(unit)] = query
-            if len(selected) >= max_units:
+            reserved_for_query += 1
+            if (
+                reserved_for_query >= reserve_per_query
+                or len(selected) >= max_units
+            ):
                 break
         if len(selected) >= max_units:
             break
@@ -1148,6 +1307,10 @@ def select_semantic_product_evidence_units(
     output = []
     for evidence_index, unit in enumerate(selected, 1):
         unit_index = unit_indexes[id(unit)]
+        complete_category = any(
+            _content_kind_row_matches(query, unit)
+            for query in queries
+        )
         relevance_scores = [
             float(query_scores[unit_index])
             for query_scores in scores_by_query.values()
@@ -1157,6 +1320,11 @@ def select_semantic_product_evidence_units(
             {
                 **unit,
                 "evidence_ref": f"E{evidence_index}",
+                **(
+                    {"complete_category": True}
+                    if complete_category
+                    else {}
+                ),
                 "question_focus": question_focus_by_unit.get(
                     id(unit),
                     "",
@@ -1258,7 +1426,7 @@ def product_model_evidence_payload(
 ) -> list[dict[str, Any]]:
     payload = []
     for unit in units:
-        text = str(unit["text"])
+        text = str(unit.get("model_text") or unit["text"])
         if unit.get("complete"):
             text = (
                 f"{unit.get('table_label') or '표'}: "

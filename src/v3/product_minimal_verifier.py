@@ -7,8 +7,17 @@ from typing import Any
 
 from src.v3.simple_rag_minimal_verifier import factual_values_supported
 from src.v3.product_evidence_pack import (
+    content_kind_table_row_present,
     explicit_question_clauses,
     kiwi_independent_requirement_queries,
+)
+from src.v3.product_question_semantics import (
+    comparison_requested,
+    normalize_release_date_subjects,
+    release_date_claim_present as _semantic_release_date_claim_present,
+    release_date_requested,
+    release_relation_evidence_present,
+    verified_complete_answer_requested,
 )
 
 
@@ -23,7 +32,6 @@ _UNSUPPORTED_LANGUAGE = (
     "제공되지 않았",
     "명시되지 않았",
 )
-_COMPLETE_CUES = ("전부", "전체", "목록")
 _MIN_ATOMIC_EVIDENCE_RELEVANCE = 0.1
 _NON_BLOCKING_REJECTION_REASONS = {
     "claim_does_not_address_question_surface",
@@ -54,6 +62,11 @@ _MILEAGE_M_VALUE = re.compile(
     re.IGNORECASE,
 )
 _NUMERIC_QUESTION = re.compile(r"(?:몇|얼마)")
+_LABELED_QUANTITY = re.compile(
+    r"^\s*(?P<label>[^:|]{1,40}?)\s*:\s*"
+    r"(?P<number>\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*"
+    r"(?P<unit>개|회|번|명|원|골드|세라|포인트|퍼센트|%)\s*$"
+)
 _BINARY_QUESTION = re.compile(
     r"(?:수\s*있|가능(?:해|한|하|했|했어|합니까)|"
     r"되(?:어|는|나|나요)|됐(?:어|나|나요|습니까)?|"
@@ -90,6 +103,8 @@ _PROCESSING_DURATION_CLAIM = re.compile(
 _PROCESSING_DURATION_EVIDENCE = re.compile(
     r"(?:처리|소요|완료|걸리|영업\s*일)"
 )
+def _release_date_claim_present(claim_text: str) -> bool:
+    return _semantic_release_date_claim_present(claim_text)
 _ABSENCE_CLAIM = re.compile(
     r"(?:제한|기한|횟수|수량|조건|항목|종류)"
     r"[^.\n]{0,30}"
@@ -151,6 +166,14 @@ def _surface_overlap(left: str, right: str) -> bool:
     return bool(
         _compact_tokens(left) & _compact_tokens(right)
         or _surface_fragments(left) & _surface_fragments(right)
+        or (
+            release_date_requested(left)
+            and release_relation_evidence_present(right)
+        )
+        or (
+            release_date_requested(right)
+            and release_relation_evidence_present(left)
+        )
     )
 
 
@@ -196,12 +219,41 @@ def _evidence_relevance_supported(
     )
 
 
+def _complete_category_values_supported(
+    question: str,
+    claim_text: str,
+    selected_units: list[dict[str, Any]],
+) -> bool:
+    category_units = [
+        unit for unit in selected_units if unit.get("complete_category")
+    ]
+    if not category_units:
+        return True
+    compact_claim = _compact(claim_text)
+    for unit in category_units:
+        text = str(unit.get("text") or "")
+        if not content_kind_table_row_present(question, text):
+            return False
+        cells = [
+            cell.strip()
+            for cell in text.strip().strip("|").split("|")
+            if cell.strip()
+        ]
+        if len(cells) < 2:
+            return False
+        if any(
+            _compact(cell) not in compact_claim
+            for cell in cells
+            if cell != "-" and _compact(cell)
+        ):
+            return False
+    return True
+
+
 def _claim_relation_role_supported(
     claim_text: str,
     selected_units: list[dict[str, Any]],
 ) -> bool:
-    if _PROCESSING_DURATION_CLAIM.search(claim_text) is None:
-        return True
     direct_evidence = "\n".join(
         " ".join(
             (
@@ -211,7 +263,17 @@ def _claim_relation_role_supported(
         )
         for unit in selected_units
     )
-    return _PROCESSING_DURATION_EVIDENCE.search(direct_evidence) is not None
+    if (
+        _PROCESSING_DURATION_CLAIM.search(claim_text) is not None
+        and _PROCESSING_DURATION_EVIDENCE.search(direct_evidence) is None
+    ):
+        return False
+    if (
+        _release_date_claim_present(claim_text)
+        and not release_relation_evidence_present(direct_evidence)
+    ):
+        return False
+    return True
 
 
 _NORMATIVE_QUESTION = re.compile(
@@ -338,6 +400,455 @@ def _normalized_factual_values_supported(
         _normalize_scaled_number_units(answer),
         _normalize_scaled_number_units(evidence_context),
     )
+
+
+def _labeled_comparison_row(
+    unit: dict[str, Any],
+) -> tuple[list[str], dict[str, tuple[Decimal, str]]]:
+    if unit.get("unit_kind") != "table_row":
+        return [], {}
+    subjects = []
+    quantities: dict[str, tuple[Decimal, str]] = {}
+    for raw_cell in str(unit.get("text") or "").strip().strip("|").split("|"):
+        cell = raw_cell.strip()
+        if not cell:
+            continue
+        match = _LABELED_QUANTITY.fullmatch(cell)
+        if match is None:
+            if _NUMBER.search(cell) is None and cell not in {"-", "O", "X"}:
+                subjects.append(cell)
+            continue
+        try:
+            number = Decimal(match.group("number").replace(",", ""))
+        except InvalidOperation:
+            continue
+        quantities[match.group("label").strip()] = (
+            number,
+            match.group("unit"),
+        )
+    return subjects, quantities
+
+
+def _table_row_subject(unit: dict[str, Any]) -> str:
+    if unit.get("unit_kind") != "table_row":
+        return ""
+    context = str(unit.get("context_text") or "")
+    if "표 대상:" in context:
+        target_row = context.rsplit("표 대상:", 1)[1].split(" > ", 1)[0]
+        target_cells = [
+            cell.strip()
+            for cell in target_row.strip().strip("|").split("|")
+            if cell.strip()
+        ]
+        if len(target_cells) == 2:
+            return target_cells[1]
+    cells = [
+        cell.strip()
+        for cell in str(unit.get("text") or "").strip().strip("|").split("|")
+        if cell.strip()
+    ]
+    if not cells or _NUMBER.search(cells[0]) is not None:
+        return ""
+    return cells[0]
+
+
+def _table_row_group_key(unit: dict[str, Any]) -> tuple[str, str]:
+    context = str(unit.get("context_text") or "").split(
+        " > 표 대상:",
+        1,
+    )[0]
+    return str(unit.get("chunk_id") or ""), context
+
+
+def _table_row_subjects_bound(
+    claim_text: str,
+    selected_units: list[dict[str, Any]],
+    evidence_units: list[dict[str, Any]],
+) -> bool:
+    grouped_subjects: dict[tuple[str, str], list[str]] = {}
+    for unit in evidence_units:
+        subject = _table_row_subject(unit)
+        if subject:
+            grouped_subjects.setdefault(
+                _table_row_group_key(unit),
+                [],
+            ).append(subject)
+    claim_tokens = _compact_tokens(claim_text)
+    for unit in selected_units:
+        subject = _table_row_subject(unit)
+        if not subject:
+            continue
+        sibling_subjects = list(
+            dict.fromkeys(
+                grouped_subjects.get(_table_row_group_key(unit), [])
+            )
+        )
+        if len(sibling_subjects) < 2:
+            continue
+        token_sets = [_compact_tokens(value) for value in sibling_subjects]
+        common_tokens = set.intersection(*token_sets)
+        subject_tokens = _compact_tokens(subject)
+        distinguishing_tokens = subject_tokens - common_tokens
+        if distinguishing_tokens:
+            if not distinguishing_tokens & claim_tokens:
+                return False
+            continue
+        if not subject_tokens & claim_tokens:
+            return False
+        for sibling, sibling_tokens in zip(
+            sibling_subjects,
+            token_sets,
+            strict=True,
+        ):
+            if sibling == subject:
+                continue
+            if (sibling_tokens - common_tokens) & claim_tokens:
+                return False
+    return True
+
+
+def _comparison_value_coverage(
+    claim_text: str,
+    question: str,
+    selected_units: list[dict[str, Any]],
+) -> bool | None:
+    if not comparison_requested(question):
+        return None
+    question_compact = _compact(question)
+    claim_compact = _compact(claim_text)
+    claim_numbers = _numeric_values(claim_text)
+    numeric_table_present = any(
+        unit.get("unit_kind") == "table_row"
+        and not isinstance(unit.get("availability_values"), dict)
+        and len(_numeric_values(unit.get("text"))) >= 2
+        for unit in selected_units
+    )
+    applicable = False
+    for unit in selected_units:
+        subjects, quantities = _labeled_comparison_row(unit)
+        if not subjects or not any(
+            _compact(subject) and _compact(subject) in claim_compact
+            for subject in subjects
+        ):
+            continue
+        requested = [
+            value
+            for label, value in quantities.items()
+            if _compact(label) and _compact(label) in question_compact
+        ]
+        if len(requested) < 2:
+            continue
+        applicable = True
+        expected_numbers = {
+            _canonical_number(str(number)) for number, _ in requested
+        }
+        if expected_numbers <= claim_numbers:
+            return True
+    return False if applicable or numeric_table_present else None
+
+
+def _joint_comparison_covered_claim_indexes(
+    question: str,
+    raw_claims: list[Any],
+    units_by_ref: dict[str, dict[str, Any]],
+) -> set[int]:
+    if not comparison_requested(question):
+        return set()
+    question_compact = _compact(question)
+    covered: set[int] = set()
+    for evidence_ref, unit in units_by_ref.items():
+        subjects, quantities = _labeled_comparison_row(unit)
+        requested = [
+            value
+            for label, value in quantities.items()
+            if _compact(label) and _compact(label) in question_compact
+        ]
+        if not subjects or len(requested) < 2:
+            continue
+        related: list[tuple[int, str]] = []
+        for claim_index, raw_claim in enumerate(raw_claims, 1):
+            if not isinstance(raw_claim, dict):
+                continue
+            claim_text = str(raw_claim.get("text") or "").strip()
+            claim_compact = _compact(claim_text)
+            claim_refs = {
+                str(value)
+                for value in (raw_claim.get("evidence_refs") or [])
+            }
+            if evidence_ref not in claim_refs or not any(
+                _compact(subject) and _compact(subject) in claim_compact
+                for subject in subjects
+            ):
+                continue
+            related.append((claim_index, claim_text))
+        if len(related) < 2:
+            continue
+        expected_numbers = {
+            _canonical_number(str(number)) for number, _ in requested
+        }
+        claim_numbers = set().union(
+            *(_numeric_values(claim_text) for _, claim_text in related)
+        )
+        if expected_numbers <= claim_numbers:
+            covered.update(claim_index for claim_index, _ in related)
+    return covered
+
+
+def _claim_availability_values(
+    claim_text: str,
+    labels: list[str],
+) -> dict[str, bool]:
+    positions = []
+    for label in labels:
+        compact_label = _compact(label)
+        pattern = r"\s*".join(
+            re.escape(character) for character in compact_label
+        )
+        for match in re.finditer(pattern, claim_text, re.IGNORECASE):
+            positions.append((match.start(), match.end(), label))
+    positions.sort()
+    values: dict[str, bool] = {}
+    for index, (_, start, label) in enumerate(positions):
+        end = (
+            positions[index + 1][0]
+            if index + 1 < len(positions)
+            else len(claim_text)
+        )
+        segment = _compact(
+            re.sub(
+                r"\(([^()]*)\)",
+                lambda match: (
+                    ""
+                    if any(
+                        cue in _compact(match.group(1))
+                        for cue in ("교환", "거래", "귀속", "밀봉")
+                    )
+                    else match.group(1)
+                ),
+                claim_text[start:end],
+            )
+        )
+        cues = [
+            (position, value)
+            for value, candidates in (
+                (False, ("불가능", "불가", "수없", "못", "안됨")),
+                (True, ("가능", "수있")),
+            )
+            for cue in candidates
+            if (position := segment.find(cue)) >= 0
+        ]
+        if cues:
+            values[label] = min(cues, key=lambda row: (row[0], row[1]))[1]
+    return values
+
+
+def _availability_subject_span(
+    claim_text: str,
+    subject: str,
+) -> tuple[int, int] | None:
+    surfaces = [subject]
+    leading_qualifier = re.match(r"\s*\[[^\[\]]+\]\s*", subject)
+    if leading_qualifier is not None:
+        surfaces.append(subject[leading_qualifier.end() :].strip())
+    qualifier = re.search(r"\s*\(([^()]*)\)\s*$", subject)
+    if qualifier is not None:
+        surfaces.append(subject[: qualifier.start()].strip())
+    for surface in surfaces:
+        surface_characters = [
+            character for character in surface if not character.isspace()
+        ]
+        if not surface_characters:
+            continue
+        pattern = r"\s*".join(
+            re.escape(character) for character in surface_characters
+        )
+        match = re.search(pattern, claim_text, re.IGNORECASE)
+        if match is not None:
+            return match.start(), match.end()
+    return None
+
+
+def _availability_subject_matches(claim_text: str, subject: str) -> bool:
+    claim_compact = _compact(claim_text)
+    if _compact(subject) in claim_compact:
+        return True
+    leading_qualifier = re.match(r"\s*\[[^\[\]]+\]\s*", subject)
+    if leading_qualifier is not None:
+        core_subject = subject[leading_qualifier.end() :].strip()
+        core_pattern = r"\s*".join(
+            re.escape(character)
+            for character in core_subject
+            if not character.isspace()
+        )
+        core_match = re.search(core_pattern, claim_text, re.IGNORECASE)
+        if core_match is not None:
+            prefix = claim_text[: core_match.start()].rstrip()
+            if not prefix.endswith("]") and _availability_subject_matches(
+                claim_text,
+                core_subject,
+            ):
+                return True
+    qualifier = re.search(r"\s*\(([^()]*)\)\s*$", subject)
+    if qualifier is None:
+        return False
+    core = subject[: qualifier.start()].strip()
+    if not core or _compact(core) not in claim_compact:
+        return False
+    core_pattern = r"\s*".join(
+        re.escape(part) for part in core.split()
+    )
+    core_match = re.search(core_pattern, claim_text, re.IGNORECASE)
+    if core_match is None:
+        return True
+    attached = re.match(r"\s*\(([^()]*)\)", claim_text[core_match.end() :])
+    return attached is None or _compact(attached.group(1)) == _compact(
+        qualifier.group(1)
+    )
+
+
+def _availability_comparison_reasons(
+    claim_text: str,
+    question: str,
+    selected_units: list[dict[str, Any]],
+) -> list[str]:
+    question_compact = _compact(question)
+    reasons = []
+    subject_spans = []
+    for candidate in selected_units:
+        candidate_subject = str(
+            candidate.get("availability_subject") or ""
+        ).strip()
+        candidate_span = _availability_subject_span(
+            claim_text,
+            candidate_subject,
+        )
+        if candidate_span is not None:
+            subject_spans.append((candidate_span[0], candidate_subject))
+    subject_spans.sort()
+    for unit in selected_units:
+        raw_values = unit.get("availability_values")
+        if not isinstance(raw_values, dict):
+            continue
+        requested_labels = [
+            str(label)
+            for label in raw_values
+            if _compact(label) and _compact(label) in question_compact
+        ]
+        if len(requested_labels) < 2:
+            continue
+        subject = str(unit.get("availability_subject") or "").strip()
+        if not subject or not _availability_subject_matches(
+            claim_text,
+            subject,
+        ):
+            reasons.append("availability_subject_mismatch")
+            continue
+        subject_span = _availability_subject_span(claim_text, subject)
+        claim_segment = claim_text
+        if subject_span is not None and len(subject_spans) > 1:
+            later_starts = [
+                start
+                for start, candidate_subject in subject_spans
+                if start > subject_span[0] and candidate_subject != subject
+            ]
+            claim_segment = claim_text[
+                subject_span[0] : min(later_starts, default=len(claim_text))
+            ]
+        claimed = _claim_availability_values(
+            claim_segment,
+            requested_labels,
+        )
+        if (
+            set(claimed) != set(requested_labels)
+            and len({bool(raw_values[label]) for label in requested_labels}) == 1
+            and all(
+                re.search(
+                    r"\s*".join(
+                        re.escape(character)
+                        for character in _compact(label)
+                    ),
+                    claim_segment,
+                    re.IGNORECASE,
+                )
+                for label in requested_labels
+            )
+        ):
+            compact_segment = _compact(claim_segment)
+            if any(
+                cue in compact_segment
+                for cue in ("불가능", "불가", "수없", "못", "안됨", "없")
+            ):
+                shared_value = False
+            elif any(
+                cue in compact_segment for cue in ("가능", "수있")
+            ):
+                shared_value = True
+            else:
+                shared_value = None
+            if shared_value is not None:
+                claimed = {
+                    label: shared_value for label in requested_labels
+                }
+        if set(claimed) != set(requested_labels):
+            reasons.append("availability_comparison_incomplete")
+            continue
+        if any(
+            claimed[label] != bool(raw_values[label])
+            for label in requested_labels
+        ):
+            reasons.append("availability_value_mismatch")
+    return list(dict.fromkeys(reasons))
+
+
+def _joint_availability_covered_claim_indexes(
+    question: str,
+    raw_claims: list[Any],
+    units_by_ref: dict[str, dict[str, Any]],
+) -> set[int]:
+    question_compact = _compact(question)
+    covered: set[int] = set()
+    for evidence_ref, unit in units_by_ref.items():
+        raw_values = unit.get("availability_values")
+        if not isinstance(raw_values, dict):
+            continue
+        requested_labels = [
+            str(label)
+            for label in raw_values
+            if _compact(label) and _compact(label) in question_compact
+        ]
+        if len(requested_labels) < 2:
+            continue
+        subject = str(unit.get("availability_subject") or "").strip()
+        related: list[tuple[int, str]] = []
+        for claim_index, raw_claim in enumerate(raw_claims, 1):
+            if not isinstance(raw_claim, dict):
+                continue
+            claim_text = str(raw_claim.get("text") or "").strip()
+            claim_refs = {
+                str(value)
+                for value in (raw_claim.get("evidence_refs") or [])
+            }
+            if (
+                evidence_ref in claim_refs
+                and subject
+                and _availability_subject_matches(claim_text, subject)
+            ):
+                related.append((claim_index, claim_text))
+        if len(related) < 2:
+            continue
+        claimed = _claim_availability_values(
+            " ".join(text for _, text in related),
+            requested_labels,
+        )
+        if set(claimed) != set(requested_labels):
+            continue
+        if any(
+            claimed[label] != bool(raw_values[label])
+            for label in requested_labels
+        ):
+            continue
+        covered.update(claim_index for claim_index, _ in related)
+    return covered
 
 
 def _claim_clause_relevance_score(
@@ -906,7 +1417,12 @@ def _replacement_evidence_for_claim(
         identity_overlap = len(
             question_tokens & _compact_tokens(identity_context)
         )
-        if identity_overlap < 2:
+        release_relation_match = bool(
+            _release_date_claim_present(claim_text)
+            and _claim_relation_role_supported(claim_text, [unit])
+        )
+        minimum_identity_overlap = 1 if release_relation_match else 2
+        if identity_overlap < minimum_identity_overlap:
             continue
         if not _explicit_conditions_match(
             question,
@@ -967,6 +1483,7 @@ def verify_product_claim_output(
     evidence_units: list[dict[str, Any]],
     chunks_by_id: dict[str, dict[str, Any]],
     requested_subjects: list[str] | None = None,
+    enable_availability_comparison: bool = False,
 ) -> dict[str, Any]:
     """Verify short product claims without validating every natural-language token."""
 
@@ -976,11 +1493,14 @@ def verify_product_claim_output(
     raw_claims = output.get("claims")
     if not isinstance(raw_claims, list):
         raise RuntimeError("product claims must be a list")
-    subjects = [
-        str(subject).strip()
-        for subject in (requested_subjects or [])
-        if str(subject).strip()
-    ]
+    subjects = normalize_release_date_subjects(
+        question,
+        [
+            str(subject).strip()
+            for subject in (requested_subjects or [])
+            if str(subject).strip()
+        ],
+    )
     clarification = str(output.get("clarification") or "").strip()
     if model_mode == "clarification":
         contract_valid = not raw_claims and bool(clarification)
@@ -1004,8 +1524,8 @@ def verify_product_claim_output(
                 "covered_subjects": [],
                 "all_requested_subjects_covered": not subjects,
                 "all_explicit_question_clauses_covered": False,
-                "complete_evidence_required": any(
-                    cue in question for cue in _COMPLETE_CUES
+                "complete_evidence_required": (
+                    verified_complete_answer_requested(question)
                 ),
                 "complete_evidence_present": False,
                 "clarification_contract_valid": contract_valid,
@@ -1016,6 +1536,22 @@ def verify_product_claim_output(
         str(unit["evidence_ref"]): unit
         for unit in evidence_units
     }
+    joint_comparison_claim_indexes = (
+        _joint_comparison_covered_claim_indexes(
+            question,
+            raw_claims,
+            units_by_ref,
+        )
+    )
+    joint_availability_claim_indexes = (
+        _joint_availability_covered_claim_indexes(
+            question,
+            raw_claims,
+            units_by_ref,
+        )
+        if enable_availability_comparison
+        else set()
+    )
     accepted = []
     rejected = []
     pruned_evidence_refs = set()
@@ -1072,14 +1608,99 @@ def verify_product_claim_output(
             evidence_context,
             requested_subjects=subjects,
         ):
-            reasons.append("claim_does_not_address_question_surface")
-        if not reasons and not _evidence_relevance_supported(selected_units):
-            reasons.append("evidence_relevance_below_threshold")
+            replacement = _replacement_evidence_for_claim(
+                question=question,
+                claim_text=text,
+                evidence_units=evidence_units,
+                units_by_ref=units_by_ref,
+                chunks_by_id=chunks_by_id,
+                requested_subjects=subjects,
+            )
+            if replacement is None:
+                reasons.append("claim_does_not_address_question_surface")
+            else:
+                replacement_ref, replacement_citation, replacement_unit = (
+                    replacement
+                )
+                rebound_evidence_refs.append(
+                    {
+                        "claim_index": claim_index,
+                        "from": list(evidence_refs),
+                        "to": [replacement_ref],
+                    }
+                )
+                evidence_refs = [replacement_ref]
+                citations = [replacement_citation]
+                selected_units = [replacement_unit]
+                evidence_context = _unit_evidence_context(replacement_unit)
+        category_values_supported = _complete_category_values_supported(
+            question,
+            text,
+            selected_units,
+        )
+        if not reasons and not category_values_supported:
+            reasons.append("content_kind_values_incomplete")
+        if (
+            not reasons
+            and not _evidence_relevance_supported(selected_units)
+            and not any(
+                unit.get("complete_category") for unit in selected_units
+            )
+        ):
+            replacement = _replacement_evidence_for_claim(
+                question=question,
+                claim_text=text,
+                evidence_units=evidence_units,
+                units_by_ref=units_by_ref,
+                chunks_by_id=chunks_by_id,
+                requested_subjects=subjects,
+            )
+            if replacement is None:
+                reasons.append("evidence_relevance_below_threshold")
+            else:
+                replacement_ref, replacement_citation, replacement_unit = (
+                    replacement
+                )
+                rebound_evidence_refs.append(
+                    {
+                        "claim_index": claim_index,
+                        "from": list(evidence_refs),
+                        "to": [replacement_ref],
+                    }
+                )
+                evidence_refs = [replacement_ref]
+                citations = [replacement_citation]
+                selected_units = [replacement_unit]
+                evidence_context = _unit_evidence_context(replacement_unit)
         if not reasons and not _claim_relation_role_supported(
             text,
             selected_units,
         ):
-            reasons.append("question_relation_role_mismatch")
+            replacement = _replacement_evidence_for_claim(
+                question=question,
+                claim_text=text,
+                evidence_units=evidence_units,
+                units_by_ref=units_by_ref,
+                chunks_by_id=chunks_by_id,
+                requested_subjects=subjects,
+            )
+            if replacement is None:
+                reasons.append("question_relation_role_mismatch")
+            else:
+                replacement_ref, replacement_citation, replacement_unit = (
+                    replacement
+                )
+                rebound_evidence_refs.append(
+                    {
+                        "claim_index": claim_index,
+                        "from": list(evidence_refs),
+                        "to": [replacement_ref],
+                    }
+                )
+                evidence_refs = [replacement_ref]
+                citations = [replacement_citation]
+                selected_units = [replacement_unit]
+                evidence_context = _unit_evidence_context(replacement_unit)
         if not reasons and not _normative_relation_supported(
             question,
             selected_units,
@@ -1096,6 +1717,35 @@ def verify_product_claim_output(
             selected_units,
         ):
             reasons.append("cross_parent_structured_value_conflict")
+        if not reasons and not _table_row_subjects_bound(
+            text,
+            selected_units,
+            evidence_units,
+        ):
+            reasons.append("table_row_subject_mismatch")
+        if not reasons and enable_availability_comparison:
+            availability_reasons = _availability_comparison_reasons(
+                text,
+                question,
+                selected_units,
+            )
+            if not (
+                claim_index in joint_availability_claim_indexes
+                and availability_reasons
+                == ["availability_comparison_incomplete"]
+            ):
+                reasons.extend(availability_reasons)
+        comparison_values_covered = _comparison_value_coverage(
+            text,
+            question,
+            selected_units,
+        )
+        if (
+            not reasons
+            and comparison_values_covered is False
+            and claim_index not in joint_comparison_claim_indexes
+        ):
+            reasons.append("comparison_values_incomplete")
         condition_mismatch = bool(
             not reasons
             and not _explicit_conditions_match(
@@ -1229,12 +1879,14 @@ def verify_product_claim_output(
         units_by_ref=units_by_ref,
     )
     clarification_contract_valid = not clarification
-    complete_required = (
-        any(cue in question for cue in _COMPLETE_CUES)
-        or ("종류" in question and "한 종류" not in question)
-    )
+    complete_required = verified_complete_answer_requested(question)
     complete_present = any(
-        bool(unit.get("complete") or unit.get("complete_list"))
+        bool(
+            unit.get("complete")
+            or unit.get("complete_list")
+            or unit.get("complete_category")
+            or unit.get("reward_kind_complete")
+        )
         for claim in accepted
         for evidence_ref in claim["evidence_refs"]
         if (unit := units_by_ref.get(evidence_ref)) is not None
@@ -1257,7 +1909,13 @@ def verify_product_claim_output(
             model_mode == "answer"
             or (
                 model_mode == "partial"
-                and _verified_binary_answer(question, accepted)
+                and (
+                    _verified_binary_answer(question, accepted)
+                    or (
+                        release_date_requested(question)
+                        and len(accepted) == 1
+                    )
+                )
             )
         )
         and clarification_contract_valid

@@ -211,6 +211,13 @@ def test_normalized_factual_support_treats_count_words_as_equivalent() -> None:
     )
 
 
+def test_normalized_factual_support_does_not_parse_reputation_as_people_unit() -> None:
+    assert factual_values_supported(
+        "입장 명성 제한은 108,921 명성입니다.",
+        "모험가 명성 108,921부터 입장이 가능합니다.",
+    )
+
+
 def test_normalized_factual_support_uses_context_for_year_only() -> None:
     assert factual_values_supported(
         "2026-06-04",

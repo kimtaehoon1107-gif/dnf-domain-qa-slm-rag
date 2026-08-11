@@ -6,7 +6,7 @@ from collections import defaultdict
 from datetime import date
 from typing import Any
 
-from src.v3.build_bm25 import tokenize_lexical
+from src.v3.build_bm25 import SearchPolicy, _allowed, tokenize_lexical
 from src.v3.simple_evidence_refs import _compact_char_ngrams
 
 
@@ -17,11 +17,16 @@ _YEAR_MONTH = re.compile(
     r"(?<!\d)(20\d{2})\s*년\s*(\d{1,2})\s*월"
 )
 _YEAR = re.compile(r"(?<!\d)(20\d{2})\s*년?")
+_BARE_MONTH = re.compile(r"(?<!\d)(\d{1,2})\s*월")
 DEFAULT_IDENTITY_DEPTH = 8
 DEFAULT_IDENTITY_PARENT_LIMIT = 2
 
 
-def explicit_temporal_interval(question: str) -> tuple[str, str] | None:
+def explicit_temporal_interval(
+    question: str,
+    *,
+    reference_date: str | None = None,
+) -> tuple[str, str] | None:
     full_date = _FULL_DATE.search(question)
     if full_date is not None:
         value = date(*(int(part) for part in full_date.groups())).isoformat()
@@ -35,7 +40,21 @@ def explicit_temporal_interval(question: str) -> tuple[str, str] | None:
         )
     year = _YEAR.search(question)
     if year is None:
-        return None
+        bare_month = _BARE_MONTH.search(question)
+        if bare_month is None or reference_date is None:
+            return None
+        reference = date.fromisoformat(reference_date[:10])
+        month = int(bare_month.group(1))
+        if not 1 <= month <= 12:
+            return None
+        return (
+            date(reference.year, month, 1).isoformat(),
+            date(
+                reference.year,
+                month,
+                monthrange(reference.year, month)[1],
+            ).isoformat(),
+        )
     year_value = int(year.group(1))
     return date(year_value, 1, 1).isoformat(), date(year_value, 12, 31).isoformat()
 
@@ -65,18 +84,29 @@ def shortlist_identity_documents(
     *,
     documents_by_id: dict[str, dict[str, Any]],
     chunks_by_parent: dict[str, list[dict[str, Any]]],
+    policy: SearchPolicy | None = None,
+    reference_date: str | None = None,
     limit: int = 2,
 ) -> list[dict[str, Any]]:
     """Rank document identities using only question and corpus metadata."""
 
-    interval = explicit_temporal_interval(question)
+    interval = explicit_temporal_interval(
+        question,
+        reference_date=reference_date or (
+            policy.as_of if policy is not None else None
+        ),
+    )
     question_ngrams = _compact_char_ngrams(question)
     ranked = []
     for document_id, document in documents_by_id.items():
         chunks = [
             chunk
             for chunk in chunks_by_parent.get(document_id, [])
-            if not chunk.get("review_required")
+            if (
+                _allowed(chunk, policy)
+                if policy is not None
+                else not chunk.get("review_required")
+            )
         ]
         if not chunks:
             continue
@@ -163,6 +193,7 @@ def shortlist_document_chunks(
     documents: list[dict[str, Any]],
     *,
     chunks_by_parent: dict[str, list[dict[str, Any]]],
+    policy: SearchPolicy | None = None,
     per_document: int = 4,
 ) -> list[dict[str, Any]]:
     question_ngrams = _compact_char_ngrams(question)
@@ -171,7 +202,11 @@ def shortlist_document_chunks(
         chunks = [
             chunk
             for chunk in chunks_by_parent.get(document["document_id"], [])
-            if not chunk.get("review_required")
+            if (
+                _allowed(chunk, policy)
+                if policy is not None
+                else not chunk.get("review_required")
+            )
         ]
         chunks.sort(
             key=lambda chunk: (

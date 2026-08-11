@@ -33,7 +33,7 @@ from src.v3.collect_details import (
 )
 
 
-PARSER_VERSION = "dnf_detail_parser_hardened_v3.2"
+PARSER_VERSION = "dnf_detail_parser_hardened_v3.3"
 PREVIEW_SCHEMA_VERSION = "dnf_detail_hardened_preview_v3.2"
 MANIFEST_SCHEMA_VERSION = "dnf_detail_parser_hardening_manifest_v3.2"
 REPORT_SCHEMA_VERSION = "dnf_detail_parser_hardening_report_v3.2"
@@ -93,16 +93,130 @@ def _path_only(url: str) -> str:
     return urlsplit(url).path.rstrip("/") or "/"
 
 
+def _direct_table_rows(table: Tag) -> list[Tag]:
+    return [row for row in table.find_all("tr") if row.find_parent("table") is table]
+
+
+def _direct_row_cells(row: Tag) -> list[Tag]:
+    return row.find_all(["th", "td"], recursive=False)
+
+
+def _cell_text_without_nested_tables(cell: Tag) -> str:
+    clone = BeautifulSoup(str(cell), "html.parser").find()
+    if not isinstance(clone, Tag):
+        return ""
+    for nested in clone.find_all("table"):
+        nested.decompose()
+    return normalize_space(clone.get_text(" ", strip=True))
+
+
+def _positive_span(cell: Tag, attribute: str) -> int:
+    try:
+        return max(1, int(cell.get(attribute) or 1))
+    except (TypeError, ValueError):
+        return 1
+
+
+def _table_rows(
+    table: Tag,
+    *,
+    prefix: tuple[str, ...] = (),
+    expand_colspans: bool = False,
+) -> list[str]:
+    rows: list[str] = []
+    active: dict[int, dict[str, Any]] = {}
+    remaining: dict[int, int] = {}
+    column_headers: dict[int, str] = {}
+    for row in _direct_table_rows(table):
+        grid = dict(active)
+        inherited_columns = set(active)
+        new_columns: set[int] = set()
+        placements: list[tuple[int, Tag]] = []
+        column = 0
+        for cell in _direct_row_cells(row):
+            while column in grid:
+                column += 1
+            colspan = _positive_span(cell, "colspan")
+            rowspan = _positive_span(cell, "rowspan")
+            record = {
+                "identity": id(cell),
+                "text": _cell_text_without_nested_tables(cell),
+            }
+            placements.append((column, cell))
+            for offset in range(colspan):
+                target = column + offset
+                grid[target] = record
+                if rowspan > 1:
+                    active[target] = record
+                    remaining[target] = rowspan - 1
+                    new_columns.add(target)
+            column += colspan
+
+        header_row = any(cell.name == "th" for _, cell in placements)
+        if expand_colspans and header_row:
+            column_headers = {
+                column: str(record["text"])
+                for column, record in grid.items()
+                if str(record["text"])
+            }
+
+        rendered = list(prefix)
+        seen: set[int] = set()
+        for column in sorted(grid):
+            record = grid[column]
+            identity = int(record["identity"])
+            if not expand_colspans and identity in seen:
+                continue
+            seen.add(identity)
+            text = str(record["text"])
+            if text:
+                header = column_headers.get(column, "")
+                rendered.append(
+                    f"{header}: {text}"
+                    if expand_colspans and not header_row and header
+                    else text
+                )
+        if rendered:
+            rows.append("| " + " | ".join(rendered) + " |")
+
+        for start_column, cell in placements:
+            context = list(prefix)
+            context_seen: set[int] = set()
+            for context_column in range(start_column):
+                record = grid.get(context_column)
+                if record is None:
+                    continue
+                identity = int(record["identity"])
+                if identity in context_seen:
+                    continue
+                context_seen.add(identity)
+                text = str(record["text"])
+                if text:
+                    context.append(text)
+            for nested in cell.find_all("table"):
+                if nested.find_parent("table") is table:
+                    rows.extend(
+                        _table_rows(
+                            nested,
+                            prefix=tuple(context),
+                            expand_colspans=True,
+                        )
+                    )
+
+        for target in inherited_columns:
+            remaining[target] -= 1
+            if remaining[target] <= 0:
+                remaining.pop(target, None)
+                active.pop(target, None)
+        for target in new_columns:
+            if remaining.get(target, 0) <= 0:
+                remaining.pop(target, None)
+                active.pop(target, None)
+    return rows
+
+
 def _table_text(table: Tag) -> str:
-    rows = []
-    for row in table.select("tr"):
-        cells = [
-            normalize_space(cell.get_text(" ", strip=True))
-            for cell in row.find_all(["th", "td"])
-        ]
-        if cells:
-            rows.append("| " + " | ".join(cells) + " |")
-    return "\n[TABLE]\n" + "\n".join(rows) + "\n[/TABLE]\n"
+    return "\n[TABLE]\n" + "\n".join(_table_rows(table)) + "\n[/TABLE]\n"
 
 
 def structured_text_hardened(
@@ -140,7 +254,11 @@ def structured_text_hardened(
         else:
             image.decompose()
 
-    for table in list(root.find_all("table")):
+    for table in [
+        candidate
+        for candidate in root.find_all("table")
+        if candidate.find_parent("table") is None
+    ]:
         table.replace_with(NavigableString(_table_text(table)))
     for heading in root.find_all(re.compile(r"^h[1-6]$")):
         level = int(heading.name[1])
@@ -465,6 +583,7 @@ def build_hardened_previews(
 def _build_report(
     previews: list[dict[str, Any]],
     *,
+    parser_version: str,
     parsed_at: str,
     manifest_path: Path,
     manifest_sha256: str,
@@ -561,7 +680,7 @@ def _build_report(
     ]
     return {
         "report_schema_version": REPORT_SCHEMA_VERSION,
-        "parser_version": PARSER_VERSION,
+        "parser_version": parser_version,
         "parsed_at": parsed_at,
         "manifest_path": manifest_path.as_posix(),
         "manifest_sha256": manifest_sha256,
@@ -674,6 +793,12 @@ def freeze_hardening_artifacts(
     collection_dir: Path,
     report_dir: Path,
 ) -> dict[str, Any]:
+    parser_versions = {
+        str(row.get("parser_version") or "") for row in previews
+    }
+    if len(parser_versions) != 1 or not next(iter(parser_versions)):
+        raise RuntimeError("previews must contain one parser version")
+    parser_version = next(iter(parser_versions))
     preview_bytes = _serialize_jsonl(
         previews, lambda row: (row["source_id"], row["canonical_url"])
     )
@@ -683,7 +808,7 @@ def freeze_hardening_artifacts(
 
     manifest = {
         "manifest_schema_version": MANIFEST_SCHEMA_VERSION,
-        "parser_version": PARSER_VERSION,
+        "parser_version": parser_version,
         "parsed_at": parsed_at,
         "registry_path": registry_path.as_posix(),
         "registry_sha256": file_sha256(registry_path),
@@ -709,6 +834,7 @@ def freeze_hardening_artifacts(
 
     report = _build_report(
         previews,
+        parser_version=parser_version,
         parsed_at=parsed_at,
         manifest_path=manifest_path,
         manifest_sha256=manifest_sha256,

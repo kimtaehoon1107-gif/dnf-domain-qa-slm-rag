@@ -421,7 +421,7 @@ _CLOCK_KOREAN = re.compile(
 )
 _NUMBER_UNIT = re.compile(
     r"(?<![\d,])(?P<number>\d[\d,]*(?:\.\d+)?)\s*"
-    r"(?P<unit>%|퍼센트|골드|세라|마일리지|포인트|개월|개|회|번|명|"
+    r"(?P<unit>%|퍼센트|골드|세라|마일리지|포인트|개월|개|회|번|명(?!성)|"
     r"일|년|주|시간|분|초|원|위|레벨|lv|gb|mb|kb)",
     re.IGNORECASE,
 )

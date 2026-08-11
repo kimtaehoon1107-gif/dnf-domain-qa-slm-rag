@@ -15,11 +15,16 @@ sys.path.insert(0, str(PROJECT_ROOT))
 os.chdir(PROJECT_ROOT)
 
 from src.v3.product_free_rag import (
+    DEFAULT_PRODUCT_BM25_MANIFEST,
+    DEFAULT_PRODUCT_CHUNKS,
+    DEFAULT_PRODUCT_DENSE_MANIFEST,
+    DEFAULT_PRODUCT_RUNTIME_SNAPSHOT,
     ProductFreeRAG,
     render_product_clarification_options,
     resolve_product_clarification_followup,
     rewrite_product_clarification_question,
 )
+from src.v3.build_bm25 import tokenize_lexical
 
 
 PIPELINES = ("legacy_experimental", "product_free_rag_v1")
@@ -29,6 +34,72 @@ EXPANDED_TABLE_INDEX_MANIFEST = Path(
     "888974fe242b695e8dd2dbdd0ab30c859223390a9b69e15da7d2937a6b4a23cf.json"
 )
 _RUNTIMES: dict[str, Any] = {}
+_RUNTIME_PATHS = {
+    "chunks_path": DEFAULT_PRODUCT_CHUNKS,
+    "bm25_manifest_path": DEFAULT_PRODUCT_BM25_MANIFEST,
+    "dense_manifest_path": DEFAULT_PRODUCT_DENSE_MANIFEST,
+    "metadata_snapshot_path": DEFAULT_PRODUCT_RUNTIME_SNAPSHOT,
+}
+
+
+def validate_demo_question(question: str) -> str:
+    raw = str(question or "")
+    normalized = " ".join(raw.split())
+    tokens = tokenize_lexical(normalized)
+    visible_length = sum(not character.isspace() for character in normalized)
+    question_marks = normalized.count("?") + normalized.count("？")
+    high_question_mark_ratio = (
+        question_marks >= 4
+        and visible_length > 0
+        and question_marks / visible_length >= 0.5
+    )
+    if not tokens or high_question_mark_ratio:
+        received_bytes = raw.encode("utf-8", errors="surrogatepass")
+        raise ValueError(
+            "corrupted question input: "
+            f"lexical_tokens={len(tokens)}; "
+            f"question_mark_ratio={question_marks}/{visible_length}; "
+            f"question_repr={raw!r}; "
+            f"received_utf8_bytes={received_bytes.hex()}"
+        )
+    return normalized
+
+
+def configure_runtime_paths(
+    *,
+    chunks_path: Path,
+    bm25_manifest_path: Path,
+    dense_manifest_path: Path,
+    metadata_snapshot_path: Path = DEFAULT_PRODUCT_RUNTIME_SNAPSHOT,
+) -> None:
+    _RUNTIME_PATHS.update(
+        {
+            "chunks_path": Path(chunks_path),
+            "bm25_manifest_path": Path(bm25_manifest_path),
+            "dense_manifest_path": Path(dense_manifest_path),
+            "metadata_snapshot_path": Path(metadata_snapshot_path),
+        }
+    )
+    _RUNTIMES.clear()
+
+
+def _runtime_config_log(*, pipeline: str) -> str:
+    resolved = {
+        name: str(
+            path.resolve()
+            if path.is_absolute()
+            else (PROJECT_ROOT / path).resolve()
+        )
+        for name, path in _RUNTIME_PATHS.items()
+    }
+    return json.dumps(
+        {
+            "event": "product_free_rag_demo_start",
+            "pipeline": pipeline,
+            **resolved,
+        },
+        ensure_ascii=False,
+    )
 
 
 def _runtime(pipeline: str) -> Any:
@@ -45,7 +116,12 @@ def _runtime(pipeline: str) -> Any:
             use_identity_shortlist=True,
             use_compact_evidence_pack=True,
             use_atomic_evidence_reranker=True,
+            use_table_comparison_reservation=True,
+            use_server_availability_rendering=True,
+            use_server_content_kind_rendering=True,
+            use_server_reward_kind_rendering=True,
             handoff_cuda_to_generation=True,
+            **_RUNTIME_PATHS,
         )
     elif pipeline == "legacy_experimental":
         from src.v3.free_minimal_claim_v2 import FreeMinimalClaimV2
@@ -208,7 +284,21 @@ def answer_question(
 ]:
     if not str(question or "").strip():
         return "질문을 입력해 주세요.", [], [], "{}", pending_state
-    normalized = " ".join(str(question).split())
+    try:
+        normalized = validate_demo_question(question)
+    except ValueError as exc:
+        result = {
+            "mode": "error",
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+        }
+        return (
+            f"### 실행 실패\n\n`{type(exc).__name__}: {exc}`",
+            [],
+            [],
+            json.dumps(result, ensure_ascii=False, indent=2),
+            None,
+        )
     pending = (
         pending_state
         if isinstance(pending_state, dict)
@@ -375,13 +465,62 @@ def build_demo(*, default_pipeline: str) -> gr.Blocks:
     return demo
 
 
-def main() -> None:
+def build_argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pipeline", choices=PIPELINES, default=PIPELINES[0])
+    parser.add_argument(
+        "--preinitialize-retrieval",
+        action="store_true",
+        help=(
+            "load Kiwi and retrieval models before opening the demo; "
+            "does not call Qwen"
+        ),
+    )
+    parser.add_argument("--chunks", type=Path, default=DEFAULT_PRODUCT_CHUNKS)
+    parser.add_argument(
+        "--bm25-manifest",
+        type=Path,
+        default=DEFAULT_PRODUCT_BM25_MANIFEST,
+    )
+    parser.add_argument(
+        "--dense-manifest",
+        type=Path,
+        default=DEFAULT_PRODUCT_DENSE_MANIFEST,
+    )
+    parser.add_argument(
+        "--metadata-snapshot",
+        type=Path,
+        default=DEFAULT_PRODUCT_RUNTIME_SNAPSHOT,
+    )
     parser.add_argument("--server-name", default="127.0.0.1")
     parser.add_argument("--server-port", type=int, default=7861)
     parser.add_argument("--share", action="store_true")
+    return parser
+
+
+def main() -> None:
+    parser = build_argument_parser()
     args = parser.parse_args()
+    configure_runtime_paths(
+        chunks_path=args.chunks,
+        bm25_manifest_path=args.bm25_manifest,
+        dense_manifest_path=args.dense_manifest,
+        metadata_snapshot_path=args.metadata_snapshot,
+    )
+    print(_runtime_config_log(pipeline=args.pipeline), flush=True)
+    if args.preinitialize_retrieval:
+        if args.pipeline != "product_free_rag_v1":
+            parser.error(
+                "--preinitialize-retrieval requires product_free_rag_v1"
+            )
+        warmup = _runtime(args.pipeline).preinitialize_retrieval()
+        print(
+            json.dumps(
+                {"event": "retrieval_preinitialized", **warmup},
+                ensure_ascii=False,
+            ),
+            flush=True,
+        )
     build_demo(default_pipeline=args.pipeline).queue(
         default_concurrency_limit=1
     ).launch(

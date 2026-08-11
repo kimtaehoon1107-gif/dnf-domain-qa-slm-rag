@@ -55,7 +55,7 @@
 
 ### 3-1. 공식 문서를 재현 가능한 스냅샷으로
 
-수집 범위는 던파 공식 게시판·게임 가이드·FAQ·세라샵·운영정책과 이미지 의존도가 높은 `/pg/` 상세 페이지다. `discover_sources → collect_details`를 분리해 목록에서 찾은 URL과 실제 수집 성공을 따로 기록했고, 동일 라운드에서는 `fetched_at`을 고정했다. 현재 공개 스냅샷은 **2026-07-17 기준 문서 980개·청크 3,599개**다. 문서와 청크 수는 [normalized corpus manifest](data/v3/normalized/normalized_corpus_manifest_3ba1afc14def8d2da1f7297679f02df6ff690e6fd18298931d3b108dcd064ebf.json)와 [chunk corpus manifest](data/v3/chunks/chunk_corpus_manifest_87fb0fc3477088cf6245e8bd3fd7719374a7dbf778094d5e36fa43458dd54c00.json)에 고정했다.
+수집 범위는 던파 공식 게시판·게임 가이드·FAQ·세라샵·운영정책과 이미지 의존도가 높은 `/pg/` 상세 페이지다. `discover_sources → collect_details`를 분리해 목록에서 찾은 URL과 실제 수집 성공을 따로 기록했고, 동일 라운드에서는 `fetched_at`을 고정했다. 현재 Product 스냅샷은 **2026-08-07 기준 문서 996개·청크 3,925개**다. 문서와 청크 수는 [normalized corpus manifest](data/v3/normalized/normalized_corpus_manifest_ebf0a8514591e88def4157aa2b97b9d3e67a53b60586a6693b54ec13c52d1003.json)와 [chunk corpus manifest](data/v3/chunks/chunk_corpus_manifest_a06f9afffd567023ff9351dc1cabc9bd632ab90d4c0754e99a108a118ce90ced.json)에 고정했다.
 
 ### 3-2. 페이지 종류별 파서와 정규화
 
@@ -63,11 +63,17 @@
 
 ### 3-3. 표·시간을 본문 사실로 보존
 
-표는 행을 평문으로 흩뜨리지 않는다. 완전한 표 청크와 검색용 atomic row를 함께 만들고, 행의 주어가 직전 도입문에 있을 때 그 문맥을 좌표와 분리해 보존한다. 시점이 있는 문서는 `status`, `revision_id`, `valid_from`, `valid_to`를 붙여 게시일과 적용일을 구분한다. 현재·최신·진행 중 같은 집합 질문은 이 메타데이터로 계산하고, 특정 문서 사실은 일반 검색으로 보낸다. 구현 근거는 [table atomic facts](docs/v3/table_atomic_facts_arm1.md)와 [temporal policy](docs/v3/temporal_policy.md)다.
+표는 행을 평문으로 흩뜨리지 않는다. 완전한 표 청크와 검색용 atomic row를 함께 만들고, 행의 주어가 직전 도입문에 있을 때 그 문맥을 좌표와 분리해 보존한다. 신규 미카엘라 비교표가 드러낸 병합 셀 손실도 `rowspan/colspan`을 해석해 아이템·난이도·수량을 한 행에 결속하도록 [구조화 파서](src/v3/harden_detail_parsers.py#L124)에 고정했다. 별도 상세 수집에서는 여러 HTML 신호 중 숫자형 `eventRewardPop(...)` 규약만 채택했다. 시점이 있는 문서는 `status`, `revision_id`, `valid_from`, `valid_to`를 붙여 게시일과 적용일을 구분한다. 현재·최신·진행 중 같은 집합 질문은 이 메타데이터로 계산하고, 특정 문서 사실은 일반 검색으로 보낸다. 구현 근거는 [table atomic facts](docs/v3/table_atomic_facts_arm1.md), [structured detail 결과](docs/v3/structured_detail_enrichment_results_20260809.md), [temporal policy](docs/v3/temporal_policy.md)다.
 
-### 3-4. 갱신해도 기존 좌표가 불필요하게 흔들리지 않게
+### 3-4. 문서 해시와 좌표 변동의 실제 범위
 
-청크 ID는 전역 순번이 아니라 `parent_document_id + offset_source + start/end + display hash + chunker version`의 해시다. 새 문서를 추가해도 기존 문서의 값이 같으면 ID가 유지되고, 수정된 문서의 영향받은 청크만 새 ID를 얻는다. 실제 계약은 [build_chunks.py:124](src/v3/build_chunks.py#L124)에 있다. 갱신 때는 ID 유지율과 봉인 근거 좌표를 다시 검사한다.
+청크 ID는 전역 순번이 아니라 `parent_document_id + offset_source + start/end + display hash + chunker version`의 해시다. 그런데 `parent_document_id`가 문서 전체 content hash를 포함하므로, 본문 밖 동적 값 하나만 달라져도 같은 근거 문장의 모든 자식 좌표가 바뀐다. 실제 계약은 [build_chunks.py:124](src/v3/build_chunks.py#L124)에 있다.
+
+2026-08 갱신에서 기존 3,599개 중 1,330개 ID만 유지됐고 봉인 A6 좌표는 8/33만 남았다. 소멸 25건은 현재 월간 상품 모듈 혼입 8건, 조회수·회전형 배너 alt 9건, 정책 접근 날짜 4건, 실제 상품 변경 1건, 문서 미보존 3건이었다. 원인과 좌표는 [봉인 좌표 게이트 보고서](docs/v3/corpus_refresh_k2_sealed_gate_failure_20260809.md)에 보존했다.
+
+동적 오염 선택자 `ul.thismonth`, `span.hits`, `article.bdview_bnrarea`, `select#revisionList`를 제거하면 두 수집분은 16/16 일치했다. 그러나 정제 결과는 기존 canonical과 0/16 일치하는 제3의 해시였다. 따라서 오염 제거는 향후 좌표를 안정화하는 수단이지 과거 좌표 복원 수단이 아니다. 이 판단 때문에 33/33 게이트를 통과 조건에서 측정 항목으로 내렸다. [동적 오염 조사](reports/v3/dynamic_contamination_survey_20260809.json)
+
+인용 결과 파일에는 좌표와 함께 원문 `text`를 저장하므로 과거 실행의 인용 내용은 재감사할 수 있다. 다음 갱신은 ID 유지율을 기록하되, 실제 근거 본문과 revision 보존 여부를 승격 판단의 중심에 둔다.
 
 ### 3-5. OCR은 수집했지만 검색에는 넣지 않았다
 
@@ -230,6 +236,8 @@ atomic pack은 후보 청크를 관련 문장·표 행 단위로 자른다. Qwen
 
 공식 sealed A6의 다른 안전·효율 수치는 false-full 0, 인용 좌표 32/32, 생성 오류 0, 평균 입력 1,923.4토큰이다. 자동 scorer의 value+claim complete는 29/61이었다. 공식 사람 판정의 남은 실패 슬롯은 `1, 2, 4, 7, 10, 11, 13, 14, 22, 26, 28, 32`이며 제품 기본 경로 승격은 NO-GO다.
 
+2026-08-10 최초 승격은 롤백했지만, 다음 날 재감사에서 공식 7월 보관 문서가 후보 안에 있음을 확인했다. 실제 원인은 과거 월 질문이 보관 상태를 검색 전에 제외한 것이었고, 이를 일반화해 `product_free_rag_v1`만 새 스냅샷으로 승격했다. §12-2에 정정 과정을 기록한다.
+
 ## 9. 실패 분석
 
 ### 9-1. 어디서 답이 사라졌는가
@@ -308,7 +316,15 @@ slot 25에서 Qwen은 일반 거푸집 `1,900 세라`, 강철 거푸집 `6,900 �
 
 검증기는 오답을 막는 동시에 정답을 지울 수 있다. 따라서 “차단 건수”만으로 안전성을 주장하지 않고 `실제 오답 차단 / 실제 정답 차단`을 함께 측정한다.
 
-### 9-4. 채택하지 않은 개선안
+### 9-4. 미카엘라 — 답은 맞았지만 근거 구성이 불완전했다
+
+질문은 “미카엘라 레이드 하드와 일반의 보상 차이 알려줘”였다. 라이브 가이드는 reranker 1·3위에 있어 S1 검색 실패가 아니었다. 그러나 evidence 후보 확장은 부모당 질문 중심 형제 청크 하나만 추가하고 `break`하므로, 라이브 문서 안의 수량 표 형제 청크가 pack에 들어오지 못했다. 구현 위치는 [product_free_rag.py:300](src/v3/product_free_rag.py#L300)이다.
+
+같은 값을 담은 퍼스트 서버 표가 대신 선택돼 `광휘의 잔재` 일반 40개·하드 90개, `초월의 의지` 일반·하드 각 200개를 정확히 답했다. preview 경고도 첫 줄에 표시됐지만 근거는 라이브 문서가 아니었고 범위도 일부여서 상태는 `partial`이었다. **답이 틀린 사례가 아니라 근거 구성이 불완전한 사례**이며, §9-1의 S2를 실제 질문으로 보여준다. 정상 Unicode 재실행과 좌표는 [preview 노출 경계 보고서](reports/v3/preview_patch_exposure_boundary_20260810.md)에 있다.
+
+이 질문의 최초 오답을 만든 표 구조 손실과 조치는 §3-3에 기록했다. 여기서는 같은 내용을 반복하지 않는다.
+
+### 9-5. 채택하지 않은 개선안
 
 | 개선안 | 사전 게이트 결과 | 결정 |
 |---|---|---|
@@ -343,6 +359,10 @@ A6 자동 채점 **sealed 7/32**를 그대로 모델 성능으로 읽으면 같�
 
 fan-out 초벌 체크는 필요한 값이 출력에 “존재하는지”만 보고 A6-7을 좋아진 것으로 읽었다. 하지만 `20→18`과 함께 금지해야 할 `12→9`가 첫 요구에도 붙어 있었다. 저장 출력을 추가 호출 없이 엄격 재채점해 요구별 금지 값과 unsupported 상태를 함께 검사했고, 최종 핵심 게이트를 **adaptive 0/2**로 정정했다. 개선 실험의 채점기도 실험 대상이라는 교훈이었다.
 
+### 테스트 실행기의 한글 인코딩을 의심하지 않은 오류
+
+PowerShell 전달 중 한글 질문이 `?`로 깨져 정상 파이프라인을 `unsupported`로 오진했다. 정상 Unicode 재실행은 40/90/200/200을 모두 맞혔다. 측정 도구가 틀리면 결론도 틀린다는 네 번째 사례다.
+
 ## 11. 기술 스택과 재현
 
 ### 11-1. 기술 스택
@@ -361,7 +381,7 @@ fan-out 초벌 체크는 필요한 값이 출력에 “존재하는지”만 보
 
 ### 11-2. 재현 경계
 
-모델 없는 검증은 `python -m pytest tests/v3 -q`로 실행한다. 현재 결과는 **1,269 passed / 2 failed**이며, 두 실패는 동결된 content-addressed manifest SHA에 대한 기존 면제 항목이다. 테스트는 생성 모델을 모킹하므로 GPU·Ollama·인터넷이 필요 없다. 코퍼스 스냅샷과 청크 ID 계약은 §3에, 레거시 v1/v2 재현 커맨드는 [별도 문서](docs/legacy_v1_v2_reproduction.md)에 분리했다.
+모델 없는 검증은 `python -m pytest tests/v3 -q`로 실행한다. 현재 결과는 **1,488 passed / 2 failed / 67 subtests passed**이며, 두 실패는 동결된 content-addressed manifest SHA에 대한 기존 면제 항목이다. 테스트는 생성 모델을 모킹하므로 GPU·Ollama·인터넷이 필요 없다. 코퍼스 스냅샷과 청크 ID 계약은 §3에, 레거시 v1/v2 재현 커맨드는 [별도 문서](docs/legacy_v1_v2_reproduction.md)에 분리했다.
 
 ### 11-3. 로컬 데모
 
@@ -379,9 +399,11 @@ Gradio 데모는 `legacy_experimental`과 `product_free_rag_v1`을 같은 질문
 
 ![Product Free RAG v1 로컬 Gradio 데모](docs/assets/product_free_rag_demo_20260806.png)
 
-문서 작성 직전 마지막 전체 v3 회귀 기록은 **1,269 passed / 2 failed**다. 실패 두 건은 content-addressed manifest SHA를 의도적으로 동결한 기존 면제 항목이며, 이번 문서 라운드에서는 평가·Qwen 호출·코퍼스 재빌드를 다시 실행하지 않았다. 기준과 면제 이름은 [portfolio writing plan](docs/v3/portfolio_final_writing_plan.md)에 고정돼 있다.
+문서 작성 직전 마지막 전체 v3 회귀 기록은 **1,488 passed / 2 failed / 67 subtests passed**다. 실패 두 건은 content-addressed manifest SHA를 의도적으로 동결한 기존 면제 항목이다. 미카엘라 보상 종류와 7월 월간 상품은 실제 Qwen3 8B까지 호출해 검증했으며, 현재 수치와 근거는 [Product 코퍼스 승격 결과](reports/v3/product_free_rag_corpus_promotion_20260811.md)에 보존했다.
 
 ## 12. 한계와 운영 계획
+
+### 12-1. 현재 한계
 
 첫째, A6-7은 8B 모델이 조건이 다른 같은 이름의 값을 안정적으로 결속하지 못한다는 한계를 보여준다. 규칙 하나로 해당 문항을 막을 수는 있지만 코퍼스 전반의 정밀도를 증명하지 못했다.
 
@@ -391,20 +413,47 @@ Gradio 데모는 `legacy_experimental`과 `product_free_rag_v1`을 같은 질문
 
 넷째, Product Free RAG는 현재 실험 경로이며 기본 제품 경로로 승격되지 않았다. 공식 sealed 20/32와 남은 실패를 기준선으로 보존한다.
 
-운영 후보가 되려면 코퍼스 갱신을 일회성 재빌드가 아니라 다음의 검증 루프로 다뤄야 한다.
+### 12-2. 코퍼스 갱신을 실제로 시도한 기록
 
-```text
-신규 공식 문서 discovery·수집
-→ parser·정규화 diff와 사람 표본 검수
-→ 청크·BM25·dense index를 새 content hash로 빌드
-→ 기존 chunk_id 유지율과 sealed 근거 33개 좌표 감사
-→ 검색 순위·안전 canary·공개 adaptive 질문 변화 측정
-→ gate 통과 시 runtime snapshot 교체, 실패 시 이전 snapshot 유지
-```
+1. **파서 크래시.** 998건 재검증 중 신규 페이지의 비표준 `<img>` 조합에서 잠복 버그가 드러났다. 2줄 방어와 회귀 테스트를 추가해 995건 정상 파싱·redirect 3건·parser failure 0으로 복구했다. [중첩 img 파서 결과](docs/v3/parser_nested_img_fix_results_20260808.md)
 
-정기 갱신 사이에는 신규 공지·정책 revision을 발견 목록에만 쌓고, 릴리스 후보를 만들 때 한 번에 검수한다. 일정 주기를 아직 실측하지 않았으므로 “매주” 같은 약속은 만들지 않는다. 각 후보는 diff 규모, parser 경고, 좌표 유지, 검색 회귀를 보고 사람이 승격 여부를 결정한다.
+2. **시각 근거 게이트.** 신규 이미지 의존 문서 2건에 시각 근거도 제외 overlay도 없어 정규화 빌더가 중단했다. 사람 판정이 필요한 지점이 자동 파이프라인 안에 숨어 있음을 확인했다. [K2 중단 보고](docs/v3/corpus_refresh_k2_blocked_20260808.md)
 
-시각 근거의 운영 경계도 유지한다. OCR 결과는 계속 `unverified_ocr`, `review_required=true`, `default_exposure=false`이며 bbox와 visual gold를 갖춘 별도 arm이 통과하기 전에는 답변 근거로 노출하지 않는다. 결과가 아직 없으므로 갱신이나 OCR이 성능을 얼마나 높일지 예상 수치를 쓰지 않는다.
+3. **봉인 좌표 8/33.** 시각 근거를 보완하고 청킹까지 도달했지만 봉인 좌표 33개 중 8개만 유지됐다. 당시 계획의 33/33 필수 게이트에 따라 인덱싱 전에 멈췄다. [봉인 좌표 게이트 실패](docs/v3/corpus_refresh_k2_sealed_gate_failure_20260809.md)
+
+4. **원인 분해.** 소멸 25건 중 21건은 정답 본문이 아니라 월간 상품 모듈·조회수·배너 alt·정책 revision UI 같은 동적 값 때문이었다. 선택자 4종을 특정했고 두 수집분이 제거 후 16/16 일치함을 확인했다. [동적 오염 조사](reports/v3/dynamic_contamination_survey_20260809.json)
+
+5. **과거 좌표 복원 불가.** 정제 결과는 기존 canonical과 0/16 일치하는 제3의 해시였다. 오염 제거는 미래 안정화에는 유효하지만 이미 오염 값을 포함해 만든 좌표를 되살리지 못한다. [동적 오염 조사](reports/v3/dynamic_contamination_survey_20260809.json)
+
+6. **잘못 만든 게이트 강등.** 문서 주장을 검증하려던 33/33 게이트가 갱신 자체를 막고 있었다. **게이트 설계가 틀렸고**, 좌표 유지율을 통과 조건에서 관측값으로 내린 뒤 어떤 값이 나와도 인덱스까지 진행하도록 고쳤다. [승격 측정 결과](reports/v3/corpus_promotion_measured_not_gated_20260810.md)
+
+7. **병합셀 표 측정.** 원본 snapshot 1,572개 중 표 포함은 833개, 병합셀 표는 294개(35.3%)였다. canonical에서는 표 보유 493문서 중 149문서(30.2%), 봉인 참조는 3/28이었고 봉인 질문의 요청 사실이 달라진 slot은 없었다. [M1-b 표 손상 측정](reports/v3/corpus_promotion_m1b_table_damage_20260810.md)
+
+8. **최초 승격 시도와 롤백.** 새 BM25·BGE-M3 인덱스를 만들고 런타임 경로를 전환했지만, “7월 상품” 질문이 실패해 기존 경로로 롤백했다. 당시에는 과거 revision 미보존으로 귀속했으며, 이 판단은 다음 단계에서 정정됐다. [승격 측정 결과](reports/v3/corpus_promotion_measured_not_gated_20260810.md)
+
+9. **재감사와 Product 승격.** 정답 본문은 공식 7월 보관 문서에 존재했고, 실제 원인은 연도 없는 과거 월 질문이 `expired/default_exposure=false` 문서를 검색 전에 제외한 것이었다. 지난 월에만 보관 상태를 열고 월 구간을 identity shortlist에서 대조하도록 일반화했다. 7월 질문은 `4,000만 골드·교환가능`, 미카엘라 보상 종류는 정식 가이드 기준으로 통과했다. 연구·레거시 상수는 유지하고 Product 경로만 2026-08-07 스냅샷으로 승격했다. [Product 코퍼스 승격 결과](reports/v3/product_free_rag_corpus_promotion_20260811.md)
+
+### 12-3. 그래서 무엇이 필요한가
+
+세 번의 측정은 승격 판단을 하나로 좁혔다.
+
+| 관측 | 승격 판단 |
+|---|---|
+| 좌표 해시 변동 | 막지 않음 — 게이트에서 측정으로 강등 |
+| 병합셀 표 변화 | 막지 않음 — 봉인 질문의 요청 사실 영향 없음 |
+| revision 미보존 | 막음 — 실제 정답 본문 손실 |
+
+버전 관리 계층은 절반 있다. 996문서에 `lineage_id`가 있고 고유 lineage는 944개이며, `supersedes_document_id` 52개와 상태 `current 888 · superseded 52 · expired 52 · unknown 4`를 보존한다. 운영정책 하나는 한 lineage 아래 2011~2026년 51 revision으로 실증됐다. [ChunkV3 계약](docs/v3/chunk_v3_corpus_contract.md) [운영정책 temporal 보고서](reports/v3/account_policy_temporal_21bdeacedbe2f6d42d4178e9c9f685d615b80f5a0e0cf02c0cf648f2709f6e16.json)
+
+빠진 것은 그 위의 자동 운영 계층이다. 현재 996/996에서 `document_id`와 `revision_id`는 같은 identity hash를 공유한다. Product 경로는 [불변 런타임 스냅샷](data/v3/runtime/product_free_rag_runtime_snapshot_20260807.json)을 쓰지만, 수집 후보 생성부터 승격·롤백까지는 아직 사람이 명시적으로 실행한다. 월간 상품의 공식 보관 문서는 보존됐지만 최신성 전용 봉인 평가도 없다. 다음 라운드는 URL별 revision 병합 검증, 스냅샷 포인터 자동 교체, 최신성 평가를 갖춰야 한다. [revision 계약](docs/v3/raw_snapshot_and_revision_contract.md)
+
+### 12-4. 운영 시 안전 경계
+
+`unverified_ocr` 22청크는 `review_required=true`, `default_exposure=false`로 격리해 색인에서 제외한다. bbox와 사람이 검수한 visual gold 없이 OCR을 답변 근거로 승격하지 않는다.
+
+canonical의 `preview_patch` 105청크는 모두 status `unknown`이며 봉인 A6 최종 인용은 0건이었다. 다만 신규 콘텐츠에서는 라이브 문서보다 먼저 검색 후보가 될 수 있으므로, 최종 승인 인용에 쓰이면 서버가 답변 첫 줄에 퍼스트 서버 기준임을 강제 표시한다. [preview 노출 경계](reports/v3/preview_patch_exposure_boundary_20260810.md)
+
+정기 갱신 사이에는 신규 문서와 revision을 발견 목록에 쌓고, 릴리스 후보마다 parser diff·본문 보존·검색 회귀·안전 canary를 측정한다. 좌표 유지율만으로 롤백하지 않되, 정답 본문이나 인용 복원이 깨지면 이전 불변 스냅샷을 유지한다.
 
 ## 부록 A. 라운드 이력
 
