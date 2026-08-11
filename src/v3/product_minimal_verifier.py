@@ -103,6 +103,23 @@ _PROCESSING_DURATION_CLAIM = re.compile(
 _PROCESSING_DURATION_EVIDENCE = re.compile(
     r"(?:처리|소요|완료|걸리|영업\s*일)"
 )
+_QUESTION_REQUEST_TAIL = re.compile(
+    r"\s*(?:이|가|은|는|을|를)?\s*"
+    r"(?:궁금(?:해|해요|합니다)?|"
+    r"알려\s*(?:줘|주세요)?|"
+    r"설명해\s*(?:줘|주세요)?|"
+    r"알고\s*싶(?:어|어요|습니다)?)\s*[?？.]?$"
+)
+_METHOD_REQUEST = re.compile(r"(?:방법|어떻게)")
+_METHOD_EVIDENCE = re.compile(
+    r"(?:NPC를?\s*통해|통해\s*(?:진행|이용)|"
+    r"(?:진행|변경)할\s*수|이용하여|선택(?:하|합)|입력(?:하|합)|"
+    r"클릭(?:하|합)|사용(?:하|합))"
+)
+_LOCATION_REQUEST = re.compile(r"(?:어디|위치|장소)")
+_LOCATION_EVIDENCE = re.compile(
+    r"(?:NPC|위치|장소|(?:에서|에게)\s*(?:진행|이용|신청|변경))"
+)
 def _release_date_claim_present(claim_text: str) -> bool:
     return _semantic_release_date_claim_present(claim_text)
 _ABSENCE_CLAIM = re.compile(
@@ -177,6 +194,29 @@ def _surface_overlap(left: str, right: str) -> bool:
     )
 
 
+def _semantic_question_relation_supported(
+    question_surface: str,
+    claim_surface: str,
+    evidence_surface: str,
+) -> bool | None:
+    relation_matches = []
+    if _METHOD_REQUEST.search(question_surface):
+        relation_matches.append(
+            bool(
+                _METHOD_EVIDENCE.search(claim_surface)
+                and _METHOD_EVIDENCE.search(evidence_surface)
+            )
+        )
+    if _LOCATION_REQUEST.search(question_surface):
+        relation_matches.append(
+            bool(
+                _LOCATION_EVIDENCE.search(claim_surface)
+                and _LOCATION_EVIDENCE.search(evidence_surface)
+            )
+        )
+    return any(relation_matches) if relation_matches else None
+
+
 def _claim_addresses_question_surface(
     question: str,
     claim_text: str,
@@ -185,10 +225,20 @@ def _claim_addresses_question_surface(
     requested_subjects: list[str],
 ) -> bool:
     if not requested_subjects:
-        return True
+        question_surface = _QUESTION_REQUEST_TAIL.sub(" ", question)
+        semantic_match = _semantic_question_relation_supported(
+            question_surface,
+            claim_text,
+            evidence_context,
+        )
+        return True if semantic_match is None else semantic_match
     question_surface = _subjectless_surface(
         question,
         requested_subjects,
+    )
+    question_surface = _QUESTION_REQUEST_TAIL.sub(
+        " ",
+        question_surface,
     )
     if not _compact(question_surface):
         return True
@@ -200,9 +250,18 @@ def _claim_addresses_question_surface(
         evidence_context,
         requested_subjects,
     )
-    return (
+    lexical_match = (
         _surface_overlap(question_surface, claim_surface)
         and _surface_overlap(question_surface, evidence_surface)
+    )
+    if lexical_match:
+        return True
+    return bool(
+        _semantic_question_relation_supported(
+            question_surface,
+            claim_surface,
+            evidence_surface,
+        )
     )
 
 

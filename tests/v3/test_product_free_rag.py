@@ -5485,6 +5485,121 @@ def test_explicit_question_subjects_only_uses_visible_surface_structure():
     ) == []
 
 
+def test_nominative_subject_excludes_generic_question_attribute():
+    for question in (
+        "장비 초월 방법이 궁금해",
+        "장비 초월 비용이 궁금해",
+        "장비 초월 위치가 궁금해",
+        "장비 초월 기간이 궁금해",
+        "장비 초월 조건이 궁금해",
+        "장비 초월 재료가 궁금해",
+    ):
+        assert explicit_nominative_question_subjects(question) == ["장비 초월"]
+
+
+def test_method_and_location_paraphrases_accept_only_procedural_evidence():
+    procedure = (
+        "장비 초월은 '아라드-벨 마이어 공국 남부-헨돈마이어-"
+        "레미디아 바실리카'의 메이가 로젠바흐 NPC를 통해 "
+        "진행할 수 있습니다."
+    )
+    definition = (
+        "장비 초월은 교환불가 장비를 계정 금고로 이동시키는 기능입니다."
+    )
+    procedure_unit = {
+        "evidence_ref": "E1",
+        "chunk_id": "procedure",
+        "parent_document_id": "guide",
+        "title": "NPC 장비 초월",
+        "context_text": "장비 초월 이용 방법",
+        "start_char": 0,
+        "end_char": len(procedure),
+        "text": procedure,
+        "unit_kind": "sentence",
+    }
+    definition_unit = {
+        "evidence_ref": "E2",
+        "chunk_id": "definition",
+        "parent_document_id": "guide",
+        "title": "NPC 장비 초월",
+        "context_text": "장비 초월 기능",
+        "start_char": 0,
+        "end_char": len(definition),
+        "text": definition,
+        "unit_kind": "sentence",
+    }
+
+    def verify(question, text, evidence_ref, unit, chunk_id):
+        return verify_product_claim_output(
+            {
+                "mode": "answer",
+                "claims": [
+                    {"text": text, "evidence_refs": [evidence_ref]}
+                ],
+                "clarification": "",
+            },
+            question=question,
+            evidence_units=[unit],
+            chunks_by_id={chunk_id: {"display_text": unit["text"]}},
+            requested_subjects=explicit_nominative_question_subjects(question),
+        )
+
+    for question in (
+        "장비 초월 방법이 궁금해",
+        "장비 초월 방법 알려줘",
+        "장비 초월은 어떻게 해?",
+        "장비 초월은 어디서 해?",
+    ):
+        verified = verify(question, procedure, "E1", procedure_unit, "procedure")
+        assert [claim["evidence_refs"] for claim in verified["claims"]] == [
+            ["E1"]
+        ]
+
+    for question in (
+        "장비 초월 방법이 궁금해",
+        "장비 초월 방법 알려줘",
+        "장비 초월은 어떻게 해?",
+        "장비 초월은 어디서 해?",
+    ):
+        definition_result = verify(
+            question,
+            definition,
+            "E2",
+            definition_unit,
+            "definition",
+        )
+        assert definition_result["claims"] == []
+
+    wrong_relation = verify(
+        "장비 초월 비용이 궁금해",
+        procedure,
+        "E1",
+        procedure_unit,
+        "procedure",
+    )
+    assert wrong_relation["claims"] == []
+
+    for question, text in (
+        (
+            "장비 초월에 필요한 재료가 궁금해",
+            "장비 초월에는 소울류 아이템과 다른 재료 아이템이 사용됩니다.",
+        ),
+        (
+            "장비 초월 비용이 궁금해",
+            "115Lv 장비 초월 비용은 100,000 골드입니다.",
+        ),
+    ):
+        unit = {
+            **procedure_unit,
+            "text": text,
+            "end_char": len(text),
+        }
+        verified = verify(question, text, "E1", unit, "procedure")
+        assert [claim["evidence_refs"] for claim in verified["claims"]] == [
+            ["E1"]
+        ]
+
+
 def test_compact_pack_keeps_two_units_for_one_surface_question():
     text = "\n".join(
         (

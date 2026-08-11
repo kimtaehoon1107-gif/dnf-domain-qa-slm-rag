@@ -44,6 +44,9 @@ _EXPLICIT_DATE = re.compile(
 )
 _TOPIC_SUBJECT = re.compile(r"^(.{2,40}?)(?:은|는)\s+")
 _NOMINATIVE_SUBJECT = re.compile(r"^(.{1,36}?)(?:이|가)\s+")
+_QUESTION_ATTRIBUTE_NOUNS = frozenset(
+    {"방법", "비용", "위치", "기간", "조건", "재료"}
+)
 _NUMBERED_LIST_ITEM = re.compile(
     r"^\s*(?:\d{1,2}[.)]|[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳])\s*"
 )
@@ -181,9 +184,14 @@ def explicit_nominative_question_subjects(question: str) -> list[str]:
         phrase = tokens[phrase_start:particle_index]
         if not phrase or int(phrase[0].start) != 0:
             continue
-        subject = normalized[
-            int(phrase[0].start) : int(particle.start)
-        ].strip()
+        subject_end = int(particle.start)
+        if (
+            len(phrase) >= 2
+            and _is_nominal_tag(_base_tag(phrase[-1]))
+            and str(phrase[-1].form) in _QUESTION_ATTRIBUTE_NOUNS
+        ):
+            subject_end = int(phrase[-1].start)
+        subject = normalized[int(phrase[0].start) : subject_end].strip()
         return [subject] if 2 <= len(subject) <= 24 else []
     return []
 
