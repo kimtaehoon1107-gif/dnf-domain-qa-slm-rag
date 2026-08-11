@@ -8,7 +8,7 @@
 
 | 무엇을 만들었나 | 현재 구성 | 범위 |
 |---|---|---|
-| 공식 문서 QA/RAG | BM25 + BGE-M3 → BGE reranker → atomic evidence pack → Qwen3 8B 1회 → 최소 검증 → 서버 인용·표 복원 | 무료·로컬 실행 |
+| 공식 문서 QA/RAG | BM25 + BGE-M3 → BGE reranker → atomic evidence pack → 조건부 서버 렌더링 또는 Qwen3 8B 1회 → bounded verifier → 서버 인용·표 복원 | 무료·로컬 실행 |
 | 평가 체계 | 봉인 세트, SHA 동결, 1회 실행, 사람 근거 검수, adaptive 진단 분리 | 성능보다 측정 정직성 우선 |
 
 | 시스템·평가 | 최종 숫자 | 해석 |
@@ -48,17 +48,24 @@
 ## 직접 검증하기 (모델·GPU 불필요)
 
 ```bash
-git clone https://github.com/kimtaehoon1107-gif/dnf-domain-qa-slm-rag
+git -c core.longpaths=true clone https://github.com/kimtaehoon1107-gif/dnf-domain-qa-slm-rag
+git -C dnf-domain-qa-slm-rag config core.longpaths true
 cd dnf-domain-qa-slm-rag
 pip install -r requirements.txt
 python -m pytest tests/v3 -q
 ```
 
-약 85초 뒤 `1,269 passed / 2 failed`가 나옵니다.
+2026-08-11의 새 클론 재검증 결과는
+`1,362 passed / 2 failed / 67 subtests passed`입니다.
 
-실패 2건은 content-addressed manifest SHA를 의도적으로 동결한 기존 면제
-항목입니다. 테스트는 생성 모델을 모킹하므로 **Ollama·GPU·모델 다운로드·
-인터넷이 모두 필요 없습니다.**
+실패 2건은 동결 artifact와 현재 재생성 manifest의 SHA가 다른 기존 known
+failures입니다. 새 Product 변경의 회귀와 구분해 그대로 보고합니다. 테스트는 생성
+모델을 모킹하므로 **Ollama·GPU·모델 다운로드·인터넷이 모두 필요 없습니다.**
+
+첫 두 줄은 긴 artifact 경로가 있는 Windows 저장소를 위한 설정입니다. Linux·macOS는
+일반 `git clone`도 사용할 수 있습니다. 독립 검토의 전체 범위와 발견한 false-full
+수정은 [평가자 재검토 보고서](reports/v3/independent_evaluator_review_20260811.md)에
+남겼습니다.
 
 실제로 질문을 던져보려면 [PORTFOLIO.md §11](PORTFOLIO.md#11-기술-스택과-재현)의
 데모 실행 절차를 참고하세요. 이 경우에는 Ollama와 약 10 GB의 모델이 필요합니다.

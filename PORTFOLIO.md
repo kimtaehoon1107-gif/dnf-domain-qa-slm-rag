@@ -6,7 +6,7 @@
 
 | 무엇을 만들었나 | 현재 구성 | 범위 |
 |---|---|---|
-| 공식 문서 QA/RAG | BM25 + BGE-M3 → BGE reranker → atomic evidence pack → Qwen3 8B 1회 → 최소 검증 → 서버 인용·표 복원 | 무료·로컬 실행 |
+| 공식 문서 QA/RAG | BM25 + BGE-M3 → BGE reranker → atomic evidence pack → 조건부 서버 렌더링 또는 Qwen3 8B 1회 → bounded verifier → 서버 인용·표 복원 | 무료·로컬 실행 |
 | 평가 체계 | 봉인 세트, SHA 동결, 1회 실행, 사람 근거 검수, adaptive 진단 분리 | 성능보다 측정 정직성 우선 |
 
 | 시스템·평가 | 최종 숫자 | 해석 |
@@ -217,16 +217,17 @@ v3 typed 경로는 자유 문장 하나가 아니라 “무엇에 대한 어떤 
 → BGE reranker
 → top 8, parent 문서당 최대 2개
 → atomic evidence pack 최대 8개
-→ Qwen3 8B 한 번
-→ 인용·핵심값·날짜·질문 관계 최소 검증
+→ 구조가 충분한 비교·종류·보상 표면 서버 결정 렌더링
+   └─ 그 외 질문만 Qwen3 8B 한 번
+→ 인용·핵심값·날짜·질문 관계 bounded deterministic 검증
 → 서버가 원문 인용과 완전한 표를 복원
 ```
 
 기억에 의존하지 않고 현재 코드의 상수를 확인했다. [retrieve_v3.py](src/v3/retrieve_v3.py)는 BM25와 dense 후보를 각각 20개까지 찾고 BGE-M3에 0.75, BM25에 0.25를 둔다. [product_free_rag.py](src/v3/product_free_rag.py)는 전체 질문과 요구 절을 중복 제거한 뒤 각 질의의 top 20을 합치고, `BAAI/bge-reranker-v2-m3`로 재정렬한다. 최종 후보는 8개이며 같은 parent는 최대 2개다.
 
-atomic pack은 후보 청크를 관련 문장·표 행 단위로 자른다. Qwen에게 긴 SHA와 좌표를 쓰게 하지 않고 `E1`~`E8`만 보인다. atomic prefilter는 요구 질의당 32개, 복수 요구에서는 질의당 3개를 먼저 예약한다. Qwen 호출은 `qwen3-8b:ctx8192`, 입력 context 한도 4,096토큰, 출력 한도 768토큰으로 한 번만 수행한다. 완전한 표는 Qwen이 다시 쓰지 않고 서버가 원문 행을 렌더링한다.
+atomic pack은 후보 청크를 관련 문장·표 행 단위로 자른다. Qwen에게 긴 SHA와 좌표를 쓰게 하지 않고 `E1`~`E8`만 보인다. atomic prefilter는 요구 질의당 32개, 복수 요구에서는 질의당 3개를 먼저 예약한다. 순수한 2축 O/X 비교표와 구조가 충분한 콘텐츠 종류·보상 종류 표는 서버가 결정적으로 렌더링한다. 그 조건에 맞지 않는 질문만 `qwen3-8b:ctx8192`를 입력 context 4,096토큰·출력 768토큰 한도에서 한 번 호출한다. 완전한 표는 Qwen이 다시 쓰지 않고 서버가 원문 행을 렌더링한다.
 
-검증기는 선택한 E번호가 실제 pack에 있는지, 답의 숫자·날짜·시각·화폐가 인용 근거에 있는지, 질문에 명시된 시간·관계 조건과 근거가 맞는지를 본다. 자연어 모든 토큰의 포함이나 relation 이름 허용목록은 제품 경로의 계약으로 사용하지 않는다. 거절된 claim은 사용자 답에서는 제거하지만 내부 `rejected_claims`에 남겨 실패 원인을 감사할 수 있다.
+검증기는 선택한 E번호가 실제 pack에 있는지, 답의 숫자·날짜·시각·화폐가 인용 근거에 있는지, 질문에 명시된 시간·관계 조건과 근거가 맞는지를 본다. 표 주어·관계 결속, 비교값, preview 노출 경계까지 다루므로 현재 구현을 “네 가지뿐인 최소 검사”라고 부르지는 않는다. 자연어 모든 토큰의 포함이나 relation 이름 허용목록은 제품 경로의 계약으로 사용하지 않는다. 거절된 claim은 사용자 답에서는 제거하지만 내부 `rejected_claims`에 남겨 실패 원인을 감사할 수 있다.
 
 ### 8-2. 공식 A6 결과
 
@@ -381,11 +382,18 @@ PowerShell 전달 중 한글 질문이 `?`로 깨져 정상 파이프라인을 `
 
 ### 11-2. 재현 경계
 
-모델 없는 검증은 `python -m pytest tests/v3 -q`로 실행한다. 현재 결과는 **1,488 passed / 2 failed / 67 subtests passed**이며, 두 실패는 동결된 content-addressed manifest SHA에 대한 기존 면제 항목이다. 테스트는 생성 모델을 모킹하므로 GPU·Ollama·인터넷이 필요 없다. 코퍼스 스냅샷과 청크 ID 계약은 §3에, 레거시 v1/v2 재현 커맨드는 [별도 문서](docs/legacy_v1_v2_reproduction.md)에 분리했다.
+모델 없는 검증은 `python -m pytest tests/v3 -q`로 실행한다. 추적 파일만 받은 새 클론 `efb995e`의 결과는 **1,362 passed / 2 failed / 67 subtests passed**이며, 두 실패는 동결된 content-addressed manifest SHA에 대한 기존 불일치다. 작업 폴더의 미추적 실험 테스트를 포함한 더 큰 숫자는 재현 수치에서 제외했다. 테스트는 생성 모델을 모킹하므로 GPU·Ollama·인터넷이 필요 없다. 코퍼스 스냅샷과 청크 ID 계약은 §3에, 레거시 v1/v2 재현 커맨드는 [별도 문서](docs/legacy_v1_v2_reproduction.md)에 분리했다.
+
+Windows의 깊은 경로에서는 추적된 봉인 artifact 이름이 기본 경로 길이를 넘을 수 있다. 실제 OneDrive 하위 clone은 다음 두 줄로 통과했다.
+
+```powershell
+git -c core.longpaths=true clone https://github.com/kimtaehoon1107-gif/dnf-domain-qa-slm-rag
+git -C dnf-domain-qa-slm-rag config core.longpaths true
+```
 
 ### 11-3. 로컬 데모
 
-Gradio 데모는 `legacy_experimental`과 `product_free_rag_v1`을 같은 질문으로 비교하고, 최종 답, 서버 복원 원문 인용, 검색 후보, 전체 JSON을 보여준다. 문서 작성 중 Qwen 질문을 제출하지 않고 화면 로딩만 확인했다. FastAPI health 함수도 `runtime_loaded: False` 상태에서 정상 응답하는 것을 확인했다.
+Gradio 데모는 `legacy_experimental`과 `product_free_rag_v1`을 같은 질문으로 비교하고, 최종 답, 서버 복원 원문 인용, 검색 후보, 전체 JSON을 보여준다. 독립 재검토에서는 clean clone으로 대표 질문 9개를 실제 실행했다. 별도 미커밋 UI 트랙도 브라우저로 확인했지만 제출 재현 범위에는 포함하지 않았다. 상세 질문별 관찰은 [독립 평가자 재검토](reports/v3/independent_evaluator_review_20260811.md)에 있다.
 
 ```powershell
 & 'C:\Users\kimdh\AppData\Local\Python\pythoncore-3.14-64\python.exe' `
@@ -399,7 +407,7 @@ Gradio 데모는 `legacy_experimental`과 `product_free_rag_v1`을 같은 질문
 
 ![Product Free RAG v1 로컬 Gradio 데모](docs/assets/product_free_rag_demo_20260806.png)
 
-문서 작성 직전 마지막 전체 v3 회귀 기록은 **1,488 passed / 2 failed / 67 subtests passed**다. 실패 두 건은 content-addressed manifest SHA를 의도적으로 동결한 기존 면제 항목이다. 미카엘라 보상 종류와 7월 월간 상품은 실제 Qwen3 8B까지 호출해 검증했으며, 현재 수치와 근거는 [Product 코퍼스 승격 결과](reports/v3/product_free_rag_corpus_promotion_20260811.md)에 보존했다.
+문서 작성 직전 clean clone의 전체 v3 회귀 기록은 **1,362 passed / 2 failed / 67 subtests passed**다. 실패 두 건은 기존 content-addressed manifest SHA 불일치다. 미카엘라 보상 종류와 7월 월간 상품은 실제 런타임까지 호출해 검증했으며, 코퍼스 승격 당시 수치와 근거는 [Product 코퍼스 승격 결과](reports/v3/product_free_rag_corpus_promotion_20260811.md)에 보존했다. 재검토 중 7월 상품 세로형 표에서 거래 타입 값을 판매가로도 노출한 false-full을 추가로 발견했고, 행 관계 결속 검사로 오답을 제거해 안전한 `partial`로 낮췄다.
 
 ## 12. 한계와 운영 계획
 
@@ -412,6 +420,10 @@ Gradio 데모는 `legacy_experimental`과 `product_free_rag_v1`을 같은 질문
 셋째, A6 32문항은 일반화를 주장하기에 작다. 같은 문항을 반복해서 튜닝하지 않고, 새로운 사람 검수 봉인 세트에서 정확도·false-full·overclaim·인용·지연을 다시 측정해야 한다.
 
 넷째, Product Free RAG는 현재 실험 경로이며 기본 제품 경로로 승격되지 않았다. 공식 sealed 20/32와 남은 실패를 기준선으로 보존한다.
+
+다섯째, 독립 재검토에서 out-of-domain 질문을 최종적으로 unsupported 처리하면서도 Qwen을 호출하는 비효율과, 모호한 보상 질문의 clarification 선택지에 주변 문서가 섞이는 UX 문제가 확인됐다. 안전성 실패로 계산하지는 않지만 서비스 전에는 선차단 비용과 선택지 정밀도를 별도로 개선해야 한다.
+
+여섯째, 세로형 표의 관계 오결속은 이번에 false-full을 `partial`로 차단했지만 질문한 모든 관계의 값을 올바른 행에서 복구하는 가용성 문제는 남아 있다. 차단 성공을 정답률 향상으로 과장하지 않는다.
 
 ### 12-2. 코퍼스 갱신을 실제로 시도한 기록
 
