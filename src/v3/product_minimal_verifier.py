@@ -120,6 +120,8 @@ _LOCATION_REQUEST = re.compile(r"(?:어디|위치|장소)")
 _LOCATION_EVIDENCE = re.compile(
     r"(?:NPC|위치|장소|(?:에서|에게)\s*(?:진행|이용|신청|변경))"
 )
+_COST_REQUEST = re.compile(r"(?:가격|비용)")
+_COST_EVIDENCE = re.compile(r"(?:가격|비용)")
 def _release_date_claim_present(claim_text: str) -> bool:
     return _semantic_release_date_claim_present(claim_text)
 _ABSENCE_CLAIM = re.compile(
@@ -212,6 +214,16 @@ def _semantic_question_relation_supported(
             bool(
                 _LOCATION_EVIDENCE.search(claim_surface)
                 and _LOCATION_EVIDENCE.search(evidence_surface)
+            )
+        )
+    if (
+        _COST_REQUEST.search(question_surface)
+        and len(explicit_question_clauses(question_surface)) <= 1
+    ):
+        relation_matches.append(
+            bool(
+                _COST_EVIDENCE.search(claim_surface)
+                and _COST_EVIDENCE.search(evidence_surface)
             )
         )
     return any(relation_matches) if relation_matches else None

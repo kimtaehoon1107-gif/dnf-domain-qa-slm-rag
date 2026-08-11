@@ -12,6 +12,7 @@ from src.v3.answer_target_router import (
 )
 from src.v3.product_question_semantics import (
     content_kind_requested,
+    cost_table_evidence_requested,
     evidence_complete_list_requested,
     release_date_priority_requested,
     release_date_surface_present,
@@ -45,7 +46,7 @@ _EXPLICIT_DATE = re.compile(
 _TOPIC_SUBJECT = re.compile(r"^(.{2,40}?)(?:은|는)\s+")
 _NOMINATIVE_SUBJECT = re.compile(r"^(.{1,36}?)(?:이|가)\s+")
 _QUESTION_ATTRIBUTE_NOUNS = frozenset(
-    {"방법", "비용", "위치", "기간", "조건", "재료"}
+    {"방법", "비용", "가격", "위치", "기간", "조건", "재료"}
 )
 _NUMBERED_LIST_ITEM = re.compile(
     r"^\s*(?:\d{1,2}[.)]|[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳])\s*"
@@ -758,7 +759,7 @@ def _short_numbered_list_units(
 def _table_label(lines: list[str]) -> str:
     for line in reversed(lines):
         stripped = line.strip().lstrip("#").strip()
-        if "비용" in stripped or "표" in stripped:
+        if "비용" in stripped or "가격" in stripped or "표" in stripped:
             return re.sub(
                 r"(?:은|는)\s*아래와\s*같습니다\.?$",
                 "",
@@ -888,11 +889,13 @@ def build_product_evidence_pack(
     else:
         query_subjects = [""] * len(queries)
 
-    table_requested = (
+    explicit_table_requested = (
         table_evidence_requested(question)
         or ("종류" in question and "한 종류" not in question)
         or sum("비용" in query for query in queries) >= 2
     )
+    cost_table_requested = cost_table_evidence_requested(question)
+    table_requested = explicit_table_requested or cost_table_requested
     if table_requested:
         table_units = _complete_table_units(
             candidate_chunk_ids,
@@ -912,6 +915,17 @@ def build_product_evidence_pack(
                     unit
                     for unit in table_units
                     if _kind_table_context_matches(query, unit)
+                    and (
+                        explicit_table_requested
+                        or cost_table_evidence_requested(
+                            " ".join(
+                                (
+                                    str(unit.get("table_label") or ""),
+                                    str(unit.get("context_text") or ""),
+                                )
+                            )
+                        )
+                    )
                 ),
                 key=lambda row, query=query, subject=subject: (
                     _requirement_score(

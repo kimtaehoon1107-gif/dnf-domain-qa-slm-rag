@@ -31,6 +31,7 @@ _NUMBERED_LIST_REQUEST_CUES = (
 )
 _SINGLE_LIST_REQUEST_CUES = ("한 가지", "하나만", "한 개")
 _TABLE_EVIDENCE_REQUEST_CUES = ("표", "전부", "전체", "목록")
+_COST_TABLE_REQUEST_CUES = ("가격", "비용")
 _EVIDENCE_COMPLETE_LIST_CUES = ("조건", "종류", "전부", "전체", "목록")
 _VERIFIED_COMPLETE_CUES = ("전부", "전체", "목록", "뭐뭐")
 _NATURAL_REWARD_ENUMERATION = re.compile(
@@ -103,6 +104,13 @@ def numbered_list_requested(question: str) -> bool:
 
 def table_evidence_requested(question: str) -> bool:
     return any(cue in question for cue in _TABLE_EVIDENCE_REQUEST_CUES)
+
+
+def cost_table_evidence_requested(question: str) -> bool:
+    """Return whether a cost relation may need a structured table."""
+
+    normalized = " ".join(str(question or "").split())
+    return any(cue in normalized for cue in _COST_TABLE_REQUEST_CUES)
 
 
 def evidence_complete_list_requested(question: str) -> bool:

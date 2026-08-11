@@ -5489,12 +5489,128 @@ def test_nominative_subject_excludes_generic_question_attribute():
     for question in (
         "장비 초월 방법이 궁금해",
         "장비 초월 비용이 궁금해",
+        "장비 초월 가격이 궁금해",
         "장비 초월 위치가 궁금해",
         "장비 초월 기간이 궁금해",
         "장비 초월 조건이 궁금해",
         "장비 초월 재료가 궁금해",
     ):
         assert explicit_nominative_question_subjects(question) == ["장비 초월"]
+
+
+def test_generic_price_question_uses_complete_cost_table_evidence():
+    table = (
+        "| 장비 종류 | 구분 | 레어리티별 소울 | 상급 원소 결정 | "
+        "순례의 인장 | 보이드 소울 |\n"
+        "| 특수장비 | 에픽 | 20 | 810 | 750 | 150 |\n"
+        "| 특수장비 | 레전더리 | 20 | 180 | 250 | 65 |\n"
+        "| 특수장비 | 유니크 | 40 | 36 | 25 | 1 |\n"
+        "| 특수장비 | 레어 | 50 | 9 | 13 | - |"
+    )
+    text = (
+        "획득 가능 보상 표\n"
+        "[TABLE]\n| 구분 | 보상 |\n| 기본 | 상자 |\n[/TABLE]\n"
+        "115Lv 장비 초월 비용은 아래와 같습니다.\n"
+        f"[TABLE]\n{table}\n[/TABLE]"
+    )
+    chunks = {
+        "cost": {
+            "chunk_id": "cost",
+            "parent_document_id": "guide",
+            "display_text": text,
+            "heading_path": ["NPC 장비 초월", "비용"],
+            "status": "current",
+        }
+    }
+    documents = {
+        "guide": {
+            "document_id": "guide",
+            "source_id": "dnf_game_guide",
+            "title": "초월",
+            "status": "current",
+        }
+    }
+
+    units = build_compact_product_evidence_pack(
+        ["cost"],
+        question="장비초월 가격이 궁금해",
+        requirement_queries=None,
+        chunks_by_id=chunks,
+        documents_by_id=documents,
+        temporal_by_document={},
+        max_units=8,
+    )
+
+    assert [unit["evidence_ref"] for unit in units] == ["T1"]
+    assert units[0]["complete"] is True
+    assert units[0]["table_label"] == "115Lv 장비 초월 비용"
+    prompt = build_product_prompt(
+        question="장비초월 가격이 궁금해",
+        evidence_units=units,
+    )
+    assert "완전한 4행 표" in prompt
+    assert "에픽 | 20 | 810" not in prompt
+
+    def fail_score_pairs(_pairs):
+        raise AssertionError("complete cost table must bypass atomic reranking")
+
+    atomic_units = build_atomic_reranked_product_evidence_pack(
+        ["cost"],
+        question="장비초월 가격이 궁금해",
+        requirement_queries=None,
+        chunks_by_id=chunks,
+        documents_by_id=documents,
+        temporal_by_document={},
+        score_pairs=fail_score_pairs,
+        max_units=8,
+    )
+    assert [unit["evidence_ref"] for unit in atomic_units] == ["T1"]
+
+    def fake_generator(*, prompt, model, timeout_seconds):
+        assert "완전한 4행 표" in prompt
+        assert "에픽 | 20 | 810" not in prompt
+        return {
+            "output": {
+                "mode": "answer",
+                "claims": [
+                    {
+                        "text": "115Lv 장비 초월 비용표입니다.",
+                        "evidence_refs": ["T1"],
+                    }
+                ],
+                "clarification": "",
+            },
+            "model": model,
+            "provider": "test",
+            "latency_ms": 1.0,
+            "usage": {
+                "input_tokens": 10,
+                "output_tokens": 5,
+                "total_tokens": 15,
+            },
+        }
+
+    result = answer_product_rag_from_candidates(
+        question="장비초월 가격이 궁금해",
+        requirement_queries=None,
+        requested_subjects=["장비초월"],
+        selected=[{"chunk_id": "cost", "parent_document_id": "guide"}],
+        chunks_by_id=chunks,
+        documents_by_id=documents,
+        temporal_by_document={},
+        model="test-model",
+        timeout_seconds=10,
+        generator=fake_generator,
+        evidence_units_override=atomic_units,
+    )
+
+    assert result["mode"] == "answer", (
+        result["rejected_claims"],
+        result["verification"],
+    )
+    assert result["claims"][0]["evidence_refs"] == ["T1"]
+    assert table in result["rendered_answer"]
+    assert result["claims"][0]["citations"][0]["text"] == table
 
 
 def test_method_and_location_paraphrases_accept_only_procedural_evidence():
@@ -5570,14 +5686,18 @@ def test_method_and_location_paraphrases_accept_only_procedural_evidence():
         )
         assert definition_result["claims"] == []
 
-    wrong_relation = verify(
+    for question in (
         "장비 초월 비용이 궁금해",
-        procedure,
-        "E1",
-        procedure_unit,
-        "procedure",
-    )
-    assert wrong_relation["claims"] == []
+        "장비 초월 가격이 궁금해",
+    ):
+        wrong_relation = verify(
+            question,
+            procedure,
+            "E1",
+            procedure_unit,
+            "procedure",
+        )
+        assert wrong_relation["claims"] == []
 
     for question, text in (
         (
@@ -5586,6 +5706,10 @@ def test_method_and_location_paraphrases_accept_only_procedural_evidence():
         ),
         (
             "장비 초월 비용이 궁금해",
+            "115Lv 장비 초월 비용은 100,000 골드입니다.",
+        ),
+        (
+            "장비 초월 가격이 궁금해",
             "115Lv 장비 초월 비용은 100,000 골드입니다.",
         ),
     ):
