@@ -382,7 +382,7 @@ PowerShell 전달 중 한글 질문이 `?`로 깨져 정상 파이프라인을 `
 
 ### 11-2. 재현 경계
 
-모델 없는 검증은 `python -m pytest tests/v3 -q`로 실행한다. 추적 파일만 받은 새 클론 `ecf7f6e`의 결과는 **1,365 passed / 2 failed / 67 subtests passed**이며, 두 실패는 동결된 content-addressed manifest SHA에 대한 기존 불일치다. 작업 폴더의 미추적 실험 테스트를 포함한 더 큰 숫자는 재현 수치에서 제외했다. 테스트는 생성 모델을 모킹하므로 GPU·Ollama·인터넷이 필요 없다. 코퍼스 스냅샷과 청크 ID 계약은 §3에, 레거시 v1/v2 재현 커맨드는 [별도 문서](docs/legacy_v1_v2_reproduction.md)에 분리했다.
+모델 없는 검증은 `python -m pytest tests/v3 -q`로 실행한다. 추적 파일만 받은 새 클론 `main`(`5891ca2`)의 결과는 **1,370 passed / 2 failed / 67 subtests passed**이며, 두 실패는 동결된 content-addressed manifest SHA에 대한 기존 불일치다. 작업 폴더의 미추적 실험 테스트를 포함한 더 큰 숫자는 재현 수치에서 제외했다. 테스트는 생성 모델을 모킹하므로 GPU·Ollama·인터넷이 필요 없다. 코퍼스 스냅샷과 청크 ID 계약은 §3에, 레거시 v1/v2 재현 커맨드는 [별도 문서](docs/legacy_v1_v2_reproduction.md)에 분리했다.
 
 Windows의 깊은 경로에서는 추적된 봉인 artifact 이름이 기본 경로 길이를 넘을 수 있다. 실제 OneDrive 하위 clone은 다음 두 줄로 통과했다.
 
@@ -393,7 +393,9 @@ git -C dnf-domain-qa-slm-rag config core.longpaths true
 
 ### 11-3. 로컬 데모
 
-Gradio 데모는 `legacy_experimental`과 `product_free_rag_v1`을 같은 질문으로 비교하고, 최종 답, 서버 복원 원문 인용, 검색 후보, 전체 JSON을 보여준다. 독립 재검토에서는 clean clone으로 대표 질문 9개를 실제 실행했다. 별도 미커밋 UI 트랙도 브라우저로 확인했지만 제출 재현 범위에는 포함하지 않았다. 상세 질문별 관찰은 [독립 평가자 재검토](reports/v3/independent_evaluator_review_20260811.md)에 있다.
+Gradio 데모는 `legacy_experimental`과 `product_free_rag_v1`을 같은 질문으로 비교하고, 최종 답, 서버 복원 원문 인용, 검색 후보, 전체 JSON을 보여준다. 독립 재검토에서는 clean clone으로 대표 질문 9개를 실제 실행했다. 상세 질문별 관찰은 [독립 평가자 재검토](reports/v3/independent_evaluator_review_20260811.md)에 있다.
+
+웹 데모(`app/product_free_rag_api.py` + `app/ui/`)도 별도로 커밋·병합됐다. 공식 출처 URL과 인용 원문을 카드로 보여주며, 고정 질문 10개(`data/v3/evaluation/demo_questions_20260811.jsonl`, 각 질문은 실행 전 커밋으로 고정)로 녹화한 화면은 [데모 영상](https://github.com/kimtaehoon1107-gif/dnf-domain-qa-slm-rag/releases/tag/demo-recording-20260812)에서 볼 수 있다. `answer`·`clarification`·`partial`·`unsupported` 네 가지 상태를 전부 포함했고, 잘 되는 사례만 고르지 않았다.
 
 ```powershell
 python app/product_free_rag_demo.py `
@@ -406,7 +408,7 @@ python app/product_free_rag_demo.py `
 
 ![Product Free RAG v1 로컬 Gradio 데모](docs/assets/product_free_rag_demo_20260806.png)
 
-최신 수정 `ecf7f6e`의 clean clone 전체 v3 회귀 기록은 **1,365 passed / 2 failed / 67 subtests passed**다. 실패 두 건은 기존 content-addressed manifest SHA 불일치다. 미카엘라 보상 종류와 7월 월간 상품은 실제 런타임까지 호출해 검증했으며, 코퍼스 승격 당시 수치와 근거는 [Product 코퍼스 승격 결과](reports/v3/product_free_rag_corpus_promotion_20260811.md)에 보존했다. 재검토 중 7월 상품 세로형 표에서 거래 타입 값을 판매가로도 노출한 false-full을 추가로 발견했고, 행 관계 결속 검사로 오답을 제거해 안전한 `partial`로 낮췄다.
+최신 수정 `5891ca2`(main)의 clean clone 전체 v3 회귀 기록은 **1,370 passed / 2 failed / 67 subtests passed**다. 실패 두 건은 기존 content-addressed manifest SHA 불일치다. 미카엘라 보상 종류와 7월 월간 상품은 실제 런타임까지 호출해 검증했으며, 코퍼스 승격 당시 수치와 근거는 [Product 코퍼스 승격 결과](reports/v3/product_free_rag_corpus_promotion_20260811.md)에 보존했다. 재검토 중 7월 상품 세로형 표에서 거래 타입 값을 판매가로도 노출한 false-full을 추가로 발견했고, 행 관계 결속 검사로 오답을 제거해 안전한 `partial`로 낮췄다.
 
 ## 12. 한계와 운영 계획
 
