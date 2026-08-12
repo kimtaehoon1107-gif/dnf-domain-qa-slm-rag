@@ -1834,6 +1834,264 @@ def test_product_verifier_prunes_overcitation_outside_explicit_policy_date():
     )
 
 
+def _minimality_unit(
+    evidence_ref,
+    text,
+    *,
+    title,
+    context_text,
+    parent_document_id,
+    valid_from="",
+    valid_to="",
+):
+    return {
+        "evidence_ref": evidence_ref,
+        "chunk_id": f"{parent_document_id}-{evidence_ref}",
+        "parent_document_id": parent_document_id,
+        "title": title,
+        "context_text": context_text,
+        "valid_from": valid_from,
+        "valid_to": valid_to,
+        "start_char": 0,
+        "end_char": len(text),
+        "text": text,
+        "complete": False,
+    }
+
+
+def test_product_verifier_minimizes_redundant_refs_after_condition_pruning():
+    current_title = "그릇된 신 미카엘라 이벤트 (2026-08-06 시작)"
+    units = [
+        _minimality_unit(
+            "E1",
+            "우편 보관 기간은 15일입니다.",
+            title="그릇된 신 미카엘라 이벤트 (2026-08-01 시작)",
+            context_text="이전 이벤트 안내",
+            parent_document_id="old-event-doc",
+            valid_from="2026-08-01",
+            valid_to="2026-08-05",
+        ),
+        *[
+            _minimality_unit(
+                evidence_ref,
+                text,
+                title=current_title,
+                context_text=context_text,
+                parent_document_id="current-event-doc",
+                valid_from="2026-08-06",
+                valid_to="2026-08-20",
+            )
+            for evidence_ref, context_text, text in (
+                (
+                    "E3",
+                    "이벤트 기간",
+                    "이벤트 기간은 2026년 8월 6일 점검 후부터 8월 20일 점검 전까지입니다.",
+                ),
+                ("E4", "이벤트 미션", "레이드 클리어 미션 보상을 받을 수 있습니다."),
+                ("E5", "적정 레벨", "적정 레벨 캐릭터로 참여할 수 있습니다."),
+                ("E6", "레이드 미션", "레이드 미션을 완료해 주세요."),
+                ("E7", "누적 보상", "누적 미션 보상이 지급됩니다."),
+                ("E8", "유의 사항", "보상은 계정귀속으로 지급됩니다."),
+            )
+        ],
+    ]
+
+    verified = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": "이벤트 기간은 2026년 8월 6일부터 8월 20일까지입니다.",
+                    "evidence_refs": ["E1", "E3", "E4", "E5", "E6", "E7", "E8"],
+                }
+            ],
+            "clarification": "",
+        },
+        question="2026-08-06 시작 미카엘라 이벤트 기간은 언제까지야?",
+        evidence_units=units,
+        chunks_by_id={
+            unit["chunk_id"]: {"display_text": unit["text"]} for unit in units
+        },
+    )
+
+    assert verified["mode"] == "answer"
+    assert verified["claims"][0]["evidence_refs"] == ["E3"]
+    assert [
+        citation["evidence_ref"] for citation in verified["claims"][0]["citations"]
+    ] == ["E3"]
+    assert verified["verification"]["pruned_evidence_refs"] == [
+        "E1",
+        "E4",
+        "E5",
+        "E6",
+        "E7",
+        "E8",
+    ]
+    assert verified["verification"]["rebound_evidence_refs"][-1] == {
+        "claim_index": 1,
+        "from": ["E3", "E4", "E5", "E6", "E7", "E8"],
+        "to": ["E3"],
+        "reason": "single_evidence_sufficient",
+    }
+
+
+def test_product_verifier_minimizes_normalized_numeric_spelling():
+    units = [
+        _minimality_unit(
+            "E1",
+            "최소 충전금액은 1만원입니다.",
+            title="Npay 7% 적립 이벤트",
+            context_text="충전 조건",
+            parent_document_id="npay-doc",
+        ),
+        _minimality_unit(
+            "E3",
+            "최대 적립액은 4천원입니다.",
+            title="Npay 7% 적립 이벤트",
+            context_text="최대 적립액",
+            parent_document_id="npay-doc",
+        ),
+    ]
+
+    verified = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": "최대 적립액은 4,000원입니다.",
+                    "evidence_refs": ["E1", "E3"],
+                }
+            ],
+            "clarification": "",
+        },
+        question="Npay 7% 적립 이벤트의 최대 적립액은 얼마였어?",
+        evidence_units=units,
+        chunks_by_id={
+            unit["chunk_id"]: {"display_text": unit["text"]} for unit in units
+        },
+    )
+
+    assert verified["mode"] == "answer"
+    assert verified["claims"][0]["evidence_refs"] == ["E3"]
+
+
+def test_product_verifier_preserves_many_complete_evidence_refs():
+    original_refs = [f"E{index}" for index in range(1, 13)]
+    units = [
+        {
+            **_minimality_unit(
+                evidence_ref,
+                "이벤트 기간은 2026년 8월 6일부터 8월 20일까지입니다.",
+                title="미카엘라 이벤트",
+                context_text="이벤트 기간",
+                parent_document_id="complete-event-doc",
+            ),
+            "complete": True,
+        }
+        for evidence_ref in original_refs
+    ]
+
+    verified = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": "이벤트 기간은 2026년 8월 6일부터 8월 20일까지입니다.",
+                    "evidence_refs": original_refs,
+                }
+            ],
+            "clarification": "",
+        },
+        question="미카엘라 이벤트 기간은 언제까지야?",
+        evidence_units=units,
+        chunks_by_id={
+            unit["chunk_id"]: {"display_text": unit["text"]} for unit in units
+        },
+    )
+
+    assert verified["mode"] == "answer"
+    assert verified["claims"][0]["evidence_refs"] == original_refs
+
+
+def test_product_verifier_preserves_refs_needed_for_multiple_values():
+    facts = [
+        ("E1", "별 단계 보상은 9회 달성 시 지급됩니다."),
+        ("E2", "성단 단계 보상은 19회 달성 시 지급됩니다."),
+        ("E3", "은하 단계 보상은 39회 달성 시 지급됩니다."),
+    ]
+    units = [
+        _minimality_unit(
+            evidence_ref,
+            text,
+            title="조율자의 저울 누적 보상",
+            context_text="단계별 보상 횟수",
+            parent_document_id="reward-doc",
+        )
+        for evidence_ref, text in facts
+    ]
+
+    verified = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": "별은 9회, 성단은 19회, 은하는 39회 달성 시 보상됩니다.",
+                    "evidence_refs": ["E1", "E2", "E3"],
+                }
+            ],
+            "clarification": "",
+        },
+        question="별, 성단, 은하 단계 보상은 각각 몇 회 달성해야 받아?",
+        evidence_units=units,
+        chunks_by_id={
+            unit["chunk_id"]: {"display_text": unit["text"]} for unit in units
+        },
+    )
+
+    assert verified["mode"] == "answer"
+    assert verified["claims"][0]["evidence_refs"] == ["E1", "E2", "E3"]
+    assert len(verified["claims"][0]["citations"]) == 3
+
+
+def test_product_verifier_preserves_refs_needed_for_two_text_fields():
+    facts = [
+        ("E1", "1. 서버/캐릭터명 :"),
+        ("E2", "2. 장착중인 칭호 :"),
+    ]
+    units = [
+        _minimality_unit(
+            evidence_ref,
+            text,
+            title="장착중인 칭호가 해제되지 않아요!",
+            context_text="1:1 문의 접수 정보",
+            parent_document_id="title-inquiry-doc",
+        )
+        for evidence_ref, text in facts
+    ]
+
+    verified = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": "문의에는 서버/캐릭터명과 장착중인 칭호를 적어야 합니다.",
+                    "evidence_refs": ["E1", "E2"],
+                }
+            ],
+            "clarification": "",
+        },
+        question="장착 칭호가 해제되지 않을 때 문의에 적어야 할 정보 두 가지는 뭐야?",
+        evidence_units=units,
+        chunks_by_id={
+            unit["chunk_id"]: {"display_text": unit["text"]} for unit in units
+        },
+    )
+
+    assert verified["mode"] == "answer"
+    assert verified["claims"][0]["evidence_refs"] == ["E1", "E2"]
+    assert len(verified["claims"][0]["citations"]) == 2
+
+
 def test_product_verifier_rejects_second_requirement_citing_price_row():
     trade_text = "| 거래타입 | 교환가능 |"
     price_text = "| 상점판매가격 | 4,000만 골드 |"

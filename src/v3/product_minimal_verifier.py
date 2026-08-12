@@ -1581,6 +1581,86 @@ def _replacement_evidence_for_claim(
     return str(best[4]), best[5], best[6]
 
 
+def _claim_evidence_surface_coverage(
+    claim_text: str,
+    selected_units: list[dict[str, Any]],
+) -> tuple[set[str], set[str]]:
+    normalized_claim = _normalize_scaled_number_units(claim_text)
+    normalized_evidence = _normalize_scaled_number_units(
+        " ".join(str(unit.get("text") or "") for unit in selected_units)
+    )
+    return (
+        _compact_tokens(normalized_claim)
+        & _compact_tokens(normalized_evidence),
+        _surface_fragments(normalized_claim)
+        & _surface_fragments(normalized_evidence),
+    )
+
+
+def _minimal_single_evidence_for_claim(
+    *,
+    question: str,
+    claim_text: str,
+    citations: list[dict[str, Any]],
+    selected_units: list[dict[str, Any]],
+    units_by_ref: dict[str, dict[str, Any]],
+    chunks_by_id: dict[str, dict[str, Any]],
+    requested_subjects: list[str],
+    enable_availability_comparison: bool,
+) -> tuple[str, dict[str, Any], dict[str, Any]] | None:
+    if len(citations) <= 1:
+        return None
+    if any(
+        unit.get("complete")
+        or unit.get("complete_list")
+        or unit.get("complete_category")
+        or unit.get("reward_kind_complete")
+        for unit in selected_units
+    ):
+        return None
+    replacement = _replacement_evidence_for_claim(
+        question=question,
+        claim_text=claim_text,
+        evidence_units=selected_units,
+        units_by_ref=units_by_ref,
+        chunks_by_id=chunks_by_id,
+        requested_subjects=requested_subjects,
+    )
+    if replacement is None:
+        return None
+    replacement_ref, replacement_citation, replacement_unit = replacement
+    if _claim_evidence_surface_coverage(
+        claim_text,
+        [replacement_unit],
+    ) != _claim_evidence_surface_coverage(claim_text, selected_units):
+        return None
+    trial = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": claim_text,
+                    "evidence_refs": [replacement_ref],
+                }
+            ],
+            "clarification": "",
+        },
+        question=question,
+        evidence_units=[replacement_unit],
+        chunks_by_id=chunks_by_id,
+        requested_subjects=requested_subjects,
+        enable_availability_comparison=enable_availability_comparison,
+        _enable_evidence_minimization=False,
+    )
+    if (
+        trial["rejected_claims"]
+        or len(trial["claims"]) != 1
+        or trial["claims"][0]["evidence_refs"] != [replacement_ref]
+    ):
+        return None
+    return replacement_ref, replacement_citation, replacement_unit
+
+
 def verify_product_claim_output(
     output: dict[str, Any],
     *,
@@ -1589,6 +1669,7 @@ def verify_product_claim_output(
     chunks_by_id: dict[str, dict[str, Any]],
     requested_subjects: list[str] | None = None,
     enable_availability_comparison: bool = False,
+    _enable_evidence_minimization: bool = True,
 ) -> dict[str, Any]:
     """Verify short product claims without validating every natural-language token."""
 
@@ -1921,6 +2002,40 @@ def verify_product_claim_output(
                 }
             )
             continue
+        if _enable_evidence_minimization:
+            minimized = _minimal_single_evidence_for_claim(
+                question=question,
+                claim_text=text,
+                citations=citations,
+                selected_units=selected_units,
+                units_by_ref=units_by_ref,
+                chunks_by_id=chunks_by_id,
+                requested_subjects=subjects,
+                enable_availability_comparison=(
+                    enable_availability_comparison
+                ),
+            )
+            if minimized is not None:
+                minimized_ref, minimized_citation, minimized_unit = minimized
+                prior_refs = list(dict.fromkeys(evidence_refs))
+                removed_refs = [
+                    evidence_ref
+                    for evidence_ref in prior_refs
+                    if evidence_ref != minimized_ref
+                ]
+                pruned_evidence_refs.update(removed_refs)
+                rebound_evidence_refs.append(
+                    {
+                        "claim_index": claim_index,
+                        "from": prior_refs,
+                        "to": [minimized_ref],
+                        "reason": "single_evidence_sufficient",
+                    }
+                )
+                evidence_refs = [minimized_ref]
+                citations = [minimized_citation]
+                selected_units = [minimized_unit]
+                evidence_context = _unit_evidence_context(minimized_unit)
         accepted.append(
             {
                 "_claim_index": claim_index,
