@@ -514,7 +514,50 @@
         color: #e7e1d6;
         line-height: 1.8;
         overflow-wrap: anywhere;
+      }
+
+      .answer-paragraph {
+        margin: 0 0 12px;
         white-space: pre-wrap;
+      }
+
+      .answer-paragraph:last-child {
+        margin-bottom: 0;
+      }
+
+      .answer-block-heading {
+        margin: 18px 0 8px;
+        color: var(--gold-bright);
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .answer-block-heading:first-child {
+        margin-top: 0;
+      }
+
+      .answer-table {
+        width: 100%;
+        margin: 4px 0 16px;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      .answer-table tr + tr {
+        border-top: 1px solid var(--panel-line);
+      }
+
+      .answer-table td {
+        padding: 7px 10px;
+        text-align: left;
+        vertical-align: top;
+        color: var(--text);
+      }
+
+      .answer-table td:first-child {
+        color: var(--muted);
+        width: 32%;
+        white-space: nowrap;
       }
 
       .answer-note {
@@ -720,6 +763,15 @@
         .answer-card {
           padding: 19px;
         }
+
+        .answer-table {
+          font-size: 12px;
+        }
+
+        .answer-table td:first-child {
+          width: auto;
+          white-space: normal;
+        }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -916,6 +968,7 @@
       const answerStatus = document.querySelector("#answerStatus");
       const answerTitle = document.querySelector("#answerTitle");
       const answerText = document.querySelector("#answerText");
+      let lastAnswerText = "";
       const copyAnswer = document.querySelector("#copyAnswer");
       const answerNote = document.querySelector("#answerNote");
       const citations = document.querySelector("#citations");
@@ -1226,6 +1279,77 @@
         });
       }
 
+      function isAnswerTableRow(line) {
+        const trimmed = line.trim();
+        return trimmed.length > 1 && trimmed.startsWith("|") && trimmed.endsWith("|");
+      }
+
+      function buildAnswerTable(tableLines) {
+        const table = document.createElement("table");
+        table.className = "answer-table";
+        const tbody = document.createElement("tbody");
+        tableLines.forEach((line) => {
+          const cells = line.trim().slice(1, -1).split("|").map((cell) => cell.trim());
+          const row = document.createElement("tr");
+          cells.forEach((cell) => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            row.append(td);
+          });
+          tbody.append(row);
+        });
+        table.append(tbody);
+        return table;
+      }
+
+      function renderAnswerBlock(container, lines) {
+        let paragraphBuffer = [];
+        const flushParagraph = () => {
+          if (!paragraphBuffer.length) return;
+          const p = document.createElement("p");
+          p.className = "answer-paragraph";
+          p.textContent = paragraphBuffer.join("\n");
+          container.append(p);
+          paragraphBuffer = [];
+        };
+
+        let i = 0;
+        while (i < lines.length) {
+          if (isAnswerTableRow(lines[i])) {
+            flushParagraph();
+            const tableLines = [];
+            while (i < lines.length && isAnswerTableRow(lines[i])) {
+              tableLines.push(lines[i]);
+              i += 1;
+            }
+            container.append(buildAnswerTable(tableLines));
+            continue;
+          }
+          if (lines[i].trim() !== "") paragraphBuffer.push(lines[i]);
+          i += 1;
+        }
+        flushParagraph();
+      }
+
+      function renderAnswerText(container, text) {
+        container.replaceChildren();
+        const trimmed = (text || "").trim();
+        if (!trimmed) return;
+
+        trimmed.split(/\n{2,}/).forEach((block) => {
+          const lines = block.split("\n");
+          let bodyLines = lines;
+          if (lines[0].startsWith("### ")) {
+            const heading = document.createElement("p");
+            heading.className = "answer-block-heading";
+            heading.textContent = lines[0].slice(4).trim();
+            container.append(heading);
+            bodyLines = lines.slice(1);
+          }
+          renderAnswerBlock(container, bodyLines);
+        });
+      }
+
       function renderResult(view) {
         const status = statusCopy[view.status] ? view.status : "error";
         const copy = statusCopy[status];
@@ -1235,7 +1359,8 @@
         answerStatus.dataset.status = status;
         answerStatus.textContent = copy.label;
         answerTitle.textContent = copy.title;
-        answerText.textContent = view.answer_text || copy.fallback;
+        lastAnswerText = view.answer_text || copy.fallback;
+        renderAnswerText(answerText, lastAnswerText);
         copyAnswer.hidden = !view.answer_text;
         copyAnswer.textContent = "답변 복사";
         answerNote.textContent = note;
@@ -1260,7 +1385,7 @@
       }
 
       copyAnswer.addEventListener("click", async () => {
-        const value = answerText.textContent.trim();
+        const value = lastAnswerText.trim();
         if (!value) return;
         try {
           await navigator.clipboard.writeText(value);
