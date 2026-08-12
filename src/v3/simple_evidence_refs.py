@@ -77,6 +77,7 @@ def _unit_metadata(
         "parent_document_id": str(chunk["parent_document_id"]),
         "source_id": document["source_id"],
         "title": document.get("title") or "",
+        "canonical_url": document.get("canonical_url") or "",
         "published_at": document.get("published_at"),
         "valid_from": temporal.get(
             "valid_from",
@@ -126,6 +127,7 @@ def build_simple_evidence_units(
                 "parent_document_id": parent_document_id,
                 "source_id": document["source_id"],
                 "title": document.get("title") or "",
+                "canonical_url": document.get("canonical_url") or "",
                 "published_at": document.get("published_at"),
                 "valid_from": temporal.get(
                     "valid_from",

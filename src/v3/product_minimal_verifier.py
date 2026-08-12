@@ -1315,6 +1315,12 @@ def _resolve_citations(
                 "end_char": end,
                 "text": source_text[start:end],
                 "title": str(unit.get("title") or ""),
+                "canonical_url": str(unit.get("canonical_url") or ""),
+                "source_id": str(unit.get("source_id") or ""),
+                "published_at": unit.get("published_at"),
+                "valid_from": unit.get("valid_from"),
+                "valid_to": unit.get("valid_to"),
+                "status": str(unit.get("status") or ""),
             }
         )
     return citations, failures, selected_units

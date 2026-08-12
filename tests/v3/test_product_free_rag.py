@@ -1132,6 +1132,12 @@ def test_product_verifier_accepts_two_grounded_claims_and_restores_coordinates()
         "end_char": len(chunks["diregie"]["display_text"]),
         "text": chunks["diregie"]["display_text"],
         "title": "검은 질병의 디레지에 레이드",
+        "canonical_url": "",
+        "source_id": "",
+        "published_at": None,
+        "valid_from": None,
+        "valid_to": None,
+        "status": "",
     }
 
 
@@ -5527,6 +5533,9 @@ def test_generic_price_question_uses_complete_cost_table_evidence():
             "document_id": "guide",
             "source_id": "dnf_game_guide",
             "title": "초월",
+            "canonical_url": "https://df.nexon.com/guide/dfguide/1",
+            "published_at": "2026-08-11T10:00:00+09:00",
+            "valid_from": "2026-08-11",
             "status": "current",
         }
     }
@@ -5610,7 +5619,13 @@ def test_generic_price_question_uses_complete_cost_table_evidence():
     )
     assert result["claims"][0]["evidence_refs"] == ["T1"]
     assert table in result["rendered_answer"]
-    assert result["claims"][0]["citations"][0]["text"] == table
+    citation = result["claims"][0]["citations"][0]
+    assert citation["text"] == table
+    assert citation["canonical_url"] == "https://df.nexon.com/guide/dfguide/1"
+    assert citation["source_id"] == "dnf_game_guide"
+    assert citation["published_at"] == "2026-08-11T10:00:00+09:00"
+    assert citation["valid_from"] == "2026-08-11"
+    assert citation["status"] == "current"
 
 
 def test_method_and_location_paraphrases_accept_only_procedural_evidence():
