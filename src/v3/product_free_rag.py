@@ -5,7 +5,6 @@ import json
 import os
 import re
 import time
-from calendar import monthrange
 from dataclasses import replace
 from datetime import date
 from itertools import permutations
@@ -13,13 +12,16 @@ from pathlib import Path
 from typing import Any, Callable, Literal
 from urllib.request import Request, urlopen
 
+from kiwipiepy import basic_typos
 from pydantic import BaseModel, ConfigDict, Field
 
 from src.io_utils import read_jsonl
+from src.v3.answer_target_router import _kiwi
 from src.v3.product_evidence_pack import (
     build_atomic_reranked_product_evidence_pack,
     build_compact_product_evidence_pack,
     build_product_evidence_pack,
+    content_kind_table_row_present,
     explicit_nominative_question_subjects,
     explicit_question_clauses,
     explicit_question_subjects,
@@ -27,6 +29,24 @@ from src.v3.product_evidence_pack import (
     product_model_evidence_payload,
 )
 from src.v3.product_minimal_verifier import verify_product_claim_output
+from src.v3.product_question_semantics import (
+    normalize_release_date_subjects,
+    numbered_list_requested,
+    release_date_requested,
+    release_date_surface_present,
+    release_relation_evidence_present,
+    rewrite_release_date_query,
+)
+from src.v3.product_reward_kind import (
+    build_reward_kind_reservation,
+    build_server_reward_kind_output,
+)
+from src.v3.product_table_comparison import (
+    build_server_availability_output,
+    build_server_content_kind_output,
+    build_table_comparison_reservation,
+    merge_table_comparison_reservation,
+)
 from src.v3.value_normalization import (
     boolean_value,
     currency_values,
@@ -42,6 +62,28 @@ DEFAULT_PARENT_LIMIT = 2
 DEFAULT_EVIDENCE_UNITS = 8
 DEFAULT_CONTEXT_TOKENS = 4096
 DEFAULT_OUTPUT_TOKENS = 768
+DEFAULT_PRODUCT_CHUNKS = Path(
+    "data/v3/chunks/"
+    "chunks_dnf_official_v3.1_"
+    "45030e5688ddcd3edc051ce383083248b13a0c6fcc85c3b9b1dae49d21f1dcd7.jsonl"
+)
+DEFAULT_PRODUCT_BM25_MANIFEST = Path(
+    "data/v3/indexes/"
+    "bm25_manifest_"
+    "9f1c64fef86a5599854ac6e52eec8b542c2b8333f6c8ddddea071976d7317aa7.json"
+)
+DEFAULT_PRODUCT_DENSE_MANIFEST = Path(
+    "data/v3/indexes/"
+    "dense_full_manifest_"
+    "00070b494293e4d2dd1737753956702167589c2536ec16f256569b2535983265.json"
+)
+DEFAULT_PRODUCT_RUNTIME_SNAPSHOT = Path(
+    "data/v3/runtime/product_free_rag_runtime_snapshot_20260807.json"
+)
+PREVIEW_SOURCE_NOTICE = (
+    "퍼스트 서버(테스트 서버) 기준 정보입니다. "
+    "라이브 서버 적용 시 변경될 수 있습니다."
+)
 GLOBAL_TEMPORAL_OVERLAY = Path(
     "data/v3/temporal/global_temporal_overlay_v3.2_"
     "f6e359dffae092f30e9129f76460bde17f01fd81165a063583095ea43a1fa317.jsonl"
@@ -61,12 +103,14 @@ clarification에서는 claims를 비우고 clarification에 사실값 없이 문
 질문에서 직접 요구한 정보만 답하고, 관련된 다른 조건을 추가하지 마세요.
 같은 대상의 다른 속성을 설명하는 근거는 사용하지 마세요. 질문한 행위나 속성을 근거가 직접 다루지 않으면 그 claim은 만들지 마세요.
 숫자와 기간 단위가 조건 안에 등장해도 이를 처리 기간으로 바꾸지 마세요. 근거가 처리·소요·완료에 걸리는 시간을 직접 말할 때만 처리 기간으로 답하세요.
+출시·오픈·추가된 날짜는 그 행위가 일어나는 날짜를 직접 말하는 근거만 사용하세요. 이벤트 기간이나 게시 날짜만으로 출시일을 추정하지 마세요.
 예·아니오 질문에서는 근거에 없는 질문 속 숫자·날짜 조건을 claim에 되풀이하지 말고, 근거가 지지하는 판단만 짧게 답하세요.
 질문 문장을 답으로 그대로 되풀이하지 마세요.
 근거가 충분한 claim만 작성하고, 근거가 없는 대상은 claim으로 만들지 마세요.
 모든 대상을 답하면 answer, 일부만 답하면 partial, 아무것도 답할 수 없으면 unsupported, 질문을 명확히 해야 하면 clarification입니다.
 각 claim에는 짧고 직접적인 text와 이를 지지하는 최소 evidence_refs만 넣으세요.
 횟수·수량·금액·비율·시각을 묻는 질문에서는 선택한 근거의 답 값을 claim text에 반드시 포함하세요.
+차이·비교 질문에서 근거가 비교 대상별 값을 제공하면 양쪽의 원문 값을 모두 쓰세요. 한쪽 값만 쓰거나 차이를 새로 계산하지 마세요.
 제공되지 않은 E번호, 원문 좌표, chunk ID는 출력하지 마세요.
 JSON 스키마 외에는 출력하지 마세요.
 """
@@ -84,23 +128,12 @@ _YEAR_MONTH = re.compile(
 _MONTH_DAY = re.compile(
     r"(?<!\d)(\d{1,2})\s*월\s*(\d{1,2})\s*일"
 )
+_BARE_MONTH = re.compile(r"(?<!\d)(\d{1,2})\s*월")
 _GENERIC_REQUEST_TAIL = re.compile(
     r"(?:에\s*대해\s*)?"
     r"(?:알려\s*줘|설명해\s*줘|뭐야|무엇이야)"
     r"[?？.\s]*$"
 )
-_NUMBERED_LIST_REQUEST_CUES = (
-    "조건",
-    "정보",
-    "목록",
-    "항목",
-    "종류",
-    "전부",
-    "전체",
-)
-_SINGLE_LIST_REQUEST_CUES = ("한 가지", "하나만", "한 개")
-
-
 class ProductClaim(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -257,6 +290,28 @@ def select_parent_diverse_candidates(
     return selected
 
 
+def _release_date_candidate_reservation(
+    question: str,
+    ranked: list[dict[str, Any]],
+    *,
+    chunks_by_id: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    if not release_date_requested(question):
+        return []
+    return [
+        row
+        for row in ranked
+        if (
+            release_date_surface_present(
+                str(chunks_by_id[str(row["chunk_id"])].get("display_text") or "")
+            )
+            and release_relation_evidence_present(
+                str(chunks_by_id[str(row["chunk_id"])].get("display_text") or "")
+            )
+        )
+    ]
+
+
 def select_required_parent_candidates(
     selected: list[dict[str, Any]],
     *,
@@ -293,6 +348,34 @@ def expand_evidence_candidate_chunk_ids(
         )
     )
     for parent_id in parent_ids:
+        parent_chunks = chunks_by_parent.get(parent_id, [])
+        content_kind_chunks = sorted(
+            (
+                chunk
+                for chunk in parent_chunks
+                if not chunk.get("review_required")
+                and content_kind_table_row_present(
+                    question,
+                    str(chunk.get("display_text") or ""),
+                )
+            ),
+            key=lambda chunk: (
+                int(chunk.get("chunk_index") or 0),
+                str(chunk["chunk_id"]),
+            ),
+        )
+        if content_kind_chunks:
+            if any(
+                str(chunk["chunk_id"]) in selected_ids
+                for chunk in content_kind_chunks
+            ):
+                continue
+            sibling = content_kind_chunks[0]
+            chunk_ids.append(str(sibling["chunk_id"]))
+            selected_ids.add(str(sibling["chunk_id"]))
+            if len(chunk_ids) >= max_chunks:
+                break
+            continue
         siblings = shortlist_document_chunks(
             question,
             [{"document_id": parent_id}],
@@ -337,17 +420,26 @@ def search_policy_for_product_question(
     else:
         year_month = _YEAR_MONTH.search(question)
         if year_month is not None:
-            year = int(year_month.group(1))
-            month = int(year_month.group(2))
-            as_of = date(
-                year,
-                month,
-                monthrange(year, month)[1],
-            ).isoformat()
+            return SearchPolicy(
+                default_exposure_only=False,
+                allowed_statuses=None,
+            )
         else:
             month_day = _MONTH_DAY.search(question)
             if month_day is None:
-                return SearchPolicy(as_of=default_as_of)
+                bare_month = _BARE_MONTH.search(question)
+                current = date.fromisoformat(default_as_of)
+                if bare_month is None:
+                    return SearchPolicy(as_of=default_as_of)
+                month = int(bare_month.group(1))
+                if not 1 <= month <= 12:
+                    return SearchPolicy(as_of=default_as_of)
+                if month >= current.month:
+                    return SearchPolicy(as_of=default_as_of)
+                return SearchPolicy(
+                    default_exposure_only=False,
+                    allowed_statuses=None,
+                )
             default_year = date.fromisoformat(default_as_of).year
             as_of = date(
                 default_year,
@@ -412,7 +504,37 @@ def normalize_product_question(question: str) -> str:
         " 제한",
         normalized,
     )
+    analyses = _kiwi().analyze(
+        normalized,
+        top_n=1,
+        typos=basic_typos,
+        typo_cost_threshold=1.0,
+    )
+    replacements = []
+    if analyses:
+        for token in analyses[0][0]:
+            start = int(token.start)
+            end = start + int(token.len)
+            replacement = str(token.form)
+            original = normalized[start:end]
+            if (
+                str(token.tag) == "NNG"
+                and 0 < float(token.typo_cost) <= 1.0
+                and len(original) == len(replacement)
+                and original != replacement
+            ):
+                replacements.append((start, end, replacement))
+    for start, end, replacement in reversed(replacements):
+        normalized = normalized[:start] + replacement + normalized[end:]
     return normalized
+
+
+def product_retrieval_query_variants(question: str) -> list[str]:
+    """Add small relation-level variants without domain-name aliases."""
+
+    normalized = normalize_product_question(question)
+    rewritten = rewrite_release_date_query(normalized)
+    return [rewritten] if rewritten is not None else []
 
 
 def _runtime_requirement_queries(
@@ -440,17 +562,14 @@ def _atomic_reserve_for_requirement_queries(
 
 
 def _should_render_complete_numbered_list(question: str) -> bool:
-    normalized = " ".join(str(question or "").split())
-    return (
-        any(cue in normalized for cue in _NUMBERED_LIST_REQUEST_CUES)
-        and not any(cue in normalized for cue in _SINGLE_LIST_REQUEST_CUES)
-    )
+    return numbered_list_requested(question)
 
 
 def build_product_prompt(
     *,
     question: str,
     evidence_units: list[dict[str, Any]],
+    require_distinct_comparison_rows: bool = False,
 ) -> str:
     payload = {
         "question": question,
@@ -458,8 +577,28 @@ def build_product_prompt(
             evidence_units
         ),
     }
+    comparison_contract = (
+        "추가 답변 계약: 서로 다른 비교표 행을 '해당 아이템'으로 "
+        "합치지 마세요. 각 행은 항목명을 포함한 하나의 별도 claim으로 "
+        "답하고, 그 claim 안에 두 비교축의 원문 값을 모두 쓰세요. "
+        "claim의 주어에는 각 행 첫 열의 항목명을 그대로 포함하세요. "
+        "두 값이 같아도 생략하지 말고, 질문하지 않은 다른 열의 값은 "
+        "쓰지 마세요. O/X/- 행은 각 축마다 '획득 가능' 또는 "
+        "'획득 불가'로 표현하세요.\n"
+        if require_distinct_comparison_rows
+        else ""
+    )
+    table_row_contract = (
+        "표 행 근거를 사용할 때 각 claim에 첫 번째 셀의 항목명을 "
+        "포함하세요. 같은 표의 여러 행을 '해당 장비'처럼 같은 "
+        "이름으로 합치지 마세요.\n"
+        if any(unit.get("unit_kind") == "table_row" for unit in evidence_units)
+        else ""
+    )
     return (
-        "다음 JSON의 question과 evidence_units만 사용해 답하세요.\n"
+        comparison_contract
+        + table_row_contract
+        + "다음 JSON의 question과 evidence_units만 사용해 답하세요.\n"
         + json.dumps(payload, ensure_ascii=False, indent=2)
     )
 
@@ -469,14 +608,35 @@ def build_product_coverage_prompt(
     question: str,
     question_requirements: list[dict[str, str]],
     evidence_units: list[dict[str, Any]],
+    require_distinct_comparison_rows: bool = False,
 ) -> str:
     payload = {
         "question": question,
         "question_requirements": question_requirements,
         "evidence_units": product_model_evidence_payload(evidence_units),
     }
+    comparison_contract = (
+        "추가 답변 계약: 서로 다른 비교표 행을 '해당 아이템'으로 "
+        "합치지 마세요. 각 행은 항목명을 포함한 하나의 별도 claim으로 "
+        "답하고, 그 claim 안에 두 비교축의 원문 값을 모두 쓰세요. "
+        "claim의 주어에는 각 행 첫 열의 항목명을 그대로 포함하세요. "
+        "두 값이 같아도 생략하지 말고, 질문하지 않은 다른 열의 값은 "
+        "쓰지 마세요. O/X/- 행은 각 축마다 '획득 가능' 또는 "
+        "'획득 불가'로 표현하세요.\n"
+        if require_distinct_comparison_rows
+        else ""
+    )
+    table_row_contract = (
+        "표 행 근거를 사용할 때 각 claim에 첫 번째 셀의 항목명을 "
+        "포함하세요. 같은 표의 여러 행을 '해당 장비'처럼 같은 "
+        "이름으로 합치지 마세요.\n"
+        if any(unit.get("unit_kind") == "table_row" for unit in evidence_units)
+        else ""
+    )
     return (
-        "다음 JSON의 question, question_requirements, evidence_units만 "
+        comparison_contract
+        + table_row_contract
+        + "다음 JSON의 question, question_requirements, evidence_units만 "
         "사용해 답하세요.\n"
         + json.dumps(payload, ensure_ascii=False, indent=2)
     )
@@ -510,8 +670,7 @@ def _snapshot_product_evidence_pack(
     snapshots = []
     for unit in evidence_units:
         chunk = chunks_by_id.get(str(unit.get("chunk_id") or ""), {})
-        snapshots.append(
-            {
+        snapshot = {
                 "ref": str(unit["evidence_ref"]),
                 "evidence_ref": str(unit["evidence_ref"]),
                 "candidate_ref": str(unit.get("candidate_ref") or ""),
@@ -541,7 +700,24 @@ def _snapshot_product_evidence_pack(
                 "complete": bool(unit.get("complete")),
                 "complete_list": bool(unit.get("complete_list")),
             }
-        )
+        if unit.get("complete_category"):
+            snapshot["complete_category"] = True
+        if unit.get("availability_subject") is not None:
+            snapshot["availability_subject"] = str(
+                unit["availability_subject"]
+            )
+        if unit.get("availability_values") is not None:
+            snapshot["availability_values"] = dict(
+                unit["availability_values"]
+            )
+        if unit.get("reward_kind_complete"):
+            snapshot["reward_kind_complete"] = True
+        if unit.get("reward_kind_groups") is not None:
+            snapshot["reward_kind_groups"] = {
+                str(group): [str(item) for item in items]
+                for group, items in unit["reward_kind_groups"].items()
+            }
+        snapshots.append(snapshot)
     return snapshots
 
 
@@ -847,6 +1023,7 @@ def _verify_product_coverage_claim_output(
     evidence_units: list[dict[str, Any]],
     chunks_by_id: dict[str, dict[str, Any]],
     requested_subjects: list[str] | None,
+    enable_availability_comparison: bool = False,
 ) -> dict[str, Any]:
     verified = verify_product_claim_output(
         output,
@@ -854,6 +1031,7 @@ def _verify_product_coverage_claim_output(
         evidence_units=evidence_units,
         chunks_by_id=chunks_by_id,
         requested_subjects=requested_subjects,
+        enable_availability_comparison=enable_availability_comparison,
     )
     if output["mode"] == "clarification" or not output["claims"]:
         return verified
@@ -881,6 +1059,7 @@ def _verify_product_coverage_claim_output(
             evidence_units=evidence_units,
             chunks_by_id=chunks_by_id,
             requested_subjects=None,
+            enable_availability_comparison=enable_availability_comparison,
         )
         accepted = bool(claim_verification["claims"])
         per_question_checks.append(
@@ -1535,6 +1714,10 @@ def answer_product_rag_from_candidates(
     generator: Callable[..., dict[str, Any]] | None = None,
     evidence_units_override: list[dict[str, Any]] | None = None,
     use_question_coverage_contract: bool = False,
+    enable_availability_comparison: bool = False,
+    use_server_availability_rendering: bool = False,
+    use_server_content_kind_rendering: bool = False,
+    use_server_reward_kind_rendering: bool = False,
 ) -> dict[str, Any]:
     started = time.perf_counter()
     candidate_chunk_ids = [str(row["chunk_id"]) for row in selected]
@@ -1575,13 +1758,56 @@ def answer_product_rag_from_candidates(
             max_units=DEFAULT_EVIDENCE_UNITS,
         )
     )
+    reward_kind_server_output = (
+        build_server_reward_kind_output(question, evidence_units)
+        if use_server_reward_kind_rendering
+        and not use_question_coverage_contract
+        else None
+    )
+    content_kind_server_output = (
+        build_server_content_kind_output(question, evidence_units)
+        if use_server_content_kind_rendering
+        and not use_question_coverage_contract
+        and reward_kind_server_output is None
+        else None
+    )
+    availability_server_output = (
+        build_server_availability_output(evidence_units)
+        if use_server_availability_rendering
+        and not use_question_coverage_contract
+        and content_kind_server_output is None
+        else None
+    )
+    server_output = (
+        reward_kind_server_output
+        or content_kind_server_output
+        or availability_server_output
+    )
+    server_rendering_kind = (
+        "reward_kind_v1"
+        if reward_kind_server_output is not None
+        else "content_kind_v1"
+        if content_kind_server_output is not None
+        else "availability_comparison_v1"
+        if availability_server_output is not None
+        else None
+    )
+    server_rendered = server_output is not None
     coverage_state = None
-    if use_question_coverage_contract:
+    generated = None
+    if server_rendered:
+        question_requirements = []
+        raw_model_output = copy.deepcopy(server_output)
+        generated_output = server_output
+    elif use_question_coverage_contract:
         question_requirements = build_product_question_requirements(question)
         prompt = build_product_coverage_prompt(
             question=question,
             question_requirements=question_requirements,
             evidence_units=evidence_units,
+            require_distinct_comparison_rows=(
+                enable_availability_comparison
+            ),
         )
         generate = generator or generate_product_coverage_output_native
     else:
@@ -1589,15 +1815,19 @@ def answer_product_rag_from_candidates(
         prompt = build_product_prompt(
             question=question,
             evidence_units=evidence_units,
+            require_distinct_comparison_rows=(
+                enable_availability_comparison
+            ),
         )
         generate = generator or generate_product_output_native
-    generated = generate(
-        prompt=prompt,
-        model=model,
-        timeout_seconds=timeout_seconds,
-    )
-    raw_model_output = copy.deepcopy(generated["output"])
-    generated_output = generated["output"]
+    if not server_rendered:
+        generated = generate(
+            prompt=prompt,
+            model=model,
+            timeout_seconds=timeout_seconds,
+        )
+        raw_model_output = copy.deepcopy(generated["output"])
+        generated_output = generated["output"]
     if use_question_coverage_contract:
         generated_output, coverage_state = _prepare_product_coverage_output(
             generated_output,
@@ -1610,6 +1840,7 @@ def answer_product_rag_from_candidates(
             evidence_units=evidence_units,
             chunks_by_id=chunks_by_id,
             requested_subjects=requested_subjects,
+            enable_availability_comparison=enable_availability_comparison,
         )
     else:
         verified = _verify_product_coverage_claim_output(
@@ -1619,6 +1850,7 @@ def answer_product_rag_from_candidates(
             evidence_units=evidence_units,
             chunks_by_id=chunks_by_id,
             requested_subjects=requested_subjects,
+            enable_availability_comparison=enable_availability_comparison,
         )
     unique_claims = []
     seen_claim_texts = set()
@@ -1633,6 +1865,39 @@ def answer_product_rag_from_candidates(
         str(unit["evidence_ref"]): unit
         for unit in evidence_units
     }
+    complete_category_refs = {
+        evidence_ref
+        for evidence_ref, unit in units_by_ref.items()
+        if unit.get("complete_category")
+        and content_kind_table_row_present(
+            question,
+            str(unit.get("text") or ""),
+        )
+    }
+    if complete_category_refs and any(
+        complete_category_refs & set(claim["evidence_refs"])
+        for claim in verified["claims"]
+    ):
+        original_claims = verified["claims"]
+        verified["claims"] = [
+            claim
+            for claim in original_claims
+            if complete_category_refs & set(claim["evidence_refs"])
+        ]
+        verified["rejected_claims"].extend(
+            {
+                "claim_index": index,
+                "text": claim["text"],
+                "evidence_refs": claim["evidence_refs"],
+                "reasons": ["outside_complete_category"],
+            }
+            for index, claim in enumerate(original_claims, 1)
+            if not complete_category_refs & set(claim["evidence_refs"])
+        )
+        if len(verified["claims"]) != len(original_claims):
+            verified["verification"][
+                "raw_output_passed_without_sanitization"
+            ] = False
     cross_parent_clarification = _cross_parent_clarification(
         question=question,
         claims=verified["claims"],
@@ -1724,7 +1989,48 @@ def answer_product_rag_from_candidates(
             coverage_state=coverage_state,
             evidence_units=evidence_units,
         )
-    rendered_parts = []
+    selected_by_chunk_id = {
+        str(row.get("chunk_id") or ""): row
+        for row in selected
+    }
+    preview_evidence_refs = []
+    for claim in verified["claims"]:
+        for evidence_ref in claim["evidence_refs"]:
+            unit = units_by_ref.get(evidence_ref)
+            if unit is None:
+                continue
+            chunk_id = str(unit.get("chunk_id") or "")
+            chunk = chunks_by_id.get(chunk_id, {})
+            parent_document_id = str(
+                unit.get("parent_document_id")
+                or chunk.get("parent_document_id")
+                or ""
+            )
+            document = documents_by_id.get(parent_document_id, {})
+            source_kind = str(
+                chunk.get("source_kind")
+                or document.get("source_kind")
+                or selected_by_chunk_id.get(chunk_id, {}).get("source_kind")
+                or unit.get("source_kind")
+                or ""
+            ).strip()
+            if (
+                source_kind == "preview_patch"
+                and evidence_ref not in preview_evidence_refs
+            ):
+                preview_evidence_refs.append(evidence_ref)
+    preview_notice_required = bool(preview_evidence_refs)
+    verified["verification"].update(
+        {
+            "preview_source_notice_required": preview_notice_required,
+            "preview_evidence_refs": preview_evidence_refs,
+        }
+    )
+    rendered_parts = (
+        [PREVIEW_SOURCE_NOTICE]
+        if preview_notice_required
+        else []
+    )
     rendered_list_refs = set()
     render_complete_lists = _should_render_complete_numbered_list(question)
     for claim in verified["claims"]:
@@ -1765,6 +2071,9 @@ def answer_product_rag_from_candidates(
         "question": question,
         **verified,
         "rendered_answer": "\n\n".join(rendered_parts),
+        "preview_source_notice": (
+            PREVIEW_SOURCE_NOTICE if preview_notice_required else ""
+        ),
         "candidates": [
             {
                 "candidate_ref": str(index),
@@ -1784,10 +2093,19 @@ def answer_product_rag_from_candidates(
             chunks_by_id=chunks_by_id,
         ),
         "raw_model_output": raw_model_output,
-        "generation": {
-            key: value
-            for key, value in generated.items()
-            if key != "output"
+        "generation": (
+            {
+                key: value
+                for key, value in generated.items()
+                if key != "output"
+            }
+            if generated is not None
+            else None
+        ),
+        "server_rendering": {
+            "used": server_rendered,
+            "renderer": server_rendering_kind,
+            "claim_count": len(server_output["claims"]) if server_output else 0,
         },
         "latency_ms": round(
             (time.perf_counter() - started) * 1000,
@@ -1996,8 +2314,16 @@ class ProductFreeRAG:
         use_identity_shortlist: bool = False,
         use_compact_evidence_pack: bool = False,
         use_atomic_evidence_reranker: bool = False,
+        use_table_comparison_reservation: bool = False,
+        use_server_availability_rendering: bool = False,
+        use_server_content_kind_rendering: bool = False,
+        use_server_reward_kind_rendering: bool = False,
         handoff_cuda_to_generation: bool = False,
         use_requirement_fanout: bool = False,
+        chunks_path: Path | None = None,
+        bm25_manifest_path: Path | None = None,
+        dense_manifest_path: Path | None = None,
+        metadata_snapshot_path: Path | None = None,
     ) -> None:
         self.root = root.resolve()
         self.model = model
@@ -2010,8 +2336,67 @@ class ProductFreeRAG:
                 "atomic evidence reranking requires the compact evidence pack"
             )
         self.use_atomic_evidence_reranker = use_atomic_evidence_reranker
+        if (
+            use_table_comparison_reservation
+            and not use_atomic_evidence_reranker
+        ):
+            raise ValueError(
+                "table comparison reservation requires atomic evidence reranking"
+            )
+        self.use_table_comparison_reservation = (
+            use_table_comparison_reservation
+        )
+        if (
+            use_server_availability_rendering
+            and not use_table_comparison_reservation
+        ):
+            raise ValueError(
+                "server availability rendering requires table comparison "
+                "reservation"
+            )
+        self.use_server_availability_rendering = (
+            use_server_availability_rendering
+        )
+        self.use_server_content_kind_rendering = (
+            use_server_content_kind_rendering
+        )
+        self.use_server_reward_kind_rendering = (
+            use_server_reward_kind_rendering
+        )
         self.handoff_cuda_to_generation = handoff_cuda_to_generation
         self.use_requirement_fanout = use_requirement_fanout
+        runtime_paths = (
+            chunks_path,
+            bm25_manifest_path,
+            dense_manifest_path,
+        )
+        if any(path is not None for path in runtime_paths) and not all(
+            path is not None for path in runtime_paths
+        ):
+            raise ValueError(
+                "chunks_path, bm25_manifest_path, and dense_manifest_path "
+                "must be provided together"
+            )
+        self.chunks_path = (
+            Path(chunks_path)
+            if chunks_path is not None
+            else DEFAULT_PRODUCT_CHUNKS
+        )
+        self.bm25_manifest_path = (
+            Path(bm25_manifest_path)
+            if bm25_manifest_path is not None
+            else DEFAULT_PRODUCT_BM25_MANIFEST
+        )
+        self.dense_manifest_path = (
+            Path(dense_manifest_path)
+            if dense_manifest_path is not None
+            else DEFAULT_PRODUCT_DENSE_MANIFEST
+        )
+        self.metadata_snapshot_path = (
+            Path(metadata_snapshot_path)
+            if metadata_snapshot_path is not None
+            else DEFAULT_PRODUCT_RUNTIME_SNAPSHOT
+        )
         self.temporal_by_document = {
             row["document_id"]: row
             for row in read_jsonl(self.root / GLOBAL_TEMPORAL_OVERLAY)
@@ -2037,7 +2422,32 @@ class ProductFreeRAG:
             MODEL_REVISION,
         )
 
-        self._artifacts = load_runtime_artifacts(self.root)
+        if self.chunks_path is None:
+            self._artifacts = load_runtime_artifacts(self.root)
+        else:
+            manifest_path = self.bm25_manifest_path
+            resolved_manifest = (
+                manifest_path
+                if manifest_path.is_absolute()
+                else self.root / manifest_path
+            )
+            manifest = json.loads(resolved_manifest.read_text(encoding="utf-8"))
+            document_inputs = [
+                row
+                for row in manifest.get("inputs", [])
+                if row.get("role") == "document_v3"
+            ]
+            if len(document_inputs) != 1 or not document_inputs[0].get("path"):
+                raise RuntimeError(
+                    "BM25 manifest must contain exactly one document_v3 input"
+                )
+            self._artifacts = load_runtime_artifacts(
+                self.root,
+                bm25_manifest_path=self.bm25_manifest_path,
+                dense_manifest_path=self.dense_manifest_path,
+                chunks_path=self.chunks_path,
+                documents_path=Path(document_inputs[0]["path"]),
+            )
         device = self.device or (
             "cuda" if torch.cuda.is_available() else "cpu"
         )
@@ -2060,6 +2470,30 @@ class ProductFreeRAG:
         self.device = device
         self._np = np
         self._torch = torch
+
+    def preinitialize_retrieval(self) -> dict[str, Any]:
+        """Prepare Kiwi and retrieval models without searching or calling Qwen."""
+
+        started = time.perf_counter()
+        already_initialized = (
+            self._artifacts is not None
+            and not self._retrieval_models_offloaded
+        )
+        kiwi_started = time.perf_counter()
+        kiwi_independent_requirement_queries("사전 초기화를 확인합니다.")
+        kiwi_ms = (time.perf_counter() - kiwi_started) * 1000
+        retrieval_started = time.perf_counter()
+        self._initialize()
+        self._ensure_retrieval_models_on_device()
+        retrieval_ms = (time.perf_counter() - retrieval_started) * 1000
+        return {
+            "already_initialized": already_initialized,
+            "qwen_called": False,
+            "device": self.device,
+            "kiwi_initialization_ms": round(kiwi_ms, 3),
+            "retrieval_initialization_ms": round(retrieval_ms, 3),
+            "total_ms": round((time.perf_counter() - started) * 1000, 3),
+        }
 
     def _ensure_retrieval_models_on_device(self) -> None:
         if not self._retrieval_models_offloaded:
@@ -2291,6 +2725,7 @@ class ProductFreeRAG:
             normalized,
             requirement_queries,
         )
+        relation_queries = product_retrieval_query_variants(normalized)
         queries = list(
             dict.fromkeys(
                 [
@@ -2300,6 +2735,7 @@ class ProductFreeRAG:
                         for query in effective_requirement_queries
                         if query.strip()
                     ),
+                    *relation_queries,
                 ]
             )
         )
@@ -2311,9 +2747,10 @@ class ProductFreeRAG:
                 latency_breakdown=latency_breakdown,
             )
         searched = time.perf_counter()
+        policy_reference_date = default_as_of or date.today().isoformat()
         policy = search_policy_for_product_question(
             normalized,
-            default_as_of=default_as_of or date.today().isoformat(),
+            default_as_of=policy_reference_date,
         )
         union_by_chunk: dict[str, dict[str, Any]] = {}
         for query_index, (query, embedding) in enumerate(
@@ -2355,11 +2792,14 @@ class ProductFreeRAG:
                 normalized,
                 documents_by_id=self._artifacts.documents_by_id,
                 chunks_by_parent=chunks_by_parent,
+                policy=policy,
+                reference_date=policy_reference_date,
             )
             shortlisted_chunks = shortlist_document_chunks(
                 normalized,
                 shortlisted_documents,
                 chunks_by_parent=chunks_by_parent,
+                policy=policy,
             )
             for chunk in shortlisted_chunks:
                 chunk_id = str(chunk["chunk_id"])
@@ -2379,25 +2819,38 @@ class ProductFreeRAG:
                 time.perf_counter() - searched
             ) * 1000
         reranked = time.perf_counter()
+        reranker_queries = list(
+            dict.fromkeys([normalized, *relation_queries])
+        )
         self.record_cuda_memory_diagnostic(
             "after_retrieval_before_reranker",
             diagnostics_hook,
             details={
                 "query_count": len(queries),
                 "retrieval_union_count": len(union),
-                "reranker_pair_count": len(union),
+                "reranker_pair_count": len(union) * len(reranker_queries),
             },
         )
         pairs = [
             (
-                normalized,
+                reranker_query,
                 self._artifacts.chunks_by_id[row["chunk_id"]][
                     "retrieval_text"
                 ],
             )
             for row in union
+            for reranker_query in reranker_queries
         ]
-        scores = self._score_pairs(pairs)
+        pair_scores = self._score_pairs(pairs)
+        scores = [
+            max(
+                pair_scores[
+                    index * len(reranker_queries) :
+                    (index + 1) * len(reranker_queries)
+                ]
+            )
+            for index in range(len(union))
+        ]
         self.record_cuda_memory_diagnostic(
             "after_retrieval_reranker",
             diagnostics_hook,
@@ -2421,10 +2874,15 @@ class ProductFreeRAG:
             latency_breakdown["candidate_rerank_ms"] += (
                 time.perf_counter() - reranked
             ) * 1000
+        release_date_candidates = _release_date_candidate_reservation(
+            normalized,
+            ranked,
+            chunks_by_id=self._artifacts.chunks_by_id,
+        )
         if self.use_identity_shortlist:
             from src.v3.product_candidate_identity import reserve_then_fill
 
-            reserved = []
+            reserved = [release_date_candidates] if release_date_candidates else []
             for document in shortlisted_documents:
                 parent_id = str(document["document_id"])
                 candidates = [
@@ -2435,6 +2893,10 @@ class ProductFreeRAG:
                 if candidates:
                     reserved.append([candidates[0]])
             return reserve_then_fill(reserved, ranked)
+        if release_date_candidates:
+            from src.v3.product_candidate_identity import reserve_then_fill
+
+            return reserve_then_fill([release_date_candidates], ranked)
         return select_parent_diverse_candidates(ranked)
 
     def _answer_metadata(
@@ -2465,8 +2927,45 @@ class ProductFreeRAG:
             if self._metadata_snapshot is None:
                 self._metadata_snapshot = load_metadata_freshness_snapshot(
                     root=self.root,
-                    snapshot_path=DEFAULT_RUNTIME_SNAPSHOT,
+                    snapshot_path=(
+                        self.metadata_snapshot_path
+                        or DEFAULT_RUNTIME_SNAPSHOT
+                    ),
                 )
+                if self.chunks_path is not None:
+                    configured_paths = {
+                        "chunks": self.chunks_path,
+                        "bm25_manifest": self.bm25_manifest_path,
+                        "dense_manifest": self.dense_manifest_path,
+                    }
+                    snapshot_paths = {
+                        str(row.get("role") or ""): Path(
+                            str(row.get("path") or "")
+                        )
+                        for row in self._metadata_snapshot["artifacts"]
+                    }
+                    mismatches = []
+                    for role, configured_path in configured_paths.items():
+                        assert configured_path is not None
+                        snapshot_path = snapshot_paths.get(role)
+                        configured_resolved = (
+                            configured_path
+                            if configured_path.is_absolute()
+                            else self.root / configured_path
+                        ).resolve()
+                        snapshot_resolved = (
+                            snapshot_path
+                            if snapshot_path is not None
+                            and snapshot_path.is_absolute()
+                            else self.root / (snapshot_path or Path())
+                        ).resolve()
+                        if configured_resolved != snapshot_resolved:
+                            mismatches.append(role)
+                    if mismatches:
+                        raise RuntimeError(
+                            "Metadata snapshot differs from active retrieval "
+                            "runtime: " + ", ".join(mismatches)
+                        )
             freshness = resolve_metadata_freshness(
                 source_id=plan.source_id,
                 requested_as_of=requested_as_of,
@@ -2696,12 +3195,21 @@ class ProductFreeRAG:
             requirement_queries,
         )
         effective_requirement_queries = resolved_requirement_queries or None
+        evidence_requirement_queries = list(
+            dict.fromkeys(
+                [
+                    *product_retrieval_query_variants(normalized),
+                    *resolved_requirement_queries,
+                ]
+            )
+        ) or None
         atomic_reserve_per_query = _atomic_reserve_for_requirement_queries(
             resolved_requirement_queries
         )
-        effective_subjects = (
+        effective_subjects = normalize_release_date_subjects(
+            normalized,
             requested_subjects
-            or explicit_nominative_question_subjects(normalized)
+            or explicit_nominative_question_subjects(normalized),
         )
         latency_breakdown["question_normalize_ms"] = (
             time.perf_counter() - started
@@ -2787,6 +3295,22 @@ class ProductFreeRAG:
                 "atomic_evidence_reranker": (
                     self.use_atomic_evidence_reranker
                 ),
+                "table_comparison_reservation": (
+                    self.use_table_comparison_reservation
+                ),
+                "table_comparison_direct_only": False,
+                "server_availability_rendering": (
+                    self.use_server_availability_rendering
+                ),
+                "server_availability_rendering_used": False,
+                "server_content_kind_rendering": (
+                    self.use_server_content_kind_rendering
+                ),
+                "server_content_kind_rendering_used": False,
+                "server_reward_kind_rendering": (
+                    self.use_server_reward_kind_rendering
+                ),
+                "server_reward_kind_rendering_used": False,
                 "cuda_model_handoff": self.handoff_cuda_to_generation,
                 "question_coverage_contract": (
                     use_question_coverage_contract
@@ -2802,19 +3326,26 @@ class ProductFreeRAG:
             )
             return result
         evidence_units_override = None
+        table_comparison_direct_only = False
+        reward_kind_direct_only = False
         evidence_candidate_chunk_count = len(selected)
         evidence_started = time.perf_counter()
         if self.use_compact_evidence_pack:
             candidate_chunk_ids = [
                 str(row["chunk_id"]) for row in selected
             ]
-            if self.use_identity_shortlist:
-                chunks_by_parent: dict[str, list[dict[str, Any]]] = {}
+            chunks_by_parent: dict[str, list[dict[str, Any]]] = {}
+            if (
+                self.use_identity_shortlist
+                or self.use_table_comparison_reservation
+                or self.use_server_reward_kind_rendering
+            ):
                 for chunk in self._artifacts.chunks_by_id.values():
                     chunks_by_parent.setdefault(
                         str(chunk["parent_document_id"]),
                         [],
                     ).append(chunk)
+            if self.use_identity_shortlist:
                 candidate_chunk_ids = expand_evidence_candidate_chunk_ids(
                     normalized,
                     selected,
@@ -2826,7 +3357,7 @@ class ProductFreeRAG:
                     build_atomic_reranked_product_evidence_pack(
                         candidate_chunk_ids,
                         question=normalized,
-                        requirement_queries=effective_requirement_queries,
+                        requirement_queries=evidence_requirement_queries,
                         chunks_by_id=self._artifacts.chunks_by_id,
                         documents_by_id=self._artifacts.documents_by_id,
                         temporal_by_document=self.temporal_by_document,
@@ -2840,12 +3371,65 @@ class ProductFreeRAG:
                 evidence_units_override = build_compact_product_evidence_pack(
                     candidate_chunk_ids,
                     question=normalized,
-                    requirement_queries=effective_requirement_queries,
+                    requirement_queries=evidence_requirement_queries,
                     chunks_by_id=self._artifacts.chunks_by_id,
                     documents_by_id=self._artifacts.documents_by_id,
                     temporal_by_document=self.temporal_by_document,
                     max_units=DEFAULT_EVIDENCE_UNITS,
                 )
+            direct_parent_ids = list(
+                dict.fromkeys(
+                    str(
+                        self._artifacts.chunks_by_id[chunk_id][
+                            "parent_document_id"
+                        ]
+                    )
+                    for chunk_id in candidate_chunk_ids
+                )
+            )
+            if self.use_server_reward_kind_rendering:
+                reward_kind_units = build_reward_kind_reservation(
+                    normalized,
+                    parent_ids=direct_parent_ids,
+                    chunks_by_parent=chunks_by_parent,
+                    documents_by_id=self._artifacts.documents_by_id,
+                    temporal_by_document=self.temporal_by_document,
+                    max_fragments=DEFAULT_EVIDENCE_UNITS,
+                )
+                if reward_kind_units:
+                    evidence_units_override = reward_kind_units
+                    reward_kind_direct_only = True
+            if (
+                self.use_table_comparison_reservation
+                and not reward_kind_direct_only
+            ):
+                comparison_parent_ids = list(
+                    dict.fromkeys(
+                        str(
+                            self._artifacts.chunks_by_id[chunk_id][
+                                "parent_document_id"
+                            ]
+                        )
+                        for chunk_id in candidate_chunk_ids
+                    )
+                )
+                reserved_units = build_table_comparison_reservation(
+                    normalized,
+                    parent_ids=comparison_parent_ids,
+                    chunks_by_parent=chunks_by_parent,
+                    documents_by_id=self._artifacts.documents_by_id,
+                    temporal_by_document=self.temporal_by_document,
+                    score_pairs=self._score_pairs,
+                )
+                if reserved_units:
+                    evidence_units_override = (
+                        merge_table_comparison_reservation(
+                            reserved_units,
+                            [],
+                            max_units=DEFAULT_EVIDENCE_UNITS,
+                        )
+                    )
+                    table_comparison_direct_only = True
         self.record_cuda_memory_diagnostic(
             "after_evidence_reranker",
             diagnostics_hook,
@@ -2858,7 +3442,30 @@ class ProductFreeRAG:
             "before_handoff",
             diagnostics_hook,
         )
-        self._handoff_cuda_models_to_generation()
+        server_availability_rendering = bool(
+            self.use_server_availability_rendering
+            and table_comparison_direct_only
+            and not use_question_coverage_contract
+            and build_server_availability_output(
+                evidence_units_override or []
+            )
+            is not None
+        )
+        server_reward_kind_rendering = bool(
+            self.use_server_reward_kind_rendering
+            and reward_kind_direct_only
+            and not use_question_coverage_contract
+            and build_server_reward_kind_output(
+                normalized,
+                evidence_units_override or [],
+            )
+            is not None
+        )
+        if not (
+            server_availability_rendering
+            or server_reward_kind_rendering
+        ):
+            self._handoff_cuda_models_to_generation()
         self.record_cuda_memory_diagnostic(
             "after_handoff",
             diagnostics_hook,
@@ -2879,6 +3486,18 @@ class ProductFreeRAG:
             timeout_seconds=self.timeout,
             evidence_units_override=evidence_units_override,
             use_question_coverage_contract=use_question_coverage_contract,
+            enable_availability_comparison=(
+                table_comparison_direct_only
+            ),
+            use_server_availability_rendering=(
+                server_availability_rendering
+            ),
+            use_server_content_kind_rendering=(
+                self.use_server_content_kind_rendering
+            ),
+            use_server_reward_kind_rendering=(
+                server_reward_kind_rendering
+            ),
         )
         answer_stage_ms = (time.perf_counter() - answer_started) * 1000
         latency_breakdown["generation_ms"] = float(
@@ -2915,6 +3534,31 @@ class ProductFreeRAG:
             "identity_shortlist": self.use_identity_shortlist,
             "compact_evidence_pack": self.use_compact_evidence_pack,
             "atomic_evidence_reranker": self.use_atomic_evidence_reranker,
+            "table_comparison_reservation": (
+                self.use_table_comparison_reservation
+            ),
+            "table_comparison_direct_only": table_comparison_direct_only,
+            "server_availability_rendering": (
+                self.use_server_availability_rendering
+            ),
+            "server_availability_rendering_used": bool(
+                result.get("server_rendering", {}).get("renderer")
+                == "availability_comparison_v1"
+            ),
+            "server_content_kind_rendering": (
+                self.use_server_content_kind_rendering
+            ),
+            "server_content_kind_rendering_used": (
+                result.get("server_rendering", {}).get("renderer")
+                == "content_kind_v1"
+            ),
+            "server_reward_kind_rendering": (
+                self.use_server_reward_kind_rendering
+            ),
+            "server_reward_kind_rendering_used": (
+                result.get("server_rendering", {}).get("renderer")
+                == "reward_kind_v1"
+            ),
             "atomic_prefilter_per_query": (
                 32 if self.use_atomic_evidence_reranker else None
             ),

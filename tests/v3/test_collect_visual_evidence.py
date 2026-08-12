@@ -326,6 +326,7 @@ class CollectVisualEvidenceTest(unittest.TestCase):
                 "ledger_path": input_paths[1],
                 "hardened_preview_path": input_paths[2],
                 "hardening_manifest_path": input_paths[3],
+                "normalization_candidates_before_visual": 7,
                 "evidence_dir": root / "evidence",
                 "report_dir": root / "reports",
             }
@@ -336,6 +337,7 @@ class CollectVisualEvidenceTest(unittest.TestCase):
             self.assertEqual(first, second)
             self.assertEqual(first["visual_evidence_decision"], "GO")
             self.assertEqual(first["document_v3_promotion_decision"], "GO")
+            self.assertEqual(first["summary"]["normalization_candidates_after_visual"], 8)
             self.assertEqual(file_sha256(Path(first["manifest_path"])), first["manifest_sha256"])
 
 

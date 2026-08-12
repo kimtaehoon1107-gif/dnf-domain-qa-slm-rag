@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>아라드 기록 보관소 UI 미리보기</title>
+    <title>아라드 기록 보관소</title>
     <style>
       @font-face {
         font-family: "DNFBitBit";
@@ -126,6 +126,41 @@
         border-radius: 999px;
         color: var(--gold-bright);
         font-size: 11px;
+      }
+
+      .header-badges {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 7px;
+      }
+
+      .connection-status {
+        flex: none;
+        padding: 6px 9px;
+        border: 1px solid #3a3e48;
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .connection-status[data-state="ready"] {
+        color: var(--verified);
+        border-color: rgb(125 173 133 / 38%);
+      }
+
+      .connection-status[data-state="offline"] {
+        color: var(--danger);
+        border-color: rgb(198 106 98 / 38%);
+      }
+
+      .document-basis {
+        flex: none;
+        padding: 6px 9px;
+        border: 1px solid rgb(202 167 95 / 24%);
+        border-radius: 999px;
+        color: #b9a982;
+        font-size: 10px;
       }
 
       .page {
@@ -426,19 +461,106 @@
         box-shadow: 0 0 10px currentColor;
       }
 
+      .status[data-status="partial"],
+      .status[data-status="clarification"] {
+        color: var(--gold-bright);
+      }
+
+      .status[data-status="unsupported"] {
+        color: var(--muted);
+      }
+
+      .status[data-status="error"] {
+        color: var(--danger);
+      }
+
       .answer-title {
-        margin: 0 0 10px;
+        margin: 0;
         font-size: 22px;
         font-weight: 400;
+      }
+
+      .answer-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      .copy-answer {
+        flex: none;
+        padding: 6px 9px;
+        border: 1px solid #454956;
+        border-radius: 7px;
+        color: var(--muted);
+        background: #121722;
+        font: inherit;
+        font-size: 11px;
+        cursor: pointer;
+      }
+
+      .copy-answer:hover {
+        color: var(--gold-bright);
+        border-color: var(--gold-dark);
+      }
+
+      .copy-answer[hidden] {
+        display: none;
       }
 
       .answer-text {
         margin: 0;
         color: #e7e1d6;
         line-height: 1.8;
+        overflow-wrap: anywhere;
       }
 
-      .mock-note {
+      .answer-paragraph {
+        margin: 0 0 12px;
+        white-space: pre-wrap;
+      }
+
+      .answer-paragraph:last-child {
+        margin-bottom: 0;
+      }
+
+      .answer-block-heading {
+        margin: 18px 0 8px;
+        color: var(--gold-bright);
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .answer-block-heading:first-child {
+        margin-top: 0;
+      }
+
+      .answer-table {
+        width: 100%;
+        margin: 4px 0 16px;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      .answer-table tr + tr {
+        border-top: 1px solid var(--panel-line);
+      }
+
+      .answer-table td {
+        padding: 7px 10px;
+        text-align: left;
+        vertical-align: top;
+        color: var(--text);
+      }
+
+      .answer-table td:first-child {
+        color: var(--muted);
+        width: 32%;
+        white-space: nowrap;
+      }
+
+      .answer-note {
         margin: 14px 0 0;
         padding: 9px 11px;
         color: #9b968e;
@@ -446,6 +568,43 @@
         border-left: 2px solid var(--gold-dark);
         font-size: 11px;
         line-height: 1.6;
+      }
+
+      .answer-note[data-status="partial"] {
+        color: #d8c38f;
+        background: #171612;
+        border-left-color: var(--gold-bright);
+      }
+
+      .clarification-options {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border: 1px solid #343844;
+        border-radius: 10px;
+        background: #10141c;
+      }
+
+      .clarification-options p {
+        margin: 0 0 8px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .option-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .option-list li {
+        padding: 6px 9px;
+        border: 1px solid var(--gold-dark);
+        border-radius: 999px;
+        color: var(--gold-bright);
+        font-size: 11px;
       }
 
       .citations {
@@ -466,10 +625,36 @@
       }
 
       .citation summary {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 8px 14px;
         padding: 12px 14px;
         color: var(--gold-bright);
         cursor: pointer;
         font-size: 13px;
+      }
+
+      .citation-summary-label {
+        min-width: 0;
+      }
+
+      .citation-summary-url {
+        display: block;
+        width: min(430px, 42vw);
+        max-width: 430px;
+        overflow: hidden;
+        color: #aebbc8;
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 10px;
+        font-weight: 400;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .citation-summary-url:hover {
+        color: var(--gold-bright);
+        text-decoration: underline;
       }
 
       .citation-body {
@@ -482,12 +667,56 @@
         font-size: 13px;
       }
 
+      .citation-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 10px;
+        margin: 0 0 9px;
+        color: var(--faint);
+        font-size: 10px;
+      }
+
       .citation-quote {
         margin: 0;
         padding-left: 11px;
         color: var(--muted);
         border-left: 2px solid #4c4334;
         font-size: 12px;
+        line-height: 1.65;
+      }
+
+      .citation-quote + .citation-quote {
+        margin-top: 10px;
+      }
+
+      .citation-link {
+        display: inline-flex;
+        margin-top: 11px;
+        color: var(--gold-bright);
+        font-size: 11px;
+        text-decoration: none;
+      }
+
+      .citation-link:hover {
+        text-decoration: underline;
+      }
+
+      .run-details {
+        margin-top: 17px;
+        padding-top: 14px;
+        border-top: 1px solid #323039;
+        color: var(--faint);
+        font-size: 11px;
+      }
+
+      .run-details summary {
+        width: fit-content;
+        cursor: pointer;
+      }
+
+      .run-summary {
+        margin: 9px 0 0;
+        color: var(--muted);
         line-height: 1.65;
       }
 
@@ -512,6 +741,10 @@
           display: none;
         }
 
+        .unofficial {
+          display: none;
+        }
+
         .query-row {
           display: block;
         }
@@ -529,6 +762,15 @@
         .loading-card,
         .answer-card {
           padding: 19px;
+        }
+
+        .answer-table {
+          font-size: 12px;
+        }
+
+        .answer-table td:first-child {
+          width: auto;
+          white-space: normal;
         }
       }
 
@@ -558,7 +800,13 @@
             <p class="brand-subtitle">공식 문서 기반 답변 · 인용 근거 제공</p>
           </div>
         </div>
-        <span class="unofficial">비공식 프로젝트</span>
+        <div class="header-badges">
+          <span class="document-basis" id="documentBasis" hidden></span>
+          <span class="connection-status" id="connectionStatus" data-state="checking">
+            API 확인 중
+          </span>
+          <span class="unofficial">비공식 프로젝트</span>
+        </div>
       </div>
     </header>
 
@@ -599,37 +847,31 @@
         </section>
 
         <article class="answer-card" id="answerCard" hidden>
-          <div class="status">공식 기록에서 확인됨</div>
-          <h2 class="answer-title bitbit">기록 답변</h2>
-          <p class="answer-text">
-            이 영역에는 실제 파이프라인이 공식 문서에서 확인한 답변이 표시됩니다.
-            답변에 사용된 근거는 아래 기록 카드에서 원문 그대로 확인할 수 있습니다.
-          </p>
-          <p class="mock-note">
-            현재는 디자인 확인용 mock입니다. 실제 수치와 답변은 API 연결 후
-            파이프라인 결과로 교체됩니다.
-          </p>
-
-          <div class="citations">
-            <details class="citation" open>
-              <summary>기록 근거 1</summary>
-              <div class="citation-body">
-                <p class="citation-title">공식 문서 제목이 표시되는 영역</p>
-                <blockquote class="citation-quote">
-                  실제 답변을 뒷받침하는 공식 문서의 인용 원문이 이곳에 표시됩니다.
-                </blockquote>
-              </div>
-            </details>
-            <details class="citation">
-              <summary>기록 근거 2</summary>
-              <div class="citation-body">
-                <p class="citation-title">추가 공식 문서</p>
-                <blockquote class="citation-quote">
-                  복수 근거가 있을 때 두 번째 원문을 별도 카드로 확인합니다.
-                </blockquote>
-              </div>
-            </details>
+          <div class="status" id="answerStatus" data-status="answer">
+            공식 기록에서 확인됨
           </div>
+          <div class="answer-heading">
+            <h2 class="answer-title bitbit" id="answerTitle">기록 답변</h2>
+            <button class="copy-answer" id="copyAnswer" type="button" hidden>
+              답변 복사
+            </button>
+          </div>
+          <div class="answer-text" id="answerText"></div>
+          <p class="answer-note" id="answerNote" hidden></p>
+
+          <div class="clarification-options" id="clarificationOptions" hidden>
+            <p>질문에 포함할 대상을 골라 다시 입력해 주세요.</p>
+            <ul class="option-list" id="optionList"></ul>
+          </div>
+
+          <div class="citations" id="citations" hidden>
+            <div id="citationList"></div>
+          </div>
+
+          <details class="run-details" id="runDetails">
+            <summary>실행 정보</summary>
+            <p class="run-summary" id="runSummary"></p>
+          </details>
         </article>
       </section>
 
@@ -669,6 +911,47 @@
     </main>
 
     <script>
+      const statusCopy = {
+        answer: {
+          label: "공식 기록에서 확인됨",
+          title: "기록 답변",
+          fallback: "",
+          note: "",
+        },
+        partial: {
+          label: "공식 기록에서 일부 확인됨",
+          title: "확인된 기록 답변",
+          fallback: "확인된 범위의 답변을 만들지 못했습니다.",
+          note: "공식 근거로 확인되지 않은 부분은 답변에서 제외했습니다.",
+        },
+        clarification: {
+          label: "질문 대상 확인 필요",
+          title: "추가 확인이 필요합니다",
+          fallback: "질문의 대상을 조금 더 구체적으로 입력해 주세요.",
+          note: "현재 녹화용 연결은 단일 질문 방식입니다. 대상을 포함해 다시 질문해 주세요.",
+        },
+        unsupported: {
+          label: "공식 근거 부족",
+          title: "확인하지 못했습니다",
+          fallback: "공식 문서에서 검증 가능한 근거를 찾지 못했습니다.",
+          note: "근거가 부족한 내용은 추측해서 답하지 않습니다.",
+        },
+        error: {
+          label: "실행 오류",
+          title: "답변을 불러오지 못했습니다",
+          fallback: "로컬 API 또는 모델 실행 상태를 확인해 주세요.",
+          note: "잠시 후 다시 시도하거나 서버 상태를 확인해 주세요.",
+        },
+      };
+      const loadingStages = {
+        queued: { range: [0, 0.06], label: "질문을 전달하고 있습니다…" },
+        retrieval: { range: [0.06, 0.32], label: "책장에서 관련 기록을 찾고 있습니다…" },
+        rerank: { range: [0.32, 0.48], label: "찾은 기록을 비교하고 있습니다…" },
+        evidence: { range: [0.48, 0.62], label: "인용할 페이지를 펼치고 있습니다…" },
+        generation: { range: [0.62, 0.96], label: "답변을 작성하고 있습니다…" },
+        complete: { range: [1, 1], label: "필요한 기록을 찾았습니다." },
+      };
+
       const form = document.querySelector("#questionForm");
       const question = document.querySelector("#question");
       const counter = document.querySelector("#counter");
@@ -682,30 +965,39 @@
       const loadingCopy = document.querySelector("#loadingCopy");
       const searcherSprite = document.querySelector("#searcherSprite");
       const answerCard = document.querySelector("#answerCard");
+      const answerStatus = document.querySelector("#answerStatus");
+      const answerTitle = document.querySelector("#answerTitle");
+      const answerText = document.querySelector("#answerText");
+      let lastAnswerText = "";
+      const copyAnswer = document.querySelector("#copyAnswer");
+      const answerNote = document.querySelector("#answerNote");
+      const citations = document.querySelector("#citations");
+      const citationList = document.querySelector("#citationList");
+      const clarificationOptions = document.querySelector("#clarificationOptions");
+      const optionList = document.querySelector("#optionList");
+      const runSummary = document.querySelector("#runSummary");
+      const connectionStatus = document.querySelector("#connectionStatus");
+      const documentBasis = document.querySelector("#documentBasis");
       const searchFrameSources = Array.from(
         { length: 4 },
         (_, index) =>
           `assets/mikaela_search_frames/mikaela_search_${String(index).padStart(2, "0")}.png?v=1`,
       );
+
+      let currentProgress = 0;
+      let targetProgress = 0;
+      let loaderFrame = 0;
+      let loaderStartedAt = 0;
+      let lastLoaderTime = 0;
+      let loaderActive = false;
+      let loaderDrivenExternally = false;
+      let lastSearchFrame = -1;
+      let requestInFlight = false;
+
       searchFrameSources.forEach((source) => {
         const frame = new Image();
         frame.src = source;
       });
-      const loadingStages = {
-        queued: { range: [0, 0.06], label: "질문을 준비하고 있습니다…" },
-        retrieval: { range: [0.06, 0.32], label: "책장에서 관련 기록을 찾고 있습니다…" },
-        rerank: { range: [0.32, 0.48], label: "찾은 기록을 비교하고 있습니다…" },
-        evidence: { range: [0.48, 0.62], label: "인용할 페이지를 펼치고 있습니다…" },
-        generation: { range: [0.62, 0.96], label: "답변을 작성하고 있습니다…" },
-        complete: { range: [1, 1], label: "필요한 기록을 찾았습니다." },
-      };
-      let currentProgress = 0;
-      let targetProgress = 0;
-      let loaderFrame = 0;
-      let lastLoaderTime = 0;
-      let loaderActive = false;
-      let lastSearchFrame = -1;
-      let responseTimers = [];
 
       function updateCounter() {
         counter.textContent = `${question.value.length}/500`;
@@ -752,12 +1044,14 @@
       function animateLoader(now) {
         if (!loaderActive) return;
 
-        const deltaSeconds = Math.min((now - lastLoaderTime) / 1000, 0.05);
-        const gap = targetProgress - currentProgress;
-        const response = 2.2 + Math.min(4.8, Math.abs(gap) * 7);
-
-        currentProgress += gap * (1 - Math.exp(-response * deltaSeconds));
-        if (Math.abs(gap) < 0.0005) currentProgress = targetProgress;
+        if (loaderDrivenExternally) {
+          const deltaSeconds = Math.min((now - lastLoaderTime) / 1000, 0.05);
+          const gap = targetProgress - currentProgress;
+          currentProgress += gap * (1 - Math.exp(-4.2 * deltaSeconds));
+        } else {
+          const cycle = ((now - loaderStartedAt) % 3600) / 3600;
+          currentProgress = cycle * 0.86;
+        }
 
         renderLoader();
         lastLoaderTime = now;
@@ -769,7 +1063,11 @@
         currentProgress = 0;
         targetProgress = 0;
         loaderActive = true;
-        lastLoaderTime = performance.now();
+        loaderDrivenExternally = false;
+        loaderStartedAt = performance.now();
+        lastLoaderTime = loaderStartedAt;
+        lastSearchFrame = -1;
+        loadingCopy.textContent = "관련 기록을 찾고 답변을 검증하고 있습니다…";
         renderLoader();
         loaderFrame = window.requestAnimationFrame(animateLoader);
       }
@@ -779,7 +1077,15 @@
         window.cancelAnimationFrame(loaderFrame);
       }
 
+      function completeLoader() {
+        stopLoader();
+        currentProgress = 1;
+        loadingCopy.textContent = loadingStages.complete.label;
+        renderLoader();
+      }
+
       function setLoadingProgress(value) {
+        loaderDrivenExternally = true;
         const normalized = Math.min(1, Math.max(0, Number(value) || 0));
         targetProgress = Math.max(targetProgress, normalized);
       }
@@ -794,52 +1100,321 @@
         setLoadingProgress(start + (end - start) * stageFraction);
       }
 
-      // API 연결 시 파이프라인 이벤트에서 이 두 함수를 호출하면 된다.
       window.setLoadingProgress = setLoadingProgress;
       window.setLoadingStage = setLoadingStage;
       loadingTrack.dataset.progressApi = "ready";
 
-      function clearMockTimeline() {
-        responseTimers.forEach(window.clearTimeout);
-        responseTimers = [];
+      function delay(milliseconds) {
+        return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
       }
 
-      function scheduleMockTimeline() {
-        const milestones = [
-          [0, "queued", 0],
-          [180, "retrieval", 0.2],
-          [480, "retrieval", 0.72],
-          [820, "rerank", 0.15],
-          [1100, "rerank", 0.8],
-          [1370, "evidence", 0.3],
-          [1660, "evidence", 0.85],
-          [1880, "generation", 0.08],
-          [2180, "generation", 0.35],
-          [2460, "generation", 0.62],
-          [2740, "generation", 0.82],
-          [3000, "generation", 0.96],
-          [3200, "complete", 1],
-        ];
+      function formatSeconds(value) {
+        const seconds = Number(value) || 0;
+        return `${seconds.toFixed(2)}초`;
+      }
 
-        milestones.forEach(([delay, stage, fraction]) => {
-          responseTimers.push(
-            window.setTimeout(() => setLoadingStage(stage, fraction), delay),
-          );
+      function documentDate(item) {
+        const value = item.published_at || item.valid_from || "";
+        return String(value).slice(0, 10);
+      }
+
+      function documentStatus(value) {
+        return {
+          current: "현재 문서",
+          upcoming: "예정 문서",
+          expired: "종료 문서",
+          superseded: "이전 문서",
+          unknown: "상태 미확인",
+        }[value] || "";
+      }
+
+      function sourceLabel(value) {
+        return {
+          dnf_game_guide: "게임가이드",
+          dnf_faq: "FAQ",
+          dnf_update: "업데이트",
+          dnf_notice: "공지사항",
+          dnf_event: "이벤트",
+          dnf_account_policy: "운영정책",
+          dnf_monthly_item: "이달의 아이템",
+          dnf_seria_shop: "세리아 상점",
+        }[value] || "던파 공식 문서";
+      }
+
+      function groupCitations(items) {
+        const groups = [];
+        const groupsByKey = new Map();
+
+        items.forEach((item, index) => {
+          const key = item.canonical_url
+            ? `url:${item.canonical_url}`
+            : `citation:${item.locator_id || item.evidence_ref || index}`;
+          let group = groupsByKey.get(key);
+          if (!group) {
+            group = {
+              ...item,
+              evidence_refs: [],
+              quotes: [],
+            };
+            groupsByKey.set(key, group);
+            groups.push(group);
+          }
+          if (
+            item.evidence_ref &&
+            !group.evidence_refs.includes(item.evidence_ref)
+          ) {
+            group.evidence_refs.push(item.evidence_ref);
+          }
+          group.quotes.push({
+            evidence_ref: item.evidence_ref || "",
+            text: item.text || "",
+          });
         });
 
-        responseTimers.push(
-          window.setTimeout(() => {
-            loadingCard.hidden = true;
-            answerCard.hidden = false;
-            submitButton.disabled = false;
-            submitButton.textContent = "기록 검색";
-            stopLoader();
-          }, 3900),
-        );
+        return groups;
       }
 
-      function runMockSearch(value) {
-        clearMockTimeline();
+      function renderCitations(items) {
+        const groupedItems = groupCitations(items);
+        citationList.replaceChildren();
+        citations.hidden = !groupedItems.length;
+
+        groupedItems.forEach((item, index) => {
+          const details = document.createElement("details");
+          details.className = "citation";
+          details.open = index === 0;
+
+          const summary = document.createElement("summary");
+          const evidenceRef = item.evidence_refs.length
+            ? ` · ${item.evidence_refs.join(", ")}`
+            : "";
+          const summaryLabel = document.createElement("span");
+          summaryLabel.className = "citation-summary-label";
+          summaryLabel.textContent = `기록 근거 ${index + 1}${evidenceRef}`;
+          summary.append(summaryLabel);
+
+          if (item.canonical_url) {
+            const summaryLink = document.createElement("a");
+            summaryLink.className = "citation-summary-url";
+            summaryLink.href = item.canonical_url;
+            summaryLink.target = "_blank";
+            summaryLink.rel = "noopener noreferrer";
+            summaryLink.textContent = item.canonical_url;
+            summaryLink.title = `공식 출처: ${item.canonical_url}`;
+            summaryLink.addEventListener("click", (event) => {
+              event.stopPropagation();
+            });
+            summary.append(summaryLink);
+          }
+
+          const body = document.createElement("div");
+          body.className = "citation-body";
+
+          const title = document.createElement("p");
+          title.className = "citation-title";
+          title.textContent = item.title || "문서 제목 정보 없음";
+
+          const meta = document.createElement("p");
+          meta.className = "citation-meta";
+          const metaItems = [
+            sourceLabel(item.source_id),
+            documentDate(item),
+            documentStatus(item.status),
+          ].filter(Boolean);
+          meta.textContent = metaItems.join(" · ");
+          meta.hidden = !metaItems.length;
+
+          body.append(title, meta);
+          item.quotes.forEach((quoteItem) => {
+            const quote = document.createElement("blockquote");
+            quote.className = "citation-quote";
+            const quoteRef = quoteItem.evidence_ref
+              ? `[${quoteItem.evidence_ref}] `
+              : "";
+            quote.textContent = `${quoteRef}${
+              quoteItem.text || "인용 원문이 제공되지 않았습니다."
+            }`;
+            body.append(quote);
+          });
+          if (item.canonical_url) {
+            const link = document.createElement("a");
+            link.className = "citation-link";
+            link.href = item.canonical_url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = "던파 공식 문서에서 확인 ↗";
+            body.append(link);
+          }
+          details.append(summary, body);
+          citationList.append(details);
+        });
+
+        return groupedItems.length;
+      }
+
+      function resultNote(view, status, copy, errorMessage) {
+        if (errorMessage) return errorMessage;
+        if (status !== "partial") return copy.note;
+
+        const verified = Number(view.verified_claim_count) || 0;
+        const rejected = Number(view.rejected_claim_count) || 0;
+        if (!verified && !rejected) return copy.note;
+
+        const verifiedCopy = `검증된 주장 ${verified}개만 표시했습니다.`;
+        const rejectedCopy = rejected
+          ? ` 공식 근거로 검증되지 않은 주장 ${rejected}개는 답변에서 제외했습니다.`
+          : "";
+        return `${verifiedCopy}${rejectedCopy}`;
+      }
+
+      function renderOptions(items) {
+        optionList.replaceChildren();
+        clarificationOptions.hidden = !items.length;
+
+        items.forEach((item) => {
+          const option = document.createElement("li");
+          const optionId = item.option_id ? `${item.option_id} · ` : "";
+          option.textContent = `${optionId}${item.title || "대상 정보 없음"}`;
+          optionList.append(option);
+        });
+      }
+
+      function isAnswerTableRow(line) {
+        const trimmed = line.trim();
+        return trimmed.length > 1 && trimmed.startsWith("|") && trimmed.endsWith("|");
+      }
+
+      function buildAnswerTable(tableLines) {
+        const table = document.createElement("table");
+        table.className = "answer-table";
+        const tbody = document.createElement("tbody");
+        tableLines.forEach((line) => {
+          const cells = line.trim().slice(1, -1).split("|").map((cell) => cell.trim());
+          const row = document.createElement("tr");
+          cells.forEach((cell) => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            row.append(td);
+          });
+          tbody.append(row);
+        });
+        table.append(tbody);
+        return table;
+      }
+
+      function renderAnswerBlock(container, lines) {
+        let paragraphBuffer = [];
+        const flushParagraph = () => {
+          if (!paragraphBuffer.length) return;
+          const p = document.createElement("p");
+          p.className = "answer-paragraph";
+          p.textContent = paragraphBuffer.join("\n");
+          container.append(p);
+          paragraphBuffer = [];
+        };
+
+        let i = 0;
+        while (i < lines.length) {
+          if (isAnswerTableRow(lines[i])) {
+            flushParagraph();
+            const tableLines = [];
+            while (i < lines.length && isAnswerTableRow(lines[i])) {
+              tableLines.push(lines[i]);
+              i += 1;
+            }
+            container.append(buildAnswerTable(tableLines));
+            continue;
+          }
+          if (lines[i].trim() !== "") paragraphBuffer.push(lines[i]);
+          i += 1;
+        }
+        flushParagraph();
+      }
+
+      function renderAnswerText(container, text) {
+        container.replaceChildren();
+        const trimmed = (text || "").trim();
+        if (!trimmed) return;
+
+        trimmed.split(/\n{2,}/).forEach((block) => {
+          const lines = block.split("\n");
+          let bodyLines = lines;
+          if (lines[0].startsWith("### ")) {
+            const heading = document.createElement("p");
+            heading.className = "answer-block-heading";
+            heading.textContent = lines[0].slice(4).trim();
+            container.append(heading);
+            bodyLines = lines.slice(1);
+          }
+          renderAnswerBlock(container, bodyLines);
+        });
+      }
+
+      function renderResult(view) {
+        const status = statusCopy[view.status] ? view.status : "error";
+        const copy = statusCopy[status];
+        const errorMessage = status === "error" ? view.error_message : "";
+        const note = resultNote(view, status, copy, errorMessage);
+
+        answerStatus.dataset.status = status;
+        answerStatus.textContent = copy.label;
+        answerTitle.textContent = copy.title;
+        lastAnswerText = view.answer_text || copy.fallback;
+        renderAnswerText(answerText, lastAnswerText);
+        copyAnswer.hidden = !view.answer_text;
+        copyAnswer.textContent = "답변 복사";
+        answerNote.textContent = note;
+        answerNote.dataset.status = status;
+        answerNote.hidden = !note;
+
+        const citationItems = Array.isArray(view.citations) ? view.citations : [];
+        const optionItems = Array.isArray(view.options) ? view.options : [];
+        const pipeline = view.developer?.pipeline || "product_free_rag_v1";
+        const sourceCount = renderCitations(citationItems);
+        renderOptions(optionItems);
+        runSummary.textContent = [
+          `파이프라인 ${pipeline}`,
+          `상태 ${status}`,
+          `전체 ${formatSeconds(view.total_seconds)}`,
+          `생성 ${formatSeconds(view.generation_seconds)}`,
+          `출처 ${sourceCount}건`,
+          `인용 ${citationItems.length}건`,
+        ].join(" · ");
+
+        answerCard.hidden = false;
+      }
+
+      copyAnswer.addEventListener("click", async () => {
+        const value = lastAnswerText.trim();
+        if (!value) return;
+        try {
+          await navigator.clipboard.writeText(value);
+          copyAnswer.textContent = "복사됨";
+        } catch (_error) {
+          copyAnswer.textContent = "복사 실패";
+        }
+        window.setTimeout(() => {
+          copyAnswer.textContent = "답변 복사";
+        }, 1400);
+      });
+
+      async function responseErrorMessage(response) {
+        if (response.status >= 500) {
+          return `서버가 요청을 처리하지 못했습니다. (${response.status})`;
+        }
+        try {
+          const body = await response.json();
+          if (typeof body.detail === "string") return body.detail;
+        } catch (_error) {
+          // JSON 오류 본문이 아니면 상태 코드만 표시한다.
+        }
+        return `요청에 실패했습니다. (${response.status})`;
+      }
+
+      async function runSearch(value) {
+        if (requestInFlight) return;
+
+        requestInFlight = true;
         askedQuestion.textContent = value;
         conversation.classList.add("active");
         hero.classList.add("compact");
@@ -848,11 +1423,78 @@
         answerCard.hidden = true;
         submitButton.disabled = true;
         submitButton.textContent = "확인 중";
+        question.disabled = true;
         startLoader();
-        setLoadingStage("queued");
 
         conversation.scrollIntoView({ behavior: "smooth", block: "start" });
-        scheduleMockTimeline();
+        const requestStartedAt = performance.now();
+
+        try {
+          const response = await fetch("/ui/answer", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question: value }),
+          });
+          if (!response.ok) {
+            throw new Error(await responseErrorMessage(response));
+          }
+
+          const view = await response.json();
+          const minimumLoadingTime = Math.max(
+            0,
+            900 - (performance.now() - requestStartedAt),
+          );
+          if (minimumLoadingTime) await delay(minimumLoadingTime);
+          completeLoader();
+          await delay(480);
+          loadingCard.hidden = true;
+          renderResult(view);
+        } catch (error) {
+          stopLoader();
+          loadingCard.hidden = true;
+          renderResult({
+            status: "error",
+            answer_text: "",
+            error_message:
+              error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.",
+            citations: [],
+            options: [],
+            total_seconds: 0,
+            generation_seconds: 0,
+          });
+        } finally {
+          requestInFlight = false;
+          submitButton.disabled = false;
+          submitButton.textContent = "기록 검색";
+          question.disabled = false;
+          question.focus();
+          checkHealth();
+        }
+      }
+
+      async function checkHealth() {
+        try {
+          const response = await fetch("/health", { cache: "no-store" });
+          if (!response.ok) throw new Error("health check failed");
+          const health = await response.json();
+          connectionStatus.dataset.state = "ready";
+          connectionStatus.textContent = health.retrieval_ready
+            ? "검색 준비됨"
+            : "API 연결됨";
+          connectionStatus.title = [health.pipeline, health.model]
+            .filter(Boolean)
+            .join(" · ");
+          const basisDate = String(health.corpus_basis_date || "");
+          documentBasis.textContent = basisDate
+            ? `검색 문서 기준 ${basisDate.replaceAll("-", ".")}`
+            : "";
+          documentBasis.hidden = !basisDate;
+        } catch (_error) {
+          connectionStatus.dataset.state = "offline";
+          connectionStatus.textContent = "API 연결 필요";
+          connectionStatus.title = "로컬 FastAPI 서버를 실행해 주세요.";
+          documentBasis.hidden = true;
+        }
       }
 
       form.addEventListener("submit", (event) => {
@@ -862,7 +1504,7 @@
           question.focus();
           return;
         }
-        runMockSearch(value);
+        runSearch(value);
       });
 
       question.addEventListener("input", updateCounter);
@@ -882,6 +1524,7 @@
       });
 
       updateCounter();
+      checkHealth();
     </script>
   </body>
 </html>

@@ -1,0 +1,256 @@
+{
+  "schema_version": "claim-evidence-ref-minimality-survey-v1",
+  "created_at": "2026-08-12",
+  "stage": "P0_read_only_survey",
+  "qwen_calls": 0,
+  "implementation_changes": 0,
+  "existing_files_modified": 0,
+  "created_outputs": [
+    "reports/v3/claim_evidence_ref_minimality_survey_20260812.json"
+  ],
+  "scope": {
+    "glob": "reports/v3/product_free_rag_*.jsonl",
+    "artifact_file_count": 103,
+    "json_record_count": 2625,
+    "case_records_with_result_claims": 1310,
+    "accepted_claim_occurrences": 1849,
+    "invalid_json_lines": 0,
+    "measurement_note": "실행 artifact의 result.claims만 집계했다. 같은 질문과 claim이 여러 실행에 반복되면 실행 단위 분포에는 각각 포함하고, 별도로 (question, claim text, evidence_refs, overlap vector) 기준 중복 제거 분포도 계산했다."
+  },
+  "method": {
+    "high_ref_threshold": 3,
+    "threshold_reason": "지시서가 지정한 탐색 기준이다. 많고 적음의 결론은 임계값이 아니라 전체 히스토그램과 함께 해석한다.",
+    "overlap_function": "src/v3/product_minimal_verifier.py::_surface_overlap",
+    "text_evidence_surface": "citation.text",
+    "structured_metadata_surface": [
+      "citation.title",
+      "citation.published_at",
+      "citation.valid_from",
+      "citation.valid_to",
+      "citation.status"
+    ],
+    "structured_metadata_caveat": "META 근거는 원문 text가 없으므로 별도 집계했다. 제목·날짜 필드의 구조화 표면은 진단에만 사용하며 text evidence 비율의 분모에서는 제외했다.",
+    "interpretation_limit": "표면 중첩은 진단 신호일 뿐 삭제 판정이 아니다. 4천원/4,000원처럼 의미가 같아도 false가 될 수 있고, 짧은 일반어 조각이 우연히 겹쳐 무관한 근거가 true가 될 수 있다."
+  },
+  "claim_evidence_ref_distribution": {
+    "run_level": {
+      "claim_count": 1849,
+      "mean": 1.468361,
+      "median": 1,
+      "max": 24,
+      "histogram": {
+        "1": {"count": 1360, "percent": 73.5533},
+        "2": {"count": 314, "percent": 16.9822},
+        "3": {"count": 85, "percent": 4.5971},
+        "4": {"count": 67, "percent": 3.6236},
+        "5": {"count": 6, "percent": 0.3245},
+        "7": {"count": 10, "percent": 0.5408},
+        "8": {"count": 4, "percent": 0.2163},
+        "24": {"count": 3, "percent": 0.1622}
+      },
+      "claims_with_at_least_3_refs": 175,
+      "claims_with_at_least_3_refs_percent": 9.4646
+    },
+    "deduplicated": {
+      "claim_count": 596,
+      "mean": 1.580537,
+      "median": 1,
+      "max": 24,
+      "histogram": {
+        "1": 425,
+        "2": 102,
+        "3": 33,
+        "4": 23,
+        "5": 3,
+        "7": 5,
+        "8": 3,
+        "24": 2
+      },
+      "claims_with_at_least_3_refs": 69,
+      "claims_with_at_least_3_refs_percent": 11.5772
+    }
+  },
+  "surface_overlap_measurement": {
+    "run_level_text_evidence": {
+      "claims_with_at_least_3_text_refs": 170,
+      "claims_with_one_or_more_zero_overlap_refs": 15,
+      "claim_level_rate": 0.088235,
+      "text_evidence_refs": 641,
+      "zero_overlap_text_evidence_refs": 28,
+      "evidence_ref_level_rate": 0.043682
+    },
+    "run_level_structured_metadata": {
+      "claim_occurrences": 5,
+      "evidence_refs": 86
+    },
+    "deduplicated_text_evidence": {
+      "claims_with_at_least_3_text_refs": 66,
+      "claims_with_one_or_more_zero_overlap_refs": 8,
+      "claim_level_rate": 0.121212,
+      "text_evidence_refs": 258,
+      "zero_overlap_text_evidence_refs": 14,
+      "evidence_ref_level_rate": 0.054264
+    },
+    "deduplicated_structured_metadata": {
+      "claims": 3,
+      "evidence_refs": 55
+    }
+  },
+  "representative_zero_overlap_cases": [
+    {
+      "source": "reports/v3/product_free_rag_existing32_final_go_candidate_20260803.jsonl:10",
+      "question": "파도치는 폭권으로! 보급 작전 이벤트 기간은 언제부터 언제까지였어?",
+      "claim": "파도치는 폭권으로! 보급 작전 이벤트 기간은 2026년 7월 2일(목) 점검 후부터 7월 23일(목) 점검 전까지였어.",
+      "evidence_ref_count": 7,
+      "zero_overlap_refs": ["E1", "E3", "E4", "E5", "E6"],
+      "finding": "기간 claim에 적정레벨·레이드·레기온 설명이 결속된 명백한 과다 인용이다. E7/E8은 짧은 이벤트명 조각 때문에 overlap=true가 되어 표면 중첩만으로는 두 무관 근거를 놓친다."
+    },
+    {
+      "source": "reports/v3/product_free_rag_a5_current_product_adaptive_replay_20260804.jsonl:20",
+      "question": "Themida 오류를 일으킨 정확한 프로그램 이름은 뭐야?",
+      "claim": "Themida 오류를 일으킨 정확한 프로그램 이름은 알려져 있지 않습니다.",
+      "evidence_ref_count": 8,
+      "zero_overlap_refs": ["E4"],
+      "finding": "원인 프로그램 부재 claim에 해결 절차와 주변 원인 후보 8개가 결속돼 있다. zero-overlap은 E4 하나만 잡아 과다 인용 규모를 과소 측정한다."
+    },
+    {
+      "source": "reports/v3/product_free_rag_existing32_adaptive_replay_20260801_minimal_v2.jsonl:29",
+      "question": "2025년 12월 스페셜 클론 레어 아바타 풀세트 상자의 상점 판매가격과 거래 타입은 뭐였어?",
+      "claim": "2025년 12월 스페셜 클론 레어 아바타 풀세트 상자의 상점 판매가격은 명시되지 않았습니다.",
+      "evidence_ref_count": 8,
+      "zero_overlap_refs": ["E2"],
+      "finding": "가격 부재 claim에 거래타입 행 E2가 붙었다. 다른 아이템명·툴팁 근거는 공통 표면 때문에 zero-overlap으로 잡히지 않는다."
+    },
+    {
+      "source": "reports/v3/product_free_rag_existing32_final_adaptive_replay_20260803.jsonl:3",
+      "question": "Npay 7% 적립 이벤트의 최소 충전금액, 적립률, 최대 적립액은 각각 얼마였어?",
+      "claim": "적립률은 7%입니다.",
+      "evidence_ref_count": 4,
+      "zero_overlap_refs": ["E4"],
+      "finding": "E4는 충전금액과 기간만 담아 적립률 claim에는 불필요하다."
+    },
+    {
+      "source": "reports/v3/product_free_rag_existing32_qcoverage_lexical_shadow_adaptive_20260804.jsonl:3",
+      "question": "Npay 7% 적립 이벤트의 최소 충전금액, 적립률, 최대 적립액은 각각 얼마였어?",
+      "claim": "4,000원",
+      "evidence_ref_count": 3,
+      "zero_overlap_refs": ["E3"],
+      "finding": "E3의 4천원은 claim의 4,000원과 의미상 동일하다. 표면 중첩 0을 삭제 규칙으로 쓰면 발생하는 실제 false positive다."
+    },
+    {
+      "source": "reports/v3/product_free_rag_new_claim32_binding_fix_adaptive_20260803.jsonl:12",
+      "question": "마일리지샵 2026 시즌7에서 플레이로 얻을 수 있는 일일 최대 마일리지와 현재 남은 획득 가능량을 알려줘.",
+      "claim": "현재 남은 획득 가능량: 0M",
+      "evidence_ref_count": 7,
+      "zero_overlap_refs": ["E8"],
+      "finding": "삭제일 안내 E8은 남은 획득 가능량 claim과 무관하다. 나머지 근거의 관련성은 짧은 숫자·마일리지 표면 때문에 별도 검증이 필요하다."
+    }
+  ],
+  "normal_multi_evidence_controls": [
+    {
+      "source": "reports/v3/product_free_rag_a5_one_shot_cd0707e3bb626b80fcd577584e520b45703bf07b10559e81d70b3f1e830f5319.jsonl:2",
+      "question": "공식 공지 중 가장 최근에 올라온 글들을 빠짐없이 알려줘.",
+      "evidence_refs": 7,
+      "why_multiple_are_needed": "서로 다른 7개 최신 공지의 제목과 게시일을 모두 열거하는 완전 목록 claim이므로 각 목록 행에 대응하는 META 근거가 필요하다.",
+      "control_kind": "structured_complete_list"
+    },
+    {
+      "source": "reports/v3/product_free_rag_a5_one_shot_cd0707e3bb626b80fcd577584e520b45703bf07b10559e81d70b3f1e830f5319.jsonl:9",
+      "question": "지금 열려 있는 행사 전체는 몇 개야?",
+      "evidence_refs": 24,
+      "why_multiple_are_needed": "진행 중 이벤트 24개라는 집계는 24개 문서의 valid_from/valid_to 상태 전체가 모여야 성립한다. 단일 문서로 24라는 합계를 증명할 수 없다.",
+      "control_kind": "structured_aggregate"
+    },
+    {
+      "source": "reports/v3/product_free_rag_a5_one_shot_cd0707e3bb626b80fcd577584e520b45703bf07b10559e81d70b3f1e830f5319.jsonl:31",
+      "question": "새해맞이 이벤트의 '이달의 행운아'와 '운명의 선택을 받은 자' 칭호 전체 표 두 개를 보여줘.",
+      "evidence_refs": 24,
+      "why_multiple_are_needed": "생성된 claim 자체는 이벤트 문서 24개 전체 목록이며 각 행이 별도 META 근거를 가진다. 질문에 대한 의미 정답 여부와 별개로, 이 목록 claim의 증거 구조는 다중 근거가 필수인 통제 사례다.",
+      "control_kind": "structured_complete_list_semantic_failure_control"
+    },
+    {
+      "source": "reports/v3/product_free_rag_a5_one_shot_cd0707e3bb626b80fcd577584e520b45703bf07b10559e81d70b3f1e830f5319.jsonl:7",
+      "question": "별·성단·은하 조율자의 저울은 보상을 각각 몇 회 뽑고 어떤 서약 결정을 확정으로 줘?",
+      "claim": "별·성단·은하 조율자의 저울은 보상을 각각 9회, 19회, 39회 뽑는다.",
+      "evidence_refs": ["E1", "E4", "E5"],
+      "why_multiple_are_needed": "E1은 별 9회, E4는 성단 19회, E5는 은하 39회를 각각 제공한다. 어느 단일 근거도 세 값을 모두 담지 않는다.",
+      "control_kind": "multi_subject_multi_value"
+    },
+    {
+      "source": "reports/v3/product_free_rag_existing32_slots16_24_30_post_server_list_restore_20260803.jsonl:2",
+      "question": "2020년 12월 4일 시행 운영정책에서 길드장 권한이 위임될 수 있는 조건과 처리 기간을 알려줘.",
+      "claim": "길드장 권한 위임 조건은 이용제한 상태 또는 12개월 이상 미접속 휴면 상태다.",
+      "evidence_refs": ["E3", "E4", "E5"],
+      "why_multiple_are_needed": "E3은 위임 가능 관계를, E4는 두 조건을 제공한다. E5는 두 번째 조건의 중복이므로 최소 부분집합은 E3+E4 후보이며, 전체 삭제나 단일-ref 강제는 오탐이다.",
+      "control_kind": "multi_span_core_with_one_redundant_ref"
+    },
+    {
+      "source": "reports/v3/product_free_rag_existing32_atomic_targeted15_20260801.jsonl:5",
+      "question": "장착 칭호가 해제되지 않을 때 1:1 문의에 적어야 할 정보와 평균 처리 기간을 알려줘.",
+      "claim": "문의에는 서버/캐릭터명과 장착중인 칭호를 적어야 한다.",
+      "evidence_refs": ["E7", "E8"],
+      "why_multiple_are_needed": "E7과 E8이 서로 다른 필수 기재 항목을 하나씩 제공한다.",
+      "control_kind": "two_field_entity_list_below_high_ref_threshold"
+    },
+    {
+      "source": "reports/v3/product_free_rag_new_claim32_qcoverage_lexical_shadow_adaptive_20260804.jsonl:19",
+      "question": "과실복구는 어떤 버튼으로 신청해야 하며 일반 1:1 문의로 신청해도 진행돼?",
+      "claim": "[복구신청 접수하기] 버튼으로 신청해야 하며 일반 1:1 문의로는 진행되지 않는다.",
+      "evidence_refs": ["E1", "E2"],
+      "why_multiple_are_needed": "E1은 일반 1:1 문의 불가, E2는 올바른 신청 버튼을 각각 증명한다.",
+      "control_kind": "two_relation_claim_below_high_ref_threshold"
+    }
+  ],
+  "sealed_a6": {
+    "case_count": 32,
+    "official_human_semantic_correct": 20,
+    "official_human_semantic_incorrect": 12,
+    "claim_count": 67,
+    "claim_ref_histogram": {"1": 49, "2": 13, "3": 3, "4": 2},
+    "claims_with_at_least_3_refs": 5,
+    "claims_with_at_least_3_refs_percent": 7.4627,
+    "slots_with_at_least_3_refs": [8, 15, 16, 23, 26],
+    "text_evidence_refs_in_these_claims": 17,
+    "zero_overlap_refs": 0,
+    "claims_with_zero_overlap_refs": 0,
+    "human_judgement_relation": {
+      "high_ref_claims_in_official_correct_slots": 4,
+      "high_ref_claims_in_official_incorrect_slots": 1,
+      "zero_overlap_pattern_in_official_correct_slots": 0,
+      "zero_overlap_pattern_in_official_incorrect_slots": 0,
+      "conclusion": "지정한 표면 중첩 0 패턴은 sealed A6 20/32 판정과 교차하지 않는다. 따라서 이 진단만으로 sealed 점수 변화는 예상되지 않지만, high-ref 자체는 정답 슬롯 4개에도 있으므로 개수 기준 일괄 삭제는 안전하지 않다."
+    },
+    "read_only_integrity": [
+      {"path": "data/v3/evaluation/product_free_rag_a6_frozen_9405401d76c87b28418b795716938a3d62578644f33f2e853ddf18fc689b65dc.jsonl", "sha256": "9405401D76C87B28418B795716938A3D62578644F33F2E853DDF18FC689B65DC"},
+      {"path": "data/v3/evaluation/product_free_rag_a6_one_shot_4d47ef5d760fdb589fd1a81217d52908a77bd76a78b875384cd2315880c78499.lock", "sha256": "6E340B9CFFB37A989CA544E6BB780A2C78901D3FB33738768511A30617AFA01D"},
+      {"path": "data/v3/evaluation/product_free_rag_a6_one_shot_4d47ef5d760fdb589fd1a81217d52908a77bd76a78b875384cd2315880c78499_attempt.json", "sha256": "70F02DBA6E941BC823509937CF39EC99F47CC988038C817ED3D48186B9C19CEC"},
+      {"path": "data/v3/evaluation/product_free_rag_a6_one_shot_4d47ef5d760fdb589fd1a81217d52908a77bd76a78b875384cd2315880c78499_journal.jsonl", "sha256": "1990E41CEA8545811BDC2CBE346D9995B50B9DB5B2D67F0D0A0CC1A9B610589C"},
+      {"path": "reports/v3/product_free_rag_a6_one_shot_4d47ef5d760fdb589fd1a81217d52908a77bd76a78b875384cd2315880c78499.jsonl", "sha256": "1252ECDA7546659B93C0253914541C045DBFADBAC22477D0ED6E8D90DB37C9C9"},
+      {"path": "reports/v3/product_free_rag_a6_pending_adaptive_manual_review_20260806.jsonl", "sha256": "BC5717EB33E34E779CD240705B778AF2C8BD50FBE88CCBFBBA2FEF1F55F65C68"}
+    ]
+  },
+  "prespecified_live_anchor": {
+    "source": "docs/v3/claim_evidence_ref_minimality_plan.md",
+    "included_in_aggregate": false,
+    "reason": "API 응답 JSON이 별도 artifact로 저장돼 있지 않아 P0의 103개 파일 통계에는 합치지 않았다.",
+    "question": "그릇된 신념으로 빚어진 성역에서 미카엘라를 마주하라 이벤트 기간이 언제까지야?",
+    "claim": "이벤트 기간은 2026년 8월 6일(목) 점검 후 ~ 8월 20일(목) 점검 전입니다.",
+    "before_evidence_refs": ["E1", "E3", "E4", "E5", "E6", "E7", "E8"],
+    "expected_minimal_evidence_refs": ["E3"]
+  },
+  "p0_conclusions": [
+    "claim당 evidence_refs 중앙값은 1이지만 실행 단위 9.4646%가 3개 이상을 사용한다.",
+    "3개 이상 text 근거 claim 중 8.8235%에서 최소 한 개의 zero-overlap ref가 관찰됐다. 근거 단위 비율은 4.3682%다.",
+    "중복 제거 후에도 claim 단위 12.1212%, 근거 단위 5.4264%이므로 특정 반복 실행 하나가 만든 현상만은 아니다.",
+    "표면 중첩 0은 과다 인용 신호지만 삭제 규칙으로는 불충분하다. 숫자 표기 정규화 false positive와 짧은 공통 표면 false negative가 모두 실측됐다.",
+    "정상 다중 근거는 완전 목록·집계·여러 대상/값·여러 필드/관계에서 실제로 필요하다. 따라서 ref 개수나 zero-overlap만으로 일괄 pruning하면 오탐 위험이 있다.",
+    "sealed A6의 3개 이상 근거 claim 5건에서는 zero-overlap 패턴이 0건이며, 공식 20/32 판정과 직접 교차하지 않았다."
+  ],
+  "p1_design_input": {
+    "recommended_direction": "표면 중첩 삭제가 아니라, 기존 verifier의 단일 evidence 재결속 판정을 현재 claim이 이미 인용한 ref들에 제한해 재사용한다.",
+    "why": "한 개의 현재 인용 근거만으로 claim의 대상·관계·숫자·부재 표현·명시 조건 전체가 기존 verifier를 통과할 때만 N개를 1개로 줄이면, 미카엘라 같은 중복 결속을 제거하면서 진짜 복수 근거 claim은 보존할 수 있다.",
+    "do_not_use_as_decision_rule": "_surface_overlap == false",
+    "sealed_expected_impact": "none",
+    "implementation_started": false
+  }
+}

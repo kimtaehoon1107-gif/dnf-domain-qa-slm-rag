@@ -1,0 +1,46 @@
+{
+  "bm25_parameters": {
+    "b": 0.75,
+    "k1": 1.2
+  },
+  "built_at": "2026-08-07T19:12:13+09:00",
+  "default_filter": {
+    "allowed_statuses": [
+      "current",
+      "upcoming"
+    ],
+    "default_exposure_only": true,
+    "include_review_required": false
+  },
+  "index": {
+    "default_searchable_chunks": 2683,
+    "path": "data/v3/indexes/bm25_index_11f183aa5cc8ae54dbe0c7c8205c321c10c4712c3ab62d17e1b3d83cd429ccf7.json",
+    "row_count": 3925,
+    "sha256": "11f183aa5cc8ae54dbe0c7c8205c321c10c4712c3ab62d17e1b3d83cd429ccf7",
+    "vocabulary_terms": 30685
+  },
+  "index_schema_version": "dnf_bm25_index_v3.1",
+  "indexed_text_field": "retrieval_text",
+  "inputs": [
+    {
+      "path": "data/v3/chunks/chunks_dnf_official_v3.1_45030e5688ddcd3edc051ce383083248b13a0c6fcc85c3b9b1dae49d21f1dcd7.jsonl",
+      "role": "chunk_v3",
+      "row_count": 3925,
+      "sha256": "45030e5688ddcd3edc051ce383083248b13a0c6fcc85c3b9b1dae49d21f1dcd7"
+    },
+    {
+      "path": "data/v3/chunks/chunk_corpus_manifest_a06f9afffd567023ff9351dc1cabc9bd632ab90d4c0754e99a108a118ce90ced.json",
+      "role": "chunk_corpus_manifest",
+      "row_count": null,
+      "sha256": "a06f9afffd567023ff9351dc1cabc9bd632ab90d4c0754e99a108a118ce90ced"
+    },
+    {
+      "path": "data/v3/normalized/documents_dnf_official_detail_v3.1_4643779c84879b9f9e81e9fd483fbc6dd4535a3c5ddd84c04872851c815c5de5.jsonl",
+      "role": "document_v3",
+      "row_count": 996,
+      "sha256": "4643779c84879b9f9e81e9fd483fbc6dd4535a3c5ddd84c04872851c815c5de5"
+    }
+  ],
+  "manifest_schema_version": "dnf_bm25_manifest_v3.1",
+  "tokenizer_version": "dnf_lexical_nfkc_word_date_v1"
+}

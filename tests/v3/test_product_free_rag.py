@@ -1,5 +1,6 @@
 import json
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 from src.v3.product_evidence_pack import build_product_evidence_pack
 from src.v3.product_evidence_pack import (
@@ -39,6 +40,7 @@ from src.v3.product_free_rag import (
     clarification_for_subject_only_question,
     expand_evidence_candidate_chunk_ids,
     normalize_product_question,
+    product_retrieval_query_variants,
     resolve_product_clarification_followup,
     rewrite_product_clarification_question,
     select_required_parent_candidates,
@@ -47,6 +49,32 @@ from src.v3.product_free_rag import (
 )
 from src.v3.product_minimal_verifier import verify_product_claim_output
 from src.v3.run_product_free_rag_existing32 import score_case
+
+
+def test_product_retrieval_preinitialization_does_not_generate(monkeypatch):
+    import src.v3.product_free_rag as product_module
+
+    runtime = object.__new__(ProductFreeRAG)
+    runtime._artifacts = None
+    runtime._retrieval_models_offloaded = False
+    runtime.device = "cuda"
+    runtime._initialize = Mock()
+    runtime._ensure_retrieval_models_on_device = Mock()
+    kiwi = Mock(return_value=[])
+    monkeypatch.setattr(
+        product_module,
+        "kiwi_independent_requirement_queries",
+        kiwi,
+    )
+
+    result = runtime.preinitialize_retrieval()
+
+    kiwi.assert_called_once_with("사전 초기화를 확인합니다.")
+    runtime._initialize.assert_called_once_with()
+    runtime._ensure_retrieval_models_on_device.assert_called_once_with()
+    assert result["already_initialized"] is False
+    assert result["qwen_called"] is False
+    assert result["device"] == "cuda"
 
 
 def _fixture():
@@ -101,6 +129,9 @@ def test_product_prompt_treats_spacing_variants_and_evidence_as_candidates():
     assert "서로 다른 문서 맥락" in PRODUCT_SYSTEM_INSTRUCTIONS
     assert "question_focus" in PRODUCT_SYSTEM_INSTRUCTIONS
     assert "clarification" in PRODUCT_SYSTEM_INSTRUCTIONS
+    assert "이벤트 기간이나 게시 날짜만으로 출시일을 추정하지 마세요" in (
+        PRODUCT_SYSTEM_INSTRUCTIONS
+    )
 
 
 def test_semantic_evidence_selector_reserves_surface_queries_then_fills():
@@ -220,6 +251,93 @@ def test_semantic_evidence_selector_can_reserve_top_three_per_clause():
     assert not any("판매됩니다" in unit["text"] for unit in baseline)
     assert any("판매됩니다" in unit["text"] for unit in expanded)
     assert len(expanded) == 4
+
+
+def test_semantic_evidence_selector_reserves_next_unseen_unit_for_colliding_query():
+    units = [
+        {
+            "candidate_ref": str(index),
+            "parent_document_id": parent,
+            "start_char": index,
+            "title": title,
+            "context_text": "",
+            "text": text,
+        }
+        for index, (parent, title, text) in enumerate(
+            [
+                ("event", "이벤트", "미카엘라 레이드 이벤트 기간"),
+                (
+                    "patch",
+                    "업데이트",
+                    "8월 6일 점검 중 미카엘라 레이드가 업데이트 됩니다.",
+                ),
+            ],
+            1,
+        )
+    ]
+
+    def score_pairs(pairs):
+        scores = []
+        for query, reranker_text in pairs:
+            if query == "미카엘라 레이드 출시일":
+                scores.append(1.0 if "이벤트 기간" in reranker_text else 0.8)
+            elif query == "미카엘라 레이드 업데이트 날짜":
+                scores.append(1.0 if "이벤트 기간" in reranker_text else 0.9)
+            else:
+                scores.append(0.0)
+        return scores
+
+    selected = select_semantic_product_evidence_units(
+        units,
+        selection_queries=[
+            "미카엘라 레이드 출시일",
+            "미카엘라 레이드 업데이트 날짜",
+        ],
+        question="미카엘라 레이드는 언제 출시했어?",
+        score_pairs=score_pairs,
+        max_units=2,
+    )
+
+    assert [unit["parent_document_id"] for unit in selected] == [
+        "event",
+        "patch",
+    ]
+    assert [unit["question_focus"] for unit in selected] == [
+        "미카엘라 레이드 출시일",
+        "미카엘라 레이드 업데이트 날짜",
+    ]
+
+
+def test_semantic_evidence_selector_prioritizes_direct_release_date_statement():
+    units = [
+        {
+            "candidate_ref": "1",
+            "parent_document_id": "event",
+            "start_char": 1,
+            "title": "미카엘라 이벤트",
+            "context_text": "2026년 8월 6일 점검 후부터 8월 20일까지",
+            "text": "미카엘라 레이드 하드 난이도 미션이 진행됩니다.",
+        },
+        {
+            "candidate_ref": "2",
+            "parent_document_id": "patch",
+            "start_char": 2,
+            "title": "미카엘라 업데이트",
+            "context_text": "업데이트",
+            "text": "8/6(목) 점검 중 업데이트 되는 내용 안내 드립니다.",
+        },
+    ]
+
+    selected = select_semantic_product_evidence_units(
+        units,
+        selection_queries=["미카엘라 레이드 업데이트 날짜"],
+        question="미카엘라 레이드는 언제 출시했어?",
+        score_pairs=lambda pairs: [0.99, 0.10, 0.99, 0.10],
+        max_units=2,
+    )
+
+    assert selected[0]["parent_document_id"] == "patch"
+    assert selected[0]["question_focus"] == "미카엘라 레이드 업데이트 날짜"
 
 
 def test_semantic_evidence_selector_reserves_near_top_complete_condition_list():
@@ -1014,6 +1132,12 @@ def test_product_verifier_accepts_two_grounded_claims_and_restores_coordinates()
         "end_char": len(chunks["diregie"]["display_text"]),
         "text": chunks["diregie"]["display_text"],
         "title": "검은 질병의 디레지에 레이드",
+        "canonical_url": "",
+        "source_id": "",
+        "published_at": None,
+        "valid_from": None,
+        "valid_to": None,
+        "status": "",
     }
 
 
@@ -1708,6 +1832,264 @@ def test_product_verifier_prunes_overcitation_outside_explicit_policy_date():
         verified["verification"]["raw_output_passed_without_sanitization"]
         is False
     )
+
+
+def _minimality_unit(
+    evidence_ref,
+    text,
+    *,
+    title,
+    context_text,
+    parent_document_id,
+    valid_from="",
+    valid_to="",
+):
+    return {
+        "evidence_ref": evidence_ref,
+        "chunk_id": f"{parent_document_id}-{evidence_ref}",
+        "parent_document_id": parent_document_id,
+        "title": title,
+        "context_text": context_text,
+        "valid_from": valid_from,
+        "valid_to": valid_to,
+        "start_char": 0,
+        "end_char": len(text),
+        "text": text,
+        "complete": False,
+    }
+
+
+def test_product_verifier_minimizes_redundant_refs_after_condition_pruning():
+    current_title = "그릇된 신 미카엘라 이벤트 (2026-08-06 시작)"
+    units = [
+        _minimality_unit(
+            "E1",
+            "우편 보관 기간은 15일입니다.",
+            title="그릇된 신 미카엘라 이벤트 (2026-08-01 시작)",
+            context_text="이전 이벤트 안내",
+            parent_document_id="old-event-doc",
+            valid_from="2026-08-01",
+            valid_to="2026-08-05",
+        ),
+        *[
+            _minimality_unit(
+                evidence_ref,
+                text,
+                title=current_title,
+                context_text=context_text,
+                parent_document_id="current-event-doc",
+                valid_from="2026-08-06",
+                valid_to="2026-08-20",
+            )
+            for evidence_ref, context_text, text in (
+                (
+                    "E3",
+                    "이벤트 기간",
+                    "이벤트 기간은 2026년 8월 6일 점검 후부터 8월 20일 점검 전까지입니다.",
+                ),
+                ("E4", "이벤트 미션", "레이드 클리어 미션 보상을 받을 수 있습니다."),
+                ("E5", "적정 레벨", "적정 레벨 캐릭터로 참여할 수 있습니다."),
+                ("E6", "레이드 미션", "레이드 미션을 완료해 주세요."),
+                ("E7", "누적 보상", "누적 미션 보상이 지급됩니다."),
+                ("E8", "유의 사항", "보상은 계정귀속으로 지급됩니다."),
+            )
+        ],
+    ]
+
+    verified = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": "이벤트 기간은 2026년 8월 6일부터 8월 20일까지입니다.",
+                    "evidence_refs": ["E1", "E3", "E4", "E5", "E6", "E7", "E8"],
+                }
+            ],
+            "clarification": "",
+        },
+        question="2026-08-06 시작 미카엘라 이벤트 기간은 언제까지야?",
+        evidence_units=units,
+        chunks_by_id={
+            unit["chunk_id"]: {"display_text": unit["text"]} for unit in units
+        },
+    )
+
+    assert verified["mode"] == "answer"
+    assert verified["claims"][0]["evidence_refs"] == ["E3"]
+    assert [
+        citation["evidence_ref"] for citation in verified["claims"][0]["citations"]
+    ] == ["E3"]
+    assert verified["verification"]["pruned_evidence_refs"] == [
+        "E1",
+        "E4",
+        "E5",
+        "E6",
+        "E7",
+        "E8",
+    ]
+    assert verified["verification"]["rebound_evidence_refs"][-1] == {
+        "claim_index": 1,
+        "from": ["E3", "E4", "E5", "E6", "E7", "E8"],
+        "to": ["E3"],
+        "reason": "single_evidence_sufficient",
+    }
+
+
+def test_product_verifier_minimizes_normalized_numeric_spelling():
+    units = [
+        _minimality_unit(
+            "E1",
+            "최소 충전금액은 1만원입니다.",
+            title="Npay 7% 적립 이벤트",
+            context_text="충전 조건",
+            parent_document_id="npay-doc",
+        ),
+        _minimality_unit(
+            "E3",
+            "최대 적립액은 4천원입니다.",
+            title="Npay 7% 적립 이벤트",
+            context_text="최대 적립액",
+            parent_document_id="npay-doc",
+        ),
+    ]
+
+    verified = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": "최대 적립액은 4,000원입니다.",
+                    "evidence_refs": ["E1", "E3"],
+                }
+            ],
+            "clarification": "",
+        },
+        question="Npay 7% 적립 이벤트의 최대 적립액은 얼마였어?",
+        evidence_units=units,
+        chunks_by_id={
+            unit["chunk_id"]: {"display_text": unit["text"]} for unit in units
+        },
+    )
+
+    assert verified["mode"] == "answer"
+    assert verified["claims"][0]["evidence_refs"] == ["E3"]
+
+
+def test_product_verifier_preserves_many_complete_evidence_refs():
+    original_refs = [f"E{index}" for index in range(1, 13)]
+    units = [
+        {
+            **_minimality_unit(
+                evidence_ref,
+                "이벤트 기간은 2026년 8월 6일부터 8월 20일까지입니다.",
+                title="미카엘라 이벤트",
+                context_text="이벤트 기간",
+                parent_document_id="complete-event-doc",
+            ),
+            "complete": True,
+        }
+        for evidence_ref in original_refs
+    ]
+
+    verified = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": "이벤트 기간은 2026년 8월 6일부터 8월 20일까지입니다.",
+                    "evidence_refs": original_refs,
+                }
+            ],
+            "clarification": "",
+        },
+        question="미카엘라 이벤트 기간은 언제까지야?",
+        evidence_units=units,
+        chunks_by_id={
+            unit["chunk_id"]: {"display_text": unit["text"]} for unit in units
+        },
+    )
+
+    assert verified["mode"] == "answer"
+    assert verified["claims"][0]["evidence_refs"] == original_refs
+
+
+def test_product_verifier_preserves_refs_needed_for_multiple_values():
+    facts = [
+        ("E1", "별 단계 보상은 9회 달성 시 지급됩니다."),
+        ("E2", "성단 단계 보상은 19회 달성 시 지급됩니다."),
+        ("E3", "은하 단계 보상은 39회 달성 시 지급됩니다."),
+    ]
+    units = [
+        _minimality_unit(
+            evidence_ref,
+            text,
+            title="조율자의 저울 누적 보상",
+            context_text="단계별 보상 횟수",
+            parent_document_id="reward-doc",
+        )
+        for evidence_ref, text in facts
+    ]
+
+    verified = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": "별은 9회, 성단은 19회, 은하는 39회 달성 시 보상됩니다.",
+                    "evidence_refs": ["E1", "E2", "E3"],
+                }
+            ],
+            "clarification": "",
+        },
+        question="별, 성단, 은하 단계 보상은 각각 몇 회 달성해야 받아?",
+        evidence_units=units,
+        chunks_by_id={
+            unit["chunk_id"]: {"display_text": unit["text"]} for unit in units
+        },
+    )
+
+    assert verified["mode"] == "answer"
+    assert verified["claims"][0]["evidence_refs"] == ["E1", "E2", "E3"]
+    assert len(verified["claims"][0]["citations"]) == 3
+
+
+def test_product_verifier_preserves_refs_needed_for_two_text_fields():
+    facts = [
+        ("E1", "1. 서버/캐릭터명 :"),
+        ("E2", "2. 장착중인 칭호 :"),
+    ]
+    units = [
+        _minimality_unit(
+            evidence_ref,
+            text,
+            title="장착중인 칭호가 해제되지 않아요!",
+            context_text="1:1 문의 접수 정보",
+            parent_document_id="title-inquiry-doc",
+        )
+        for evidence_ref, text in facts
+    ]
+
+    verified = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": "문의에는 서버/캐릭터명과 장착중인 칭호를 적어야 합니다.",
+                    "evidence_refs": ["E1", "E2"],
+                }
+            ],
+            "clarification": "",
+        },
+        question="장착 칭호가 해제되지 않을 때 문의에 적어야 할 정보 두 가지는 뭐야?",
+        evidence_units=units,
+        chunks_by_id={
+            unit["chunk_id"]: {"display_text": unit["text"]} for unit in units
+        },
+    )
+
+    assert verified["mode"] == "answer"
+    assert verified["claims"][0]["evidence_refs"] == ["E1", "E2"]
+    assert len(verified["claims"][0]["citations"]) == 2
 
 
 def test_product_verifier_rejects_second_requirement_citing_price_row():
@@ -3585,6 +3967,23 @@ def test_product_search_policy_uses_only_explicit_question_date():
     assert current.default_exposure_only is True
 
 
+def test_product_search_policy_resolves_completed_bare_month_to_archive():
+    historical = search_policy_for_product_question(
+        "7월 스페셜 클론 레어 아바타 상점 판매가 알려줘",
+        default_as_of="2026-08-11",
+    )
+    current = search_policy_for_product_question(
+        "8월 이달의 아이템 알려줘",
+        default_as_of="2026-08-11",
+    )
+
+    assert historical.as_of is None
+    assert historical.default_exposure_only is False
+    assert historical.allowed_statuses is None
+    assert current.as_of == "2026-08-11"
+    assert current.default_exposure_only is True
+
+
 def test_product_clarifies_retrieved_subject_identity_not_explicit_relation():
     selected = [{"parent_document_id": "diregie", "chunk_id": "chunk"}]
     chunks = {"chunk": {"heading_path": ["디레지에 레이드"]}}
@@ -3662,6 +4061,18 @@ def test_product_complete_tables_are_hidden_from_model_and_rendered_by_server():
     assert "완전한 2행 표" in prompt
     assert "1,000" not in prompt
     assert "4,000" not in prompt
+
+    comparison_prompt = build_product_prompt(
+        question=question,
+        evidence_units=units,
+        require_distinct_comparison_rows=True,
+    )
+    assert "각 행은 항목명을 포함한 하나의 별도 claim" in comparison_prompt
+    assert "두 값이 같아도 생략하지 말고" in comparison_prompt
+    assert "질문하지 않은 다른 열의 값은 쓰지 마세요" in comparison_prompt
+    assert "O/X/- 행은 각 축마다" in comparison_prompt
+    assert "각 행 첫 열의 항목명을 그대로 포함하세요" in comparison_prompt
+    assert "각 행은 항목명을 포함한 하나의 별도 claim" not in prompt
 
     def fake_generator(*, prompt, model, timeout_seconds):
         return {
@@ -4836,6 +5247,62 @@ def test_default_product_path_does_not_run_coverage_lexical_overlap():
     assert "question_coverage_lexical_overlap" not in result["verification"]
 
 
+def test_server_availability_rendering_skips_qwen_and_restores_citation():
+    question = "임의 레이드 하드와 일반의 보상 차이 알려줘."
+    evidence = "| 원석 | 하드: O | 일반: - |"
+    unit = {
+        "evidence_ref": "E1",
+        "candidate_ref": "1",
+        "chunk_id": "reward",
+        "parent_document_id": "raid",
+        "title": "임의 레이드",
+        "context_text": "보상 표",
+        "start_char": 0,
+        "end_char": len(evidence),
+        "text": evidence,
+        "unit_kind": "table_row",
+        "complete": False,
+        "availability_subject": "원석",
+        "availability_values": {"하드": True, "일반": False},
+    }
+
+    def fail_generator(**kwargs):
+        raise AssertionError(f"Qwen must not run: {kwargs}")
+
+    result = answer_product_rag_from_candidates(
+        question=question,
+        requirement_queries=None,
+        requested_subjects=None,
+        selected=[{"chunk_id": "reward", "parent_document_id": "raid"}],
+        chunks_by_id={"reward": {"display_text": evidence}},
+        documents_by_id={"raid": {"title": "임의 레이드"}},
+        temporal_by_document={},
+        model="test-model",
+        timeout_seconds=10,
+        generator=fail_generator,
+        evidence_units_override=[unit],
+        enable_availability_comparison=True,
+        use_server_availability_rendering=True,
+    )
+
+    assert result["mode"] == "answer"
+    assert result["generation"] is None
+    assert result["server_rendering"] == {
+        "used": True,
+        "renderer": "availability_comparison_v1",
+        "claim_count": 1,
+    }
+    assert result["claims"][0]["text"] == (
+        "원석: 하드 획득 가능, 일반 획득 불가."
+    )
+    citation = result["claims"][0]["citations"][0]
+    assert citation["evidence_ref"] == "E1"
+    assert citation["chunk_id"] == "reward"
+    assert citation["start_char"] == 0
+    assert citation["end_char"] == len(evidence)
+    assert citation["text"] == evidence
+
+
 def test_surface_requirement_queries_keep_relation_coordination_separate():
     question = (
         "2026년 1월 아라드 패스 2026 시즌1 보상 상자의 "
@@ -4979,6 +5446,244 @@ def test_product_retrieval_keeps_one_query_without_kiwi_clause(monkeypatch):
     assert searched_queries == ["디레지에 입장 명성 알려줘"]
 
 
+def test_product_retrieval_expands_release_date_relation_without_domain_alias():
+    variants = product_retrieval_query_variants(
+        "미카엘라 레이드는 언제 출시했어?"
+    )
+
+    assert len(variants) == 1
+    assert "미카엘라 레이드" in variants[0]
+    assert "업데이트 되는 내용" in variants[0]
+    assert "출시" not in variants[0]
+    assert product_retrieval_query_variants(
+        "미카엘라 레이드 보상 알려줘"
+    ) == []
+    assert normalize_product_question(
+        "축성 방어구 제작 제료 알려줘"
+    ) == "축성 방어구 제작 재료 알려줘"
+    assert product_retrieval_query_variants(
+        "축성 방어구 제작 제료 알려줘"
+    ) == []
+    assert product_retrieval_query_variants(
+        "축성 방어구 제작 재료 알려줘"
+    ) == []
+
+
+def test_product_retrieval_uses_release_date_variant_for_search_and_reranking(
+    monkeypatch,
+):
+    searched_queries = []
+    reranker_pairs = []
+    artifacts = SimpleNamespace(chunks_by_id={}, documents_by_id={})
+
+    def fake_retrieve_with_embedding(
+        query,
+        embedding,
+        loaded_artifacts,
+        *,
+        top_k,
+        policy,
+    ):
+        chunk_id = "release"
+        artifacts.chunks_by_id[chunk_id] = {
+            "retrieval_text": "미카엘라 레이드 8월 6일 업데이트"
+        }
+        searched_queries.append(query)
+        return [
+            {
+                "chunk_id": chunk_id,
+                "parent_document_id": "release-parent",
+                "rank": 1,
+            }
+        ]
+
+    def fake_score_pairs(pairs):
+        reranker_pairs.extend(pairs)
+        return [1.0] * len(pairs)
+
+    monkeypatch.setattr(
+        "src.v3.retrieve_v3.retrieve_with_embedding",
+        fake_retrieve_with_embedding,
+    )
+    rag = ProductFreeRAG.__new__(ProductFreeRAG)
+    rag._artifacts = artifacts
+    rag.use_identity_shortlist = False
+    rag._encode_queries = lambda queries: [None] * len(queries)
+    rag._score_pairs = fake_score_pairs
+    rag.record_cuda_memory_diagnostic = lambda *args, **kwargs: None
+
+    rag.retrieve("미카엘라 레이드는 언제 출시했어?", default_as_of="2026-08-11")
+
+    assert searched_queries[0] == "미카엘라 레이드는 언제 출시했어?"
+    assert "미카엘라 레이드는 업데이트 되는 내용?" in searched_queries
+    assert [pair[0] for pair in reranker_pairs] == [
+        "미카엘라 레이드는 언제 출시했어?",
+        "미카엘라 레이드는 업데이트 되는 내용?",
+    ]
+
+
+def test_release_date_claim_rejects_event_window_without_release_relation():
+    evidence = (
+        "미카엘라 레이드 하드 난이도 미션에 참여하면 "
+        "캐릭터 미션도 함께 완료됩니다."
+    )
+    result = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": "미카엘라 레이드는 2026년 8월 6일 점검 후 출시했습니다.",
+                    "evidence_refs": ["E1"],
+                }
+            ],
+            "clarification": "",
+        },
+        question="미카엘라 레이드는 언제 출시했어?",
+        evidence_units=[
+            {
+                "evidence_ref": "E1",
+                "chunk_id": "event",
+                "start_char": 0,
+                "end_char": len(evidence),
+                "text": evidence,
+                "title": "미카엘라 클리어 미션 이벤트",
+                "context_text": (
+                    "2026년 8월 6일 점검 후부터 8월 20일 점검 전까지 "
+                    "진행되는 이벤트"
+                ),
+                "published_at": "2026-08-06",
+                "valid_from": "2026-08-06",
+                "valid_to": "2026-08-20",
+                "question_relevance_score": 0.9,
+            }
+        ],
+        chunks_by_id={
+            "event": {
+                "chunk_id": "event",
+                "display_text": evidence,
+            }
+        },
+        requested_subjects=None,
+    )
+
+    assert result["claims"] == []
+    assert result["rejected_claims"][0]["reasons"] == [
+        "question_relation_role_mismatch"
+    ]
+
+
+def test_release_date_claim_accepts_explicit_update_date_evidence():
+    evidence = (
+        "미카엘라 레이드는 2026년 8월 6일(목) 점검 중 "
+        "업데이트 되는 내용입니다."
+    )
+    result = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": "미카엘라 레이드는 2026년 8월 6일 업데이트됐습니다.",
+                    "evidence_refs": ["E1"],
+                }
+            ],
+            "clarification": "",
+        },
+        question="미카엘라 레이드는 언제 출시했어?",
+        evidence_units=[
+            {
+                "evidence_ref": "E1",
+                "chunk_id": "patch-note",
+                "start_char": 0,
+                "end_char": len(evidence),
+                "text": evidence,
+                "title": "시즌 11 Act 3. 무너진 성자 미카엘라",
+                "context_text": "업데이트 안내",
+                "published_at": "2026-08-06",
+                "question_relevance_score": 0.9,
+            }
+        ],
+        chunks_by_id={
+            "patch-note": {
+                "chunk_id": "patch-note",
+                "display_text": evidence,
+            }
+        },
+        requested_subjects=None,
+    )
+
+    assert [claim["text"] for claim in result["claims"]] == [
+        "미카엘라 레이드는 2026년 8월 6일 업데이트됐습니다."
+    ]
+    assert result["rejected_claims"] == []
+
+
+def test_release_date_claim_rebinds_event_ref_to_direct_update_evidence():
+    patch_text = (
+        "미카엘라 레이드는 2026년 8월 6일(목) 점검 중 "
+        "업데이트 되는 내용입니다."
+    )
+    event_text = "미카엘라 레이드 하드 난이도 미션이 진행됩니다."
+    result = verify_product_claim_output(
+        {
+            "mode": "answer",
+            "claims": [
+                {
+                    "text": "미카엘라 레이드는 2026년 8월 6일 출시했습니다.",
+                    "evidence_refs": ["E2"],
+                }
+            ],
+            "clarification": "",
+        },
+        question="미카엘라 레이드는 언제 출시했어?",
+        evidence_units=[
+            {
+                "evidence_ref": "E1",
+                "candidate_ref": "1",
+                "chunk_id": "patch-note",
+                "start_char": 0,
+                "end_char": len(patch_text),
+                "text": patch_text,
+                "title": "시즌 11 Act 3. 무너진 성자 미카엘라",
+                "context_text": "업데이트 안내",
+                "published_at": "2026-08-05",
+                "question_relevance_score": 0.9,
+            },
+            {
+                "evidence_ref": "E2",
+                "candidate_ref": "2",
+                "chunk_id": "event",
+                "start_char": 0,
+                "end_char": len(event_text),
+                "text": event_text,
+                "title": "미카엘라 클리어 미션 이벤트",
+                "context_text": (
+                    "2026년 8월 6일 점검 후부터 8월 20일까지"
+                ),
+                "published_at": "2026-08-06",
+                "question_relevance_score": 0.9,
+            },
+        ],
+        chunks_by_id={
+            "patch-note": {
+                "chunk_id": "patch-note",
+                "display_text": patch_text,
+            },
+            "event": {
+                "chunk_id": "event",
+                "display_text": event_text,
+            },
+        },
+        requested_subjects=None,
+    )
+
+    assert result["rejected_claims"] == []
+    assert result["claims"][0]["evidence_refs"] == ["E1"]
+    assert result["claims"][0]["citations"][0]["text"] == patch_text
+    assert result["verification"]["rebound_evidence_refs"] == [
+        {"claim_index": 1, "from": ["E2"], "to": ["E1"]}
+    ]
+
+
 def test_kiwi_clause_split_does_not_split_one_descriptive_phrase():
     question = "빠르고 강한 장비의 특징을 알려줘."
 
@@ -5042,6 +5747,254 @@ def test_explicit_question_subjects_only_uses_visible_surface_structure():
         "DirectX 11 추가 최적화 뒤 메모리 사용량은 "
         "DirectX 9과 견줘 어느 수준까지 개선됐어?"
     ) == []
+
+
+def test_nominative_subject_excludes_generic_question_attribute():
+    for question in (
+        "장비 초월 방법이 궁금해",
+        "장비 초월 비용이 궁금해",
+        "장비 초월 가격이 궁금해",
+        "장비 초월 위치가 궁금해",
+        "장비 초월 기간이 궁금해",
+        "장비 초월 조건이 궁금해",
+        "장비 초월 재료가 궁금해",
+    ):
+        assert explicit_nominative_question_subjects(question) == ["장비 초월"]
+
+
+def test_generic_price_question_uses_complete_cost_table_evidence():
+    table = (
+        "| 장비 종류 | 구분 | 레어리티별 소울 | 상급 원소 결정 | "
+        "순례의 인장 | 보이드 소울 |\n"
+        "| 특수장비 | 에픽 | 20 | 810 | 750 | 150 |\n"
+        "| 특수장비 | 레전더리 | 20 | 180 | 250 | 65 |\n"
+        "| 특수장비 | 유니크 | 40 | 36 | 25 | 1 |\n"
+        "| 특수장비 | 레어 | 50 | 9 | 13 | - |"
+    )
+    text = (
+        "획득 가능 보상 표\n"
+        "[TABLE]\n| 구분 | 보상 |\n| 기본 | 상자 |\n[/TABLE]\n"
+        "115Lv 장비 초월 비용은 아래와 같습니다.\n"
+        f"[TABLE]\n{table}\n[/TABLE]"
+    )
+    chunks = {
+        "cost": {
+            "chunk_id": "cost",
+            "parent_document_id": "guide",
+            "display_text": text,
+            "heading_path": ["NPC 장비 초월", "비용"],
+            "status": "current",
+        }
+    }
+    documents = {
+        "guide": {
+            "document_id": "guide",
+            "source_id": "dnf_game_guide",
+            "title": "초월",
+            "canonical_url": "https://df.nexon.com/guide/dfguide/1",
+            "published_at": "2026-08-11T10:00:00+09:00",
+            "valid_from": "2026-08-11",
+            "status": "current",
+        }
+    }
+
+    units = build_compact_product_evidence_pack(
+        ["cost"],
+        question="장비초월 가격이 궁금해",
+        requirement_queries=None,
+        chunks_by_id=chunks,
+        documents_by_id=documents,
+        temporal_by_document={},
+        max_units=8,
+    )
+
+    assert [unit["evidence_ref"] for unit in units] == ["T1"]
+    assert units[0]["complete"] is True
+    assert units[0]["table_label"] == "115Lv 장비 초월 비용"
+    prompt = build_product_prompt(
+        question="장비초월 가격이 궁금해",
+        evidence_units=units,
+    )
+    assert "완전한 4행 표" in prompt
+    assert "에픽 | 20 | 810" not in prompt
+
+    def fail_score_pairs(_pairs):
+        raise AssertionError("complete cost table must bypass atomic reranking")
+
+    atomic_units = build_atomic_reranked_product_evidence_pack(
+        ["cost"],
+        question="장비초월 가격이 궁금해",
+        requirement_queries=None,
+        chunks_by_id=chunks,
+        documents_by_id=documents,
+        temporal_by_document={},
+        score_pairs=fail_score_pairs,
+        max_units=8,
+    )
+    assert [unit["evidence_ref"] for unit in atomic_units] == ["T1"]
+
+    def fake_generator(*, prompt, model, timeout_seconds):
+        assert "완전한 4행 표" in prompt
+        assert "에픽 | 20 | 810" not in prompt
+        return {
+            "output": {
+                "mode": "answer",
+                "claims": [
+                    {
+                        "text": "115Lv 장비 초월 비용표입니다.",
+                        "evidence_refs": ["T1"],
+                    }
+                ],
+                "clarification": "",
+            },
+            "model": model,
+            "provider": "test",
+            "latency_ms": 1.0,
+            "usage": {
+                "input_tokens": 10,
+                "output_tokens": 5,
+                "total_tokens": 15,
+            },
+        }
+
+    result = answer_product_rag_from_candidates(
+        question="장비초월 가격이 궁금해",
+        requirement_queries=None,
+        requested_subjects=["장비초월"],
+        selected=[{"chunk_id": "cost", "parent_document_id": "guide"}],
+        chunks_by_id=chunks,
+        documents_by_id=documents,
+        temporal_by_document={},
+        model="test-model",
+        timeout_seconds=10,
+        generator=fake_generator,
+        evidence_units_override=atomic_units,
+    )
+
+    assert result["mode"] == "answer", (
+        result["rejected_claims"],
+        result["verification"],
+    )
+    assert result["claims"][0]["evidence_refs"] == ["T1"]
+    assert table in result["rendered_answer"]
+    citation = result["claims"][0]["citations"][0]
+    assert citation["text"] == table
+    assert citation["canonical_url"] == "https://df.nexon.com/guide/dfguide/1"
+    assert citation["source_id"] == "dnf_game_guide"
+    assert citation["published_at"] == "2026-08-11T10:00:00+09:00"
+    assert citation["valid_from"] == "2026-08-11"
+    assert citation["status"] == "current"
+
+
+def test_method_and_location_paraphrases_accept_only_procedural_evidence():
+    procedure = (
+        "장비 초월은 '아라드-벨 마이어 공국 남부-헨돈마이어-"
+        "레미디아 바실리카'의 메이가 로젠바흐 NPC를 통해 "
+        "진행할 수 있습니다."
+    )
+    definition = (
+        "장비 초월은 교환불가 장비를 계정 금고로 이동시키는 기능입니다."
+    )
+    procedure_unit = {
+        "evidence_ref": "E1",
+        "chunk_id": "procedure",
+        "parent_document_id": "guide",
+        "title": "NPC 장비 초월",
+        "context_text": "장비 초월 이용 방법",
+        "start_char": 0,
+        "end_char": len(procedure),
+        "text": procedure,
+        "unit_kind": "sentence",
+    }
+    definition_unit = {
+        "evidence_ref": "E2",
+        "chunk_id": "definition",
+        "parent_document_id": "guide",
+        "title": "NPC 장비 초월",
+        "context_text": "장비 초월 기능",
+        "start_char": 0,
+        "end_char": len(definition),
+        "text": definition,
+        "unit_kind": "sentence",
+    }
+
+    def verify(question, text, evidence_ref, unit, chunk_id):
+        return verify_product_claim_output(
+            {
+                "mode": "answer",
+                "claims": [
+                    {"text": text, "evidence_refs": [evidence_ref]}
+                ],
+                "clarification": "",
+            },
+            question=question,
+            evidence_units=[unit],
+            chunks_by_id={chunk_id: {"display_text": unit["text"]}},
+            requested_subjects=explicit_nominative_question_subjects(question),
+        )
+
+    for question in (
+        "장비 초월 방법이 궁금해",
+        "장비 초월 방법 알려줘",
+        "장비 초월은 어떻게 해?",
+        "장비 초월은 어디서 해?",
+    ):
+        verified = verify(question, procedure, "E1", procedure_unit, "procedure")
+        assert [claim["evidence_refs"] for claim in verified["claims"]] == [
+            ["E1"]
+        ]
+
+    for question in (
+        "장비 초월 방법이 궁금해",
+        "장비 초월 방법 알려줘",
+        "장비 초월은 어떻게 해?",
+        "장비 초월은 어디서 해?",
+    ):
+        definition_result = verify(
+            question,
+            definition,
+            "E2",
+            definition_unit,
+            "definition",
+        )
+        assert definition_result["claims"] == []
+
+    for question in (
+        "장비 초월 비용이 궁금해",
+        "장비 초월 가격이 궁금해",
+    ):
+        wrong_relation = verify(
+            question,
+            procedure,
+            "E1",
+            procedure_unit,
+            "procedure",
+        )
+        assert wrong_relation["claims"] == []
+
+    for question, text in (
+        (
+            "장비 초월에 필요한 재료가 궁금해",
+            "장비 초월에는 소울류 아이템과 다른 재료 아이템이 사용됩니다.",
+        ),
+        (
+            "장비 초월 비용이 궁금해",
+            "115Lv 장비 초월 비용은 100,000 골드입니다.",
+        ),
+        (
+            "장비 초월 가격이 궁금해",
+            "115Lv 장비 초월 비용은 100,000 골드입니다.",
+        ),
+    ):
+        unit = {
+            **procedure_unit,
+            "text": text,
+            "end_char": len(text),
+        }
+        verified = verify(question, text, "E1", unit, "procedure")
+        assert [claim["evidence_refs"] for claim in verified["claims"]] == [
+            ["E1"]
+        ]
 
 
 def test_compact_pack_keeps_two_units_for_one_surface_question():
@@ -5501,6 +6454,10 @@ def test_identity_shortlist_treats_explicit_month_as_an_interval():
         valid_from="2026-04-30",
         valid_to="2026-05-28",
     )
+    assert explicit_temporal_interval(
+        "7월 스페셜 클론 레어 아바타 상자를 알려줘",
+        reference_date="2026-07-31",
+    ) == ("2026-07-01", "2026-07-31")
 
 
 def test_identity_shortlist_prefers_matching_month_label():
@@ -5577,3 +6534,132 @@ def test_duplicate_aware_visibility_accepts_same_parent_overlap_text():
 
     assert visibility["all_supported_visible"] is True
     assert visibility["requirements"][0]["overlap_equivalent"] is True
+
+
+def _preview_notice_result(
+    *,
+    accepted_chunk_id: str,
+    claim_text: str | None = None,
+    source_kind_on_document: bool = False,
+):
+    evidence_by_chunk = {
+        "preview": "퍼스트 서버에서 광휘의 잔재 하드 보상은 90개입니다.",
+        "live": "라이브 서버에서 광휘의 잔재 하드 보상은 90개입니다.",
+    }
+    evidence = evidence_by_chunk[accepted_chunk_id]
+
+    def fake_generator(*, prompt, model, timeout_seconds):
+        del prompt, timeout_seconds
+        return {
+            "output": {
+                "mode": "answer",
+                "claims": [
+                    {
+                        "text": claim_text or evidence,
+                        "evidence_refs": ["E1"],
+                    }
+                ],
+                "clarification": "",
+            },
+            "model": model,
+            "provider": "test",
+            "latency_ms": 1.0,
+            "usage": {},
+        }
+
+    return answer_product_rag_from_candidates(
+        question="광휘의 잔재 하드 보상은 몇 개야?",
+        requirement_queries=None,
+        requested_subjects=None,
+        selected=[
+            {"chunk_id": "preview", "parent_document_id": "preview-doc"},
+            {"chunk_id": "live", "parent_document_id": "live-doc"},
+        ],
+        chunks_by_id={
+            "preview": {
+                "display_text": evidence_by_chunk["preview"],
+                "source_kind": (
+                    None if source_kind_on_document else "preview_patch"
+                ),
+            },
+            "live": {
+                "display_text": evidence_by_chunk["live"],
+                "source_kind": "guide",
+            },
+        },
+        documents_by_id={
+            "preview-doc": {
+                "source_kind": (
+                    "preview_patch" if source_kind_on_document else None
+                )
+            }
+        },
+        temporal_by_document={},
+        model="test-model",
+        timeout_seconds=10,
+        generator=fake_generator,
+        evidence_units_override=[
+            {
+                "evidence_ref": "E1",
+                "candidate_ref": "1",
+                "chunk_id": accepted_chunk_id,
+                "parent_document_id": f"{accepted_chunk_id}-doc",
+                "title": "미카엘라 레이드 보상",
+                "context_text": "난이도별 보상",
+                "start_char": 0,
+                "end_char": len(evidence),
+                "text": evidence,
+                "complete": False,
+            }
+        ],
+    )
+
+
+def test_preview_notice_is_server_rendered_for_accepted_preview_citation():
+    result = _preview_notice_result(accepted_chunk_id="preview")
+
+    notice = (
+        "퍼스트 서버(테스트 서버) 기준 정보입니다. "
+        "라이브 서버 적용 시 변경될 수 있습니다."
+    )
+    assert result["mode"] == "answer"
+    assert result["rendered_answer"].startswith(notice)
+    assert result["verification"]["preview_source_notice_required"] is True
+    assert result["verification"]["preview_evidence_refs"] == ["E1"]
+
+
+def test_preview_candidate_does_not_trigger_notice_when_live_citation_is_used():
+    result = _preview_notice_result(accepted_chunk_id="live")
+
+    assert "퍼스트 서버(테스트 서버) 기준 정보입니다." not in result[
+        "rendered_answer"
+    ]
+    assert result["verification"]["preview_source_notice_required"] is False
+    assert result["verification"]["preview_evidence_refs"] == []
+
+
+def test_rejected_preview_claim_does_not_trigger_notice():
+    result = _preview_notice_result(
+        accepted_chunk_id="preview",
+        claim_text="퍼스트 서버에서 광휘의 잔재 하드 보상은 91개입니다.",
+    )
+
+    assert result["claims"] == []
+    assert result["rejected_claims"]
+    assert "퍼스트 서버(테스트 서버) 기준 정보입니다." not in result[
+        "rendered_answer"
+    ]
+    assert result["verification"]["preview_source_notice_required"] is False
+    assert result["verification"]["preview_evidence_refs"] == []
+
+
+def test_preview_notice_accepts_document_level_source_kind_metadata():
+    result = _preview_notice_result(
+        accepted_chunk_id="preview",
+        source_kind_on_document=True,
+    )
+
+    assert result["verification"]["preview_source_notice_required"] is True
+    assert result["rendered_answer"].startswith(
+        "퍼스트 서버(테스트 서버) 기준 정보입니다."
+    )
