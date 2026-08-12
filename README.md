@@ -2,7 +2,7 @@
 
 던전앤파이터 공식 문서에서 답을 찾고 근거 좌표까지 복원하며, 봉인 평가와 사람 감수로 실패를 추적한 로컬 QA/RAG 프로젝트입니다.
 
-> **포트폴리오 본문: [PORTFOLIO.md](PORTFOLIO.md)**
+> **포트폴리오 본문: [PORTFOLIO.md](PORTFOLIO.md)** · **웹 페이지: [kimtaehoon1107-gif.github.io/dnf-domain-qa-slm-rag](https://kimtaehoon1107-gif.github.io/dnf-domain-qa-slm-rag/)** · **데모 영상: [7:40, 10문항](https://github.com/kimtaehoon1107-gif/dnf-domain-qa-slm-rag/releases/tag/demo-recording-20260812)**
 
 ## 현재 상태
 
@@ -20,8 +20,8 @@
 
 | 판정 대상 | 판정 | 이유 |
 |---|---|---|
-| 포트폴리오 공개 | **GO** | 성공뿐 아니라 실패, 측정 오류, 기각한 개선안까지 재현 가능하게 남겼습니다. |
-| Product Free RAG 제품 기본 경로 승격 | **NO-GO** | A6 사람 감수 정확도가 목표 80%에 미달하고 한 건의 unsupported overclaim이 남았습니다. |
+| 포트폴리오 공개 | **GO** | 성공뿐 아니라 실패, 측정 오류, 기각한 개선안까지 재현 가능하게 남김 |
+| Product Free RAG 제품 기본 경로 승격 | **NO-GO** | A6 사람 감수 정확도가 목표 80%에 미달하고 한 건의 unsupported overclaim이 남음 |
 
 ## 코퍼스 스냅샷
 

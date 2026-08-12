@@ -395,7 +395,7 @@ git -C dnf-domain-qa-slm-rag config core.longpaths true
 
 Gradio 데모는 `legacy_experimental`과 `product_free_rag_v1`을 같은 질문으로 비교하고, 최종 답, 서버 복원 원문 인용, 검색 후보, 전체 JSON을 보여준다. 독립 재검토에서는 clean clone으로 대표 질문 9개를 실제 실행했다. 상세 질문별 관찰은 [독립 평가자 재검토](reports/v3/independent_evaluator_review_20260811.md)에 있다.
 
-웹 데모(`app/product_free_rag_api.py` + `app/ui/`)도 별도로 커밋·병합됐다. 공식 출처 URL과 인용 원문을 카드로 보여주며, 고정 질문 10개(`data/v3/evaluation/demo_questions_20260811.jsonl`, 각 질문은 실행 전 커밋으로 고정)로 녹화한 화면은 [데모 영상](https://github.com/kimtaehoon1107-gif/dnf-domain-qa-slm-rag/releases/tag/demo-recording-20260812)에서 볼 수 있다. `answer`·`clarification`·`partial`·`unsupported` 네 가지 상태를 전부 포함했고, 잘 되는 사례만 고르지 않았다.
+웹 데모(`app/product_free_rag_api.py` + `app/ui/`)는 이후 커밋·병합됐다. 공식 출처 URL과 인용 원문을 카드로 보여주며, 고정 질문 10개(`data/v3/evaluation/demo_questions_20260811.jsonl`, 각 질문은 실행 전 커밋으로 고정)로 녹화한 화면은 [데모 영상](https://github.com/kimtaehoon1107-gif/dnf-domain-qa-slm-rag/releases/tag/demo-recording-20260812)에서 볼 수 있다. `answer`·`clarification`·`partial`·`unsupported` 네 가지 상태를 전부 포함했고, 잘 되는 사례만 고르지 않았다.
 
 ```powershell
 python app/product_free_rag_demo.py `
