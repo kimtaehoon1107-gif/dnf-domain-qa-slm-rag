@@ -55,8 +55,8 @@ pip install -r requirements.txt
 python -m pytest tests/v3 -q
 ```
 
-2026-08-11의 새 클론 재검증 결과는
-`1,365 passed / 2 failed / 67 subtests passed`입니다.
+2026-08-12의 새 클론 재검증(`main`, `5891ca2`) 결과는
+`1,370 passed / 2 failed / 67 subtests passed`입니다.
 
 실패 2건은 동결 artifact와 현재 재생성 manifest의 SHA가 다른 기존 known
 failures입니다. 새 Product 변경의 회귀와 구분해 그대로 보고합니다. 테스트는 생성
