@@ -420,8 +420,11 @@ def _render_markdown(report: dict[str, Any], rows: list[dict[str, Any]]) -> byte
     return "\n".join(lines).encode("utf-8")
 
 
-def evaluate_and_freeze(root: Path) -> dict[str, Any]:
+def evaluate_and_freeze(
+    root: Path, *, artifact_root: Path | None = None
+) -> dict[str, Any]:
     root = root.resolve()
+    artifact_root = root if artifact_root is None else artifact_root.resolve()
     inputs = {
         "ground_truth": root / DEFAULT_GROUND_TRUTH,
         "adaptive_dev": root / DEFAULT_DEV,
@@ -487,8 +490,8 @@ def evaluate_and_freeze(root: Path) -> dict[str, Any]:
             for name, path in inputs.items()
         },
     }
-    evidence_dir = root / "data/v3/evidence"
-    reports_dir = root / "reports/v3"
+    evidence_dir = artifact_root / "data/v3/evidence"
+    reports_dir = artifact_root / "reports/v3"
     cases_bytes = _serialize_jsonl(rows, sort_key=lambda row: row["case_id"])
     cases_sha = hashlib.sha256(cases_bytes).hexdigest()
     cases_path = evidence_dir / f"bounded_candidate_source_fallback_cases_{cases_sha}.jsonl"
@@ -511,9 +514,9 @@ def evaluate_and_freeze(root: Path) -> dict[str, Any]:
         "decision": result["decision"],
         "inputs": report["inputs"],
         "outputs": {
-            "cases": {"path": cases_path.relative_to(root).as_posix(), "sha256": cases_sha, "row_count": len(rows)},
-            "report_json": {"path": report_path.relative_to(root).as_posix(), "sha256": report_sha},
-            "report_md": {"path": markdown_path.relative_to(root).as_posix(), "sha256": markdown_sha},
+            "cases": {"path": cases_path.relative_to(artifact_root).as_posix(), "sha256": cases_sha, "row_count": len(rows)},
+            "report_json": {"path": report_path.relative_to(artifact_root).as_posix(), "sha256": report_sha},
+            "report_md": {"path": markdown_path.relative_to(artifact_root).as_posix(), "sha256": markdown_sha},
         },
         "input_hashes_unchanged": True,
         "runtime_or_canonical_promoted": False,

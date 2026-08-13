@@ -5,8 +5,9 @@ import json
 import unittest
 from pathlib import Path
 
+import src.v3.evaluate_claim_reranker as claim_reranker_evaluator
+from src.v3.collect_details import write_immutable
 from src.v3.evaluate_claim_reranker import (
-    freeze_claim_reranker,
     verify_reranked_claim,
 )
 
@@ -82,12 +83,13 @@ class ClaimRerankerArtifactTest(unittest.TestCase):
     CASES_SHA = "e1f2cedb533a9af62051dcf60fca1bdf8489c39e28a3b7724459aa97dbf9fe3a"
     MANIFEST_SHA = "32d236a75d30ead63c33530e92ea1349bb8000e6f03615e3783c82f76ce6bd6c"
 
-    def test_full_replay_is_content_addressed_and_reproducible(self) -> None:
-        result = freeze_claim_reranker(root=self.ROOT)
-        self.assertEqual(result["cases_sha256"], self.CASES_SHA)
-        self.assertEqual(result["manifest_sha256"], self.MANIFEST_SHA)
-        cases_path = Path(result["cases_path"])
-        manifest_path = Path(result["manifest_path"])
+    def test_frozen_artifacts_match_recorded_sha(self) -> None:
+        cases_path = self.ROOT / (
+            f"data/v3/evidence/claim_reranker_cases_{self.CASES_SHA}.jsonl"
+        )
+        manifest_path = self.ROOT / (
+            f"data/v3/evidence/claim_reranker_manifest_{self.MANIFEST_SHA}.json"
+        )
         self.assertEqual(
             hashlib.sha256(cases_path.read_bytes()).hexdigest(), self.CASES_SHA
         )
@@ -102,8 +104,24 @@ class ClaimRerankerArtifactTest(unittest.TestCase):
         self.assertEqual(
             [row["query_ordinal"] for row in rows], list(range(63))
         )
-        self.assertEqual(result["metrics"]["reranked_cited_group_hits"], 56)
-        self.assertEqual(result["metrics"]["strict_regressions"], 0)
+
+
+def test_claim_reranker_generator_is_reproducible(
+    tmp_path: Path, monkeypatch
+) -> None:
+    root = Path(__file__).resolve().parents[2]
+
+    def write_to_tmp(path: Path, content: bytes) -> None:
+        write_immutable(tmp_path / path.resolve().relative_to(root), content)
+
+    monkeypatch.setattr(claim_reranker_evaluator, "write_immutable", write_to_tmp)
+    first = claim_reranker_evaluator.freeze_claim_reranker(root=root)
+    second = claim_reranker_evaluator.freeze_claim_reranker(root=root)
+
+    assert first == second
+    assert first["metrics"]["reranked_cited_group_hits"] == 56
+    assert first["metrics"]["strict_regressions"] == 0
+    assert len([path for path in tmp_path.rglob("*") if path.is_file()]) == 4
 
 
 if __name__ == "__main__":

@@ -503,6 +503,7 @@ def _audit_regression_cases(
 def freeze_temporal_router(
     *,
     root: Path,
+    artifact_root: Path | None = None,
     documents_path: Path,
     chunks_path: Path,
     bm25_index_path: Path,
@@ -514,6 +515,7 @@ def freeze_temporal_router(
     schema_source_path: Path,
     contract_path: Path,
 ) -> dict[str, Any]:
+    artifact_root = root if artifact_root is None else artifact_root.resolve()
     documents = read_jsonl(documents_path)
     chunks = read_jsonl(chunks_path)
     overlay_rows = read_jsonl(overlay_path)
@@ -621,8 +623,8 @@ def freeze_temporal_router(
     )
     cases_bytes = _serialize_jsonl(case_rows, lambda row: row["case_id"])
     cases_sha = _sha256_bytes(cases_bytes)
-    temporal_dir = root / "data/v3/temporal"
-    reports_dir = root / "reports/v3"
+    temporal_dir = artifact_root / "data/v3/temporal"
+    reports_dir = artifact_root / "reports/v3"
     cases_path = temporal_dir / f"temporal_router_cases_{cases_sha}.jsonl"
     write_immutable(cases_path, cases_bytes)
 
@@ -671,7 +673,7 @@ def freeze_temporal_router(
             for name, path in input_paths.items()
         },
         "cases": {
-            "path": _relative(root, cases_path),
+            "path": _relative(artifact_root, cases_path),
             "sha256": cases_sha,
             "row_count": len(case_rows),
             "actual_current_rows": len(current_case_rows),

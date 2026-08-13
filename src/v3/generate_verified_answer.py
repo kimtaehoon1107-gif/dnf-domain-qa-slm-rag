@@ -486,6 +486,7 @@ def _markdown(report: dict[str, Any]) -> str:
 def freeze_extractive_generator(
     *,
     root: Path,
+    artifact_root: Path | None = None,
     documents_path: Path,
     dev_set_path: Path,
     decomposed_cases_path: Path,
@@ -495,6 +496,7 @@ def freeze_extractive_generator(
     selector_source_path: Path,
     contract_path: Path,
 ) -> dict[str, Any]:
+    artifact_root = root if artifact_root is None else artifact_root.resolve()
     documents = read_jsonl(documents_path)
     documents_by_id = {row["document_id"]: row for row in documents}
     dev_by_id = {row["dev_id"]: row for row in read_jsonl(dev_set_path)}
@@ -600,8 +602,8 @@ def freeze_extractive_generator(
         "final_benchmark": "NO-GO",
     }
 
-    generation_dir = root / "data/v3/generation"
-    reports_dir = root / "reports/v3"
+    generation_dir = artifact_root / "data/v3/generation"
+    reports_dir = artifact_root / "reports/v3"
     rows_bytes = _serialize_jsonl(output_rows, lambda row: row["case_id"])
     rows_sha = _sha256_bytes(rows_bytes)
     rows_path = generation_dir / f"extractive_answer_cases_{rows_sha}.jsonl"
@@ -633,7 +635,7 @@ def freeze_extractive_generator(
             "free_form_generation": False,
         },
         "cases": {
-            "path": _relative(root, rows_path),
+            "path": _relative(artifact_root, rows_path),
             "sha256": rows_sha,
             "row_count": len(output_rows),
             "claim_count": claim_count,
@@ -654,9 +656,9 @@ def freeze_extractive_generator(
         "gates": gates,
         "decisions": decisions,
         "artifacts": {
-            "cases_path": _relative(root, rows_path),
+            "cases_path": _relative(artifact_root, rows_path),
             "cases_sha256": rows_sha,
-            "manifest_path": _relative(root, manifest_path),
+            "manifest_path": _relative(artifact_root, manifest_path),
             "manifest_sha256": manifest_sha,
         },
         "not_measured": [

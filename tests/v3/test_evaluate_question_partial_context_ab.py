@@ -101,9 +101,9 @@ def test_context_claims_are_exact_full_chunk_slices():
         assert observation["context_character_count"] == expected_chars
 
 
-def test_freeze_is_content_addressed_and_reproducible():
-    first = evaluate_and_freeze(ROOT)
-    second = evaluate_and_freeze(ROOT)
+def test_freeze_is_content_addressed_and_reproducible(tmp_path: Path):
+    first = evaluate_and_freeze(ROOT, artifact_root=tmp_path)
+    second = evaluate_and_freeze(ROOT, artifact_root=tmp_path)
 
     assert first["cases_sha256"] == second["cases_sha256"]
     assert first["audit_sha256"] == second["audit_sha256"]

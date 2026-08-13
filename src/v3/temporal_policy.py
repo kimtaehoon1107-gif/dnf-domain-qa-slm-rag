@@ -329,7 +329,10 @@ def freeze_temporal_policy(
     search_source_path: Path,
     schema_source_path: Path,
     contract_path: Path,
+    *,
+    artifact_root: Path | None = None,
 ) -> dict[str, Any]:
+    artifact_root = root if artifact_root is None else artifact_root.resolve()
     documents = read_jsonl(documents_path)
     chunks = read_jsonl(chunks_path)
     conflict_rows = read_jsonl(conflict_packet_path)
@@ -380,8 +383,8 @@ def freeze_temporal_policy(
             }
         )
 
-    temporal_dir = root / "data/v3/temporal"
-    reports_dir = root / "reports/v3"
+    temporal_dir = artifact_root / "data/v3/temporal"
+    reports_dir = artifact_root / "reports/v3"
     overlay_bytes = _serialize_jsonl(
         overlay, lambda row: (row["lineage_id"], row["revision_ordinal"])
     )
@@ -464,7 +467,7 @@ def freeze_temporal_policy(
             for name, path in inputs.items()
         },
         "overlay": {
-            "path": _relative(root, overlay_path),
+            "path": _relative(artifact_root, overlay_path),
             "sha256": overlay_sha,
             "row_count": len(overlay),
             "audit": overlay_audit,

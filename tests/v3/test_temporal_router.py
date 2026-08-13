@@ -250,34 +250,29 @@ class TemporalRoutedPipelineTest(unittest.TestCase):
         )
 
 
-class TemporalRouterArtifactTest(unittest.TestCase):
-    def test_actual_inputs_refreeze_deterministically(self) -> None:
-        kwargs = {
-            "root": Path.cwd(),
-            "documents_path": DEFAULT_DOCUMENTS,
-            "chunks_path": DEFAULT_CHUNKS,
-            "bm25_index_path": DEFAULT_BM25_INDEX,
-            "overlay_path": DEFAULT_OVERLAY,
-            "conflict_packet_path": DEFAULT_CONFLICT_PACKET,
-            "builder_source_path": DEFAULT_BUILDER_SOURCE,
-            "retriever_source_path": DEFAULT_RETRIEVER_SOURCE,
-            "selector_source_path": DEFAULT_SELECTOR_SOURCE,
-            "schema_source_path": DEFAULT_SCHEMA_SOURCE,
-            "contract_path": DEFAULT_CONTRACT,
-        }
-        first = freeze_temporal_router(**kwargs)
-        second = freeze_temporal_router(**kwargs)
-        self.assertEqual(first, second)
-        for key in ("cases", "manifest", "report", "report_markdown"):
-            self.assertEqual(
-                file_sha256(Path(first[f"{key}_path"])),
-                first[f"{key}_sha256"],
-            )
-        self.assertTrue(all(first["gates"].values()))
-        self.assertEqual(
-            first["decisions"]["account_policy_temporal_intent_router"], "GO"
-        )
-        self.assertEqual(first["decisions"]["free_form_generator_generation"], "NO-GO")
+def test_actual_inputs_refreeze_deterministically(tmp_path: Path) -> None:
+    kwargs = {
+        "root": Path.cwd(),
+        "artifact_root": tmp_path,
+        "documents_path": DEFAULT_DOCUMENTS,
+        "chunks_path": DEFAULT_CHUNKS,
+        "bm25_index_path": DEFAULT_BM25_INDEX,
+        "overlay_path": DEFAULT_OVERLAY,
+        "conflict_packet_path": DEFAULT_CONFLICT_PACKET,
+        "builder_source_path": DEFAULT_BUILDER_SOURCE,
+        "retriever_source_path": DEFAULT_RETRIEVER_SOURCE,
+        "selector_source_path": DEFAULT_SELECTOR_SOURCE,
+        "schema_source_path": DEFAULT_SCHEMA_SOURCE,
+        "contract_path": DEFAULT_CONTRACT,
+    }
+    first = freeze_temporal_router(**kwargs)
+    second = freeze_temporal_router(**kwargs)
+    assert first == second
+    for key in ("cases", "manifest", "report", "report_markdown"):
+        assert file_sha256(Path(first[f"{key}_path"])) == first[f"{key}_sha256"]
+    assert all(first["gates"].values())
+    assert first["decisions"]["account_policy_temporal_intent_router"] == "GO"
+    assert first["decisions"]["free_form_generator_generation"] == "NO-GO"
 
 
 if __name__ == "__main__":

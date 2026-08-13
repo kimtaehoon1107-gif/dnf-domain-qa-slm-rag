@@ -449,6 +449,7 @@ def _markdown(report: dict[str, Any]) -> str:
 def freeze_decomposed_hybrid(
     *,
     root: Path,
+    artifact_root: Path | None = None,
     documents_path: Path,
     chunks_path: Path,
     bm25_manifest_path: Path,
@@ -465,6 +466,7 @@ def freeze_decomposed_hybrid(
     contract_path: Path,
     query_embeddings: np.ndarray,
 ) -> dict[str, Any]:
+    artifact_root = root if artifact_root is None else artifact_root.resolve()
     cases = read_jsonl(decomposition_cases_path)
     dev_rows = read_jsonl(dev_set_path)
     overlay_rows = read_jsonl(overlay_path)
@@ -670,8 +672,8 @@ def freeze_decomposed_hybrid(
         "final_benchmark": "NO-GO",
     }
 
-    decomposition_dir = root / "data/v3/decomposition"
-    reports_dir = root / "reports/v3"
+    decomposition_dir = artifact_root / "data/v3/decomposition"
+    reports_dir = artifact_root / "reports/v3"
     query_bytes = embeddings.astype("<f4", copy=False).tobytes(order="C")
     query_sha = _sha256_bytes(query_bytes)
     query_path = decomposition_dir / f"decomposed_query_embeddings_{query_sha}.f32"
@@ -707,7 +709,7 @@ def freeze_decomposed_hybrid(
             for name, path in input_paths.items()
         },
         "query_embeddings": {
-            "path": _relative(root, query_path),
+            "path": _relative(artifact_root, query_path),
             "sha256": query_sha,
             "row_count": embeddings.shape[0],
             "dimension": embeddings.shape[1],
@@ -718,7 +720,7 @@ def freeze_decomposed_hybrid(
             "normalized": True,
         },
         "cases": {
-            "path": _relative(root, cases_path),
+            "path": _relative(artifact_root, cases_path),
             "sha256": cases_sha,
             "row_count": len(output_cases),
         },
@@ -737,11 +739,11 @@ def freeze_decomposed_hybrid(
         "gates": gates,
         "decisions": decisions,
         "artifacts": {
-            "query_embeddings_path": _relative(root, query_path),
+            "query_embeddings_path": _relative(artifact_root, query_path),
             "query_embeddings_sha256": query_sha,
-            "cases_path": _relative(root, cases_path),
+            "cases_path": _relative(artifact_root, cases_path),
             "cases_sha256": cases_sha,
-            "manifest_path": _relative(root, manifest_path),
+            "manifest_path": _relative(artifact_root, manifest_path),
             "manifest_sha256": manifest_sha,
         },
         "not_measured": [

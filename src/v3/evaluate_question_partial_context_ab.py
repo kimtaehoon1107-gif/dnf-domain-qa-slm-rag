@@ -406,8 +406,11 @@ def _render_markdown(report: dict[str, Any], audit: list[dict[str, Any]]) -> byt
     return "\n".join(lines).encode("utf-8")
 
 
-def evaluate_and_freeze(root: Path) -> dict[str, Any]:
+def evaluate_and_freeze(
+    root: Path, *, artifact_root: Path | None = None
+) -> dict[str, Any]:
     root = root.resolve()
+    artifact_root = root if artifact_root is None else artifact_root.resolve()
     inputs = {
         "q2_cases": root / DEFAULT_Q2_CASES,
         "answerability_ground_truth": root / DEFAULT_GROUND_TRUTH,
@@ -467,8 +470,8 @@ def evaluate_and_freeze(root: Path) -> dict[str, Any]:
         },
     }
 
-    evidence_dir = root / "data/v3/evidence"
-    reports_dir = root / "reports/v3"
+    evidence_dir = artifact_root / "data/v3/evidence"
+    reports_dir = artifact_root / "reports/v3"
     cases_bytes = _serialize_jsonl(q3_rows, sort_key=lambda row: row["case_id"])
     cases_sha = hashlib.sha256(cases_bytes).hexdigest()
     cases_path = evidence_dir / f"question_partial_context_ab_cases_{cases_sha}.jsonl"
@@ -496,10 +499,10 @@ def evaluate_and_freeze(root: Path) -> dict[str, Any]:
         "decision": result["decision"],
         "inputs": report["inputs"],
         "outputs": {
-            "cases": {"path": cases_path.relative_to(root).as_posix(), "sha256": cases_sha, "row_count": len(q3_rows)},
-            "error_audit": {"path": audit_path.relative_to(root).as_posix(), "sha256": audit_sha, "row_count": len(audit)},
-            "report_json": {"path": report_path.relative_to(root).as_posix(), "sha256": report_sha},
-            "report_md": {"path": markdown_path.relative_to(root).as_posix(), "sha256": markdown_sha},
+            "cases": {"path": cases_path.relative_to(artifact_root).as_posix(), "sha256": cases_sha, "row_count": len(q3_rows)},
+            "error_audit": {"path": audit_path.relative_to(artifact_root).as_posix(), "sha256": audit_sha, "row_count": len(audit)},
+            "report_json": {"path": report_path.relative_to(artifact_root).as_posix(), "sha256": report_sha},
+            "report_md": {"path": markdown_path.relative_to(artifact_root).as_posix(), "sha256": markdown_sha},
         },
         "input_hashes_unchanged": True,
         "runtime_or_canonical_promoted": False,

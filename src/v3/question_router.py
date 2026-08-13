@@ -780,6 +780,7 @@ def _gold_route_allowed(
 def freeze_question_router(
     *,
     root: Path,
+    artifact_root: Path | None = None,
     documents_path: Path,
     chunks_path: Path,
     bm25_index_path: Path,
@@ -794,6 +795,7 @@ def freeze_question_router(
     schema_source_path: Path,
     contract_path: Path,
 ) -> dict[str, Any]:
+    artifact_root = root if artifact_root is None else artifact_root.resolve()
     documents = read_jsonl(documents_path)
     chunks = read_jsonl(chunks_path)
     overlay_rows = read_jsonl(overlay_path)
@@ -934,8 +936,8 @@ def freeze_question_router(
     cases = sorted(cases, key=lambda row: row["case_id"])
     cases_bytes = _serialize_jsonl(cases, lambda row: row["case_id"])
     cases_sha = _sha256_bytes(cases_bytes)
-    router_dir = root / "data/v3/router"
-    reports_dir = root / "reports/v3"
+    router_dir = artifact_root / "data/v3/router"
+    reports_dir = artifact_root / "reports/v3"
     cases_path = router_dir / f"question_router_cases_{cases_sha}.jsonl"
     write_immutable(cases_path, cases_bytes)
     manifest = {
@@ -948,7 +950,7 @@ def freeze_question_router(
             for name, path in input_paths.items()
         },
         "cases": {
-            "path": _relative(root, cases_path),
+            "path": _relative(artifact_root, cases_path),
             "sha256": cases_sha,
             "row_count": row_count,
         },

@@ -239,38 +239,33 @@ class QuestionRouterRuntimeTest(unittest.TestCase):
         self.assertTrue(all(not row["default_exposure"] for row in preview["hits"]))
 
 
-class QuestionRouterArtifactTest(unittest.TestCase):
-    def test_actual_adaptive_dev_refreezes_deterministically(self) -> None:
-        kwargs = {
-            "root": Path.cwd(),
-            "documents_path": DEFAULT_DOCUMENTS,
-            "chunks_path": DEFAULT_CHUNKS,
-            "bm25_index_path": DEFAULT_BM25_INDEX,
-            "bm25_manifest_path": DEFAULT_BM25_MANIFEST,
-            "dense_manifest_path": DEFAULT_DENSE_MANIFEST,
-            "overlay_path": DEFAULT_OVERLAY,
-            "dev_set_path": DEFAULT_DEV_SET,
-            "query_embeddings_path": DEFAULT_QUERY_EMBEDDINGS,
-            "builder_source_path": DEFAULT_BUILDER_SOURCE,
-            "runtime_source_path": DEFAULT_RUNTIME_SOURCE,
-            "temporal_source_path": DEFAULT_TEMPORAL_SOURCE,
-            "schema_source_path": DEFAULT_SCHEMA_SOURCE,
-            "contract_path": DEFAULT_CONTRACT,
-        }
-        first = freeze_question_router(**kwargs)
-        second = freeze_question_router(**kwargs)
-        self.assertEqual(first, second)
-        for key in ("cases", "manifest", "report", "report_markdown"):
-            self.assertEqual(
-                file_sha256(Path(first[f"{key}_path"])),
-                first[f"{key}_sha256"],
-            )
-        self.assertTrue(all(first["gates"].values()))
-        self.assertEqual(first["metrics"]["source_exact"], 63)
-        self.assertEqual(
-            first["decisions"]["adaptive_source_time_router"], "GO"
-        )
-        self.assertEqual(first["decisions"]["decomposition_execution"], "NO-GO")
+def test_actual_adaptive_dev_refreezes_deterministically(tmp_path: Path) -> None:
+    kwargs = {
+        "root": Path.cwd(),
+        "artifact_root": tmp_path,
+        "documents_path": DEFAULT_DOCUMENTS,
+        "chunks_path": DEFAULT_CHUNKS,
+        "bm25_index_path": DEFAULT_BM25_INDEX,
+        "bm25_manifest_path": DEFAULT_BM25_MANIFEST,
+        "dense_manifest_path": DEFAULT_DENSE_MANIFEST,
+        "overlay_path": DEFAULT_OVERLAY,
+        "dev_set_path": DEFAULT_DEV_SET,
+        "query_embeddings_path": DEFAULT_QUERY_EMBEDDINGS,
+        "builder_source_path": DEFAULT_BUILDER_SOURCE,
+        "runtime_source_path": DEFAULT_RUNTIME_SOURCE,
+        "temporal_source_path": DEFAULT_TEMPORAL_SOURCE,
+        "schema_source_path": DEFAULT_SCHEMA_SOURCE,
+        "contract_path": DEFAULT_CONTRACT,
+    }
+    first = freeze_question_router(**kwargs)
+    second = freeze_question_router(**kwargs)
+    assert first == second
+    for key in ("cases", "manifest", "report", "report_markdown"):
+        assert file_sha256(Path(first[f"{key}_path"])) == first[f"{key}_sha256"]
+    assert all(first["gates"].values())
+    assert first["metrics"]["source_exact"] == 63
+    assert first["decisions"]["adaptive_source_time_router"] == "GO"
+    assert first["decisions"]["decomposition_execution"] == "NO-GO"
 
 
 if __name__ == "__main__":

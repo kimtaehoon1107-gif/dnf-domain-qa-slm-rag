@@ -1,0 +1,202 @@
+{
+  "schema_version": "test_artifact_freeze_contract_split_survey_v1",
+  "surveyed_at": "2026-08-13",
+  "plan_path": "docs/v3/test_artifact_freeze_contract_split_plan.md",
+  "plan_sha256": "910e6c40553bdabe28ec4e997d1a4c566274aac45d4af0002025bd77c682257c",
+  "survey_baseline": {
+    "origin_main_commit": "bbf2d2c79b908a76aa76988d9eb35289eb5ad0a8",
+    "isolated_worktree": "C:/dnf_freeze_contract_survey",
+    "qwen_calls": 0
+  },
+  "summary": {
+    "tests_with_direct_freeze_calls": 15,
+    "direct_freeze_tests_already_isolated": 4,
+    "direct_freeze_tests_using_repository_paths": 11,
+    "repository_path_freeze_tests_passing": 9,
+    "repository_path_freeze_tests_failing": 2,
+    "passing_repository_path_freeze_tests_currently_creating_untracked_files": 2,
+    "passing_repository_path_freeze_tests_with_latent_write_side_effect": 7,
+    "additional_same_family_repository_writers": 4,
+    "current_polluting_tests_total": 8,
+    "current_polluting_tests_passing": 6,
+    "current_polluting_tests_failing": 2,
+    "current_generated_untracked_files": 14,
+    "tracked_files_changed": 0
+  },
+  "already_isolated_direct_freeze_tests": [
+    {
+      "test": "tests/v3/test_build_retrieval_dev.py::BuildRetrievalDevTest::test_content_addressed_write_is_reproducible_and_immutable",
+      "function": "freeze_json",
+      "isolation": "TemporaryDirectory"
+    },
+    {
+      "test": "tests/v3/test_build_table_atomic_facts.py::test_freeze_is_deterministic_and_input_is_unchanged",
+      "function": "freeze_table_atomic_facts",
+      "isolation": "tmp_path and explicit output_dir"
+    },
+    {
+      "test": "tests/v3/test_collect_details.py::CollectDetailsTest::test_immutable_write_and_freeze_hashes_are_reproducible",
+      "function": "freeze_collection_artifacts",
+      "isolation": "TemporaryDirectory and explicit collection_dir/report_dir"
+    },
+    {
+      "test": "tests/v3/test_collect_visual_evidence.py::CollectVisualEvidenceTest::test_freeze_is_content_addressed_and_reproducible",
+      "function": "freeze_visual_artifacts",
+      "isolation": "TemporaryDirectory and explicit evidence_dir/report_dir"
+    }
+  ],
+  "repository_path_direct_freeze_tests": [
+    {
+      "test": "tests/v3/test_evaluate_claim_reranker.py::ClaimRerankerArtifactTest::test_full_replay_is_content_addressed_and_reproducible",
+      "function": "freeze_claim_reranker",
+      "status": "passed",
+      "new_untracked_files": [],
+      "risk": "latent: production artifact writer is called against repository root"
+    },
+    {
+      "test": "tests/v3/test_evaluate_retrieval.py::FrozenRetrievalEvaluationTest::test_frozen_query_embeddings_refreeze_to_identical_artifacts",
+      "function": "freeze_evaluation",
+      "status": "passed",
+      "new_untracked_files": [],
+      "risk": "latent: current outputs match tracked content-addressed artifacts"
+    },
+    {
+      "test": "tests/v3/test_generate_verified_answer.py::ExtractiveGeneratorArtifactTest::test_actual_adaptive_pilot_refreezes_deterministically",
+      "function": "freeze_extractive_generator",
+      "status": "passed",
+      "new_untracked_files": [],
+      "risk": "latent: current outputs match tracked content-addressed artifacts"
+    },
+    {
+      "test": "tests/v3/test_harden_detail_parsers.py::FrozenHardenedParserArtifactTest::test_actual_hardened_artifacts_and_refreeze_are_reproducible",
+      "function": "freeze_hardening_artifacts",
+      "status": "passed",
+      "new_untracked_files": [],
+      "risk": "latent; output directories are already injectable"
+    },
+    {
+      "test": "tests/v3/test_question_decomposer.py::QuestionDecompositionArtifactTest::test_actual_adaptive_pilot_refreezes_deterministically",
+      "function": "freeze_question_decomposition",
+      "status": "passed",
+      "new_untracked_files": [
+        "data/v3/decomposition/question_decomposition_manifest_ab777ec9f7e60ba8f4f82a83afb6eeb0ba922d9255e0e2c1f92ce5d4f0a18c98.json",
+        "reports/v3/question_decomposition_cfa3112f68cac54d90ed2c98179a6429a7baea22bab1dda749151a4a2c9214bc.json"
+      ],
+      "risk": "current clean-clone pollution"
+    },
+    {
+      "test": "tests/v3/test_question_router.py::QuestionRouterArtifactTest::test_actual_adaptive_dev_refreezes_deterministically",
+      "function": "freeze_question_router",
+      "status": "passed",
+      "new_untracked_files": [
+        "data/v3/router/question_router_manifest_18f6ec70ebd8d6d3ab609503aae577576a82cfeb2a344aec80f4d978e3eccd38.json",
+        "reports/v3/question_router_8a22b2b2c95deee91142b2eea6384af9cc63dab05620739172ea6194daa94ff0.json"
+      ],
+      "risk": "current clean-clone pollution"
+    },
+    {
+      "test": "tests/v3/test_retrieve_decomposed.py::DecomposedHybridArtifactTest::test_actual_adaptive_pilot_refreezes_from_frozen_child_embeddings",
+      "function": "freeze_decomposed_hybrid",
+      "status": "failed",
+      "new_untracked_files": [
+        "data/v3/decomposition/decomposed_hybrid_manifest_d1cd565b98babf2c47aa89438f48fe8b5d210fd3ebd55f1680731b2c80453eae.json",
+        "reports/v3/decomposed_hybrid_e1855d8caa328b0b91d9cc0688dc8530020b037b462a74d2b8840ef281ae9f7e.json"
+      ],
+      "failure": "regenerated manifest SHA differs from the historical frozen manifest SHA"
+    },
+    {
+      "test": "tests/v3/test_review_entailment_app.py::EntailmentReviewUISmokeTest::test_smoke_report_freezes_deterministically",
+      "function": "freeze_smoke_report",
+      "status": "passed",
+      "new_untracked_files": [],
+      "risk": "latent: production report writer is called against repository root"
+    },
+    {
+      "test": "tests/v3/test_run_unified_runtime.py::UnifiedRuntimeArtifactTest::test_full_replay_is_content_addressed_and_reproducible",
+      "function": "freeze_unified_runtime",
+      "status": "failed",
+      "new_untracked_files": [
+        "data/v3/runtime/unified_runtime_manifest_9a7916f9226afe84795b8ab6d3b04d6cb00584249cc0d10b1760ddf345b013d2.json",
+        "reports/v3/unified_runtime_2a0eb5fcef1fa84cdf36786a14599ad4edcce730ca278ce0aa7926f8d53a52a7.json"
+      ],
+      "failure": "regenerated manifest SHA differs from the historical frozen manifest SHA"
+    },
+    {
+      "test": "tests/v3/test_temporal_policy.py::AccountPolicyTemporalArtifactTest::test_actual_inputs_refreeze_deterministically",
+      "function": "freeze_temporal_policy",
+      "status": "passed",
+      "new_untracked_files": [],
+      "risk": "latent: production artifact writer is called against repository root"
+    },
+    {
+      "test": "tests/v3/test_temporal_router.py::TemporalRouterArtifactTest::test_actual_inputs_refreeze_deterministically",
+      "function": "freeze_temporal_router",
+      "status": "passed",
+      "new_untracked_files": [],
+      "risk": "latent: production artifact writer is called against repository root"
+    }
+  ],
+  "additional_current_polluters": [
+    {
+      "test": "tests/v3/test_build_normalized_corpus.py::FrozenNormalizedCorpusArtifactTest::test_actual_normalized_corpus_refreeze_is_reproducible",
+      "function": "build_normalized_corpus",
+      "status": "passed",
+      "new_untracked_count": 3
+    },
+    {
+      "test": "tests/v3/test_evaluate_bounded_candidate_source_fallback_ab.py::test_freeze_is_content_addressed_and_reproducible",
+      "function": "evaluate_and_freeze",
+      "status": "passed",
+      "new_untracked_count": 1
+    },
+    {
+      "test": "tests/v3/test_evaluate_question_partial_context_ab.py::test_freeze_is_content_addressed_and_reproducible",
+      "function": "evaluate_and_freeze",
+      "status": "passed",
+      "new_untracked_count": 1
+    },
+    {
+      "test": "tests/v3/test_evaluate_question_partial_hybrid_ab.py::test_freeze_is_content_addressed_and_reproducible",
+      "function": "evaluate_and_freeze",
+      "status": "passed",
+      "new_untracked_count": 1
+    }
+  ],
+  "write_contract_findings": [
+    {
+      "function": "freeze_decomposed_hybrid",
+      "write_locations": [
+        "src/v3/retrieve_decomposed.py:678",
+        "src/v3/retrieve_decomposed.py:682",
+        "src/v3/retrieve_decomposed.py:731",
+        "src/v3/retrieve_decomposed.py:756",
+        "src/v3/retrieve_decomposed.py:760"
+      ],
+      "production_intent": "yes; CLI main calls the function",
+      "test_side_effect": "test reuses the production writer with Path.cwd()"
+    },
+    {
+      "function": "freeze_unified_runtime",
+      "write_locations": [
+        "src/v3/run_unified_runtime.py:716",
+        "src/v3/run_unified_runtime.py:745",
+        "src/v3/run_unified_runtime.py:771",
+        "src/v3/run_unified_runtime.py:775"
+      ],
+      "production_intent": "yes; CLI main calls the function",
+      "test_side_effect": "test reuses the production writer with repository ROOT"
+    },
+    {
+      "function_group": "all surveyed artifact builders",
+      "production_intent": "content-addressed writes are intentional in production",
+      "test_side_effect": "writing into data/v3 or reports/v3 is not required for test assertions and is accidental test coupling"
+    }
+  ],
+  "p0_gate": {
+    "production_code_changes": 0,
+    "passing_same_pattern_count_reported": 9,
+    "current_passing_polluter_count_reported": 6,
+    "production_vs_test_side_effect_classified": true,
+    "decision": "GO_TO_P1"
+  }
+}

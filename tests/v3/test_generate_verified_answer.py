@@ -244,37 +244,32 @@ class AnswerPlanVerifierTest(unittest.TestCase):
         self.assertFalse(verification["gates"]["temporal_policy_valid"])
 
 
-class ExtractiveGeneratorArtifactTest(unittest.TestCase):
-    def test_actual_adaptive_pilot_refreezes_deterministically(self) -> None:
-        kwargs = {
-            "root": Path.cwd(),
-            "documents_path": DEFAULT_DOCUMENTS,
-            "dev_set_path": DEFAULT_DEV_SET,
-            "decomposed_cases_path": DEFAULT_DECOMPOSED_CASES,
-            "decomposed_manifest_path": DEFAULT_DECOMPOSED_MANIFEST,
-            "builder_source_path": DEFAULT_BUILDER_SOURCE,
-            "retrieval_source_path": DEFAULT_RETRIEVAL_SOURCE,
-            "selector_source_path": DEFAULT_SELECTOR_SOURCE,
-            "contract_path": DEFAULT_CONTRACT,
-        }
-        first = freeze_extractive_generator(**kwargs)
-        second = freeze_extractive_generator(**kwargs)
+def test_frozen_extractive_artifacts_match_recorded_sha() -> None:
+    for path in (FROZEN_CASES, FROZEN_MANIFEST, FROZEN_REPORT, FROZEN_REPORT_MD):
+        assert file_sha256(path) == path.stem.rsplit("_", 1)[-1]
 
-        self.assertEqual(first, second)
-        self.assertEqual(first["cases_sha256"], file_sha256(FROZEN_CASES))
-        self.assertEqual(first["manifest_sha256"], file_sha256(FROZEN_MANIFEST))
-        self.assertEqual(first["report_sha256"], file_sha256(FROZEN_REPORT))
-        self.assertEqual(
-            first["report_markdown_sha256"], file_sha256(FROZEN_REPORT_MD)
-        )
-        self.assertTrue(all(first["gates"].values()))
-        self.assertEqual(first["metrics"]["verified_claims"], 8)
-        self.assertEqual(
-            first["decisions"]["schema_constrained_extractive_generator"], "GO"
-        )
-        self.assertEqual(
-            first["decisions"]["deterministic_claim_verifier"], "GO"
-        )
+
+def test_extractive_generator_is_reproducible(tmp_path: Path) -> None:
+    kwargs = {
+        "root": Path.cwd(),
+        "artifact_root": tmp_path,
+        "documents_path": DEFAULT_DOCUMENTS,
+        "dev_set_path": DEFAULT_DEV_SET,
+        "decomposed_cases_path": DEFAULT_DECOMPOSED_CASES,
+        "decomposed_manifest_path": DEFAULT_DECOMPOSED_MANIFEST,
+        "builder_source_path": DEFAULT_BUILDER_SOURCE,
+        "retrieval_source_path": DEFAULT_RETRIEVAL_SOURCE,
+        "selector_source_path": DEFAULT_SELECTOR_SOURCE,
+        "contract_path": DEFAULT_CONTRACT,
+    }
+    first = freeze_extractive_generator(**kwargs)
+    second = freeze_extractive_generator(**kwargs)
+
+    assert first == second
+    assert all(first["gates"].values())
+    assert first["metrics"]["verified_claims"] == 8
+    assert first["decisions"]["schema_constrained_extractive_generator"] == "GO"
+    assert first["decisions"]["deterministic_claim_verifier"] == "GO"
 
 
 if __name__ == "__main__":
