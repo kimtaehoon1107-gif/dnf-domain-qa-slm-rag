@@ -55,6 +55,11 @@ pip install -r requirements.txt
 python -m pytest tests/v3 -q
 ```
 
+`requirements.txt`는 하한 버전만 지정합니다. CI가 실제로 설치·검증한
+정확한 버전 조합 그대로 재현하려면 `requirements-lock.txt`를 대신
+씁니다(`pip install -r requirements-lock.txt`) — GitHub Actions도 이
+파일을 씁니다.
+
 2026-08-13의 새 클론 재검증(`main`, `b0ec7c9`) 결과는
 `1,378 passed / 0 failed / 67 subtests passed`이며 종료 코드는 0입니다.
 
