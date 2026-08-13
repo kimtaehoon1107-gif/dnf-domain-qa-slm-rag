@@ -55,12 +55,17 @@ pip install -r requirements.txt
 python -m pytest tests/v3 -q
 ```
 
-2026-08-12의 새 클론 재검증(`main`, `5891ca2`) 결과는
-`1,370 passed / 2 failed / 67 subtests passed`입니다.
+2026-08-13의 새 클론 재검증(`main`, `b0ec7c9`) 결과는
+`1,378 passed / 0 failed / 67 subtests passed`이며 종료 코드는 0입니다.
 
-실패 2건은 동결 artifact와 현재 재생성 manifest의 SHA가 다른 기존 known
-failures입니다. 새 Product 변경의 회귀와 구분해 그대로 보고합니다. 테스트는 생성
-모델을 모킹하므로 **Ollama·GPU·모델 다운로드·인터넷이 모두 필요 없습니다.**
+이전에는 동결 artifact와 재생성 manifest의 SHA가 갈리는 known failure
+2건이 있었습니다. `freeze_*` 계열 함수를 테스트에서 직접 호출하면서
+저장소 경로에 결과를 쓰는 부작용이 있었는데, 봉인 무결성 검증(읽기 전용)과
+생성기 재현성 검증(`tmp_path` 격리)으로 계약을 분리해 제거했습니다. 실행
+전후 `git status`도 동일합니다. 자세한 과정은 [freeze 계약 분리
+결과](reports/v3/test_artifact_freeze_contract_split_results_20260813.md)에
+있습니다. 테스트는 생성 모델을 모킹하므로 **Ollama·GPU·모델 다운로드·
+인터넷이 모두 필요 없습니다.**
 
 첫 두 줄은 긴 artifact 경로가 있는 Windows 저장소를 위한 설정입니다. Linux·macOS는
 일반 `git clone`도 사용할 수 있습니다. 독립 검토의 전체 범위와 발견한 false-full

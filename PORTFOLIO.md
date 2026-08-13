@@ -382,7 +382,7 @@ PowerShell 전달 중 한글 질문이 `?`로 깨져 정상 파이프라인을 `
 
 ### 11-2. 재현 경계
 
-모델 없는 검증은 `python -m pytest tests/v3 -q`로 실행한다. 추적 파일만 받은 새 클론 `main`(`5891ca2`)의 결과는 **1,370 passed / 2 failed / 67 subtests passed**이며, 두 실패는 동결된 content-addressed manifest SHA에 대한 기존 불일치다. 작업 폴더의 미추적 실험 테스트를 포함한 더 큰 숫자는 재현 수치에서 제외했다. 테스트는 생성 모델을 모킹하므로 GPU·Ollama·인터넷이 필요 없다. 코퍼스 스냅샷과 청크 ID 계약은 §3에, 레거시 v1/v2 재현 커맨드는 [별도 문서](docs/legacy_v1_v2_reproduction.md)에 분리했다.
+모델 없는 검증은 `python -m pytest tests/v3 -q`로 실행한다. 추적 파일만 받은 새 클론 `main`(`b0ec7c9`)의 결과는 **1,378 passed / 0 failed / 67 subtests passed**이며 종료 코드는 0이다. 예전에는 동결 SHA와 재생성 manifest가 갈리는 known failure 2건이 있었는데, `freeze_*` 함수가 테스트 안에서 저장소 경로에 직접 쓰던 부작용을 봉인 무결성(읽기 전용)과 생성기 재현성(`tmp_path`) 검증으로 분리해 제거했다. 실행 전후 `git status`도 동일하다 — [freeze 계약 분리 결과](reports/v3/test_artifact_freeze_contract_split_results_20260813.md). 작업 폴더의 미추적 실험 테스트를 포함한 더 큰 숫자는 재현 수치에서 제외했다. 테스트는 생성 모델을 모킹하므로 GPU·Ollama·인터넷이 필요 없다. 코퍼스 스냅샷과 청크 ID 계약은 §3에, 레거시 v1/v2 재현 커맨드는 [별도 문서](docs/legacy_v1_v2_reproduction.md)에 분리했다.
 
 Windows의 깊은 경로에서는 추적된 봉인 artifact 이름이 기본 경로 길이를 넘을 수 있다. 실제 OneDrive 하위 clone은 다음 두 줄로 통과했다.
 
@@ -408,7 +408,7 @@ python app/product_free_rag_demo.py `
 
 ![Product Free RAG v1 로컬 Gradio 데모](docs/assets/product_free_rag_demo_20260806.png)
 
-최신 수정 `5891ca2`(main)의 clean clone 전체 v3 회귀 기록은 **1,370 passed / 2 failed / 67 subtests passed**다. 실패 두 건은 기존 content-addressed manifest SHA 불일치다. 미카엘라 보상 종류와 7월 월간 상품은 실제 런타임까지 호출해 검증했으며, 코퍼스 승격 당시 수치와 근거는 [Product 코퍼스 승격 결과](reports/v3/product_free_rag_corpus_promotion_20260811.md)에 보존했다. 재검토 중 7월 상품 세로형 표에서 거래 타입 값을 판매가로도 노출한 false-full을 추가로 발견했고, 행 관계 결속 검사로 오답을 제거해 안전한 `partial`로 낮췄다.
+최신 수정 `b0ec7c9`(main)의 clean clone 전체 v3 회귀 기록은 **1,378 passed / 0 failed / 67 subtests passed**다(종료 코드 0). 미카엘라 보상 종류와 7월 월간 상품은 실제 런타임까지 호출해 검증했으며, 코퍼스 승격 당시 수치와 근거는 [Product 코퍼스 승격 결과](reports/v3/product_free_rag_corpus_promotion_20260811.md)에 보존했다. 재검토 중 7월 상품 세로형 표에서 거래 타입 값을 판매가로도 노출한 false-full을 추가로 발견했고, 행 관계 결속 검사로 오답을 제거해 안전한 `partial`로 낮췄다.
 
 ## 12. 한계와 운영 계획
 
