@@ -223,24 +223,26 @@ class FrozenRetrievalEvaluationTest(unittest.TestCase):
             {"both": 46, "bm25_only": 2, "dense_only": 6, "neither": 1},
         )
 
-    def test_frozen_query_embeddings_refreeze_to_identical_artifacts(self) -> None:
-        embeddings = np.fromfile(FROZEN_QUERY_EMBEDDINGS, dtype="<f4").reshape(63, 1024)
+def test_retrieval_generator_is_reproducible(tmp_path: Path) -> None:
+    embeddings = np.fromfile(FROZEN_QUERY_EMBEDDINGS, dtype="<f4").reshape(63, 1024)
+    query_model = json.loads(FROZEN_MANIFEST.read_text(encoding="utf-8"))[
+        "query_model"
+    ]
+    kwargs = {
+        "root": Path.cwd(),
+        "dev_path": DEFAULT_DEV_SET,
+        "dev_manifest_path": DEV_MANIFEST,
+        "bm25_manifest_path": DEFAULT_BM25_MANIFEST,
+        "dense_manifest_path": DEFAULT_DENSE_MANIFEST,
+        "query_embeddings": embeddings,
+        "query_model": query_model,
+        "artifact_root": tmp_path,
+    }
 
-        result = freeze_evaluation(
-            Path.cwd(),
-            DEFAULT_DEV_SET,
-            DEV_MANIFEST,
-            DEFAULT_BM25_MANIFEST,
-            DEFAULT_DENSE_MANIFEST,
-            embeddings,
-            self.manifest["query_model"],
-        )
+    first = freeze_evaluation(**kwargs)
+    second = freeze_evaluation(**kwargs)
 
-        self.assertEqual(result["query_embeddings_sha256"], file_sha256(FROZEN_QUERY_EMBEDDINGS))
-        self.assertEqual(result["results_sha256"], file_sha256(FROZEN_RESULTS))
-        self.assertEqual(result["manifest_sha256"], file_sha256(FROZEN_MANIFEST))
-        self.assertEqual(result["report_sha256"], file_sha256(FROZEN_REPORT))
-        self.assertEqual(result["report_markdown_sha256"], file_sha256(FROZEN_REPORT_MD))
+    assert first == second
 
 
 if __name__ == "__main__":

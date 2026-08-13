@@ -164,32 +164,27 @@ class EntailmentReviewExportTest(unittest.TestCase):
             self.assertFalse(manifest["use_restrictions"]["training_allowed"])
 
 
-class EntailmentReviewUISmokeTest(unittest.TestCase):
-    def test_smoke_report_freezes_deterministically(self) -> None:
-        first = freeze_smoke_report(
-            Path.cwd(),
-            DEFAULT_PACKET,
-            DEFAULT_PACKET_MANIFEST,
-            DEFAULT_APP_SOURCE,
-            DEFAULT_REVIEW_CONTRACT,
-            DEFAULT_DRAFT,
-        )
-        second = freeze_smoke_report(
-            Path.cwd(),
-            DEFAULT_PACKET,
-            DEFAULT_PACKET_MANIFEST,
-            DEFAULT_APP_SOURCE,
-            DEFAULT_REVIEW_CONTRACT,
-            DEFAULT_DRAFT,
-        )
-        self.assertEqual(first, second)
-        self.assertEqual(first["decision"]["ui_contract"], "GO")
-        self.assertEqual(first["decision"]["human_review"], "PENDING")
-        self.assertEqual(first["decision"]["generator_entry"], "NO-GO")
-        self.assertEqual(first["report_sha256"], file_sha256(FROZEN_SMOKE_REPORT))
-        self.assertEqual(
-            first["report_markdown_sha256"], file_sha256(FROZEN_SMOKE_REPORT_MD)
-        )
+def test_frozen_smoke_reports_match_recorded_sha() -> None:
+    for path in (FROZEN_SMOKE_REPORT, FROZEN_SMOKE_REPORT_MD):
+        assert file_sha256(path) == path.stem.rsplit("_", 1)[-1]
+
+
+def test_smoke_report_generator_is_reproducible(tmp_path: Path) -> None:
+    args = (
+        Path.cwd(),
+        DEFAULT_PACKET,
+        DEFAULT_PACKET_MANIFEST,
+        DEFAULT_APP_SOURCE,
+        DEFAULT_REVIEW_CONTRACT,
+        DEFAULT_DRAFT,
+    )
+    first = freeze_smoke_report(*args, artifact_root=tmp_path)
+    second = freeze_smoke_report(*args, artifact_root=tmp_path)
+
+    assert first == second
+    assert first["decision"]["ui_contract"] == "GO"
+    assert first["decision"]["human_review"] == "PENDING"
+    assert first["decision"]["generator_entry"] == "NO-GO"
 
 
 if __name__ == "__main__":

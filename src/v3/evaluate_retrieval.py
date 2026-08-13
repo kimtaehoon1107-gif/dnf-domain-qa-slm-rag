@@ -527,7 +527,10 @@ def freeze_evaluation(
     dense_manifest_path: Path,
     query_embeddings: np.ndarray,
     query_model: dict[str, Any],
+    *,
+    artifact_root: Path | None = None,
 ) -> dict[str, Any]:
+    artifact_root = root if artifact_root is None else artifact_root.resolve()
     dev_hash = _verify_content_hash(dev_path)
     dev_manifest_hash = _verify_content_hash(dev_manifest_path)
     dev_rows = read_jsonl(dev_path)
@@ -552,8 +555,8 @@ def freeze_evaluation(
         raise RuntimeError(f"Retrieval evaluation gates failed: {failed}")
     aggregate = aggregate_results(results)
 
-    retrieval_dir = root / "data/v3/retrieval"
-    reports_dir = root / "reports/v3"
+    retrieval_dir = artifact_root / "data/v3/retrieval"
+    reports_dir = artifact_root / "reports/v3"
     query_bytes = query_embeddings.astype("<f4", copy=False).tobytes(order="C")
     query_sha = _sha256_bytes(query_bytes)
     query_path = retrieval_dir / f"retrieval_dev_query_embeddings_{query_sha}.f32"
@@ -577,7 +580,7 @@ def freeze_evaluation(
             **input_provenance,
         },
         "query_embeddings": {
-            "path": _relative(root, query_path),
+            "path": _relative(artifact_root, query_path),
             "sha256": query_sha,
             "row_count": query_embeddings.shape[0],
             "dimension": query_embeddings.shape[1],
@@ -587,7 +590,7 @@ def freeze_evaluation(
         "query_model": query_model,
         "dense_model": dense_model,
         "results": {
-            "path": _relative(root, result_path),
+            "path": _relative(artifact_root, result_path),
             "sha256": result_sha,
             "row_count": len(results),
         },
@@ -617,11 +620,11 @@ def freeze_evaluation(
         "audit": audit,
         "failure_cases_at_10": _failure_cases(results, 10),
         "artifacts": {
-            "results_path": _relative(root, result_path),
+            "results_path": _relative(artifact_root, result_path),
             "results_sha256": result_sha,
-            "query_embeddings_path": _relative(root, query_path),
+            "query_embeddings_path": _relative(artifact_root, query_path),
             "query_embeddings_sha256": query_sha,
-            "manifest_path": _relative(root, manifest_path),
+            "manifest_path": _relative(artifact_root, manifest_path),
             "manifest_sha256": manifest_sha,
         },
         "not_measured": [

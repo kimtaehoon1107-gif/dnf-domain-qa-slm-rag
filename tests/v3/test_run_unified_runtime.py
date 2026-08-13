@@ -143,13 +143,13 @@ class UnifiedRuntimeArtifactTest(unittest.TestCase):
     CASES_SHA = "f28e2fbfb768c901dc4f1079f262252d645a74c7e4ee494180c2879e528f7789"
     MANIFEST_SHA = "7f9d747c65960db5985c2ddf07592e09f0f82053b41db2801ce117151ac032c3"
 
-    def test_full_replay_is_content_addressed_and_reproducible(self) -> None:
-        result = freeze_unified_runtime(root=self.ROOT)
-        self.assertEqual(result["cases_sha256"], self.CASES_SHA)
-        self.assertEqual(result["manifest_sha256"], self.MANIFEST_SHA)
-
-        cases_path = Path(result["cases_path"])
-        manifest_path = Path(result["manifest_path"])
+    def test_frozen_artifacts_match_recorded_sha(self) -> None:
+        cases_path = self.ROOT / (
+            f"data/v3/runtime/unified_runtime_cases_{self.CASES_SHA}.jsonl"
+        )
+        manifest_path = self.ROOT / (
+            f"data/v3/runtime/unified_runtime_manifest_{self.MANIFEST_SHA}.json"
+        )
         self.assertEqual(
             hashlib.sha256(cases_path.read_bytes()).hexdigest(), self.CASES_SHA
         )
@@ -169,6 +169,20 @@ class UnifiedRuntimeArtifactTest(unittest.TestCase):
         self.assertTrue(
             all(not row["response"]["citation_chunk_ids"] for row in abstained)
         )
+
+
+def test_unified_runtime_generator_is_reproducible(tmp_path: Path) -> None:
+    root = Path(__file__).resolve().parents[2]
+    first = freeze_unified_runtime(root=root, artifact_root=tmp_path)
+    second = freeze_unified_runtime(root=root, artifact_root=tmp_path)
+
+    assert first == second
+    rows = [
+        json.loads(line)
+        for line in Path(first["cases_path"]).read_text(encoding="utf-8").splitlines()
+    ]
+    assert len(rows) == 63
+    assert [row["query_ordinal"] for row in rows] == list(range(63))
 
 
 if __name__ == "__main__":

@@ -339,6 +339,7 @@ def _markdown(report: dict[str, Any]) -> str:
 def freeze_unified_runtime(
     *,
     root: Path,
+    artifact_root: Path | None = None,
     documents_path: Path | None = None,
     chunks_path: Path | None = None,
     bm25_index_path: Path | None = None,
@@ -356,6 +357,7 @@ def freeze_unified_runtime(
     contract_path: Path | None = None,
 ) -> dict[str, Any]:
     root = root.resolve()
+    artifact_root = root if artifact_root is None else artifact_root.resolve()
 
     def resolve(path: Path | None, default: Path) -> Path:
         value = default if path is None else path
@@ -708,8 +710,8 @@ def freeze_unified_runtime(
         "final_benchmark": "NO-GO",
     }
 
-    runtime_dir = root / "data/v3/runtime"
-    reports_dir = root / "reports/v3"
+    runtime_dir = artifact_root / "data/v3/runtime"
+    reports_dir = artifact_root / "reports/v3"
     rows_bytes = _serialize_jsonl(rows, lambda row: row["query_ordinal"])
     rows_sha = _sha256_bytes(rows_bytes)
     rows_path = runtime_dir / f"unified_runtime_cases_{rows_sha}.jsonl"
@@ -731,7 +733,7 @@ def freeze_unified_runtime(
             "gold_available_to_runtime": False,
         },
         "cases": {
-            "path": _relative(root, rows_path),
+            "path": _relative(artifact_root, rows_path),
             "sha256": rows_sha,
             "row_count": len(rows),
         },
@@ -753,9 +755,9 @@ def freeze_unified_runtime(
         "decisions": decisions,
         "failures": failures,
         "artifacts": {
-            "cases_path": _relative(root, rows_path),
+            "cases_path": _relative(artifact_root, rows_path),
             "cases_sha256": rows_sha,
-            "manifest_path": _relative(root, manifest_path),
+            "manifest_path": _relative(artifact_root, manifest_path),
             "manifest_sha256": manifest_sha,
         },
         "not_measured": [

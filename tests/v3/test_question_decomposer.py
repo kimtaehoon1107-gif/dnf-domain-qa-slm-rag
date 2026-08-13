@@ -142,36 +142,31 @@ class ParentSourceHintTest(unittest.TestCase):
         )
 
 
-class QuestionDecompositionArtifactTest(unittest.TestCase):
-    def test_actual_adaptive_pilot_refreezes_deterministically(self) -> None:
-        kwargs = {
-            "root": Path.cwd(),
-            "documents_path": DEFAULT_DOCUMENTS,
-            "chunks_path": DEFAULT_CHUNKS,
-            "bm25_index_path": DEFAULT_BM25_INDEX,
-            "overlay_path": DEFAULT_OVERLAY,
-            "dev_set_path": DEFAULT_DEV_SET,
-            "router_cases_path": DEFAULT_ROUTER_CASES,
-            "router_manifest_path": DEFAULT_ROUTER_MANIFEST,
-            "builder_source_path": DEFAULT_BUILDER_SOURCE,
-            "router_source_path": DEFAULT_ROUTER_SOURCE,
-            "schema_source_path": DEFAULT_SCHEMA_SOURCE,
-            "contract_path": DEFAULT_CONTRACT,
-        }
-        first = freeze_question_decomposition(**kwargs)
-        second = freeze_question_decomposition(**kwargs)
-        self.assertEqual(first, second)
-        for key in ("cases", "manifest", "report", "report_markdown"):
-            self.assertEqual(
-                file_sha256(Path(first[f"{key}_path"])),
-                first[f"{key}_sha256"],
-            )
-        self.assertTrue(all(first["gates"].values()))
-        self.assertEqual(first["metrics"]["evidence_group_hits_at_10"], 8)
-        self.assertEqual(
-            first["decisions"]["deterministic_question_decomposition"], "GO"
-        )
-        self.assertEqual(first["decisions"]["child_hybrid_retrieval"], "NO-GO")
+def test_actual_adaptive_pilot_refreezes_deterministically(tmp_path: Path) -> None:
+    kwargs = {
+        "root": Path.cwd(),
+        "artifact_root": tmp_path,
+        "documents_path": DEFAULT_DOCUMENTS,
+        "chunks_path": DEFAULT_CHUNKS,
+        "bm25_index_path": DEFAULT_BM25_INDEX,
+        "overlay_path": DEFAULT_OVERLAY,
+        "dev_set_path": DEFAULT_DEV_SET,
+        "router_cases_path": DEFAULT_ROUTER_CASES,
+        "router_manifest_path": DEFAULT_ROUTER_MANIFEST,
+        "builder_source_path": DEFAULT_BUILDER_SOURCE,
+        "router_source_path": DEFAULT_ROUTER_SOURCE,
+        "schema_source_path": DEFAULT_SCHEMA_SOURCE,
+        "contract_path": DEFAULT_CONTRACT,
+    }
+    first = freeze_question_decomposition(**kwargs)
+    second = freeze_question_decomposition(**kwargs)
+    assert first == second
+    for key in ("cases", "manifest", "report", "report_markdown"):
+        assert file_sha256(Path(first[f"{key}_path"])) == first[f"{key}_sha256"]
+    assert all(first["gates"].values())
+    assert first["metrics"]["evidence_group_hits_at_10"] == 8
+    assert first["decisions"]["deterministic_question_decomposition"] == "GO"
+    assert first["decisions"]["child_hybrid_retrieval"] == "NO-GO"
 
 
 if __name__ == "__main__":

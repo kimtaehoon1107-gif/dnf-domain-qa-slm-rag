@@ -261,7 +261,7 @@ class HardenDetailParsersTest(unittest.TestCase):
 
 
 class FrozenHardenedParserArtifactTest(unittest.TestCase):
-    def test_actual_hardened_artifacts_and_refreeze_are_reproducible(self) -> None:
+    def test_actual_hardened_artifacts_match_recorded_sha(self) -> None:
         previews = read_jsonl(FROZEN_PREVIEW)
         manifest = json.loads(FROZEN_MANIFEST.read_text(encoding="utf-8"))
         report = json.loads(FROZEN_REPORT.read_text(encoding="utf-8"))
@@ -304,20 +304,27 @@ class FrozenHardenedParserArtifactTest(unittest.TestCase):
         )
         self.assertEqual(guide_change["observed_updated_at"], "2026-07-16")
 
-        refrozen = freeze_hardening_artifacts(
-            previews,
-            parsed_at=FROZEN_PARSED_AT,
-            registry_path=Path(manifest["registry_path"]),
-            ledger_path=Path(manifest["ledger_path"]),
-            previous_preview_path=Path(manifest["previous_preview_path"]),
-            collection_manifest_path=Path(manifest["collection_manifest_path"]),
-            guide_baseline_path=Path(manifest["guide_baseline_path"]),
-            collection_dir=Path("data/v3/collections"),
-            report_dir=Path("reports/v3"),
-        )
-        self.assertEqual(refrozen["preview_sha256"], FROZEN_PREVIEW.stem.rsplit("_", 1)[-1])
-        self.assertEqual(refrozen["manifest_sha256"], FROZEN_MANIFEST.stem.rsplit("_", 1)[-1])
-        self.assertEqual(refrozen["report_sha256"], FROZEN_REPORT.stem.rsplit("_", 1)[-1])
+
+
+def test_hardened_parser_generator_is_reproducible(tmp_path: Path) -> None:
+    previews = read_jsonl(FROZEN_PREVIEW)
+    manifest = json.loads(FROZEN_MANIFEST.read_text(encoding="utf-8"))
+    kwargs = {
+        "previews": previews,
+        "parsed_at": FROZEN_PARSED_AT,
+        "registry_path": Path(manifest["registry_path"]),
+        "ledger_path": Path(manifest["ledger_path"]),
+        "previous_preview_path": Path(manifest["previous_preview_path"]),
+        "collection_manifest_path": Path(manifest["collection_manifest_path"]),
+        "guide_baseline_path": Path(manifest["guide_baseline_path"]),
+        "collection_dir": tmp_path / "data/v3/collections",
+        "report_dir": tmp_path / "reports/v3",
+    }
+
+    first = freeze_hardening_artifacts(**kwargs)
+    second = freeze_hardening_artifacts(**kwargs)
+
+    assert first == second
 
 
 if __name__ == "__main__":

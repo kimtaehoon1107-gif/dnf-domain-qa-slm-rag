@@ -372,7 +372,10 @@ def freeze_smoke_report(
     app_source_path: Path,
     review_contract_path: Path,
     draft_path: Path,
+    *,
+    artifact_root: Path | None = None,
 ) -> dict[str, Any]:
+    artifact_root = root if artifact_root is None else artifact_root.resolve()
     packet_rows = read_jsonl(packet_path)
     progress = review_progress(packet_rows)
     gates = {
@@ -430,7 +433,7 @@ def freeze_smoke_report(
             "final_blind_evaluation",
         ],
     }
-    reports_dir = root / "reports/v3"
+    reports_dir = artifact_root / "reports/v3"
     report_bytes = _canonical_json_bytes(report)
     report_sha = _sha256_bytes(report_bytes)
     report_path = reports_dir / f"entailment_review_ui_smoke_{report_sha}.json"

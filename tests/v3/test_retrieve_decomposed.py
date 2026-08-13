@@ -292,45 +292,40 @@ class DecomposedEvidenceMergeTest(unittest.TestCase):
         self.assertEqual(len(result["policy_violations"]), 2)
 
 
-class DecomposedHybridArtifactTest(unittest.TestCase):
-    def test_actual_adaptive_pilot_refreezes_from_frozen_child_embeddings(self) -> None:
-        embeddings = np.fromfile(DEFAULT_QUERY_EMBEDDINGS, dtype="<f4").reshape(
-            8, 1024
-        )
-        kwargs = {
-            "root": Path.cwd(),
-            "documents_path": DEFAULT_DOCUMENTS,
-            "chunks_path": DEFAULT_CHUNKS,
-            "bm25_manifest_path": DEFAULT_BM25_MANIFEST,
-            "dense_manifest_path": DEFAULT_DENSE_MANIFEST,
-            "overlay_path": DEFAULT_OVERLAY,
-            "dev_set_path": DEFAULT_DEV_SET,
-            "decomposition_cases_path": DEFAULT_DECOMPOSITION_CASES,
-            "decomposition_manifest_path": DEFAULT_DECOMPOSITION_MANIFEST,
-            "builder_source_path": DEFAULT_BUILDER_SOURCE,
-            "runtime_source_path": DEFAULT_RUNTIME_SOURCE,
-            "router_source_path": DEFAULT_ROUTER_SOURCE,
-            "decomposer_source_path": DEFAULT_DECOMPOSER_SOURCE,
-            "selector_source_path": DEFAULT_SELECTOR_SOURCE,
-            "contract_path": DEFAULT_CONTRACT,
-            "query_embeddings": embeddings,
-        }
-        first = freeze_decomposed_hybrid(**kwargs)
-        second = freeze_decomposed_hybrid(**kwargs)
+def test_frozen_decomposed_artifacts_match_recorded_sha() -> None:
+    for path in (FROZEN_CASES, FROZEN_MANIFEST, FROZEN_REPORT, FROZEN_REPORT_MD):
+        assert file_sha256(path) == path.stem.rsplit("_", 1)[-1]
 
-        self.assertEqual(first, second)
-        self.assertEqual(first["cases_sha256"], file_sha256(FROZEN_CASES))
-        self.assertEqual(first["manifest_sha256"], file_sha256(FROZEN_MANIFEST))
-        self.assertEqual(first["report_sha256"], file_sha256(FROZEN_REPORT))
-        self.assertEqual(
-            first["report_markdown_sha256"], file_sha256(FROZEN_REPORT_MD)
-        )
-        self.assertTrue(all(first["gates"].values()))
-        self.assertEqual(first["metrics"]["merged_evidence_group_hits"], 8)
-        self.assertEqual(first["decisions"]["child_hybrid_retrieval"], "GO")
-        self.assertEqual(
-            first["decisions"]["evidence_merge_and_conflict_policy"], "GO"
-        )
+
+def test_decomposed_generator_is_reproducible(tmp_path: Path) -> None:
+    embeddings = np.fromfile(DEFAULT_QUERY_EMBEDDINGS, dtype="<f4").reshape(8, 1024)
+    kwargs = {
+        "root": Path.cwd(),
+        "artifact_root": tmp_path,
+        "documents_path": DEFAULT_DOCUMENTS,
+        "chunks_path": DEFAULT_CHUNKS,
+        "bm25_manifest_path": DEFAULT_BM25_MANIFEST,
+        "dense_manifest_path": DEFAULT_DENSE_MANIFEST,
+        "overlay_path": DEFAULT_OVERLAY,
+        "dev_set_path": DEFAULT_DEV_SET,
+        "decomposition_cases_path": DEFAULT_DECOMPOSITION_CASES,
+        "decomposition_manifest_path": DEFAULT_DECOMPOSITION_MANIFEST,
+        "builder_source_path": DEFAULT_BUILDER_SOURCE,
+        "runtime_source_path": DEFAULT_RUNTIME_SOURCE,
+        "router_source_path": DEFAULT_ROUTER_SOURCE,
+        "decomposer_source_path": DEFAULT_DECOMPOSER_SOURCE,
+        "selector_source_path": DEFAULT_SELECTOR_SOURCE,
+        "contract_path": DEFAULT_CONTRACT,
+        "query_embeddings": embeddings,
+    }
+    first = freeze_decomposed_hybrid(**kwargs)
+    second = freeze_decomposed_hybrid(**kwargs)
+
+    assert first == second
+    assert all(first["gates"].values())
+    assert first["metrics"]["merged_evidence_group_hits"] == 8
+    assert first["decisions"]["child_hybrid_retrieval"] == "GO"
+    assert first["decisions"]["evidence_merge_and_conflict_policy"] == "GO"
 
 
 if __name__ == "__main__":

@@ -95,28 +95,28 @@ class AccountPolicyTemporalOverlayTest(unittest.TestCase):
             )
 
 
-class AccountPolicyTemporalArtifactTest(unittest.TestCase):
-    def test_actual_inputs_refreeze_deterministically(self) -> None:
-        kwargs = {
-            "root": Path.cwd(),
-            "documents_path": DEFAULT_DOCUMENTS,
-            "chunks_path": DEFAULT_CHUNKS,
-            "bm25_index_path": DEFAULT_BM25_INDEX,
-            "conflict_packet_path": DEFAULT_CONFLICT_PACKET,
-            "conflict_draft_path": DEFAULT_CONFLICT_DRAFT,
-            "builder_source_path": DEFAULT_BUILDER_SOURCE,
-            "search_source_path": DEFAULT_SEARCH_SOURCE,
-            "schema_source_path": DEFAULT_SCHEMA_SOURCE,
-            "contract_path": DEFAULT_CONTRACT,
-        }
-        first = freeze_temporal_policy(**kwargs)
-        second = freeze_temporal_policy(**kwargs)
-        self.assertEqual(first, second)
-        for key in ("overlay", "manifest", "report", "report_markdown"):
-            path = Path(first[f"{key}_path"])
-            self.assertEqual(file_sha256(path), first[f"{key}_sha256"])
-        self.assertEqual(first["decisions"]["current_policy_retrieval_filter"], "GO")
-        self.assertEqual(first["decisions"]["revision_conflict_human_review"], "CANCELLED")
+def test_actual_inputs_refreeze_deterministically(tmp_path: Path) -> None:
+    kwargs = {
+        "root": Path.cwd(),
+        "artifact_root": tmp_path,
+        "documents_path": DEFAULT_DOCUMENTS,
+        "chunks_path": DEFAULT_CHUNKS,
+        "bm25_index_path": DEFAULT_BM25_INDEX,
+        "conflict_packet_path": DEFAULT_CONFLICT_PACKET,
+        "conflict_draft_path": DEFAULT_CONFLICT_DRAFT,
+        "builder_source_path": DEFAULT_BUILDER_SOURCE,
+        "search_source_path": DEFAULT_SEARCH_SOURCE,
+        "schema_source_path": DEFAULT_SCHEMA_SOURCE,
+        "contract_path": DEFAULT_CONTRACT,
+    }
+    first = freeze_temporal_policy(**kwargs)
+    second = freeze_temporal_policy(**kwargs)
+    assert first == second
+    for key in ("overlay", "manifest", "report", "report_markdown"):
+        path = Path(first[f"{key}_path"])
+        assert file_sha256(path) == first[f"{key}_sha256"]
+    assert first["decisions"]["current_policy_retrieval_filter"] == "GO"
+    assert first["decisions"]["revision_conflict_human_review"] == "CANCELLED"
 
 
 if __name__ == "__main__":

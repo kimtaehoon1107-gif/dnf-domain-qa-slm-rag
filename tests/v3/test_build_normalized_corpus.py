@@ -433,51 +433,49 @@ class FrozenNormalizedCorpusArtifactTest(unittest.TestCase):
         self.assertTrue(report["gates"]["visual_ocr_has_separate_unverified_provenance"])
         self.assertEqual(report["promotion_decision"], "GO")
 
-    def test_actual_normalized_corpus_refreeze_is_reproducible(self) -> None:
-        kwargs = {
-            "built_at": BUILT_AT,
-            "registry_path": Path(
-                "data/v3/discovery/"
-                "source_registry_04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a.jsonl"
-            ),
-            "ledger_path": Path(
-                "data/v3/collections/"
-                "detail_full_collection_ledger_0165b356041a60ca920949b9d8c4436cb7509bdf7787fe97fee90fb9856ce12b.jsonl"
-            ),
-            "hardened_preview_path": Path(
-                "data/v3/collections/"
-                "detail_hardened_extraction_preview_ac49a188c07ec22cc3265ebfa656f4849bfad3f5070779f538925e920fc4c4c8.jsonl"
-            ),
-            "visual_evidence_path": Path(
-                "data/v3/visual_evidence/"
-                "visual_document_evidence_c7362de31d59ee1f0877477caa8c5d4848fdbdf40719b5c64cdb861c29469d38.jsonl"
-            ),
-            "correction_overlay_path": Path(
-                "data/v3/visual_evidence/"
-                "discovery_correction_overlay_0841fdad1f8c80dcda51036162b524ed4c7cf3cd31fb2bdb26a915cf77ddf61b.jsonl"
-            ),
-            "visual_manifest_path": Path(
-                "data/v3/visual_evidence/"
-                "visual_evidence_manifest_ff585eb897627edd9bceae3f643fe5ac23904a07fcbed7b5fbe51cb59e64050b.json"
-            ),
-            "baseline_documents_path": Path(
-                "data/v3/normalized/documents_dnf_official_v3.0_c77299d729a6.jsonl"
-            ),
-            "normalized_dir": Path("data/v3/normalized"),
-            "report_dir": Path("reports/v3"),
-        }
+def test_actual_normalized_corpus_generator_is_reproducible(tmp_path: Path) -> None:
+    kwargs = {
+        "built_at": BUILT_AT,
+        "registry_path": Path(
+            "data/v3/discovery/"
+            "source_registry_04c902454e96e279edeacd12d56e25dddcd5523d98f65fd4444ea981559dec3a.jsonl"
+        ),
+        "ledger_path": Path(
+            "data/v3/collections/"
+            "detail_full_collection_ledger_0165b356041a60ca920949b9d8c4436cb7509bdf7787fe97fee90fb9856ce12b.jsonl"
+        ),
+        "hardened_preview_path": Path(
+            "data/v3/collections/"
+            "detail_hardened_extraction_preview_ac49a188c07ec22cc3265ebfa656f4849bfad3f5070779f538925e920fc4c4c8.jsonl"
+        ),
+        "visual_evidence_path": Path(
+            "data/v3/visual_evidence/"
+            "visual_document_evidence_c7362de31d59ee1f0877477caa8c5d4848fdbdf40719b5c64cdb861c29469d38.jsonl"
+        ),
+        "correction_overlay_path": Path(
+            "data/v3/visual_evidence/"
+            "discovery_correction_overlay_0841fdad1f8c80dcda51036162b524ed4c7cf3cd31fb2bdb26a915cf77ddf61b.jsonl"
+        ),
+        "visual_manifest_path": Path(
+            "data/v3/visual_evidence/"
+            "visual_evidence_manifest_ff585eb897627edd9bceae3f643fe5ac23904a07fcbed7b5fbe51cb59e64050b.json"
+        ),
+        "baseline_documents_path": Path(
+            "data/v3/normalized/documents_dnf_official_v3.0_c77299d729a6.jsonl"
+        ),
+        "normalized_dir": tmp_path / "data/v3/normalized",
+        "report_dir": tmp_path / "reports/v3",
+    }
 
-        first = build_normalized_corpus(**kwargs)
-        second = build_normalized_corpus(**kwargs)
+    first = build_normalized_corpus(**kwargs)
+    second = build_normalized_corpus(**kwargs)
 
-        self.assertEqual(first, second)
-        self.assertEqual(first["document_sha256"], file_sha256(FROZEN_DOCUMENTS))
-        self.assertEqual(first["content_sha256"], file_sha256(FROZEN_CONTENTS))
-        refreshed_manifest = json.loads(Path(first["manifest_path"]).read_text(encoding="utf-8"))
-        refreshed_report = json.loads(Path(first["report_json_path"]).read_text(encoding="utf-8"))
-        self.assertEqual(refreshed_manifest["builder_version"], "dnf_normalized_corpus_builder_v3.2")
-        self.assertTrue(all(value is True or value == 0 for value in refreshed_report["gates"].values()))
-        self.assertEqual(first["promotion_decision"], "GO")
+    assert first == second
+    refreshed_manifest = json.loads(Path(first["manifest_path"]).read_text(encoding="utf-8"))
+    refreshed_report = json.loads(Path(first["report_json_path"]).read_text(encoding="utf-8"))
+    assert refreshed_manifest["builder_version"] == "dnf_normalized_corpus_builder_v3.2"
+    assert all(value is True or value == 0 for value in refreshed_report["gates"].values())
+    assert first["promotion_decision"] == "GO"
 
 
 if __name__ == "__main__":

@@ -104,9 +104,9 @@ def test_mileage_case_expands_only_to_event_and_shop_and_uses_no_gold_decision()
     assert row["gold_ids_available_to_trigger_or_commit"] is False
 
 
-def test_freeze_is_content_addressed_and_reproducible():
-    first = evaluate_and_freeze(ROOT)
-    second = evaluate_and_freeze(ROOT)
+def test_freeze_is_content_addressed_and_reproducible(tmp_path: Path):
+    first = evaluate_and_freeze(ROOT, artifact_root=tmp_path)
+    second = evaluate_and_freeze(ROOT, artifact_root=tmp_path)
 
     assert first["cases_sha256"] == second["cases_sha256"]
     assert first["report_json_sha256"] == second["report_json_sha256"]
