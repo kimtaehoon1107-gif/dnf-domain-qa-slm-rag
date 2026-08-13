@@ -17,7 +17,7 @@ jobs:
           python-version: "3.14"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements-lock.txt
 
       - name: Run v3 regression suite
         run: python -m pytest tests/v3 -q
