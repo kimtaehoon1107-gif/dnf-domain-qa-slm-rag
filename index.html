@@ -161,6 +161,8 @@
     .metric + .metric { padding-left: 28px; border-left: 1px solid var(--line); }
     .metric strong { display: block; color: var(--nexon-deep-blue); font-size: clamp(1.45rem, 3vw, 2.1rem); line-height: 1.1; letter-spacing: -0.04em; }
     .metric span { display: block; margin-top: 7px; color: var(--muted); font-size: 0.8rem; }
+    .metric-badge-link { display: inline-block; }
+    .metric-badge { height: 28px; width: auto; vertical-align: middle; }
 
     .section { padding: 100px 0; }
     .section-soft { background: var(--soft); }
@@ -363,7 +365,7 @@
       <div class="shell metrics">
         <div class="metric"><strong>996</strong><span>공식 문서</span></div>
         <div class="metric"><strong>3,925</strong><span>검색용 청크</span></div>
-        <div class="metric"><strong>1,378</strong><span>clean-clone 회귀 통과(0 failed)</span></div>
+        <div class="metric"><strong><a class="metric-badge-link" href="https://github.com/kimtaehoon1107-gif/dnf-domain-qa-slm-rag/actions/workflows/tests.yml"><img class="metric-badge" src="https://github.com/kimtaehoon1107-gif/dnf-domain-qa-slm-rag/actions/workflows/tests.yml/badge.svg" alt="tests workflow status" /></a></strong><span>전체 회귀(실시간, README 상세)</span></div>
         <div class="metric"><strong>0</strong><span>유료 생성 API 호출</span></div>
       </div>
     </section>
