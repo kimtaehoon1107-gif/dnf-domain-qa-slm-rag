@@ -19,10 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-This license covers the source code only (`src/`, `app/`, `tests/`, and other
-project code). It does not cover the contents of `data/`, which are collected
-from the official Dungeon & Fighter website operated by Neople and remain the
-property of Neople Inc. See the Data Source Notice in README.md for terms.

@@ -82,7 +82,9 @@ python -m pytest tests/v3 -q
 
 ## Data Source Notice
 
-The documents under `data/` are collected from the official Dungeon & Fighter
+The [LICENSE](LICENSE) (MIT) covers the source code only (`src/`, `app/`,
+`tests/`, and other project code). It does not cover the contents of `data/`:
+the documents under `data/` are collected from the official Dungeon & Fighter
 website operated by Neople. All game content and original document text are the
 property of Neople Inc. They are included here solely for non-commercial
 research and educational purposes (document-grounded QA evaluation). If you are
