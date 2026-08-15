@@ -2,7 +2,7 @@ name: tests
 
 on:
   push:
-    branches: [main, codex/rag-v3-corpus-foundation]
+    branches: [main]
   pull_request:
     branches: [main]
 
