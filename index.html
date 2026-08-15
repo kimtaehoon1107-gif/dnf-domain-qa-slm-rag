@@ -303,6 +303,28 @@
       html { scroll-behavior: auto; }
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
+
+    @media print {
+      @page { size: A4; margin: 14mm; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      .skip-link, .menu-button, .copy-button, .nav-links { display: none !important; }
+      .site-header { position: static !important; backdrop-filter: none !important; }
+      html { scroll-behavior: auto; }
+      .hero-grid, .demo-grid, .reproduce { grid-template-columns: 1fr !important; gap: 24px !important; }
+      .pipeline, .problem-grid, .evaluation-grid, .limits-grid { grid-template-columns: repeat(2, 1fr) !important; }
+      .timeline { grid-template-columns: 1fr !important; }
+      .metrics { grid-template-columns: repeat(2, 1fr) !important; }
+      .failure-card { grid-template-columns: 1fr !important; }
+      .section { padding: 26px 0 !important; }
+      .hero { padding: 0 0 26px !important; }
+      .problem-card, .pipe-step, .timeline-card, .score-card, .failure-card,
+      .limit-card, .code-card, .answer-card, .table-card, .metric {
+        break-inside: avoid;
+      }
+      h1, h2, h3, .section-head { break-after: avoid; }
+      .code-card { overflow-x: visible; white-space: pre-wrap; }
+      .code-card code { white-space: pre-wrap; word-break: break-all; }
+    }
   </style>
 </head>
 <body>
