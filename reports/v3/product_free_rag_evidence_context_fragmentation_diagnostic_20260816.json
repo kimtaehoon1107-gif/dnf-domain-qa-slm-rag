@@ -1,0 +1,69 @@
+{
+  "type": "diagnostic",
+  "purpose": "Check whether splitting a single source chunk into multiple narrow evidence_refs (vs keeping it as one context-rich unit) causes condition/subject binding errors already observed in sealed A6 (slot 2, A6-7/slot 7). No sealed artifacts touched. No frozen chunk IDs reused as citations. Direct calls to build_product_prompt / _generate_product_output_native against a live qwen3-8b:ctx8192 (temperature=0).",
+  "case_slot2_maintenance_time": {
+    "question": "2025년 8월 12일 퍼스트서버 초기화 점검은 몇 시에 시작하고 서버는 어느 날 다시 열릴 예정이었어?",
+    "source_chunk": "chunk_sha256_ad9fe6ce44df819f0d55d310a1b1b7ab60136e1fca54d9ba0434c3b960441547",
+    "fragmented_evidence": {
+      "E1": "2025.08.12 14:00",
+      "E2": "8월 12일 15시부터 퍼스트 서버 초기화 및 점검이 진행될 예정이오니 이 점 참고하여 주시기 바랍니다.",
+      "E3": "퍼스트서버 오픈 일정은 8월 13일(수)입니다."
+    },
+    "fragmented_result": {
+      "mode": "answer",
+      "claims": [
+        {"text": "2025년 8월 12일 퍼스트서버 초기화 점검은 14시에 시작한다.", "evidence_refs": ["E1"]},
+        {"text": "2025년 8월 12일 퍼스트서버 초기화 점검 후 서버는 8월 13일 다시 열린다.", "evidence_refs": ["E3"]}
+      ],
+      "verdict": "WRONG - 14:00 is the post metadata timestamp, not the maintenance start time (15:00). Matches the real sealed A6 slot 2 failure mode.",
+      "latency_ms": 8235.873
+    },
+    "merged_context_evidence": {
+      "E1": "### 공지사항\n퍼스트서버\n8월 12일 퍼스트서버 초기화 및 점검 안내\n2025.08.12 14:00\n37,477\n안녕하세요. 던전앤파이터 퍼섭지기입니다.\n8월 12일 15시부터 퍼스트 서버 초기화 및 점검이 진행될 예정이오니 이 점 참고하여 주시기 바랍니다. 퍼스트서버 오픈 일정은 8월 13일(수)입니다.\n그리고 앞으로의 퍼스트서버는 라이브 서버 오픈 시 종료될 예정입니다."
+    },
+    "merged_context_result": {
+      "mode": "answer",
+      "claims": [
+        {"text": "2025년 8월 12일 퍼스트서버 초기화 점검은 15시에 시작한다.", "evidence_refs": ["E1"]},
+        {"text": "2025년 8월 12일 퍼스트서버 초기화 점검 후 서버는 8월 13일 다시 열린다.", "evidence_refs": ["E1"]}
+      ],
+      "verdict": "CORRECT - model correctly identified 14:00 as a post-header timestamp once title/view-count/body stayed in one block.",
+      "latency_ms": 5788.692
+    }
+  },
+  "case_a6_7_tide_bound": {
+    "question": "타이드 바운드 쿨타임이 어떻게 바뀌었어? 그리고 '질풍' 스킬 개화 옵션이 적용된 타이드 바운드의 쿨타임은 어떻게 바뀌었어?",
+    "note": "Question wording is a reconstruction of the two-part ask described in section 9-2, not the literal frozen A6-7 question text.",
+    "split_evidence_result": {
+      "mode": "answer",
+      "claims": [
+        {"text": "타이드 바운드의 기본 쿨타임은 20초에서 18초로 감소했습니다.", "evidence_refs": ["E2"]},
+        {"text": "타이드 바운드의 기본 쿨타임은 12초에서 9초로 감소했습니다.", "evidence_refs": ["E1"]},
+        {"text": "타이드 바운드의 '질풍' 스킬 개화 옵션이 적용된 쿨타임은 12초에서 9초로 감소했습니다.", "evidence_refs": ["E1"]}
+      ],
+      "verdict": "PARTIALLY WRONG - correct claims 1 and 3, but an extra spurious duplicate claim (2) mislabels the gale-option value as the base value.",
+      "latency_ms": 9749.327
+    },
+    "split_evidence_thinking_true_result": {
+      "mode": "answer",
+      "claims": [
+        {"text": "타이드 바운드의 쿨타임은 20초에서 18초로 감소했습니다.", "evidence_refs": ["E2"]},
+        {"text": "'질풍' 스킬 개화 옵션이 적용된 타이드 바운드의 쿨타임은 9초로 변경되었습니다.", "evidence_refs": ["E1"]}
+      ],
+      "verdict": "CORRECT - no duplicate, but thinking trace shows extended back-and-forth uncertainty before landing on the right split.",
+      "latency_ms": 35930.809,
+      "note": "Latency alone would breach the project's own p95<=30s safety gate for a single call."
+    },
+    "merged_context_result_think_false": {
+      "mode": "answer",
+      "claims": [
+        {"text": "타이드 바운드의 쿨타임은 20초에서 18초로 감소했습니다.", "evidence_refs": ["E1"]},
+        {"text": "질풍 스킬 개화 옵션이 적용된 타이드 바운드의 쿨타임은 기본 쿨타임 9초로 변경되었습니다.", "evidence_refs": ["E1"]}
+      ],
+      "verdict": "CORRECT - same quality as thinking=true, without the latency cost.",
+      "latency_ms": 8618.748
+    }
+  },
+  "conclusion": "For these two cases, merging adjacent source text into one context-rich evidence unit removed the same binding error that thinking=true also removed, at roughly 1/4 the latency of thinking=true and with no extra prompt-engineering. This points at evidence-pack construction (how atomic units are split) as a more actionable lever than model-side fixes for this failure class. Not yet implemented in src/v3/product_free_rag.py; scoped as future work.",
+  "not_applicable": "A separate slot-1 case (퀵계좌이체 payment limits) was tested the same way but is a different failure class: the correct row for 퀵계좌이체 does not exist at all in the retrieved comparison table, so no amount of context-merging fixes it — that one is a retrieval/coverage gap, not a fragmentation problem."
+}
